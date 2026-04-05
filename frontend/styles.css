@@ -34,7 +34,7 @@ button:active, a:active {
     background-color: #41b1c5;
 }
 
-#backend {
+#backend-ssr, #api-estado {
     background-color: #ff7519e1;
 }
 

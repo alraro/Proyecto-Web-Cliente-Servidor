@@ -10,8 +10,8 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class ApiController {
 
-    @GetMapping("/estado")
+    @GetMapping("/ejemplo")
     public List<String> obtenerEstado() {
-        return List.of("Servidor OK", "Base de datos conectada", "Despliegue activo");
+        return List.of("Backend funcionando correctamente", "API de ejemplo");
     }
 }
