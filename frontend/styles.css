@@ -6,7 +6,7 @@
     font-family: 'Arial', sans-serif;
 }
 
-#incrementar {
+button, a {
     background-color: #4CAF50;
     color: white;
     padding: 15px 32px;
@@ -16,10 +16,30 @@
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid black;
+    border-radius: 10px;
 }
 
-#incrementador:hover {
-    background-color: #45a049;
+button:hover, a:hover {
+    transform: scale(1.1);
+}
+
+button:active, a:active {
+    transform: scale(0.909);
+    filter: brightness(0.8);
+}
+
+#frontend {
+    background-color: #41b1c5;
+}
+
+#backend {
+    background-color: #ff7519e1;
+}
+
+#adminer {
+    background-color: #a312c0;
 }
 
 #bloque-contar {
