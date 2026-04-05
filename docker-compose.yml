@@ -1,0 +1,51 @@
+services:
+  frontend:
+    container_name: nginx-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - ${FRONTEND_PORT:-80}:80
+    depends_on:
+      - backend
+  
+  database:
+    image: postgres:15-alpine
+    container_name: postgres-database
+    env_file:
+      - ./.env
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer-postgres
+    env_file:
+      - ./.env
+    ports:
+      - ${ADMINER_PORT:-8081}:8080
+    depends_on:
+      - database
+  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spring-boot-backend
+    env_file:
+      - ./.env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - ${BACKEND_PORT:-8080}:8080
+    depends_on:
+      - database
+
+volumes:
+  postgres_data:

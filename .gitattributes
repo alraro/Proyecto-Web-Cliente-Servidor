@@ -1,0 +1,5 @@
+# Forzar LF en el wrapper de Maven sin importar en qué subcarpeta esté
+**/mvnw text eol=lf
+
+# Forzar CRLF en los scripts de Windows sin importar la subcarpeta
+**/*.cmd text eol=crlf

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio del frontend</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Bienvenido a la página del putísimo bancosol</h1>
+    <nav>
+        <a id="frontend" href="http://localhost:80" target="_blank">Frontend</a>
+        <a id="backend-ssr" href="http://localhost:8080/inicio" target="_blank">Backend (Server Side Rendering)</a>
+        <a id="api-estado" href="http://localhost:8080/api/v1/ejemplo" target="_blank">Backend (API)</a>
+        <a id="adminer" href="http://localhost:8081" target="_blank">Base de datos (adminer)</a>
+    </nav>
+    <p>Esto está siendo desplegado por un contendor de nginx.</p>
+    <div id="bloque-contar">
+        <p>Contador para testear el js: <span id="counter">0</span></p>
+        <button id="incrementar">Dame un click</button>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
