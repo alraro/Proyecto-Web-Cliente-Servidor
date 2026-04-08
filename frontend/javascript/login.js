@@ -4,6 +4,8 @@ const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
 
@@ -15,7 +17,7 @@ togglePasswordButton.addEventListener('click', () => {
     );
 });
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const email = emailInput.value.trim();
@@ -30,7 +32,7 @@ form.addEventListener('submit', (event) => {
     }
 
     if (!emailInput.validity.valid) {
-        message.textContent = 'Ingresa un correo o usuario válido.';
+        message.textContent = 'Ingresa un correo valido.';
         message.classList.add('is-error');
         emailInput.focus();
         return;
@@ -43,6 +45,30 @@ form.addEventListener('submit', (event) => {
         return;
     }
 
-    message.textContent = 'Validación correcta. Puedes conectar aquí la entrada real al sistema.';
-    message.classList.add('is-success');
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+            }),
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+            message.textContent = payload.message || 'No se pudo iniciar sesion.';
+            message.classList.add('is-error');
+            return;
+        }
+
+        message.textContent = `Bienvenido/a ${payload.nombre}. Login correcto.`;
+        message.classList.add('is-success');
+    } catch {
+        message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
+        message.classList.add('is-error');
+    }
 });
