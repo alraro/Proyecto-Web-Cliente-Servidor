@@ -5,6 +5,37 @@ const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
 const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const AUTH_TOKEN_KEY = 'bancosol_auth_token';
+
+async function comprobarSesionActiva() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            return;
+        }
+
+        const payload = await response.json();
+        message.textContent = `Sesion activa de ${payload.nombre}.`;
+        message.classList.remove('is-error');
+        message.classList.add('is-success');
+    } catch {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+}
+
+comprobarSesionActiva();
 
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
@@ -63,6 +94,10 @@ form.addEventListener('submit', async (event) => {
             message.textContent = payload.message || 'No se pudo iniciar sesion.';
             message.classList.add('is-error');
             return;
+        }
+
+        if (payload.token) {
+            localStorage.setItem(AUTH_TOKEN_KEY, payload.token);
         }
 
         message.textContent = `Bienvenido/a ${payload.nombre}. Login correcto.`;
