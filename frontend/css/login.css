@@ -330,6 +330,13 @@ body {
     color: #1d7c43;
 }
 
+.auth-switch {
+    margin: 1rem 0 0;
+    font-size: 0.95rem;
+    text-align: center;
+    color: rgba(53, 51, 53, 0.72);
+}
+
 .security-note {
     display: flex;
     align-items: center;
