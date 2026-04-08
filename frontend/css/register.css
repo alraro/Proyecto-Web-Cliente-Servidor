@@ -1,0 +1,41 @@
+@import url('login.css');
+
+.login-card {
+    max-width: 540px;
+}
+
+.register-form .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1rem;
+    margin-top: 1rem;
+}
+
+.register-form .field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-form .field-group label {
+    margin: 0 0 0.45rem;
+}
+
+.register-form .field-group .input-shell {
+    margin-top: 0;
+}
+
+.register-form .full-width {
+    grid-column: 1 / -1;
+}
+
+.register-form .help-text {
+    margin: -0.3rem 0 0;
+    font-size: 0.86rem;
+    color: rgba(53, 51, 53, 0.62);
+}
+
+@media (max-width: 640px) {
+    .register-form .field-grid {
+        grid-template-columns: 1fr;
+    }
+}
