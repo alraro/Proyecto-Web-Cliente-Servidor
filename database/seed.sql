@@ -1,3 +1,7 @@
+-- TODO: CAMPAÑAS INVENTADAS COMPLETAMENTE PARA QUE FUNCIONE EL PROGRAMA
+INSERT INTO Campana (ID_Campana, Nombre, Tipo, Fecha_inicio, Fecha_fin) VALUES (1, 'Recogida Primavera 2026', 'Primavera', '2026-05-01', '2026-05-31');
+INSERT INTO Campana (ID_Campana, Nombre, Tipo, Fecha_inicio, Fecha_fin) VALUES (2, 'Gran Recogida Invierno', 'GR', '2026-11-20', '2026-11-22');
+
 INSERT INTO Cadena (ID_Cadena, Nombre, Codigo, Participa) VALUES (1, 'CARREFOUR', 'CAD-001', TRUE);
 INSERT INTO Cadena (ID_Cadena, Nombre, Codigo, Participa) VALUES (2, 'DIA', 'CAD-002', TRUE);
 INSERT INTO Cadena (ID_Cadena, Nombre, Codigo, Participa) VALUES (3, 'EL CORTE INGLES', 'CAD-003', TRUE);
