@@ -49,6 +49,12 @@ button {
     gap: 0.9rem;
 }
 
+.brand .logo {
+    display: block;
+    width: clamp(150px, 26vw, 220px);
+    height: auto;
+}
+
 .brand-mark {
     width: 52px;
     height: 52px;
@@ -89,6 +95,28 @@ button {
     align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
+}
+
+.site-footer {
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    padding: 1rem 1.5rem 1.25rem;
+    border-top: 1px solid rgba(42, 40, 106, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.site-footer .logo {
+    display: block;
+    width: clamp(130px, 20vw, 190px);
+    height: auto;
+}
+
+.site-footer p {
+    margin: 0;
+    color: rgba(53, 51, 53, 0.8);
 }
 
 .main-nav a,
@@ -450,5 +478,12 @@ button {
     .hero-panel,
     .section-block {
         padding: 1rem;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }

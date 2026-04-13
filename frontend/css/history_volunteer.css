@@ -44,6 +44,12 @@ a {
     gap: 0.9rem;
 }
 
+.brand .logo {
+    display: block;
+    width: clamp(150px, 26vw, 220px);
+    height: auto;
+}
+
 .brand-mark {
     width: 52px;
     height: 52px;
@@ -71,6 +77,28 @@ a {
     align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
+}
+
+.site-footer {
+    max-width: 1200px;
+    margin: 0 auto 1.2rem;
+    padding: 0 1.5rem;
+    border-top: 1px solid rgba(42, 40, 106, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.site-footer .logo {
+    display: block;
+    width: clamp(130px, 20vw, 190px);
+    height: auto;
+}
+
+.site-footer p {
+    margin: 0;
+    color: rgba(53, 51, 53, 0.78);
 }
 
 .main-nav a {
@@ -321,5 +349,11 @@ select {
 
     .history-card {
         padding: 1rem;
+    }
+
+    .site-footer {
+        padding: 0 1rem;
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

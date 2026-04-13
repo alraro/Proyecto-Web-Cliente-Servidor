@@ -30,10 +30,25 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.25rem 2rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.brand .logo {
+    display: block;
+    width: clamp(150px, 23vw, 200px);
+    height: auto;
 }
 
 .main-nav-login {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 0.75rem;
+    margin-top: 0.45rem;
 }
 
 .main-nav-login a {
@@ -153,6 +168,12 @@ body {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.brand-lockup .logo {
+    display: block;
+    width: 78px;
+    height: auto;
 }
 
 .brand-mark {
@@ -348,6 +369,28 @@ body {
     font-size: 0.9rem;
 }
 
+.site-footer {
+    max-width: 1200px;
+    margin: 0 auto 1.2rem;
+    padding: 0 2rem;
+    border-top: 1px solid rgba(42, 40, 106, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.site-footer .logo {
+    display: block;
+    width: clamp(130px, 20vw, 180px);
+    height: auto;
+}
+
+.site-footer p {
+    margin: 0;
+    color: rgba(53, 51, 53, 0.78);
+}
+
 .security-dot {
     width: 12px;
     height: 12px;
@@ -360,6 +403,11 @@ body {
     .topbar-login {
         flex-wrap: wrap;
         gap: 1rem;
+    }
+
+    .main-nav-login {
+        margin-top: 0;
+        justify-content: flex-start;
     }
 
     .login-page {
@@ -407,5 +455,11 @@ body {
 
     .card-copy h2 {
         font-size: 1.7rem;
+    }
+
+    .site-footer {
+        padding: 0 1rem;
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
