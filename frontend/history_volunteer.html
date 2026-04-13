@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Historial de participación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/history_volunteer.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html" aria-label="Bancosol inicio">
+            <span class="brand-mark">BS</span>
+            <span>
+                <strong>Bancosol</strong>
+                <small>Banco de alimentos</small>
+            </span>
+        </a>
+
+        <nav class="main-nav" id="main-nav">
+            <a href="index.html">Inicio</a>
+            <a href="index.html#servicios">Campañas</a>
+            <a href="history.html" aria-current="page">Historial</a>
+            <a href="index.html#contacto">Contacto</a>
+            <a class="nav-cta" href="login.html">Iniciar sesión</a>
+        </nav>
+    </header>
+
+    <main class="history-page">
+        <section class="history-hero" aria-labelledby="history-title">
+            <p class="eyebrow">Participación de voluntariado</p>
+            <h1 id="history-title">Consultar historial de campañas y turnos</h1>
+            <p>Busca por identificador de voluntario y revisa en una vista paginada todas las campañas en las que ha participado, con detalle de turnos registrados.</p>
+        </section>
+
+        <section class="history-card" aria-labelledby="filters-title">
+            <div class="card-head">
+                <h2 id="filters-title">Consulta de historial</h2>
+                <p>Los resultados se cargan desde <code>GET /api/volunteers/:id/history</code>.</p>
+            </div>
+
+            <form id="history-filter-form" class="filter-form" novalidate>
+                <div class="field-group">
+                    <label for="volunteer-id">ID voluntario</label>
+                    <input id="volunteer-id" name="volunteerId" type="text" placeholder="Ej. 12" required>
+                </div>
+
+                <button type="submit" class="primary-button">Buscar historial</button>
+            </form>
+
+            <p id="history-message" class="history-message" role="status" aria-live="polite"></p>
+
+            <div class="history-meta" id="history-meta"></div>
+
+            <div class="table-wrap">
+                <table class="history-table" aria-label="Historial de campañas">
+                    <thead>
+                        <tr>
+                            <th>Campaña</th>
+                            <th>Estado</th>
+                            <th>Turnos realizados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <tr>
+                            <td colspan="3" class="empty-state">Sin datos cargados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" aria-label="Paginación historial">
+                <button type="button" id="prev-page" class="secondary-button" disabled>Anterior</button>
+                <span id="page-indicator">Página 1</span>
+                <button type="button" id="next-page" class="secondary-button" disabled>Siguiente</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="javascript/history.js"></script>
+</body>
+</html>
