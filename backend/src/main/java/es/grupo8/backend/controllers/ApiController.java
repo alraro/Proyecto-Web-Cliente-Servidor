@@ -1,9 +1,5 @@
 package es.grupo8.backend.controllers;
 
-import es.grupo8.backend.dto.LoginRequest;
-import es.grupo8.backend.dto.LoginResponse;
-import es.grupo8.backend.dto.RegisterRequest;
-import es.grupo8.backend.services.JwtService;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
