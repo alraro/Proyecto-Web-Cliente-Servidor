@@ -3,22 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio del frontend</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Bancosol | Gestión de campañas</title>
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <h1>Bienvenido a la página de bancosol</h1>
-    <nav>
-        <a id="frontend" href="http://localhost:80" target="_blank">Frontend</a>
-        <a id="backend-ssr" href="http://localhost:8080/inicio" target="_blank">Backend (Server Side Rendering)</a>
-        <a id="api-estado" href="http://localhost:8080/api/v1/ejemplo" target="_blank">Backend (API)</a>
-        <a id="adminer" href="http://localhost:8081" target="_blank">Base de datos (adminer)</a>
-    </nav>
-    <p>Esto está siendo desplegado por un contendor de nginx.</p>
-    <div id="bloque-contar">
-        <p>Contador para testear el js: <span id="counter">0</span></p>
-        <button id="incrementar">Dame un click</button>
-    </div>
-    <script src="index.js"></script>
+    <header class="topbar">
+        <a class="brand" href="index.html" aria-label="Bancosol inicio">
+            <span class="brand-mark">BS</span>
+            <span>
+                <strong>Bancosol</strong>
+                <small>Banco de alimentos</small>
+            </span>
+        </a>
+
+        <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="main-nav">Menú</button>
+
+        <nav class="main-nav" id="main-nav">
+            <a href="#servicios">Campañas</a>
+            <a href="#seguridad">Impacto</a>
+            <a href="#contacto">Contacto</a>
+            <a class="nav-cta" href="login.html">Iniciar sesión</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">Gestión social y solidaria</span>
+                <h1>Coordina campañas, donaciones y entidades colaboradoras desde un solo lugar.</h1>
+                <p>
+                    Una plataforma pensada para planificar campañas, registrar excedentes, organizar voluntariado y
+                    hacer seguimiento del impacto social de cada acción.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="primary-action" href="login.html">Acceder a gestión</a>
+                    <a class="secondary-action" href="#servicios">Ver campañas</a>
+                </div>
+
+                <div class="hero-stats" aria-label="Indicadores principales">
+                    <article>
+                        <strong>Campañas</strong>
+                        <span>Planificación y seguimiento</span>
+                    </article>
+                    <article>
+                        <strong>Donaciones</strong>
+                        <span>Registro de excedentes recibidos</span>
+                    </article>
+                    <article>
+                        <strong>Entidades</strong>
+                        <span>Coordinación con organizaciones sociales</span>
+                    </article>
+                </div>
+            </div>
+
+            <aside class="hero-panel" aria-label="Resumen de acceso">
+                <div class="panel-card panel-card-dark">
+                    <p>Campaña activa</p>
+                    <h2>Recogida solidaria</h2>
+                    <span>Semana en curso</span>
+                </div>
+
+                <div class="panel-card">
+                    <p>Últimas acciones</p>
+                    <ul>
+                        <li><span>Recepción de alimentos</span><strong>+480 kg</strong></li>
+                        <li><span>Clasificación de productos</span><strong>+12 lotes</strong></li>
+                        <li><span>Entrega a entidad social</span><strong>+8 cajas</strong></li>
+                    </ul>
+                </div>
+
+                <div class="quick-access">
+                    <button type="button" data-service="Nueva campaña">Nueva campaña</button>
+                    <button type="button" data-service="Registrar donación">Registrar donación</button>
+                    <button type="button" data-service="Asignar reparto">Asignar reparto</button>
+                </div>
+
+                <p class="panel-message" id="panel-message">Selecciona una acción rápida para ver la opción destacada.</p>
+            </aside>
+        </section>
+
+        <section class="section-block" id="servicios">
+            <div class="section-heading">
+                <span class="eyebrow">Campañas</span>
+                <h2>Herramientas para organizar cada fase de la gestión</h2>
+            </div>
+
+            <div class="service-grid">
+                <article>
+                    <h3>Planificación de campañas</h3>
+                    <p>Define objetivos, fechas, recursos y responsables para cada campaña.</p>
+                </article>
+                <article>
+                    <h3>Inventario y almacén</h3>
+                    <p>Controla entradas, salidas, clasificación y stock de alimentos aptos para consumo.</p>
+                </article>
+                <article>
+                    <h3>Entidades y voluntariado</h3>
+                    <p>Coordina la entrega a entidades sociales y organiza equipos de apoyo.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-block section-highlight" id="seguridad">
+            <div>
+                <span class="eyebrow">Impacto</span>
+                <h2>Transparencia para medir el alcance social de cada campaña</h2>
+                <p>
+                    Seguimiento de alimentos recuperados, entidades atendidas y resultados de cada acción solidaria para
+                    facilitar la toma de decisiones.
+                </p>
+            </div>
+            <div class="security-pillars">
+                <article>
+                    <strong>Registro fiable</strong>
+                    <span>Datos ordenados y trazables de cada movimiento.</span>
+                </article>
+                <article>
+                    <strong>Seguimiento</strong>
+                    <span>Indicadores claros sobre campañas y reparto.</span>
+                </article>
+                <article>
+                    <strong>Colaboración</strong>
+                    <span>Trabajo coordinado entre equipos y entidades.</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-block contact-strip" id="contacto">
+            <div>
+                <span class="eyebrow">Contacto</span>
+                <h2>¿Necesitas coordinar una campaña?</h2>
+                <p>Accede al panel de gestión o contacta con el equipo para organizar donaciones, logística y distribución.</p>
+            </div>
+            <a class="primary-action" href="login.html">Ir al acceso</a>
+        </section>
+    </main>
+
+    <script src="javascript/index.js"></script>
 </body>
 </html>
