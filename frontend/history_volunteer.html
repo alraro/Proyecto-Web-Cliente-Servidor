@@ -22,7 +22,7 @@
         <nav class="main-nav" id="main-nav">
             <a href="index.html">Inicio</a>
             <a href="index.html#servicios">Campañas</a>
-            <a href="history.html" aria-current="page">Historial</a>
+            <a href="history_volunteer.html" aria-current="page">Historial</a>
             <a href="index.html#contacto">Contacto</a>
             <a class="nav-cta" href="login.html">Iniciar sesión</a>
         </nav>
@@ -45,6 +45,15 @@
                 <div class="field-group">
                     <label for="volunteer-id">ID voluntario</label>
                     <input id="volunteer-id" name="volunteerId" type="text" placeholder="Ej. 12" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="page-size">Elementos por página</label>
+                    <select id="page-size" name="pageSize">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
                 </div>
 
                 <button type="submit" class="primary-button">Buscar historial</button>
@@ -79,6 +88,6 @@
         </section>
     </main>
 
-    <script src="javascript/history.js"></script>
+    <script src="javascript/history_volunteer.js"></script>
 </body>
 </html>
