@@ -2,1202 +2,1062 @@
 -- INSERTS GENERADOS DESDE APP_CAMPAÑAS.xlsm
 -- Siguen el esquema CREATE TABLE definido en el modelo
 -- ============================================================
+-- ============================================================
+-- SEED DATA generated from APP_CAMPAÑAS.xlsm
+-- ============================================================
 
 -- 1. TIPO DE CAMPAÑA
-INSERT INTO Tipo_Campana (ID_Tipo, Nombre) VALUES (1, 'Primavera');
-INSERT INTO Tipo_Campana (ID_Tipo, Nombre) VALUES (2, 'GR');
+INSERT INTO Tipo_Campana (ID_Tipo, Nombre) VALUES
+  (1, 'Colecta de Alimentos');
 
 -- 2. CAMPAÑA
-INSERT INTO Campana (ID_Campana, Nombre, ID_Tipo, Fecha_inicio, Fecha_fin) VALUES (1, 'Recogida Primavera 2026', 1, '2026-05-01', '2026-05-31');
-INSERT INTO Campana (ID_Campana, Nombre, ID_Tipo, Fecha_inicio, Fecha_fin) VALUES (2, 'Gran Recogida Invierno', 2, '2026-11-20', '2026-11-22');
+INSERT INTO Campana (ID_Campana, Nombre, ID_Tipo, Fecha_inicio, Fecha_fin) VALUES
+  (1, 'Campaña Primavera', 1, '2026-05-09', '2026-05-10');
 
--- 3. ZONA GEOGRÁFICA
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (1, 'Antequera');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (2, 'Axarquía');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (3, 'Costa del Sol Occidental');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (4, 'Guadalhorce');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (5, 'Málaga');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (6, 'Serranía de Ronda');
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES (7, 'Sierra de las Nieves');
+-- 3. ZONAS GEOGRÁFICAS
+INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES
+  (1, 'Antequera'),
+  (2, 'Axarquía'),
+  (3, 'Guadalhorce'),
+  (4, 'Serranía de Ronda'),
+  (5, 'Sierra de las Nieves'),
+  (6, 'Costa del Sol Occidental'),
+  (7, 'Málaga');
 
--- 4. LOCALIDAD
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (1, 'Alameda', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (2, 'Algarrobo', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (3, 'Alhaurín de la Torre', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (4, 'Alhaurín el Grande', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (5, 'Alozaina', 7);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (6, 'Antequera', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (7, 'Archidona', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (8, 'Benahavís', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (9, 'Benalmádena', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (10, 'Campillos', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (11, 'Casarabonela', 7);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (12, 'Chilches', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (13, 'Churriana', 5);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (14, 'Coín', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (15, 'Cártama Estación', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (16, 'Cártama Pueblo', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (17, 'Estepona', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (18, 'Fuengirola', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (19, 'La Cala de Mijas', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (20, 'Manilva', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (21, 'Marbella', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (22, 'Marbella - San Pedro', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (23, 'Mijas', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (24, 'Mollina', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (25, 'Málaga', 5);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (26, 'Nerja', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (27, 'Pizarra', 4);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (28, 'Rincón de la Victoria', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (29, 'Ronda', 6);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (30, 'Sabinillas', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (31, 'Torre del Mar', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (32, 'Torremolinos', 3);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (33, 'Torrox', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (34, 'Villanueva de Algaidas', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (35, 'Vva de Algaidas', 1);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (36, 'Vélez-Málaga', 2);
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES (37, 'Álora', 4);
+-- 4. LOCALIDADES
+INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES
+  (1, 'Alameda', 1),
+  (2, 'Alcaucín', 2),
+  (3, 'Alfarnate', 2),
+  (4, 'Algarrobo', 2),
+  (5, 'Alhaurín de la Torre', 3),
+  (6, 'Alhaurín el Grande', 3),
+  (7, 'Almargen', 4),
+  (8, 'Almogía', 3),
+  (9, 'Álora', 3),
+  (10, 'Alozaina', 5),
+  (11, 'Alpandeire', 4),
+  (12, 'Antequera', 1),
+  (13, 'Archidona', 1),
+  (14, 'Ardales', 4),
+  (15, 'Arenas', 2),
+  (16, 'Arriate', 4),
+  (17, 'Arroyo Coche, Almogía', 3),
+  (18, 'Atajate', 4),
+  (19, 'Benadalid', 4),
+  (20, 'Benahavís', 6),
+  (21, 'Benalauría', 4),
+  (22, 'Benalmádena', 6),
+  (23, 'Benaoján', 4),
+  (24, 'Benarrabá', 4),
+  (25, 'Campillos', 1),
+  (26, 'Canillas de Aceituno', 2),
+  (27, 'Canillas de Albaida', 2),
+  (28, 'Cañete la Real', 4),
+  (29, 'Carratraca', 4),
+  (30, 'Cartajima', 4),
+  (31, 'Cártama Estación', 3),
+  (32, 'Cártama Pueblo', 3),
+  (33, 'Casabermeja', 1),
+  (34, 'Casarabonela', 5),
+  (35, 'Casares', 6),
+  (36, 'Chilches', 2),
+  (37, 'Málaga', 7),
+  (38, 'Coín', 3),
+  (39, 'Colmenar', 2),
+  (40, 'Comares', 2),
+  (41, 'Cómpeta', 2),
+  (42, 'Cortes de la Frontera', 4),
+  (43, 'Cuevas Bajas', 1),
+  (44, 'Cuevas de San Marcos', 1),
+  (45, 'Cuevas del Becerro', 4),
+  (46, 'El Burgo', 5),
+  (47, 'Estepona', 6),
+  (48, 'Faraján', 4),
+  (49, 'Frigiliana', 2),
+  (50, 'Fuengirola', 6),
+  (51, 'Fuente de Piedra', 1),
+  (52, 'Gaucín', 4),
+  (53, 'Guaro', 5),
+  (54, 'Humilladero', 1),
+  (55, 'Igualeja', 4),
+  (56, 'Istán', 5),
+  (57, 'Jimera de Líbar', 4),
+  (58, 'Jubrique', 4),
+  (59, 'Júzcar', 4),
+  (60, 'La Cala de Mijas', 6),
+  (61, 'Manilva', 6),
+  (62, 'Marbella', 6),
+  (63, 'Marbella - San Pedro de Alcantara', 6),
+  (64, 'Mijas', 6),
+  (65, 'Mollina', 1),
+  (66, 'Monda', 5),
+  (67, 'Montecorto', 4),
+  (68, 'Montejaque', 4),
+  (69, 'Nerja', 2),
+  (70, 'Ojén', 5),
+  (71, 'Parauta', 4),
+  (72, 'Periana', 2),
+  (73, 'Pizarra', 3),
+  (74, 'Pujerra', 4),
+  (75, 'Rincón de la Victoria', 2),
+  (76, 'Riogordo', 2),
+  (77, 'Ronda', 4),
+  (78, 'Sabinillas', 6),
+  (79, 'Salares', 2),
+  (80, 'Sayalonga', 2),
+  (81, 'Sedella', 2),
+  (82, 'Serrato', 4),
+  (83, 'Sierra de Yeguas', 1),
+  (84, 'Teba', 4),
+  (85, 'Tolox', 5),
+  (86, 'Torre del Mar', 2),
+  (87, 'Torremolinos', 6),
+  (88, 'Torrox', 2),
+  (89, 'Totalán', 2),
+  (90, 'Valle de Abdalajís', 1),
+  (91, 'Vélez-Málaga', 2),
+  (92, 'Vélez-Málaga - Caleta de Vélez', 2),
+  (93, 'Villanueva de Algaidas', 1),
+  (94, 'Villanueva de la Concepción', 1),
+  (95, 'Villanueva del Rosario', 1),
+  (96, 'Villanueva del Trabuco', 1),
+  (97, 'Viñuela', 2),
+  (98, 'Yunquera', 5),
+  (99, 'Churriana', 7),
+  (100, 'Marbella - San Pedro', 6),
+  (101, 'Vva de Algaidas', 1),
+  (102, 'Almachar', NULL),
+  (103, 'Moclinejo', NULL),
+  (104, '#N/A', NULL);
 
--- 5. CÓDIGO POSTAL
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29017', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29018', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29005', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29016', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29010', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29011', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29007', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29013', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29009', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29014', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29006', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29008', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29012', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29003', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29190', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29002', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29004', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29001', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29590', 25);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29692', 20);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29639', 9);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29631', 9);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29630', 9);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29750', 2);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29790', 12);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29780', 26);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29730', 28);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29740', 31);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29793', 33);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29700', 36);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29130', 3);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29120', 3);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29500', 37);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29567', 5);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29320', 10);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29570', 15);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29580', 15);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29140', 13);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29100', 14);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29560', 27);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29400', 29);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29640', 18);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29649', 19);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29651', 23);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29650', 23);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29679', 8);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29603', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29600', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29601', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29604', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29602', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29660', 21);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29670', 22);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29680', 17);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29620', 32);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29530', 1);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29200', 6);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29300', 7);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29532', 24);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29310', 34);
-INSERT INTO Codigo_Postal (CP, ID_Localidad) VALUES ('29566', 11);
+-- 5. DISTRITOS (todos pertenecen a Málaga)
+INSERT INTO Distrito (ID_Distrito, Nombre, ID_Localidad) VALUES
+  (1, 'Centro', 37),
+  (2, 'Este', 37),
+  (3, 'Ciudad Jardín', 37),
+  (4, 'Bailén Miraflores', 37),
+  (5, 'Palma-Palmilla', 37),
+  (6, 'Cruz de Humilladero', 37),
+  (7, 'Carretera de Cádiz', 37),
+  (8, 'Churriana', 37),
+  (9, 'Campanillas', 37),
+  (10, 'Puerto de la Torre', 37),
+  (11, 'Teatinos-Universidad', 37);
 
--- 6. CADENA
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (1, 'CARREFOUR', 'CAD-001');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (2, 'DIA', 'CAD-002');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (3, 'EL CORTE INGLES', 'CAD-003');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (4, 'EL JAMON', 'CAD-004');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (5, 'EROSKI', 'CAD-005');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (6, 'LIDL', 'CAD-006');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (7, 'MAKRO', 'CAD-007');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (8, 'MAS', 'CAD-008');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (9, 'MERCADONA', 'CAD-009');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (10, 'SUMA', 'CAD-010');
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES (11, 'ALCAMPO', 'CAD-011');
+-- 6. CÓDIGOS POSTALES
+INSERT INTO Codigo_Postal (CP, ID_Localidad, ID_Distrito) VALUES
+  ('29001', 37, NULL),
+  ('29002', 37, NULL),
+  ('29003', 37, NULL),
+  ('29004', 37, NULL),
+  ('29005', 37, NULL),
+  ('29006', 37, NULL),
+  ('29007', 37, NULL),
+  ('29008', 37, NULL),
+  ('29009', 37, NULL),
+  ('29010', 37, NULL),
+  ('29011', 37, NULL),
+  ('29012', 37, NULL),
+  ('29013', 37, NULL),
+  ('29014', 37, NULL),
+  ('29015', 37, NULL),
+  ('29016', 37, NULL),
+  ('29017', 37, NULL),
+  ('29018', 37, NULL),
+  ('29100', 38, NULL),
+  ('29108', 53, NULL),
+  ('29109', 85, NULL),
+  ('29110', 66, NULL),
+  ('29120', 6, 6),
+  ('29130', 5, 3),
+  ('29140', 37, NULL),
+  ('29150', 8, 5),
+  ('29160', 33, NULL),
+  ('29170', 39, NULL),
+  ('29180', 76, NULL),
+  ('29190', 37, NULL),
+  ('29193', 37, NULL),
+  ('29194', 3, 1),
+  ('29195', 40, NULL),
+  ('29196', 37, NULL),
+  ('29197', 89, NULL),
+  ('29200', 12, NULL),
+  ('29210', 44, NULL),
+  ('29220', 43, NULL),
+  ('29230', 94, NULL),
+  ('29239', 17, NULL),
+  ('29240', 90, NULL),
+  ('29250', 12, NULL),
+  ('29260', 12, NULL),
+  ('29300', 13, NULL),
+  ('29310', 93, NULL),
+  ('29311', 93, NULL),
+  ('29312', 95, NULL),
+  ('29313', 96, NULL),
+  ('29314', 13, NULL),
+  ('29315', 13, NULL),
+  ('29320', 25, NULL),
+  ('29327', 84, NULL),
+  ('29328', 83, NULL),
+  ('29329', 83, NULL),
+  ('29330', 7, 2),
+  ('29340', 28, NULL),
+  ('29350', 16, NULL),
+  ('29360', 68, NULL),
+  ('29370', 23, NULL),
+  ('29380', 42, NULL),
+  ('29391', 42, NULL),
+  ('29392', 57, NULL),
+  ('29393', 67, NULL),
+  ('29394', 77, NULL),
+  ('29400', 77, NULL),
+  ('29410', 98, NULL),
+  ('29420', 46, NULL),
+  ('29430', 67, NULL),
+  ('29440', 55, NULL),
+  ('29450', 74, NULL),
+  ('29451', 71, NULL),
+  ('29452', 30, NULL),
+  ('29460', 11, NULL),
+  ('29461', 48, NULL),
+  ('29462', 59, NULL),
+  ('29470', 45, NULL),
+  ('29471', 82, NULL),
+  ('29480', 52, NULL),
+  ('29490', 24, NULL),
+  ('29491', 21, NULL),
+  ('29492', 58, NULL),
+  ('29493', 19, NULL),
+  ('29494', 18, NULL),
+  ('29500', 9, 10),
+  ('29510', 9, 11),
+  ('29520', 51, NULL),
+  ('29530', 1, 4),
+  ('29531', 54, NULL),
+  ('29532', 65, NULL),
+  ('29533', 54, NULL),
+  ('29540', 12, NULL),
+  ('29550', 14, NULL),
+  ('29551', 29, NULL),
+  ('29552', 9, NULL),
+  ('29560', 73, NULL),
+  ('29566', 34, NULL),
+  ('29567', 10, NULL),
+  ('29569', 73, NULL),
+  ('29570', 32, NULL),
+  ('29580', 31, NULL),
+  ('29590', 37, NULL),
+  ('29591', 37, NULL),
+  ('29593', 9, NULL),
+  ('29600', 62, NULL),
+  ('29601', 62, NULL),
+  ('29602', 62, NULL),
+  ('29603', 62, NULL),
+  ('29604', 62, NULL),
+  ('29610', 70, NULL),
+  ('29611', 56, NULL),
+  ('29612', 70, NULL),
+  ('29620', 87, NULL),
+  ('29630', 22, NULL),
+  ('29631', 22, NULL),
+  ('29632', 22, NULL),
+  ('29633', 22, NULL),
+  ('29634', 22, NULL),
+  ('29635', 22, NULL),
+  ('29639', 22, NULL),
+  ('29640', 50, NULL),
+  ('29649', 60, NULL),
+  ('29650', 64, NULL),
+  ('29651', 64, NULL),
+  ('29660', 62, NULL),
+  ('29670', 63, NULL),
+  ('29678', 20, NULL),
+  ('29679', 20, NULL),
+  ('29680', 47, NULL),
+  ('29688', 47, NULL),
+  ('29689', 47, NULL),
+  ('29690', 35, NULL),
+  ('29691', 61, NULL),
+  ('29692', 78, NULL),
+  ('29693', 47, NULL),
+  ('29700', 91, NULL),
+  ('29710', 72, NULL),
+  ('29711', 2, 9),
+  ('29712', 97, NULL),
+  ('29713', 2, 7),
+  ('29714', 79, NULL),
+  ('29715', 81, NULL),
+  ('29716', 26, NULL),
+  ('29718', 91, NULL),
+  ('29719', 91, NULL),
+  ('29720', 75, NULL),
+  ('29730', 75, NULL),
+  ('29738', 75, NULL),
+  ('29740', 86, NULL),
+  ('29749', 91, NULL),
+  ('29750', 4, 8),
+  ('29751', 92, NULL),
+  ('29752', 80, NULL),
+  ('29753', 15, NULL),
+  ('29754', 41, NULL),
+  ('29755', 27, NULL),
+  ('29760', 91, NULL),
+  ('29770', 88, NULL),
+  ('29780', 69, NULL),
+  ('29787', 69, NULL),
+  ('29788', 49, NULL),
+  ('29789', 49, NULL),
+  ('29790', 36, NULL),
+  ('29791', 91, NULL),
+  ('29792', 91, NULL),
+  ('29793', 88, NULL);
 
--- 7. ENTIDAD COLABORADORA
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (1, 'AAVV TORRIJOS', 'Centro Ciudadano Huelin.Calle Emilio de la Cerda 24,2ª. 29002 MALAGA', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (2, 'ABC ASOCIACIÓN BENEFICA CRISTIANA DIOS ES FIEL', 'Calle Jabalcuza,11 29130 - Alhaurín de la Torre ( Malaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (3, 'ACCEM', 'Callejón Pericón 29008 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (4, 'ACCION PLURAL', 'CALLE CANALES,7 29002 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (5, 'ADINTRE', 'Calle Feria de Jerez s/n 29640 - Fuengirola, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (6, 'ADRA', 'Calle Licurgo, 26 29004 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (7, 'AECC ASOCIACION ESPAÑOLA CONTRA EL CANCER MALAGA', 'Alameda de Capuchinos, 37-39, 29009 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (8, 'AECC-Málaga', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (9, 'AECC-Marbella', 'Avda. del Mar, 5', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (10, 'Agrupación Cofadías Semana Santa Vélez-Málaga', 'C. P.º Nuevo, 14 Vélez-Málaga, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (11, 'AGRUPACIÓN COFRADIAS DE MARBELLA', 'PLAZA DE LA IGLESIA, S/N 29601 - Marbella, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (12, 'ALCER ASOCIACION PARA LA LUCHA CONTRA LAS ENFERMEDADES RENALES', 'Avenida Carlos de Haya, 41 1ºB 29010 - Malaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (13, 'Altas Capacidades Marbella y San Pedro', 'Ricardo Soriano 46B', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (14, 'AMANECER EN LA COLONIA ASOCIACIÓN', 'C/ Bilbao, 2 29660 San Pedro Alcántara ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (15, 'AMFREMAR COMEDOR SOCIAL', 'Practicante Fernández Alcolea, 11', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (16, 'ARPOM - AYUDA RECUPERACION POLITOXICOMANOS MARGINADOS. ALORA', 'Camimo de la Vega Redonda. s/n  29500 - Alora', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (17, 'ASIMA ASOCIACION CIUDADANA ANTISIDA DE MALAGA', 'Calle Cruz Verde, 22 29013 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (18, 'ASIS COMEDOR SOCIAL DE ANTEQUERA', 'C/ Córdoba 29, Antequera, CP 29200 (Málaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (19, 'Asociación 3ª Edad', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (20, 'Asociación Anika', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (21, 'ASOCIACIÓN AYUDA SOCIAL PALABRAS DE PODER', 'Calle Tulipan,48', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (22, 'ASOCIACIÓN CENTRO DE VIDA CRISTIANA DE MALAGA', 'Camino de la Corta s/n 29010 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (23, 'ASOCIACIÓN CONTRA LA POBREZA Y EXCLUSION SOCIAL DE VELEZ-MALAGA', 'Plz de las Indias, 7 29700 Vélez-Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (24, 'ASOCIACIÓN CUDECA BENALMÁDENA', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (25, 'ASOCIACIÓN CULTURAL BENFICA 100.1 AMANECER', 'CALLE SALESIANOS ,6', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (26, 'ASOCIACIÓN EL VUELO DE LAS LIBELULAS', 'Avda Estrella de Mar, 18 29630 - Benalmádena, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (27, 'Asociación Española Contra el Cancer', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (28, 'ASOCIACIÓN EVANGELICA GRAN LUZ', 'Pza. Hospital Civil  29009 - Málaga ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (29, 'ASOCIACIÓN MARROQUI', 'CALLE JINETES, NUM 5 29012 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (30, 'Asociación Mayores Anika', 'Plz de la Mezquita Arroyo de la Miel, Benalmádena', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (31, 'ASOCIACIÓN NUEVA CULTURA DESARROLLO GITANO', 'Río Viñuela, 1-Villa Carmen 4 29651 Mijas Costa                                                 ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (32, 'ASOCIACIÓN PAPILIO', 'CAMINO VIEJO DE VÉLEZ,5 29738 - Torre de Benagalbon, Rincón de la Victoria, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (33, 'Asociación Pastoral Los Bataneros', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (34, 'ASOCIACIÓN RED MADRE MALAGA', 'Jaboneros, 7 29009 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (35, 'ASOCIACIÓN SAN IGNACIO', 'C/ ABUL BEKA 15, 29004 malaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (36, 'ASOCIACIÓN SAN VICENTE DE PAUL', 'C/ Eucalipto. Iglesia de la Mosca ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (37, 'Asociación Sembrando Sonrisas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (38, 'Asociación Terrazas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (39, 'Aviva Comunidad Cristiana', 'Paseo Generalife, local 7 29630 Arroyo de la Miel', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (40, 'AYUNTAMIENTO DE ALAMEDA', 'PLAZA DE ESPAÑA, 5 29530 - Alameda, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (41, 'AYUNTAMIENTO DE ALGARROBO', 'c/Antonio Ruiz Rivas, 2 29750', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (42, 'AYUNTAMIENTO DE ALGATOCIN', 'C/ FUENTE Nº 2 29491 - Algatocín, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (43, 'AYUNTAMIENTO DE ALMACHAR', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (44, 'AYUNTAMIENTO DE ALMOGIA', 'Plz de la Constitución, s/n 29150 Almogía, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (45, 'AYUNTAMIENTO DE ARCHIDONA', 'PLAZA OCHAVADA Nº1 29300 - Archidona, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (46, 'AYUNTAMIENTO DE ARRIATE', 'Plz de la emigración Arriateña, s/n 29350 - Arriate, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (47, 'AYUNTAMIENTO DE CASABERMEJA', 'C/ LLANETE DE ABAJO, 2 29160 - Casabermeja, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (48, 'AYUNTAMIENTO DE CORTES DE LA FRONTERA', 'PLAZA CARLOS TERCERO 29380 - Cortes de la Frontera, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (49, 'AYUNTAMIENTO DE FUENTE DE PIEDRA', 'Calle Ancha, 9                 29520 - Fuente de Piedra (Málaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (50, 'AYUNTAMIENTO DE HUMILLADERO', 'Avda. El Emigrante, 1                       29531 Humilladero', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (51, 'AYUNTAMIENTO DE JUBRIQUE', 'CALLE CONSTITUCIÓN S/N.BAJOS AYUNTAMIENTO', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (52, 'AYUNTAMIENTO DE MANILVA', 'Calle Mar, 34 29691 Manilva, Málaga, España', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (53, 'Ayuntamiento de Mijas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (54, 'AYUNTAMIENTO DE MOCLINEJO', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (55, 'AYUNTAMIENTO DE MOLLINA', 'CALLE DE LA ALAMEDA, 1 29532 - Mollina, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (56, 'AYUNTAMIENTO DE MONTEJAQUE', 'Plz Constitución, 4 29360 - Montejaque, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (57, 'AYUNTAMIENTO DE OJEN', 'Camino Marbella, 3 29610 Ojén, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (58, 'AYUNTAMIENTO DE SIERRA DE YEGUAS', 'Plz Andalucia, 1            29328 - Sierra de Yeguas (Málaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (59, 'AYUNTAMIENTO DE TEBA', 'Pl. de la Constitución, 13, 29327 Teba, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (60, 'AYUNTAMIENTO DE TORROX', 'Plz de la Constitución, 1                            29793 Torrox', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (61, 'AYUNTAMIENTO DE VILLANUEVA  DEL TRABUCO', 'Plaza del Prado, 1 29313 - Villanueva del Trabuco, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (62, 'AYUNTAMIENTO DE VILLANUEVA DE ALGAIDAS', 'C/ Constitución, 16          29310 - Villanueva de Algaidas (Málaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (63, 'AYUNTAMIENTO DEL VALLE DE ABDALAJIS', 'Calle Alameda, 2 29240 Valle de Abdalajís, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (64, 'BUENAS NUEVAS IGLESIA EVANGELICA', 'Camino San Rafael, 91 29006 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (65, 'Caixa Bank-Voluntariado', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (66, 'Cáritas Calvario', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (67, 'CARITAS CALVARIO - MARBELLA', 'Calle del Calvario, s/n  29601 Marbella', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (68, 'CARITAS CASTRENSE', 'C/ Casas de Campos,18.Bajo Izq 29001 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (69, 'CARITAS DIOCESANA - HOGAR POZO DULCE', 'C/ Pozos Dulces, - 29008 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (70, 'CAritas Encarnación Alhaurín el Grande', 'Plz Baja, 6,', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (71, 'CARITAS IGLESIA DEL CARMEN', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (72, 'CARITAS NUEVA ANDALUCIA - MARBELLA', 'Avda. Gustavo Adolfo Bécquer, 40  29660 Nueva Andalucía', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (73, 'CARITAS PARROQUIAL SANTO TOMÁS DE AQUINO', 'Calle Salvador Dalí, 3 29009 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (74, 'Caritas Purisima', 'Rampa de la Aurora, 3, 29009 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (75, 'CARITAS PURISIMA CONCEPCION. MALAGA', 'Plz Prudencio Jiménez, 1 29010 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (76, 'Caritas San Antonio Ronda', 'c/ Pozo, 4', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (77, 'CARITAS SAN JOSE DE ESTEPONA', 'Mariana Pineda, 1 29680 - Estepona, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (78, 'Caritas Socorro Catequistas Ronda', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (79, 'Caritas Torrox', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (80, 'CARITAS VIRGEN DEL ROCIO - SAN PEDRO ALCANTARA', 'Avda. Virgen del Rocío, 25                             29670 San Pedro de Alcántara', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (81, 'CARMELITAS MISIONERAS COMUNIDAD DE RELIGIOSAS SANTA TERESA', 'Avda. del Carmelo, 12                              29620 Torremolinos, Malaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (82, 'Casa Luna', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (83, 'CASA MENGA ASOC', 'Plz de Capuchinos, 2 Antequera ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (84, 'CASA SALESIANA-COLEGIO SAGRDO CORAZON DE JESUS', 'Carretera de Campillos,S/N', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (85, 'Catequistas Caleta de Vélez', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (86, 'Catequistas La Paz', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (87, 'CENTRO ACOGIDA DE SAN JUAN DE DIOS', 'Plazuela de San Juan de Dios, 2             29008 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (88, 'CEPER Palmilla', 'C. Antonio María Isola, 2, Palma-Palmilla, 29011 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (89, 'CESMA CENTRO ESPAÑOL DE SOLIDARIDAD DE MALAGA ALGARROBO-AXARQUIA', 'Carretera Algarrobo, Km 1', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (90, 'CIUDAD DE LOS NIÑOS - HERMANOS OBREROS DE MARIA', 'Finca Los Asperones, s/n  - 29010 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (91, 'Club Leones Málaga Ilusión', 'c/ De la Era, 18', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (92, 'Club Leones Marbella', 'Carretera A7, Km 166.15 - Ur Saladi, en Estepona (Málaga). ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (93, 'Cofradía Cautivo', 'Parroquia de San Miguel Arcángel, calle Las Mercedes, 7, Benalmádena Pueblo', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (94, 'Cofradía Estudiantes Antequera', 'Pl. San Francisco, 29, 29200 Antequera, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (95, 'Cofradía Estudiantes Málaga', 'C/ Alcazabilla, 3 29015 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (96, 'Cofradía Mayor Dolor Antequera', 'Infante don Fernando, 70, en Antequera, Málaga. ', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (97, 'Cofradía Nuestra Señora Socorro Antequera', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (98, 'Colegio Alborán', 'Lugar Urbanización Ricmar, s/n, 29604 Marbella, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (99, 'Colegio Atalaya', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (100, 'Colegio Ecos', 'C/ Velázquez 7 - Urb. Elviria', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (101, 'Colegio El Divino Pastor', 'C. Gaucín, S/N, Carretera de Cádiz, 29003 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (102, 'Colegio El Monte', 'C. Ferrándiz, 54-56, Distrito Centro, 29012 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (103, 'Colegio Escuelas Ave María', 'Av de Sor Teresa Prat, 51, Carretera de Cádiz, 29003 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (104, 'COLEGIO LA MILAGROSA-HIJAS DE LA CARIDAD - EL PALO', 'PLAZA VIRGEN MILAGROSA 11, 29017 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (105, 'Colegio Los Olivos', 'C. Julio Verne, 8, Puerto de la Torre, 29190 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (106, 'Colegio María Auxiliadora', 'Plz San Bernabé nº 7', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (107, 'Colegio Novaschool', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (108, 'Colegio Rosario Moreno (APA)', 'C. Júcar, 16, Carretera de Cádiz, 29004 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (109, 'Colegio Salesiano', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (110, 'Colegio San José Obrero - Carranque', 'Calle Emilio Benavent, 1', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (111, 'Colegio Santa Rosa de Lima', 'C. Julio Verne, 8, Puerto de la Torre, 29190 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (112, 'Colegio Teresianas', 'Calle Monte de Sancha, Nº 38, 29016, 29016 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (113, 'Colegio Torrequebrada', 'C. Rda. Del Golf Este, 7, 11', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (114, 'COMEDOR SOCIAL ADE RONDA', 'C/ Infantes, 51 29400 Ronda', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (115, 'COMEDOR SOCIAL HIJAS DE LA CARIDAD', 'C/ ARLANZA Nº 7 29011 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (116, 'COMEDOR SOCIAL YO SOY TU', 'Calle Moreno Nieto, 18 29011 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (117, 'Compañía de la Cruz Málaga', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (118, 'COMUNIDAD RR ADORATRICES CASA EN MÁLAGA', 'Santa María Micaela, s/n 29013 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (119, 'COMUNIDAD SANTA ROSALÍA', 'Calle Bernardo de Balbuena,3 29591 - Santa Rosalía, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (120, 'CONVENTO NUESTRA SEÑORA DE LA PAZ. CLARISAS TRINIDAD', 'Plz Zumaya, 5 29009 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (121, 'COOPERACIÓN INTERNACIONAL', 'Club Maestranza. Avenida de las Caballerizas, Limonar', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (122, 'CORAJE SOLIDARIO', 'Calle Sta. Isabel 15 29640 Fuengirola, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (123, 'CORAZONES MALAGUEÑOS', 'CAMINO DE SAN RAFAEL', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (124, 'Coro Luz del Alba', 'C. Pintor Cipriano Maldonado, 29740 Torre del Mar, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (125, 'COTOLENGO FUNDACION CASA DEL SAGRADO CORAZON DE JESUS', 'c/ López Pinto 29002 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (126, 'CSIF', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (127, 'Dacesalduba', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (128, 'DESARROLLO E INTEGRACION DIEZ 42', 'Av.Andalucia, 27-Local 7A     29010 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (129, 'EMAUS OBRA DE AMOR COMEDOR SOCIAL VELEZ-MALAGA', 'C/ Esperanza nº 15 29700 Vélez- Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (130, 'EMAUS, OBRA DE AMOR ESTEPONA', 'Calle del Naranjo, 5 29680 - Estepona, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (131, 'EMAUS, OBRA DE AMOR TORREMOLINOS', 'C/ CRUZ Nº 5, 1º 29620 - Torremolinos, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (132, 'Encuentro', 'C. Arbequín, Bloque 5, bajo 8', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (133, 'Escuela Fútbol Atlético Marbellí', 'C. Ricardo Lucena Sola, s/n', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (134, 'Escuela Oficial de Idiomas', 'Calle Alfredo Palma, 32, bajo (Edificio Feria)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (135, 'ESPAI', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (136, 'Familia Luque Cañizares', 'Huelin', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (137, 'Familia Obdulia', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (138, 'Familia: Berthe Nicole Ries', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (139, 'Federación de Peñas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (140, 'FIBROMIALGIA - ASOC DE FIBROMIALGIA Y FATIGA CRONICA DE ARRIATE', 'C/ LA FABRICA S/N 29350 - Arriate, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (141, 'FIBROMIALGIA ARRIATE', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (142, 'Fibromialgia Benalmádena', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (143, 'FUNDACIÓN BENÉFICA VIRGEN DE VALVANUZ', 'Huerto de los Claveles, 7 - Bajo 7 29013 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (144, 'Fundación Cánovas del Castillo', 'C/ San Millán, 12, Málaga, con código postal 29013', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (145, 'FUNDACION DE LEONES. TORREMOLINOS', 'Calle Tiépolo.S/N.Local 5 y 6 29620 - Torremolinos, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (146, 'FUNDACION LA MERCED MIGRACIONES', 'Plz de las Flores,5 29005 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (147, 'FUNDACION PROLIBERTAS', 'Cruz Blanca, 25 29200 - Antequera, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (148, 'Golf Solidario', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (149, 'Grupo 3ª Edad Mariana Chacón', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (150, 'Grupo Animalista Benalmádena', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (151, 'Grupo B4L (Baloncesto for Life)', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (152, 'Grupo Bancosol-(Insersión Carolina)', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (153, 'Grupo Bancosol-(Insersión María)', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (154, 'Grupo Cecilia Loor', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (155, 'Grupo de Soledad (Siervas de María)', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (156, 'Grupo Hugo y Ecos', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (157, 'Grupo Maskom Antequera', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (158, 'Grupo Maskom c/sidra', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (159, 'Grupo Mercadona Antequera Parquesol', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (160, 'Grupo Mercadona Benalmádena SalvadorVicenteMaravillas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (161, 'Grupo Miriam', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (162, 'Grupo SAFA-ICET', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (163, 'Grupo Salvador Ruiz', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (164, 'Grupo Servicios Sociales Arriate', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (165, 'Grupo Teología', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (166, 'Grupo Universidad De Mayores', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (167, 'Guadalpín y voluntarios varios', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (168, 'Guardia Civil', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (169, 'Guardia Civil', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (170, 'HERMANAS DE LA COMPAÑIA DE LA CRUZ (PIZARRA)', 'Alta, 8 29560  Pizarra', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (171, 'HERMANAS DE LA CRUZ RONDA', 'Plz Duquesa de Parcent, 7 29400 - Ronda, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (172, 'Hermandad Cautivo y Santa Marta', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (173, 'Hermandad Cristo del Amor', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (174, 'Hermandad de la Crucifixión', 'C. Diego de Siloé, 8, Distrito Centro, 29013 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (175, 'Hermandad de Nuestra Señora de la Piedad', 'Calle Alderete, 3, Distrito Centro, 29013 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (176, 'Hermandad del Rocío Ronda', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (177, 'Hermandad del Santo Traslado', 'C. Trinidad, 72, Distrito Centro, 29009 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (178, 'Hermandad La Paloma', 'Pl. de San Francisco, s/n, Distrito Centro, 29008 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (179, 'Hermandad Melosas y Protegidas Torre del Mar', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (180, 'Hermandad Nazareno Benalmádena', 'C/ Santo Domingo, 16 | Benalmádena (MÁLAGA).', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (181, 'Hermandad Santo Entierro Ronda', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (182, 'Hermandad Soledad Ronda', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (183, 'Hermandad Virgen Alegria', 'Plz Caouchinos, 7 29014 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (184, 'Hermandad Virgen Araceli', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (185, 'Hermandad Virgen de la Sierra', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (186, 'Hermandad Virgen del Carmen de Torre del Mar', 'C/ Infantes, nº 2- Bajo  29740- Torre del Mar (Málaga)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (187, 'Hermandad Virgen del Rocío Torre del Mar', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (188, 'Hermandad Virgen del Rocío Vélez-Málaga', 'C/ Ferrocarril, 5 Velez Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (189, 'HERMANITAS DE LOS POBRES DE RONDA', 'Av. Poeta Rilke, 2 B 29400 - Ronda, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (190, 'Hidralia', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (191, 'HOGAR BETANIA', 'C/ Dos Aceras,18 29012 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (192, 'Hola! Sol Marbella', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (193, 'IES Cerro del Viento', 'Av. Cerro del Viento, 11, 29631 Benalmádena, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (194, 'IES Guadalpín', 'Bulevar Principe Alfonso de Hohenlohe, s/n, 29602 Marbella, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (195, 'IES María Zambrano', 'C. Pintor Cipriano Maldonado, 8, 29740 Torre del Mar, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (196, 'IES Pérez de Guzmán', 'C. Dolores Ibárruri, 3, 29400 Ronda, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (197, 'IES Reyes Católicos', 'Av. Vivar Téllez, 42 29700 Vélez-Málaga, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (198, 'IES Rosaleda', 'Av. de Luis Buñuel, 8, Palma-Palmilla, 29011 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (199, 'IES Sierrabermeja', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (200, 'Iglesia Evangélica Hdad del Huerto Ronda', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (201, 'Iglesia Evangélica Luz Del Mundo', 'C. Serenata, 29603 Marbella, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (202, 'Iglesia Evangélica Marbella', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (203, 'Iglesia Evangélica Monte de los Olivos', 'Avda. Andalucucía, 33', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (204, 'Iglesia Evangélica Renacer Axarquía', 'c/ Paralela de la Estación, 21 29700 - Vélez Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (205, 'Iglesia Evangélica Renacer Torrox', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (206, 'Iglesia Evangélica Senda de Amor', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (207, 'Inmobiliaria Century 21', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (208, 'INSERTA ANDALUCIA', 'CALLE JOSÉ PALANCA 1 29003 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (209, 'INTEGRACIÓN PARA LA VIDA "INPAVI"', 'Camino de la Corta s/n', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (210, 'Isabel Vargas Trobalbo', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (211, 'JARIFA ASOC ALIMENTOS', 'Calle Atrás, 2 29500 Álora, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (212, 'JOMAD ASOC AYUDA A JOVENES Y MENORES MARGINADOS POR LAS DROGAS', 'C/ Altozano 1-3, 29013 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (213, 'La Iglesia de Jesucristo de Los Santos de Los Últimos Días', 'Avda. Simon Bolivar esquina c, Av. de Luis Buñuel, 15, 29011 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (214, 'LA UNIÓN DE CIUDAD JARDÍN', 'Avda. Las Postas, s/n - Antiguo Colegio Salvador Rueda 29014 - MÁLAGA', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (215, 'Los Mormones', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (216, 'Madre Las Chapas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (217, 'Magyk Concept', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (218, 'MAYDAN MALAGA ASOC', 'C/Rafaela 18-2 29009 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (219, 'MENSAJEROS DE LA PAZ ANDALUCIA', 'C. de Prosper Mérimée,17.Bloque 7,2b', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (220, 'Mujeres 3º Milenio Asociación', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (221, 'Mujeres Benalmádena Asociación', 'C. Cauce, 3, 29631 Arroyo de La Miel, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (222, 'MUJERES DE LA LAGUNA', 'JUANA CASTRO 2 29010 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (223, 'Mujeres San Roque Torrox', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (224, 'NOVAYA VOLNA', 'C/Antonio Jiménez Ruiz, 54 29009 Malaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (225, 'Nuevas Generaciones Marbella', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (226, 'Padres Las Chapas', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (227, 'Palabra de Vida Eterna', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (228, 'Partido Somos Benalmádena', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (229, 'Pastoral de la Salud Torre del Mar', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (230, 'PATRONATO HOGAR NUESTRA SEÑORA DE LOS ÁNGELES', 'C/ Arroyo de los Angeles,  S/N APTDO CORREOS 63 29011 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (231, 'PENTECOSTAL IGLESIA APOSTOLICA ANTEQUERA', 'Arrayán, 6 29200 - Antequera, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (232, 'PEPE BRAVO CASA DE ACOGIDA', 'C/ Sanchez Rivas Nº 36 29567 Alozaina, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (233, 'PP-Benalmádena', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (234, 'PP-Nerja', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (235, 'PP-Rincón de la Victoria', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (236, 'PP-Velez Málaga', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (237, 'Protección Civil Andres Alba', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (238, 'Psoe Benalmádena', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (239, 'RELIGIOSAS DE MARÍA INMACULADA (SERVICIO DOMESTICO)', 'Victoria, 70-72 29012 Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (240, 'RELIGIOSAS FILIPENSES HIJAS DE MARIA DOLOROSA - HOGAR SAN CARLOS', 'Llano de la Trinidad 29007 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (241, 'RESIDENCIA DE ANCIANOS HERMANITAS DE LOS POBRES', 'C/ HEROE DE SOSTOA  Nº 1 29002 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (242, 'RESIDENCIA DE MAYORES SAN JOSÉ DE LA MONTAÑA', 'Calle Madre Petra, 6 29240 Valle de Abdalajís, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (243, 'Residencia Estates', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (244, 'RESIDENCIA MONSALVE HERMANAS CARMELITAS DEL SAGRADO CORAZON DE JESUS.', 'C/Mercedes Formica 89 29140 - Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (245, 'RESIDENCIA SAN JUAN DE DIOS ANTEQUERA', 'Ctra Granada S/N 29200 - Antequera, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (246, 'Rotary', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (247, 'SAVE THE CHILDREN', 'Avenida. Nuestra Señora de las Guias, 1', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (248, 'SENDA PROYECTO HOMBRE - RONDA', 'Pasaje Juan de la Cruz, LOCAL 1 29400 - Ronda, Málaga', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (249, 'The Workshop', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (250, 'THEMIS ASOC DE INMIGRANTES MUJERES Y NIÑOS', 'CL Tejares, 48 29011 - MALAGA', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (251, 'U.M.A.', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (252, 'VIRGEN DE LAS FLORES ALORA RESIDENCIA', 'Av. Pablo Ruiz Picasso, 20 29500 Álora', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (253, 'Voluntario 1', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (254, 'Voluntario 2', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (255, 'Voluntario 3', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (256, 'Voluntario 4', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (257, 'Voluntario 5', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (258, 'Voluntario 6', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (259, 'Voluntario 7', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (260, 'Voluntario 8', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (261, 'Voluntario 9', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (262, 'Voluntario 10', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (263, 'Voluntario 11', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (264, 'Voluntario 12', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (265, 'Voluntario 13', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (266, 'Voluntario 14', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (267, 'Voluntario 15', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (268, 'Voluntario 16', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (269, 'Voluntario 17', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (270, 'Voluntario 18', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (271, 'Voluntario 19', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (272, 'Voluntario 20', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (273, 'Voluntario 21', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (274, 'Voluntario 22', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (275, 'Voluntario 23', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (276, 'Voluntario 24', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (277, 'Voluntario 25', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (278, 'Voluntario 26', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (279, 'Voluntario 27', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (280, 'Voluntario 28', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (281, 'Voluntario 29', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (282, 'Voluntario 30', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (283, 'Voluntario 31', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (284, 'Voluntario 32', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (285, 'Voluntario 33', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (286, 'Voluntario 34', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (287, 'Voluntario 35', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (288, 'Voluntario 36', 'c/ Goleta (Urb El Cañuelo)', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (289, 'Voluntario 37', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (290, 'Voluntario 38', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (291, 'Voluntario 39', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (292, 'Voluntario 40', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (293, 'Voluntario 41', 'Calle Hemanos Lavao 3, 4B', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (294, 'Voluntario 42', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (295, 'Voluntario 43', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (296, 'Voluntario 44', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (297, 'Voluntario 45', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (298, 'Voluntario 46', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (299, 'Voluntario 47', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (300, 'Voluntario 48', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (301, 'Voluntario 49', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (302, 'Voluntario 50', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (303, 'Voluntario 51', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (304, 'Voluntario 52', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (305, 'Voluntario 53', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (306, 'Voluntario 54', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (307, 'Voluntario 55', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (308, 'Voluntario 56', '', '');
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES (309, 'VOX BENALMADENA', '', '');
+-- 7. CADENAS
+INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES
+  (1, 'CARREFOUR', 'CARREFOUR'),
+  (2, 'DIA', 'DIA'),
+  (3, 'EL CORTE INGLES', 'ECI'),
+  (4, 'EL JAMON', 'EL_JAM'),
+  (5, 'EROSKI', 'EROSKI'),
+  (6, 'LIDL', 'LIDL'),
+  (7, 'MAKRO', 'MAKRO'),
+  (8, 'MAS', 'MAS'),
+  (9, 'MERCADONA', 'MERCADONA'),
+  (10, 'SUMA', 'SUMA'),
+  (11, 'ALCAMPO', 'ALCAMPO');
 
--- 8. USUARIO (Capitanes)
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (100, 'Cristóbal', 'capitan100@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (101, 'Ezequiel', 'capitan101@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (102, 'Nancy', 'capitan102@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (103, 'Virginia', 'capitan103@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (104, 'Fran', 'capitan104@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (105, 'Eli', 'capitan105@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (106, 'José Luis', 'capitan106@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (107, 'José M', 'capitan107@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (108, 'Niguel', 'capitan108@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (109, 'Pepe Avila', 'capitan109@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (110, 'Manuel', 'capitan110@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (111, 'Mari', 'capitan111@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (112, 'María Victoria', 'capitan112@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (113, 'Juan Manuel', 'capitan113@nomail.es', '', 'hash_pendiente');
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES (114, 'Vicente', 'capitan114@nomail.es', '', 'hash_pendiente');
+-- 8. USUARIOS (coordinadores)
+-- Contraseña por defecto: 'changeme' (hash simulado)
+INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
+  (1, 'Arantxa', 'bancosolseguimiento@gmail.com', '652032496', 'changeme'),
+  (2, 'Cristóbal Aragón', 'aragoncristobal@hotmail.com', '639784306', 'changeme'),
+  (3, 'Diego Vazquez', 'dvazquez.ronda59@gmail.com', '617967834', 'changeme'),
+  (4, 'Diego Vazquez', 'dvazquez.ronda59@gmail.com', '617967834', 'changeme'),
+  (5, 'Fran Jimenez', 'rafaelsalcedo@bancosol.info', '647202611', 'changeme'),
+  (6, 'José M Cobos', 'j-m-cobos@hotmail.com', '639789171', 'changeme'),
+  (7, 'Manuel Ladoux Arroyo', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (8, 'Mari Carmen Chamizo', 'mchamizo@bancosol.info', '671562051', 'changeme'),
+  (9, 'Mari Luz Pérez', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (10, 'María Victoria Ruiz', 'mariavictoriaruizjimenez@gmail.com', '656379575', 'changeme'),
+  (11, 'Coord Torremolinos', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (12, 'Vicente Morato', 'vimor@yahoo.es', '627818795', 'changeme'),
+  (13, 'Zona Marbella', 'rafaelsalcedo@bancosol.info', NULL, 'changeme');
 
--- 8b. CAPITANES (asignación a campaña 1)
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (100, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (101, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (102, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (103, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (104, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (105, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (106, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (107, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (108, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (109, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (110, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (111, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (112, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (113, 1);
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (114, 1);
+-- 9. COORDINADORES (asociados a campaña 1)
+INSERT INTO Coordinadores (ID_Usuario, ID_Campana) VALUES
+  (1, 1),
+  (2, 1),
+  (3, 1),
+  (4, 1),
+  (5, 1),
+  (6, 1),
+  (7, 1),
+  (8, 1),
+  (9, 1),
+  (10, 1),
+  (11, 1),
+  (12, 1),
+  (13, 1);
 
--- 9. TIENDA
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (1, 'CARREFOUR EXPRESS', 'Avda Pio Baroja, 6', '29017', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (2, 'CARREFOUR EXPRESS', 'Avda Principal del Candado, 2', '29018', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (3, 'CARREFOUR EXPRESS', 'c/  Atarazanas, s/n', '29005', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (4, 'CARREFOUR EXPRESS', 'c/ Cervantes, 5', '29016', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (5, 'CARREFOUR EXPRESS', 'c/ Reding, 10', '29016', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (6, 'CARREFOUR EXPRESS', 'c/ Tomás Escalonilla', '29010', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (7, 'CARREFOUR EXPRESS', 'Ctra Almería, 19-21', '29018', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (8, 'CARREFOUR EXPRESS', 'Pasaje Tamayo y Baus, 2', '29010', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (9, 'CARREFOUR HIPER', 'CC LA ROSALEDA C/: Simón Bolívar, s/n', '29011', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (10, 'CARREFOUR HIPER', 'Prolongación Avda Andalucía s/n', '29007', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (11, 'CARREFOUR MARKET', 'Avda Juan Sebastian Elcano 30', '29017', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (12, 'CARREFOUR MARKET', 'c/ Gordón, Prolongación 13', '29013', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (13, 'CARREFOUR SUPECO', 'c/ Rafaela, 11', '29009', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (14, 'DIA', 'Avda Málaga Oloroso 30', '29014', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (15, 'DIA', 'c/ Albéniz 38', '29014', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (16, 'DIA', 'c/ Alcalde Joaquim Quiles, 19', '29014', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (17, 'DIA', 'c/ Alozaina, 4', '29006', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (18, 'DIA', 'c/ Antigona 4', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (19, 'DIA', 'c/ Carreterias, 94', '29008', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (20, 'DIA', 'c/ Cómpeta, 8', '29007', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (21, 'DIA', 'c/ Corregidor Francisco de Luján, 9', '29006', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (22, 'DIA', 'c/ Enrique de Egas, 5', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (23, 'DIA', 'c/ Juan de Austria, 32', '29009', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (24, 'DIA', 'c/ Macabeos, 5', '29012', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (25, 'DIA', 'c/ Magistrado Salvador Barbera, 7', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (26, 'DIA', 'c/ Marmoles, 27', '29007', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (27, 'DIA', 'c/ Miguel Moya, 14', '29017', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (28, 'DIA', 'c/ Niño de Gloria, 10', '29003', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (29, 'DIA', 'c/ Nuestra Señora Del Tiscar 8', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (30, 'DIA LA PLAZA', 'Alameda de Capuchinos, 14', '29014', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (31, 'DIA LA PLAZA', 'Avda Lope de Vega, 8', '29190', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (32, 'DIA LA PLAZA', 'c/ Alcalde Jose Luis Estrada Segalerva, 3', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (33, 'DIA LA PLAZA', 'c/ Arturo Reyes, 1', '29011', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (34, 'DIA LA PLAZA', 'c/ Navarro Ledesma, s/n', '29010', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (35, 'DIAMARKET', 'c/ Cristo de la Epidemia, 47', '29013', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (36, 'DIAMAXI', 'Camino de los Almendrales, s/n', '29013', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (37, 'ECI-HIPERCOR', 'Avda Andalucía, 4y6', '29007', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (38, 'ECI-HIPERCOR', 'c/ Hamlet, 2', '29006', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (39, 'ECI-SUPERCOR', 'Avda. de las Caballerizas c/v c/ de los Zahones, 29016', '29016', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (40, 'ECI-SUPEROPEN', 'Avda Carlos Haya 77', '29007', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (41, 'EL JAMON', 'Paseo Cerrado de Calderón, 14', '29018', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (42, 'EROSKI', 'CC Larios Avd.de la Aurora s/n', '29002', 5);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (43, 'LIDL', 'Avda José Ortega y Gasset, 224', '29006', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (44, 'LIDL', 'Avda Pascueros, 3', '29014', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (45, 'LIDL', 'c/ Navarro Ledesma, s/n', '29010', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (46, 'LIDL', 'Camino San Rafael, 63', '29006', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (47, 'MAKRO', 'Avda Velázquez, 288', '29004', 7);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (48, 'MAS', 'c/ Alameda Colón, 12', '29001', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (49, 'MAS', 'c/ Emilio Thuiller 112-114', '29014', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (50, 'MAS CASH FRESH', 'Avda Jorge Luis Borges, 11 Edif. Don Juan', '29010', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (51, 'MAS CASH FRESH', 'c/ Camino Suárez 31', '29010', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (52, 'MAS CASH FRESH', 'c/ Joaquín Gaztambide s/n', '29011', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (53, 'MAS&Go', 'Plaza del Teatro, 1', '29008', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (54, 'MAS&Go', 'Plaza Victoria, 1', '29012', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (55, 'MASCERKA', 'c/ Nuzas, 30 - El Atabal', '29010', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (56, 'MASCERKA', 'c/ San Millán 13', '29013', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (57, 'MASKOM', 'AV. VIRGEN DE LAS GUIAS, 48', '29014', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (58, 'MASKOM', 'c/ Carraca 1', '29011', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (59, 'MASKOM', 'c/ Cómpeta, 12, Cruz de Humilladero', '29007', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (60, 'MASKOM', 'c/ Cristo de la Epidemia, 96', '29013', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (61, 'MASKOM', 'c/ Gómez Pallete, 2-Mercado de la Merced', '29012', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (62, 'MASKOM', 'c/ Horacio Lengo, 12', '29006', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (63, 'MASKOM', 'c/ José Calderón, 216', '29590', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (64, 'MASKOM', 'C/ JUAN ANTONIO TERCERO, 5', '29010', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (65, 'MASKOM', 'c/ La Unión 71', '29006', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (66, 'MASKOM', 'c/ Lope de Rueda, 61, Puerto de la Torre', '29190', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (67, 'MASKOM', 'c/ San Bartolomé, 7-Esq.c/Duque de Rivas', '29013', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (68, 'MASKOM', 'Plaza Basconia 1', '29010', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (69, 'MERCADONA', 'Avda Arquitecto Luis Bono, 17, Puerto de la Torre', '29190', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (70, 'MERCADONA', 'Avda del Dr. Marañón, 8, Palma-Palmilla', '29009', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (71, 'MERCADONA', 'Avda Europa, S/N', '29003', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (72, 'MERCADONA', 'Avda Imperio Argentina, 1, Cra de Cádiz', '29004', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (73, 'MERCADONA', 'Avda José Ortega y Gasset, s/n, Cruz de Humilladero', '29006', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (74, 'MERCADONA', 'Avda Juan Sebastian Elcano, 147', '29016', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (75, 'MERCADONA', 'Avda Santa Rosa de Lima, 20', '29007', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (76, 'MERCADONA', 'Avda Velazquez, 43', '29002', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (77, 'MERCADONA', 'Bulevar Louis Pasteur, 15', '29010', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (78, 'MERCADONA', 'c/ Albeniz, 35 - c/ Bocana', '29014', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (79, 'MERCADONA', 'c/ Alfonso Ponde de León, 2', '29004', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (80, 'MERCADONA', 'c/ Algarrobo, C. Potosí', '29018', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (81, 'MERCADONA', 'c/ Eduardo Marquina, 10', '29002', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (82, 'MERCADONA', 'c/ Emilio Thuiller, 2', '29014', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (83, 'MERCADONA', 'c/ Explanada de la Estación, 1', '29002', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (84, 'MERCADONA', 'c/ Gutemberg, 1', '29014', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (85, 'MERCADONA', 'c/ Olmos, 43', '29018', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (86, 'MERCADONA', 'c/ Píndaro, c/ Aristófanes, s/n', '29010', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (87, 'MERCADONA', 'c/ Sarajevo-Finca Hacienda Segovia-Campanillas', '29590', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (88, 'MERCADONA', 'Camino de Suarez, 22', '29011', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (89, 'MERCADONA', 'Camino Viejo Casabermeja, 64', '29011', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (90, 'SUMA TU SUPER', 'c/ Corregidor Francisco de Molina, 4', '29006', 10);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (91, 'CARREFOUR EXPRESS', 'Avda Manilva, 1', '29692', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (92, 'EL JAMON', 'Ctra Sabinillas - Manilva Km. 0,2', '29692', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (93, 'MERCADONA', 'c/ Bolivia, 18, San Luis de Sabinillas', '29692', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (94, 'CARREFOUR MARKET', 'Avda AGUAMARINA', '29639', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (95, 'CARREFOUR MARKET', 'Avda Antonio Machado 20', '29631', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (96, 'CARREFOUR MARKET', 'Avda Obispo Herrera Oria Esquina Avda Estación', '29630', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (97, 'CARREFOUR MARKET', 'Avda Salvador Vicente 3', '29630', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (98, 'CARREFOUR MARKET', 'CC El Higuerón,C.Comar Mijas', '29630', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (99, 'DIAMAXI', 'c/ Cortijo de Mena-parcela 3', '29630', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (100, 'ECI-SUPERCOR', 'Puerto Marina Shopping', '29639', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (101, 'ECI-SUPERCOR', 'Urb Torrequebrada - parcela C 4 centro', '29630', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (102, 'EL JAMON', 'Avda Inmaculada Concepción', '29630', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (103, 'LIDL', 'Avda del Cosmos, 2', '29630', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (104, 'LIDL', 'c/ Europa, 2', '29630', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (105, 'MAS', 'c/ San Silvestre s/n', '29630', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (106, 'MASKOM', 'Avda Juan Peralta, 49', '29630', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (107, 'MASKOM', 'C/ SIDRA, 21-27', '29630', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (108, 'MERCADONA', 'Avda Arroyo Hondo, 29 (Urb Veracruz)', '29630', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (109, 'MERCADONA', 'Avda de las Palmeras,33', '29630', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (110, 'MERCADONA', 'Avda Estrella del Mar 21', '29630', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (111, 'MERCADONA', 'c/ Federico García Lorca, 3', '29630', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (112, 'MERCADONA', 'c/ Paloma, 1-Avda Salvador Vicente Maravillas', '29630', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (113, 'DIA', 'Avda Andalucia, 35', '29750', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (114, 'LIDL', 'Ctra MA-103 Avda Las Pancha, 50', '29750', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (115, 'MERCADONA', 'Ctra A-7206, Sector AU-L.9 (C/ Balate)', '29750', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (116, 'MERCADONA', 'c/ Jacaranda, s/n', '29790', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (117, 'CARREFOUR SUPECO', 'c/ Heroe de Sostoa nº 188 esq. Avenida de la Paloma nº 36', '29003', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (118, 'CARREFOUR MARKET', 'c/ Antonio Ferrandis Chanquete, s/n', '29780', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (119, 'CARREFOUR MARKET', 'CN-340 Málaga-Almería PK 292-Urb ElCapistrano', '29780', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (120, 'LIDL', 'Avda Alcalde Antonio Villasclaras Rosas, 3', '29780', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (121, 'MAS', 'c/ Antonio Ferrándiz (Chanquete)', '29780', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (122, 'MERCADONA', 'c/ San Miguel - Pasaje San Miguel', '29780', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (123, 'MERCADONA', 'CN-340-C/ Sierra Mar-C/ Cartama', '29780', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (124, 'CARREFOUR EXPRESS', 'c/ Ronda, s/n', '29730', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (125, 'CARREFOUR HIPER', 'c/ Arroyo de Totalan, nº 36 - CC LA VICTORIA', '29730', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (126, 'CARREFOUR MARKET', 'Plaza Don Antonio Estrada, s/n - La Cala del Moral', '29730', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (127, 'CARREFOUR SUPECO', 'Ctra de Benagalbon, s/n', '29730', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (128, 'DIA', 'c/ Poeta Manuel alcántara, 1', '29730', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (129, 'DIAMAXI', 'Ctra Benagalbón, s/n', '29730', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (130, 'LIDL', 'c/ Verdial, 41', '29730', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (131, 'MERCADONA', 'Avda Mediterráneo - Urb Los Olivos', '29730', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (132, 'MERCADONA', 'c/ Pepa Flores González-Torre Benagalbón', '29730', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (133, 'MERCADONA', 'Plaza Costa del Sol s/n - Urb Cotomar', '29730', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (134, 'CARREFOUR EXPRESS', 'c/ Dr. Fleming, 26', '29740', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (135, 'CARREFOUR EXPRESS', 'c/ Princesa, 6, Edif. Boulevard', '29740', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (136, 'CARREFOUR SUPECO', 'Ctra Malaga-Almeria, Finca La Bateria Nº53', '29740', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (137, 'DIA LA PLAZA', 'c/ del Rio Esq.Antonio Machado', '29740', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (138, 'DIAMARKET', 'c/ Doctor Fleming, 77', '29740', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (139, 'EROSKI', 'CC El Ingenio Avda Juan  Carlos I s/n', '29740', 5);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (140, 'MASKOM', 'C/ PINTOR CIPRIANO MALDONADO, 17', '29740', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (141, 'MERCADONA', 'c/ Mar Tirreno, s/n', '29740', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (142, 'MERCADONA', 'Ctra Torre del Mar-Velez  Málaga, PK 0,4-Ruta Los Galves s/n -  Ruta Los Carboneros s/n', '29740', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (143, 'DIA LA PLAZA', 'Urb Charca-C/Urano s/n', '29793', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (144, 'EL JAMON', 'Ctra Málaga-Almería PK 283 Avda de Andalucía, 56', '29793', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (145, 'LIDL', 'Ctra Torrox Pueblo, s/n', '29793', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (146, 'MERCADONA', 'CN-340- Avda Andalucía-Urbanización Paraiso Sol, 92', '29793', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (147, 'CARREFOUR EXPRESS', 'c/  Camino Viejo de Málaga', '29700', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (148, 'DIAMAXI', 'Avda Juan Carlos I, s/n', '29700', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (149, 'DIAMAXI', 'Avda Molino de Velasco, 12', '29700', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (150, 'LIDL', 'Avda Juan Carlos I, 14', '29700', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (151, 'MASKOM', 'C/CAMINO VIEJO DE MALAGA', '29700', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (152, 'MERCADONA', 'c/ Alcalde Juan Barranquero, 1 - c/ Del Río, 38', '29700', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (153, 'MERCADONA', 'Camino de Malaga, 33-37 -C/ Arroyo Hondo, 21-23- C/ del Cristo, 36.', '29700', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (154, 'CARREFOUR SUPECO', 'Avda Reyes Católicos, Esq. Juan Carlos I', '29130', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (155, 'CARREFOUR SUPECO', 'Urb La Capellanía, Manzana 9', '29130', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (156, 'DIAMAXI', 'c/ Hacienda San Francisco 28', '29130', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (157, 'LIDL', 'Avda Ceuta s/n-Rotonda El Encuentro', '29130', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (158, 'MERCADONA', 'Avda de los Cortijos s/n', '29130', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (159, 'MERCADONA', 'C/ DE LOS REGISTRADORES, S/N', '29120', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (160, 'MERCADONA', 'Crta. Cartama, s/n - Huerta de los Patos, s/n', '29120', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (161, 'SUMA TU SUPER', 'c/ Gerald Brenan, 72', '29120', 10);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (162, 'SUMA TU SUPER', 'c/ Virgen del Rosario, 1', '29120', 10);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (163, 'MERCADONA', 'c/ Albahaca, s/n', '29500', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (164, 'DIA FRANQUICIA', 'PIaza La Pasadilla-Nave 1', '29567', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (165, 'DIA FRANQUICIA', 'c/ San Benito, s/n-Prolongación', '29320', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (166, 'MASCERKA', 'Avda Sta María del Reposo 17', '29320', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (167, 'MERCADONA', 'Avda Constitución - C/ Gerardo Fernández Delgado - C/ Tirso de Molina', '29320', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (168, 'LIDL', 'Ctra MA-421, PI El Cerro de Cártama', '29570', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (169, 'MERCADONA', 'c/ Alemania s/n - c/ Grecia s/n', '29580', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (170, 'MASKOM', 'c/ Gonzalez Marín 126 Cártama Pueblo', '29570', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (171, 'EL JAMON', 'Ctra de Coin, 75', '29140', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (172, 'LIDL', 'Ctra Coín 47. P.I. El Alamo', '29140', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (173, 'MASKOM', 'Avda San Javier, 3', '29140', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (174, 'MASKOM', 'c/ Escritora Carmen Bravo Villasante, 15', '29140', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (175, 'MASKOM', 'CARRETERA DE COIN, 77', '29140', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (176, 'MERCADONA', 'c/ Doctor Ramos Acosta, 104', '29140', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (177, 'CARREFOUR HIPER FRANQUICIA', 'Ctra Coín-Cártama PK 1', '29100', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (178, 'DIA LA PLAZA', 'c/ Santa Teresa s/n', '29100', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (179, 'DIAMAXI', 'Avda Reina Sofía, s/n', '29100', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (180, 'LIDL', 'Avda Reina Sofía, 50', '29100', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (181, 'MASKOM', 'c/ Doctor Marañón s/n', '29100', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (182, 'MERCADONA', 'Avda Reina Sofía, s/n', '29100', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (183, 'CARREFOUR EXPRESS', 'Avda Carlos Haya, 60', '29007', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (184, 'CARREFOUR EXPRESS', 'c/ Martinez Maldonado, 68', '29007', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (185, 'DIA LA PLAZA', 'Avda Moliere, 18', '29004', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (186, 'DIA LA PLAZA', 'c/ Martinez Maldonado, 53', '29007', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (187, 'LIDL', 'c/ Armengual de la Mota, 20', '29007', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (188, 'MAS', 'c/ Martínez Maldonado, 71', '29007', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (189, 'MASKOM', 'c/ Pedro Gómez Chaix, 5, Cruz de Humilladero', '29007', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (190, 'MERCADONA', 'c/ Martinez Maldonado, 6', '29007', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (191, 'MAS', 'Plaza de la Estación, 1', '29560', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (192, 'MASKOM', 'c/ Ingen. Pablo Esteban, 39-43', '29560', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (193, 'CARREFOUR SUPECO', 'PI El Fuerte, C/ Genal', '29400', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (194, 'DIAMARKET', 'c/ Cruz Verde 16', '29400', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (195, 'DIAMAXI', 'Avda de la Serranía, s/n', '29400', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (196, 'DIAMAXI', 'c/ Guadalhorce  S/N', '29400', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (197, 'LIDL', 'c/ Andrés Aguilar Gracián, s/n', '29400', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (198, 'MASKOM', 'c/ Molinos, 36', '29400', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (199, 'MASKOM', 'c/ Tabares 8', '29400', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (200, 'MERCADONA', 'c/ Buleria s/n - c/ Andres Aguilar Gracian', '29400', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (201, 'MERCADONA', 'c/ Guadalquivir s/n', '29400', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (202, 'CARREFOUR HIPER', 'Parque Miramar. Av. Encarnación S/N', '29640', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (203, 'DIA', 'c/ Huelva, 1 esq. Camino Coin, 18', '29640', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (204, 'DIA', 'c/ Uruguay esq. Brasil, s/n', '29640', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (205, 'DIA', 'Ps Jesus Santos Rein esq. Maestra Angeles Azpiazu', '29640', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (206, 'DIA LA PLAZA', 'Avda Acapulco, 9', '29640', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (207, 'ECI-SUPEROPEN', 'Avda N2 Padre Jesus Cautivo, 33 (Jesus Santos Rein n933)', '29640', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (208, 'EL JAMON', 'Avda de los Boliches,94-96', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (209, 'EL JAMON', 'c/ Doctor Gálvez Ginachero, esq. c/ Asturias', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (210, 'EL JAMON', 'c/ Gimena, esq. Pasaje del Sol (parte peatonal)', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (211, 'EL JAMON', 'c/ Nuñez de Balboa, esq. c/Goya', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (212, 'EL JAMON', 'c/ Romería del Rocío, esq. c/Fiesta de la Crema,', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (213, 'EL JAMON', 'c/ Uruguay, esq. c/Ricardo León', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (214, 'EL JAMON', 'Camino de la Cantera, Los Pacos', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (215, 'EL JAMON', 'Camino de Santiago, esq. C/Rioja', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (216, 'LIDL', 'c/ Calerita', '29640', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (217, 'MAS CASH FRESH', 'Crta MIJAS, 28', '29640', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (218, 'MASKOM', 'AV. CONDES SAN ISIDRO S/N', '29640', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (219, 'MASKOM', 'Avda Santa Amalia, s/n', '29640', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (220, 'MASKOM', 'C/ PALANGREROS, 5', '29640', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (221, 'MERCADONA', 'Avda Ramón y Cajal, s/n (Los Boliches)', '29640', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (222, 'MERCADONA', 'c/ Córdoba, 35', '29640', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (223, 'MERCADONA', 'c/ Francisco Rivera Paquirri, 21', '29640', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (224, 'MERCADONA', 'c/ Mahón, s/n', '29640', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (225, 'CARREFOUR HIPER FRANQUICIA', 'Avda MARENOSTRUM S/N LA CALA DE MIJAS', '29649', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (226, 'CARREFOUR MARKET', 'c/ Adarves.CC los Olivos', '29649', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (227, 'CARREFOUR MARKET', 'c/ Nuevo Boulevard', '29649', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (228, 'ECI-HIPERCOR', 'N-340 De Cadiz km. 198,1 "Riviera del Sol"', '29649', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (229, 'EL JAMON', 'c/ Río Aguas, esq. c/Río Padrón', '29640', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (230, 'EL JAMON', 'CC El Zoco Ctra De Cádiz Km. 198', '29649', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (231, 'LIDL', 'c/ Juan de la Cierva', '29649', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (232, 'LIDL', 'c/ Mar Cantábrico', '29649', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (233, 'LIDL', 'PI Molino de Viento Avda Carmen Sáez Tejada nº1', '29649', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (234, 'MAS', 'C/ Romeral de Calypso,1', '29649', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (235, 'MERCADONA', 'c/ Mérida de Jarales, N° 4', '29649', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (236, 'CARREFOUR HIPER FRANQUICIA', 'Avda de los Lirios s/n', '29651', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (237, 'DIA', 'Avda Mejico, 25', '29650', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (238, 'DIA', 'c/ Dr.Garcia Games S/N - esq. San Bernardo', '29650', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (239, 'DIA LA PLAZA', 'c/ Del Albero, Esquina Con Avd Dinamarca 1', '29651', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (240, 'ECI-SUPERCOR', 'c/ Sta. Laura', '29651', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (241, 'MAS', 'Avda. del Golf, 25', '29650', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (242, 'MERCADONA', 'Avda DE MIJAS, Cl SAN DIONISIO N° 1', '29651', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (243, 'MERCADONA', 'UER. 2,3,4 CAMINO VIEJO DE COIN', '29651', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (244, 'MERCADONA', 'Urb EL LIMONAR S/N LA CALA DE MIJAS', '29651', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (245, 'ECI-SUPERCOR', 'Ctra A-397 Ronda - Malaga  Km45 UrbMontehalcones s/n', '29679', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (246, 'MERCADONA', 'c/ Picos Alcazaba, S/n (Urb La Alquería), Benahavís', '29679', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (247, 'ALCAMPO', 'Ctra DE OJEN S/N PARQUE CC LA CAÑADA', '29603', 11);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (248, 'CARREFOUR MARKET', 'Avda General López Dominguez, 19', '29600', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (249, 'CARREFOUR MARKET', 'c/ LG CC Elviria, s/n', '29600', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (250, 'CARREFOUR MARKET', 'c/ LG CC Guadalmina', '29600', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (251, 'CARREFOUR MARKET', 'c/ Valentuñana, Nº 3 (Edif. Marbeland)', '29601', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (252, 'CARREFOUR MARKET', 'Ctra N-340 Cádiz, Km. 188 El Casco', '29600', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (253, 'CARREFOUR MARKET', 'Ctra N-340 Cadiz-Malaga, Km.179 (F.Aresbank)', '29600', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (254, 'DIA', 'Avda Andalucia, s/n -Camping Marbella Playa', '29604', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (255, 'DIA', 'Avda Canovas Del Castillo S/N', '29601', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (256, 'DIA', 'Avda El Trapiche, 27', '29601', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (257, 'DIA LA PLAZA', 'c/ Rodrigo de Triana, 2', '29600', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (258, 'DIA LA PLAZA', 'c/ San Antonio, s/n', '29600', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (259, 'ECI', 'Avda Bulevar Principe Alfonso de Hohenlohe', '29602', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (260, 'ECI', 'c/ Ramon Areces, s/n', '29660', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (261, 'ECI-SUPERCOR', 'Avda Playa del Duque c/v Avd. Jose BanUs', '29660', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (262, 'ECI-SUPERCOR', 'Avda Ramon y Cajal. Conj.Urb Marbella Center', '29601', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (263, 'ECI-SUPERCOR', 'c/ 2B C.Comercial Odeon,local 2 al 8. Nueva Andalucia', '29660', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (264, 'ECI-SUPERCOR', 'c/ Coto de los Dolores, s/n UrbPinogolf, Elviria', '29600', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (265, 'ECI-SUPERCOR', 'CC "Aloha", C/ Via 1, Urb Nueva Andalucia', '29660', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (266, 'ECI-SUPERCOR', 'CC Andasol km 187 Nac.340', '29600', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (267, 'ECI-SUPERCOR', 'CC Plaza del Mar - c/ Camila Jose Cela, s/n', '29600', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (268, 'ECI-SUPEROPEN', 'c/ Hacienda Las Chapas, s/n', '29600', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (269, 'LIDL', 'Bulevar Príncipe Alfonso Von Hohenlohe s/n', '29600', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (270, 'LIDL', 'c/ La Hacienda', '29604', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (271, 'MERCADONA', 'Avda de las Albarizas (Urb, Las Terrazas)', '29601', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (272, 'MERCADONA', 'Avda Ricardo soriano, 70 (Edif. Golden)', '29601', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (273, 'MERCADONA', 'c/ CALIFA, 1', '29660', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (274, 'MERCADONA', 'c/ Francisca Carrillo, 3 (Urb XARBLANCA)', '29602', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (275, 'MERCADONA', 'c/ San Manuel, s/n', '29604', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (276, 'MERCADONA', 'c/ Serenata', '29600', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (277, 'MERCADONA', 'Urb Los Naranjos de Marbella', '29660', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (278, 'CARREFOUR MARKET', 'Avda Virgen del Rocío - Urb s/n', '29670', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (279, 'CARREFOUR MARKET', 'Plaza Juan Macías', '29670', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (280, 'CARREFOUR MARKET', 'Urb Cortijo Blanco, Parcela A1', '29670', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (281, 'CARREFOUR SUPECO', 'c/ Sta. Maria Esquina Fuente Nueva', '29670', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (282, 'DIA', 'CC La Colonia N-340', '29670', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (283, 'DIA', 'Ctra Comarcal 3, Manzana 3 (San Pedro de Alcantara)', '29670', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (284, 'ECI-SUPERCOR', 'Urb Rio Verde CC.Puerta de Bandas Locales 1,2,5 y 6', '29670', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (285, 'MASKOM', 'c/ Lagasca, 56', '29670', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (286, 'MASKOM', 'C/ GÓMEZ DE LA SERNA, 2', '29670', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (287, 'MERCADONA', 'c/ Santa Leonor, S/N', '29670', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (288, 'DIA', 'Autovía A7, PK 142.5, urbanización Los Hidalgos', '29692', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (289, 'LIDL', 'Ctra N-340, Km 1079', '29692', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (290, 'CARREFOUR EXPRESS', 'c/ La Portada, Parcela 4', '29680', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (291, 'CARREFOUR HIPER FRANQUICIA', 'Ctra Cádiz-Málaga km. 156,9', '29680', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (292, 'CARREFOUR MARKET', 'c/ Torre Almenara, Frente al Puerto', '29680', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (293, 'CARREFOUR SUPECO', 'Urb Bell-Air Camino Calderon', '29680', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (294, 'DIA', 'Avda Carlos Cano,1. Conjunto Miramar, Fase Ii 8', '29680', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (295, 'DIA', 'c/ Juan Gris, 15', '29680', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (296, 'ECI-SUPERCOR', 'Avda de Espatia,s/n Parcela Sur Puerto Deportivo Estepona', '29680', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (297, 'ECI-SUPERCOR', 'Avda Puerta del Mar 45', '29680', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (298, 'ECI-SUPERCOR', 'Urb "El Pilar" parcela G-dos y G-uno. N-340 (Km 167,5)', '29680', 3);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (299, 'LIDL', 'Avda Puerta del Mar, s/n', '29680', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (300, 'MAS CASH FRESH', 'Avda España, 200', '29680', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (301, 'MERCADONA', 'Avda ANDALUCIA, S/N', '29680', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (302, 'MERCADONA', 'Avda DE BEL-AIR, 2', '29680', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (303, 'MERCADONA', 'AVDA. ANDALUCÍA, 20', '29680', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (304, 'MERCADONA', 'C/ ITALIA, 1', '29680', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (305, 'MERCADONA', 'C/ JOSEFINA SAMPER, S/N', '29680', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (306, 'CARREFOUR EXPRESS', 'c/  Casablanca, 5', '29620', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (307, 'CARREFOUR HIPER FRANQUICIA', 'CN-340 CC  Costasol Centro Carretera Circunvalación s/nº', '29620', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (308, 'CARREFOUR MARKET', 'Paseo del Colorado 25', '29620', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (309, 'CARREFOUR SUPECO', 'Avda de los Manantiales, s/n', '29620', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (310, 'DIA', 'Avda Benalmadena S/N', '29620', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (311, 'DIA', 'c/ Ciudad de Porcuna, 4', '29620', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (312, 'DIA', 'c/ Joan Miró Nº8', '29620', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (313, 'LIDL', 'Avda Carlota Alesandri, nº 288', '29620', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (314, 'LIDL', 'c/ Cruz, 69', '29620', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (315, 'MASKOM', 'c/ GRAN CARDENAL, 12', '29620', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (316, 'MERCADONA', 'Avda Playamar, S/N', '29620', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (317, 'MERCADONA', 'c/ Miguel de Cervantes, s/n', '29620', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (318, 'MERCADONA', 'c/ Rio Aranda, S/N', '29620', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (319, 'MERCADONA', 'Plaza Costa del Sol, S/N', '29620', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (320, 'CARREFOUR EXPRESS', 'c/ Camino de los Guindos, 8', '29004', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (321, 'CARREFOUR EXPRESS', 'c/ Cuarteles, 49', '29002', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (322, 'CARREFOUR EXPRESS', 'Paseo de los Tilos, 53', '29006', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (323, 'CARREFOUR HIPER', 'Ctra de Cádiz, Km. 241 - CC Los Patios', '29004', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (324, 'DIA FRANQUICIA', 'c/ Mirarosas', '29006', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (325, 'DIA LA PLAZA', 'c/ Reboul, s/n - Esq Gregorio Frías', '29006', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (326, 'DIAMARKET', 'c/ Ayala 82', '29002', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (327, 'DIAMAXI', 'Avda Velázquez, 9', '29003', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (328, 'DIAMAXI', 'c/ Cuarteles, 35', '29002', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (329, 'EL JAMON', 'Avda Europa, 112', '29003', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (330, 'EL JAMON', 'c/ Paseo de los Tilos, 35', '29006', 4);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (331, 'LIDL', 'c/ Gerona, 43', '29006', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (332, 'LIDL', 'c/ Héroe Sostoa, 126', '29002', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (333, 'LIDL', 'c/ Villanueva de Algaidas,6', '29004', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (334, 'MAS', 'Avda. de la Aurora esq. C/ Pavía numero 9', '29002', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (335, 'MAS', 'c/ Carril de la Chupa s/n', '29004', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (336, 'MAS', 'c/ Cuarteles, 37', '29002', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (337, 'MAS CASH FRESH', 'c/ Canillas de Aceituno, 1', '29004', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (338, 'MASKOM', 'Avda Antonio Gaudí, 10', '29004', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (339, 'MASKOM', 'c/ Alozaina 17', '29006', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (340, 'MASKOM', 'C/ AYALA, 92', '29002', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (341, 'MASKOM', 'c/ Capulino Jáuregui, 3', '29002', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (342, 'MASKOM', 'c/ Obsidiana, 1-Barriada Santa Cristina', '29006', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (343, 'MERCADONA', 'Avda Velazquez, 95 - C/ Viña del Mar, 2', '29004', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (344, 'MERCADONA', 'Camino San Rafael, 55', '29006', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (345, 'DIA FRANQUICIA', 'Avda Blas Infante 10', '29530', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (346, 'MASKOM', 'Plaza Andalucía 20', '29530', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (347, 'CARREFOUR HIPER', 'CC La Verónica. Ctra Sevilla CN 343-PK 6,5', '29200', 1);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (348, 'LIDL', 'c/ Barrrero, 10--Ctra Sevilla-Cuesta Talavera', '29200', 6);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (349, 'MASKOM', 'C/ Infante Don Fernando, 47', '29200', NULL);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (350, 'MERCADONA', 'Avda de la Estación s/n', '29200', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (351, 'MERCADONA', 'c/ Calzada, 18', '29200', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (352, 'MERCADONA', 'Urb Parquesol, 32', '29200', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (353, 'MASKOM', 'c/ Nueva 16-18', '29300', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (354, 'MERCADONA', 'Avda Llano de Pablo Picasso, 30', '29300', 9);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (355, 'MAS CASH FRESH', 'Avda de la Casería del Rey, 12', '29532', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (356, 'MASKOM', 'C/ Archidona 15', '29310', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (357, 'DIAMARKET', 'Ctra Antequera-Malaga, Km 64.14', '29310', 2);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (358, 'MASKOM', 'Av. JUAN XXIII, 28', '29566', 8);
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES (359, 'MASKOM', 'C/ AGUILAR Y CANO, 4', '29018', NULL);
+-- 10. TIENDAS
+INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES
+  (1, 'ECHEVERRIA', 'Avda Pio Baroja, 6', '29017', 1),
+  (2, 'CANDADO', 'Avda Principal del Candado, 2', '29018', 1),
+  (3, 'ATARAZANA', 'c/  Atarazanas, s/n', '29005', 1),
+  (4, 'CERVANTES', 'c/ Cervantes, 5', '29016', 1),
+  (5, 'MALAGUETA', 'c/ Reding, 10', '29016', 1),
+  (6, 'GAMARRA', 'c/ Tomás Escalonilla', '29010', 1),
+  (7, 'CRTA.ALMERIA', 'Ctra Almería, 19-21', '29018', 1),
+  (8, 'TAMAYO Y BAUS', 'Pasaje Tamayo y Baus, 2', '29010', 1),
+  (9, 'CARREFOUR ROSALEDA', 'CC LA ROSALEDA C/: Simón Bolívar, s/n', '29011', 1),
+  (10, 'CARREFOUR ALAMEDA', 'Prolongación Avda Andalucía s/n', '29007', 1),
+  (11, 'PEDREGALEJO', 'Avda Juan Sebastian Elcano 30', '29017', 1),
+  (12, 'GORDON', 'c/ Gordón, Prolongación 13', '29013', 1),
+  (13, 'SUPECO MALAGA RAFA', 'c/ Rafaela, 11', '29009', 1),
+  (14, 'DIA', 'Avda Málaga Oloroso 30', '29014', 2),
+  (15, 'DIA', 'c/ Albéniz 38', '29014', 2),
+  (16, 'DIA', 'c/ Alcalde Joaquim Quiles, 19', '29014', 2),
+  (17, 'DIA', 'c/ Alozaina, 4', '29006', 2),
+  (18, 'DIA', 'c/ Antigona 4', '29010', 2),
+  (19, 'DIA', 'c/ Carreterias, 94', '29008', 2),
+  (20, 'DIA', 'c/ Cómpeta, 8', '29007', 2),
+  (21, 'DIA', 'c/ Corregidor Francisco de Luján, 9', '29006', 2),
+  (22, 'DIA', 'c/ Enrique de Egas, 5', '29010', 2),
+  (23, 'DIA', 'c/ Juan de Austria, 32', '29009', 2),
+  (24, 'DIA', 'c/ Macabeos, 5', '29012', 2),
+  (25, 'DIA', 'c/ Magistrado Salvador Barbera, 7', '29010', 2),
+  (26, 'DIA', 'c/ Marmoles, 27', '29007', 2),
+  (27, 'DIA', 'c/ Miguel Moya, 14', '29017', 2),
+  (28, 'DIA', 'c/ Niño de Gloria, 10', '29003', 2),
+  (29, 'DIA', 'c/ Nuestra Señora Del Tiscar 8', '29010', 2),
+  (30, 'DIA LA PLAZA', 'Alameda de Capuchinos, 14', '29014', 2),
+  (31, 'DIA LA PLAZA', 'Avda Lope de Vega, 8', '29190', 2),
+  (32, 'DIA LA PLAZA', 'c/ Alcalde Jose Luis Estrada Segalerva, 3', '29010', 2),
+  (33, 'DIA LA PLAZA', 'c/ Arturo Reyes, 1', '29011', 2),
+  (34, 'DIA LA PLAZA', 'c/ Navarro Ledesma, s/n', '29010', 2),
+  (35, 'DIAMARKET', 'c/ Cristo de la Epidemia, 47', '29013', 2),
+  (36, 'DIAMAXI', 'Camino de los Almendrales, s/n', '29013', 2),
+  (37, 'EL CORTE INGLÉS C.C. MÁLAGA', 'Avda Andalucía, 4y6', '29007', 3),
+  (38, 'EL CORTE INGLES C.C. BAHIA MALAGA', 'c/ Hamlet, 2', '29006', 3),
+  (39, 'SP MAYORAZGO', 'Avda. de las Caballerizas c/v c/ de los Zahones, 29016', '29016', 3),
+  (40, 'SP OP CARLOS HAYA', 'Avda Carlos Haya 77', '29007', 3),
+  (41, 'EL JAMON', 'Paseo Cerrado de Calderón, 14', '29018', 4),
+  (42, 'EROSKI', 'CC Larios Avd.de la Aurora s/n', '29002', 5),
+  (43, 'Málaga Alameda', 'Avda José Ortega y Gasset, 224', '29006', 6),
+  (44, 'Málaga Olletas', 'Avda Pascueros, 3', '29014', 6),
+  (45, 'Málaga El Cónsul', 'c/ Navarro Ledesma, s/n', '29010', 6),
+  (46, 'Málaga San Rafael', 'Camino San Rafael, 63', '29006', 6),
+  (47, 'MAKRO', 'Avda Velázquez, 288', '29004', 7),
+  (48, 'ALAMEDA COLON', 'c/ Alameda Colón, 12', '29001', 8),
+  (49, 'EMILIO THUILLER', 'c/ Emilio Thuiller 112-114', '29014', 8),
+  (50, 'TEATINOS', 'Avda Jorge Luis Borges, 11 Edif. Don Juan', '29010', 8),
+  (51, 'CAMINO SUAREZ', 'c/ Camino Suárez 31', '29010', 8),
+  (52, 'JOAQUIN GAZTAMBIDE-VIRREINA', 'c/ Joaquín Gaztambide s/n', '29011', 8),
+  (53, 'PLAZA TEATRO', 'Plaza del Teatro, 1', '29008', 8),
+  (54, 'VICTORIA', 'Plaza Victoria, 1', '29012', 8),
+  (55, 'El Atabal', 'c/ Nuzas, 30 - El Atabal', '29010', 8),
+  (56, 'El Ejido', 'c/ San Millán 13', '29013', 8),
+  (57, 'Parque del Sur', 'AV. VIRGEN DE LAS GUIAS, 48', '29014', 8),
+  (58, 'Arroyo Angeles', 'c/ Carraca 1', '29011', 8),
+  (59, 'Portada Alta', 'c/ Cómpeta, 12, Cruz de Humilladero', '29007', 8),
+  (60, 'Cristo Epidemia', 'c/ Cristo de la Epidemia, 96', '29013', 8),
+  (61, 'Centro', 'c/ Gómez Pallete, 2-Mercado de la Merced', '29012', 8),
+  (62, 'Cruz Humilladero', 'c/ Horacio Lengo, 12', '29006', 8),
+  (63, 'MASKOM', 'c/ José Calderón, 216', '29590', 8),
+  (64, 'Miraflores', 'C/ JUAN ANTONIO TERCERO, 5', '29010', 8),
+  (65, 'Centro', 'c/ La Unión 71', '29006', 8),
+  (66, 'Puerto de la Torre', 'c/ Lope de Rueda, 61, Puerto de la Torre', '29190', 8),
+  (67, 'Molinillo', 'c/ San Bartolomé, 7-Esq.c/Duque de Rivas', '29013', 8),
+  (68, 'Eugenio Gross', 'Plaza Basconia 1', '29010', 8),
+  (69, 'El Cañaveral', 'Avda Arquitecto Luis Bono, 17, Puerto de la Torre', '29190', 9),
+  (70, 'MARTIRICOS', 'Avda del Dr. Marañón, 8, Palma-Palmilla', '29009', 9),
+  (71, 'Avda. de Europa', 'Avda Europa, S/N', '29003', 9),
+  (72, 'c/ Vellanueva de Tapia', 'Avda Imperio Argentina, 1, Cra de Cádiz', '29004', 9),
+  (73, 'Ortega y Gasset', 'Avda José Ortega y Gasset, s/n, Cruz de Humilladero', '29006', 9),
+  (74, 'El Palo', 'Avda Juan Sebastian Elcano, 147', '29016', 9),
+  (75, 'Avda. Santa Rosa de Lima', 'Avda Santa Rosa de Lima, 20', '29007', 9),
+  (76, 'Ctra. de Cádiz', 'Avda Velazquez, 43', '29002', 9),
+  (77, 'Teatinos', 'Bulevar Louis Pasteur, 15', '29010', 9),
+  (78, 'Centro Olletas', 'c/ Albeniz, 35 - c/ Bocana', '29014', 9),
+  (79, 'Plaza Mayor', 'c/ Alfonso Ponde de León, 2', '29004', 9),
+  (80, 'Calle Algarrobo', 'c/ Algarrobo, C. Potosí', '29018', 9),
+  (81, 'Huelín', 'c/ Eduardo Marquina, 10', '29002', 9),
+  (82, 'Emilio Thuiller', 'c/ Emilio Thuiller, 2', '29014', 9),
+  (83, 'C.C. Vialia', 'c/ Explanada de la Estación, 1', '29002', 9),
+  (84, 'Gutemberg', 'c/ Gutemberg, 1', '29014', 9),
+  (85, 'Cerrado de Calderón', 'c/ Olmos, 43', '29018', 9),
+  (86, 'Parque Azalea (Consul)', 'c/ Píndaro, c/ Aristófanes, s/n', '29010', 9),
+  (87, 'Hacienda Segovia', 'c/ Sarajevo-Finca Hacienda Segovia-Campanillas', '29590', 9),
+  (88, 'Camino de Suárez', 'Camino de Suarez, 22', '29011', 9),
+  (89, 'Camino Casabermeja', 'Camino Viejo Casabermeja, 64', '29011', 9),
+  (90, 'SUMA MÁLAGA', 'c/ Corregidor Francisco de Molina, 4', '29006', 10),
+  (91, 'MANILVA', 'Avda Manilva, 1', '29692', 1),
+  (92, 'EL JAMON', 'Ctra Sabinillas - Manilva Km. 0,2', '29692', 4),
+  (93, 'Sabinillas', 'c/ Bolivia, 18, San Luis de Sabinillas', '29692', 9),
+  (94, 'ARROYO MIEL', 'Avda AGUAMARINA', '29639', 1),
+  (95, 'BENALMADENA', 'Avda Antonio Machado 20', '29631', 1),
+  (96, 'TIVOLI', 'Avda Obispo Herrera Oria Esquina Avda Estación', '29630', 1),
+  (97, 'HIPERARROYO', 'Avda Salvador Vicente 3', '29630', 1),
+  (98, 'RESERVA D.HIGUERON', 'CC El Higuerón,C.Comar Mijas', '29630', 1),
+  (99, 'DIAMAXI', 'c/ Cortijo de Mena-parcela 3', '29630', 2),
+  (100, 'SP/OP PUERTO MARINA', 'Puerto Marina Shopping', '29639', 3),
+  (101, 'SP TORREQUEBRADA', 'Urb Torrequebrada - parcela C 4 centro', '29630', 3),
+  (102, 'EL JAMON', 'Avda Inmaculada Concepción', '29630', 4),
+  (103, 'Benalmádena', 'Avda del Cosmos, 2', '29630', 6),
+  (104, 'Benalmádena Torrequebrada', 'c/ Europa, 2', '29630', 6),
+  (105, 'BENALMÁDENA', 'c/ San Silvestre s/n', '29630', 8),
+  (106, 'MASKOM', 'Avda Juan Peralta, 49', '29630', 8),
+  (107, 'MASKOM', 'C/ SIDRA, 21-27', '29630', 8),
+  (108, 'Veracruz', 'Avda Arroyo Hondo, 29 (Urb Veracruz)', '29630', 9),
+  (109, 'Benalmadena Costa', 'Avda de las Palmeras,33', '29630', 9),
+  (110, 'Nueva Torrequebrada', 'Avda Estrella del Mar 21', '29630', 9),
+  (111, 'Arroyo De La Miel', 'c/ Federico García Lorca, 3', '29630', 9),
+  (112, 'Salvador Vicente Maravillas', 'c/ Paloma, 1-Avda Salvador Vicente Maravillas', '29630', 9),
+  (113, 'DIA', 'Avda Andalucia, 35', '29750', 2),
+  (114, 'Algarrobo', 'Ctra MA-103 Avda Las Pancha, 50', '29750', 6),
+  (115, 'Algarrobo Costa', 'Ctra A-7206, Sector AU-L.9 (C/ Balate)', '29750', 9),
+  (116, 'Chilches', 'c/ Jacaranda, s/n', '29790', 9),
+  (117, 'SUPECO MALAGA', 'c/ Heroe de Sostoa nº 188 esq. Avenida de la Paloma nº 36', '29003', 1),
+  (118, 'NERJA', 'c/ Antonio Ferrandis Chanquete, s/n', '29780', 1),
+  (119, 'CAPISTRANO', 'CN-340 Málaga-Almería PK 292-Urb ElCapistrano', '29780', 1),
+  (120, 'Nerja', 'Avda Alcalde Antonio Villasclaras Rosas, 3', '29780', 6),
+  (121, 'NERJA', 'c/ Antonio Ferrándiz (Chanquete)', '29780', 8),
+  (122, 'C/ San Miguel', 'c/ San Miguel - Pasaje San Miguel', '29780', 9),
+  (123, 'Urb. Sierra Mar', 'CN-340-C/ Sierra Mar-C/ Cartama', '29780', 9),
+  (124, 'RINCON VICTORIA', 'c/ Ronda, s/n', '29730', 1),
+  (125, 'CARREFOUR RINCON DE LA VICTORIA', 'c/ Arroyo de Totalan, nº 36 - CC LA VICTORIA', '29730', 1),
+  (126, 'LA CALA', 'Plaza Don Antonio Estrada, s/n - La Cala del Moral', '29730', 1),
+  (127, 'RINCON', 'Ctra de Benagalbon, s/n', '29730', 1),
+  (128, 'DIA', 'c/ Poeta Manuel alcántara, 1', '29730', 2),
+  (129, 'DIAMAXI', 'Ctra Benagalbón, s/n', '29730', 2),
+  (130, 'Rincón de la Victoria', 'c/ Verdial, 41', '29730', 6),
+  (131, 'Urbanización Los Olivos', 'Avda Mediterráneo - Urb Los Olivos', '29730', 9),
+  (132, 'Cotomar', 'c/ Pepa Flores González-Torre Benagalbón', '29730', 9),
+  (133, 'Torre De Benagalbón', 'Plaza Costa del Sol s/n - Urb Cotomar', '29730', 9),
+  (134, 'DOCTOR FLEMING', 'c/ Dr. Fleming, 26', '29740', 1),
+  (135, 'PRINCESA', 'c/ Princesa, 6, Edif. Boulevard', '29740', 1),
+  (136, 'F. LA BATERIA', 'Ctra Malaga-Almeria, Finca La Bateria Nº53', '29740', 1),
+  (137, 'DIA LA PLAZA', 'c/ del Rio Esq.Antonio Machado', '29740', 2),
+  (138, 'DIAMARKET', 'c/ Doctor Fleming, 77', '29740', 2),
+  (139, 'EROSKI', 'CC El Ingenio Avda Juan  Carlos I s/n', '29740', 5),
+  (140, 'Torre del Mar', 'C/ PINTOR CIPRIANO MALDONADO, 17', '29740', 8),
+  (141, 'Torre Del Mar', 'c/ Mar Tirreno, s/n', '29740', 9),
+  (142, 'El Tomillar', 'Ctra Torre del Mar-Velez  Málaga, PK 0,4-Ruta Los Galves s/n - 
+Ruta Los Carboneros s/n', '29740', 9),
+  (143, 'DIA LA PLAZA', 'Urb Charca-C/Urano s/n', '29793', 2),
+  (144, 'EL JAMON', 'Ctra Málaga-Almería PK 283 Avda de Andalucía, 56', '29793', 4),
+  (145, 'Torrox', 'Ctra Torrox Pueblo, s/n', '29793', 6),
+  (146, 'Torrox Costa', 'CN-340- Avda Andalucía-Urbanización Paraiso Sol, 92', '29793', 9),
+  (147, 'VELEZ CAMINO VIEJO', 'c/  Camino Viejo de Málaga', '29700', 1),
+  (148, 'DIAMAXI', 'Avda Juan Carlos I, s/n', '29700', 2),
+  (149, 'DIAMAXI', 'Avda Molino de Velasco, 12', '29700', 2),
+  (150, 'Vélez', 'Avda Juan Carlos I, 14', '29700', 6),
+  (151, 'Centro', 'C/CAMINO VIEJO DE MALAGA', '29700', 8),
+  (152, 'C/ Alcalde Juan Barranquero', 'c/ Alcalde Juan Barranquero, 1 - c/ Del Río, 38', '29700', 9),
+  (153, 'Camino Viejo de Málaga', 'Camino de Malaga, 33-37 -C/ Arroyo Hondo, 21-23- C/ del Cristo, 36.', '29700', 9),
+  (154, 'ALHA. DE LA TORRE', 'Avda Reyes Católicos, Esq. Juan Carlos I', '29130', 1),
+  (155, 'CAPELANIA', 'Urb La Capellanía, Manzana 9', '29130', 1),
+  (156, 'DIAMAXI', 'c/ Hacienda San Francisco 28', '29130', 2),
+  (157, 'Alhaurín de la Torre', 'Avda Ceuta s/n-Rotonda El Encuentro', '29130', 6),
+  (158, 'Cortijo Del Sol', 'Avda de los Cortijos s/n', '29130', 9),
+  (159, 'AVDA. DE LAS AMÉRICAS', 'C/ DE LOS REGISTRADORES, S/N', '29120', 9),
+  (160, 'Alhaurín El Grande', 'Crta. Cartama, s/n - Huerta de los Patos, s/n', '29120', 9),
+  (161, 'SUMA ALHAURIN', 'c/ Gerald Brenan, 72', '29120', 10),
+  (162, 'SUMA EL GRANDE', 'c/ Virgen del Rosario, 1', '29120', 10),
+  (163, 'Álora', 'c/ Albahaca, s/n', '29500', 9),
+  (164, 'DIA FRANQUICIA', 'PIaza La Pasadilla-Nave 1', '29567', 2),
+  (165, 'DIA FRANQUICIA', 'c/ San Benito, s/n-Prolongación', '29320', 2),
+  (166, 'MASCERKA', 'Avda Sta María del Reposo 17', '29320', 8),
+  (167, 'Campillos', 'Avda Constitución - C/ Gerardo Fernández Delgado - C/ Tirso de Molina', '29320', 9),
+  (168, 'Cártama', 'Ctra MA-421, PI El Cerro de Cártama', '29570', 6),
+  (169, 'Cartama Estación', 'c/ Alemania s/n - c/ Grecia s/n', '29580', 9),
+  (170, 'MASKOM', 'c/ Gonzalez Marín 126
+Cártama Pueblo', '29570', 8),
+  (171, 'EL JAMON', 'Ctra de Coin, 75', '29140', 4),
+  (172, 'Churriana', 'Ctra Coín 47. P.I. El Alamo', '29140', 6),
+  (173, 'Churriana', 'Avda San Javier, 3', '29140', 8),
+  (174, 'Churriana (Ctra.Alora)', 'c/ Escritora Carmen Bravo Villasante, 15', '29140', 8),
+  (175, 'Churriana (Ctra.Coín)', 'CARRETERA DE COIN, 77', '29140', 8),
+  (176, 'Las Espeñuelas', 'c/ Doctor Ramos Acosta, 104', '29140', 9),
+  (177, 'CARREFOUR VALLE DEL GUADALHORCE', 'Ctra Coín-Cártama PK 1', '29100', 1),
+  (178, 'DIA LA PLAZA', 'c/ Santa Teresa s/n', '29100', 2),
+  (179, 'DIAMAXI', 'Avda Reina Sofía, s/n', '29100', 2),
+  (180, 'Coín', 'Avda Reina Sofía, 50', '29100', 6),
+  (181, 'MASKOM', 'c/ Doctor Marañón s/n', '29100', 8),
+  (182, 'Avda. Reina Sofía', 'Avda Reina Sofía, s/n', '29100', 9),
+  (183, 'CARLOS HAYA', 'Avda Carlos Haya, 60', '29007', 1),
+  (184, 'MALDONADO', 'c/ Martinez Maldonado, 68', '29007', 1),
+  (185, 'DIA LA PLAZA', 'Avda Moliere, 18', '29004', 2),
+  (186, 'DIA LA PLAZA', 'c/ Martinez Maldonado, 53', '29007', 2),
+  (187, 'Málaga Centro', 'c/ Armengual de la Mota, 20', '29007', 6),
+  (188, 'MARTINEZ MALDONADO', 'c/ Martínez Maldonado, 71', '29007', 8),
+  (189, 'Carranque', 'c/ Pedro Gómez Chaix, 5, Cruz de Humilladero', '29007', 8),
+  (190, 'Mármoles', 'c/ Martinez Maldonado, 6', '29007', 9),
+  (191, 'PIZARRA', 'Plaza de la Estación, 1', '29560', 8),
+  (192, 'Centro', 'c/ Ingen. Pablo Esteban, 39-43', '29560', 8),
+  (193, 'HIPERDINO RONDA', 'PI El Fuerte, C/ Genal', '29400', 1),
+  (194, 'DIAMARKET', 'c/ Cruz Verde 16', '29400', 2),
+  (195, 'DIAMAXI', 'Avda de la Serranía, s/n', '29400', 2),
+  (196, 'DIAMAXI', 'c/ Guadalhorce  S/N', '29400', 2),
+  (197, 'Ronda', 'c/ Andrés Aguilar Gracián, s/n', '29400', 6),
+  (198, 'Centro', 'c/ Molinos, 36', '29400', 8),
+  (199, 'Centro', 'c/ Tabares 8', '29400', 8),
+  (200, 'Jardines De San Rafael', 'c/ Buleria s/n - c/ Andres Aguilar Gracian', '29400', 9),
+  (201, 'Calle Guadalquivir', 'c/ Guadalquivir s/n', '29400', 9),
+  (202, 'CARREFOUR FUENGIROLA', 'Parque Miramar. Av. Encarnación S/N', '29640', 1),
+  (203, 'DIA', 'c/ Huelva, 1 esq. Camino Coin, 18', '29640', 2),
+  (204, 'DIA', 'c/ Uruguay esq. Brasil, s/n', '29640', 2),
+  (205, 'DIA', 'Ps Jesus Santos Rein esq. Maestra Angeles Azpiazu', '29640', 2),
+  (206, 'DIA LA PLAZA', 'Avda Acapulco, 9', '29640', 2),
+  (207, 'SP FUENGIROLA', 'Avda N2 Padre Jesus Cautivo, 33 (Jesus Santos Rein n933)', '29640', 3),
+  (208, 'EL JAMON', 'Avda de los Boliches,94-96', '29640', 4),
+  (209, 'EL JAMON', 'c/ Doctor Gálvez Ginachero, esq. c/ Asturias', '29640', 4),
+  (210, 'EL JAMON', 'c/ Gimena, esq. Pasaje del Sol (parte peatonal)', '29640', 4),
+  (211, 'EL JAMON', 'c/ Nuñez de Balboa, esq. c/Goya', '29640', 4),
+  (212, 'EL JAMON', 'c/ Romería del Rocío, esq. c/Fiesta de la Crema,', '29640', 4),
+  (213, 'EL JAMON', 'c/ Uruguay, esq. c/Ricardo León', '29640', 4),
+  (214, 'EL JAMON', 'Camino de la Cantera, Los Pacos', '29640', 4),
+  (215, 'EL JAMON', 'Camino de Santiago, esq. C/Rioja', '29640', 4),
+  (216, 'Fuengirola', 'c/ Calerita', '29640', 6),
+  (217, 'FUENGIROLA', 'Crta MIJAS, 28', '29640', 8),
+  (218, 'MASKOM', 'AV. CONDES SAN ISIDRO S/N', '29640', 8),
+  (219, 'MASKOM', 'Avda Santa Amalia, s/n', '29640', 8),
+  (220, 'MASKOM', 'C/ PALANGREROS, 5', '29640', 8),
+  (221, 'BARRIO LOS BOLICHES', 'Avda Ramón y Cajal, s/n (Los Boliches)', '29640', 9),
+  (222, 'C/ Córdoba', 'c/ Córdoba, 35', '29640', 9),
+  (223, 'C/ FRANCISCO RIVERA', 'c/ Francisco Rivera Paquirri, 21', '29640', 9),
+  (224, 'El Boquetillo', 'c/ Mahón, s/n', '29640', 9),
+  (225, 'CARREFOUR LA CALA DE MIJAS', 'Avda MARENOSTRUM S/N LA CALA DE MIJAS', '29649', 1),
+  (226, 'C.C. LOS OLIVOS', 'c/ Adarves.CC los Olivos', '29649', 1),
+  (227, 'CALA MIJAS', 'c/ Nuevo Boulevard', '29649', 1),
+  (228, 'SP/OP MIJAS COSTA', 'N-340 De Cadiz km. 198,1 "Riviera del Sol"', '29649', 3),
+  (229, 'EL JAMON', 'c/ Río Aguas, esq. c/Río Padrón', '29640', 4),
+  (230, 'EL JAMON', 'CC El Zoco Ctra De Cádiz Km. 198', '29649', 4),
+  (231, 'Mijas-Sito Calahonda', 'c/ Juan de la Cierva', '29649', 6),
+  (232, 'Mijas La Cala', 'c/ Mar Cantábrico', '29649', 6),
+  (233, 'Mijas Las Lagunas', 'PI Molino de Viento Avda Carmen Sáez Tejada nº1', '29649', 6),
+  (234, 'CALAHONDA', 'C/ Romeral de Calypso,1', '29649', 8),
+  (235, 'Calahonda', 'c/ Mérida de Jarales, N° 4', '29649', 9),
+  (236, 'CARREFOUR MIJAS', 'Avda de los Lirios s/n', '29651', 1),
+  (237, 'DIA', 'Avda Mejico, 25', '29650', 2),
+  (238, 'DIA', 'c/ Dr.Garcia Games S/N - esq. San Bernardo', '29650', 2),
+  (239, 'DIA LA PLAZA', 'c/ Del Albero, Esquina Con Avd Dinamarca 1', '29651', 2),
+  (240, 'EL CORTE INGLES C.C. COSTA MIJAS', 'c/ Sta. Laura', '29651', 3),
+  (241, 'MIJAS COSTA', 'Avda. del Golf, 25', '29650', 8),
+  (242, 'AVDA. DE MIJAS', 'Avda DE MIJAS, Cl SAN DIONISIO N° 1', '29651', 9),
+  (243, 'CAMINO VIEJO DE COIN', 'UER. 2,3,4 CAMINO VIEJO DE COIN', '29651', 9),
+  (244, 'La Cala De Mijas', 'Urb EL LIMONAR S/N LA CALA DE MIJAS', '29651', 9),
+  (245, 'SP/OP MONTEALCHONES', 'Ctra A-397 Ronda - Malaga  Km45 UrbMontehalcones s/n', '29679', 3),
+  (246, 'BENAHAVIS', 'c/ Picos Alcazaba, S/n (Urb La Alquería), Benahavís', '29679', 9),
+  (247, 'ALCAMPO', 'Ctra DE OJEN S/N PARQUE CC LA CAÑADA', '29603', 11),
+  (248, 'MARBELLA', 'Avda General López Dominguez, 19', '29600', 1),
+  (249, 'ELVIRIA', 'c/ LG CC Elviria, s/n', '29600', 1),
+  (250, 'GUADALMINA', 'c/ LG CC Guadalmina', '29600', 1),
+  (251, 'VALENTUÑANA', 'c/ Valentuñana, Nº 3 (Edif. Marbeland)', '29601', 1),
+  (252, 'EL CASCO', 'Ctra N-340 Cádiz, Km. 188 El Casco', '29600', 1),
+  (253, 'HIPERMARBELLA', 'Ctra N-340 Cadiz-Malaga, Km.179 (F.Aresbank)', '29600', 1),
+  (254, 'DIA', 'Avda Andalucia, s/n -Camping Marbella Playa', '29604', 2),
+  (255, 'DIA', 'Avda Canovas Del Castillo S/N', '29601', 2),
+  (256, 'DIA', 'Avda El Trapiche, 27', '29601', 2),
+  (257, 'DIA LA PLAZA', 'c/ Rodrigo de Triana, 2', '29600', 2),
+  (258, 'DIA LA PLAZA', 'c/ San Antonio, s/n', '29600', 2),
+  (259, 'EL CORTE INGLES C.C. EL CAPRICHO', 'Avda Bulevar Principe Alfonso de Hohenlohe', '29602', 3),
+  (260, 'EL CORTE INGLES C.C. MARBELLA', 'c/ Ramon Areces, s/n', '29660', 3),
+  (261, 'SP/OP PLAYAS DEL DUQUE', 'Avda Playa del Duque c/v Avd. Jose BanUs', '29660', 3),
+  (262, 'SP/OP MARBELLA', 'Avda Ramon y Cajal. Conj.Urb Marbella Center', '29601', 3),
+  (263, 'SP/OP NUEVA ANDALUCIA', 'c/ 2B C.Comercial Odeon,local 2 al 8. Nueva Andalucia', '29660', 3),
+  (264, 'SP/OP PINOGOLF', 'c/ Coto de los Dolores, s/n UrbPinogolf, Elviria', '29600', 3),
+  (265, 'SP OP ALOHA', 'CC "Aloha", C/ Via 1, Urb Nueva Andalucia', '29660', 3),
+  (266, 'SP/OP ANDASOL', 'CC Andasol km 187 Nac.340', '29600', 3),
+  (267, 'SP PLAZA DEL MAR', 'CC Plaza del Mar - c/ Camila Jose Cela, s/n', '29600', 3),
+  (268, 'SP OP LAS CHAPAS', 'c/ Hacienda Las Chapas, s/n', '29600', 3),
+  (269, 'Marbella', 'Bulevar Príncipe Alfonso Von Hohenlohe s/n', '29600', 6),
+  (270, 'Marbella-Elviría', 'c/ La Hacienda', '29604', 6),
+  (271, 'Avda de las Albarizas', 'Avda de las Albarizas (Urb, Las Terrazas)', '29601', 9),
+  (272, 'RICARDO SORIANO', 'Avda Ricardo soriano, 70 (Edif. Golden)', '29601', 9),
+  (273, 'Nueva Andalucía', 'c/ CALIFA, 1', '29660', 9),
+  (274, 'XARBLANCA', 'c/ Francisca Carrillo, 3 (Urb XARBLANCA)', '29602', 9),
+  (275, 'Elviria', 'c/ San Manuel, s/n', '29604', 9),
+  (276, 'Ctra de Ojen', 'c/ Serenata', '29600', 9),
+  (277, 'Los Naranjos', 'Urb Los Naranjos de Marbella', '29660', 9),
+  (278, 'MK GUADALCANTARA', 'Avda Virgen del Rocío - Urb s/n', '29670', 1),
+  (279, 'S.PEDRO ALCANTARA', 'Plaza Juan Macías', '29670', 1),
+  (280, 'SAN PEDRO', 'Urb Cortijo Blanco, Parcela A1', '29670', 1),
+  (281, 'SUPECO MARBELLA', 'c/ Sta. Maria Esquina Fuente Nueva', '29670', 1),
+  (282, 'DIA', 'CC La Colonia N-340', '29670', 2),
+  (283, 'DIA', 'Ctra Comarcal 3, Manzana 3 (San Pedro de Alcantara)', '29670', 2),
+  (284, 'SP/OP PUERTA MARBELLA', 'Urb Rio Verde CC.Puerta de Bandas Locales 1,2,5 y 6', '29670', 3),
+  (285, 'S.Pedro Alcantara', 'c/ Lagasca, 56', '29670', 8),
+  (286, 'S.Pedro Alcantara', 'C/ GÓMEZ DE LA SERNA, 2', '29670', 8),
+  (287, 'SAN PEDRO ALCÁNTARA', 'c/ Santa Leonor, S/N', '29670', 9),
+  (288, 'DIA', 'Autovía A7, PK 142.5, urbanización Los Hidalgos', '29692', 2),
+  (289, 'Manilva', 'Ctra N-340, Km 1079', '29692', 6),
+  (290, 'PORTADA', 'c/ La Portada, Parcela 4', '29680', 1),
+  (291, 'CARREFOUR ESTEPONA', 'Ctra Cádiz-Málaga km. 156,9', '29680', 1),
+  (292, 'ESTEPONA', 'c/ Torre Almenara, Frente al Puerto', '29680', 1),
+  (293, 'BELL AIR', 'Urb Bell-Air Camino Calderon', '29680', 1),
+  (294, 'DIA', 'Avda Carlos Cano,1. Conjunto Miramar, Fase Ii 8', '29680', 2),
+  (295, 'DIA', 'c/ Juan Gris, 15', '29680', 2),
+  (296, 'SP/OP ESTEPONA', 'Avda de Espatia,s/n Parcela Sur Puerto Deportivo Estepona', '29680', 3),
+  (297, 'SUPERCOR MONTEMAYOR (ESTEPONA)', 'Avda Puerta del Mar 45', '29680', 3),
+  (298, 'SP/OP EL PILAR', 'Urb "El Pilar" parcela G-dos y G-uno. N-340 (Km 167,5)', '29680', 3),
+  (299, 'Estepona', 'Avda Puerta del Mar, s/n', '29680', 6),
+  (300, 'ESTEPONA', 'Avda España, 200', '29680', 8),
+  (301, 'Avda. Andalucía', 'Avda ANDALUCIA, S/N', '29680', 9),
+  (302, 'Bel- Air', 'Avda DE BEL-AIR, 2', '29680', 9),
+  (303, 'LA PORTADA', 'AVDA. ANDALUCÍA, 20', '29680', 9),
+  (304, 'CAMINO DE LAS MESAS', 'C/ ITALIA, 1', '29680', 9),
+  (305, 'ARROYO DE ENMEDIO', 'C/ JOSEFINA SAMPER, S/N', '29680', 9),
+  (306, 'CASABLANCA', 'c/  Casablanca, 5', '29620', 1),
+  (307, 'CARREFOUR TORREMOLINOS', 'CN-340 CC  Costasol Centro Carretera Circunvalación s/nº', '29620', 1),
+  (308, 'PLAYAMAR', 'Paseo del Colorado 25', '29620', 1),
+  (309, 'HIPERTORREMOLINOS', 'Avda de los Manantiales, s/n', '29620', 1),
+  (310, 'DIA', 'Avda Benalmadena S/N', '29620', 2),
+  (311, 'DIA', 'c/ Ciudad de Porcuna, 4', '29620', 2),
+  (312, 'DIA', 'c/ Joan Miró Nº8', '29620', 2),
+  (313, 'Torremolinos Saltillo', 'Avda Carlota Alesandri, nº 288', '29620', 6),
+  (314, 'Torremolinos Playamar', 'c/ Cruz, 69', '29620', 6),
+  (315, 'Centro', 'c/ GRAN CARDENAL, 12', '29620', 8),
+  (316, 'Playamar', 'Avda Playamar, S/N', '29620', 9),
+  (317, 'El Pinillo', 'c/ Miguel de Cervantes, s/n', '29620', 9),
+  (318, 'Río Aranda', 'c/ Rio Aranda, S/N', '29620', 9),
+  (319, 'Plaza Costa Del Sol', 'Plaza Costa del Sol, S/N', '29620', 9),
+  (320, 'LOS GUINDOS', 'c/ Camino de los Guindos, 8', '29004', 1),
+  (321, 'CUARTELES', 'c/ Cuarteles, 49', '29002', 1),
+  (322, 'PASEO DE LOS TILOS', 'Paseo de los Tilos, 53', '29006', 1),
+  (323, 'CARREFOUR LOS PATIOS', 'Ctra de Cádiz, Km. 241 - CC Los Patios', '29004', 1),
+  (324, 'DIA FRANQUICIA', 'c/ Mirarosas', '29006', 2),
+  (325, 'DIA LA PLAZA', 'c/ Reboul, s/n - Esq Gregorio Frías', '29006', 2),
+  (326, 'DIAMARKET', 'c/ Ayala 82', '29002', 2),
+  (327, 'DIAMAXI', 'Avda Velázquez, 9', '29003', 2),
+  (328, 'DIAMAXI', 'c/ Cuarteles, 35', '29002', 2),
+  (329, 'EL JAMON', 'Avda Europa, 112', '29003', 4),
+  (330, 'EL JAMON', 'c/ Paseo de los Tilos, 35', '29006', 4),
+  (331, 'Málaga Cruz de Humilladero', 'c/ Gerona, 43', '29006', 6),
+  (332, 'Málaga Sostoa', 'c/ Héroe Sostoa, 126', '29002', 6),
+  (333, 'Málaga Litoral', 'c/ Villanueva de Algaidas,6', '29004', 6),
+  (334, 'PAVIA', 'Avda. de la Aurora esq. C/ Pavía numero 9', '29002', 8),
+  (335, 'CARRIL DE LA CHUPA', 'c/ Carril de la Chupa s/n', '29004', 8),
+  (336, 'CUARTELILLO', 'c/ Cuarteles, 37', '29002', 8),
+  (337, 'PARQUE PONIENTE- LA TÉRMICA', 'c/ Canillas de Aceituno, 1', '29004', 8),
+  (338, 'La Luz', 'Avda Antonio Gaudí, 10', '29004', 8),
+  (339, 'Camino San Rafael', 'c/ Alozaina 17', '29006', 8),
+  (340, 'Centro', 'C/ AYALA, 92', '29002', 8),
+  (341, 'Huelin', 'c/ Capulino Jáuregui, 3', '29002', 8),
+  (342, 'Carretera de Cártama', 'c/ Obsidiana, 1-Barriada Santa Cristina', '29006', 8),
+  (343, 'Puerta Blanca', 'Avda Velazquez, 95 - C/ Viña del Mar, 2', '29004', 9),
+  (344, 'Camino San Rafael', 'Camino San Rafael, 55', '29006', 9),
+  (345, 'DIA FRANQUICIA', 'Avda Blas Infante 10', '29530', 2),
+  (346, 'MASKOM', 'Plaza Andalucía 20', '29530', 8),
+  (347, 'CARREFOUR ANTEQUERA', 'CC La Verónica. Ctra Sevilla CN 343-PK 6,5', '29200', 1),
+  (348, 'Antequera', 'c/ Barrrero, 10--Ctra Sevilla-Cuesta Talavera', '29200', 6),
+  (349, 'AVDA. DE LA ESTACION', 'Avda de la Estación s/n', '29200', 9),
+  (350, 'CALZADA', 'c/ Calzada, 18', '29200', 9),
+  (351, 'PARQUESOL', 'Urb Parquesol, 32', '29200', 9),
+  (352, 'MASKOM', 'c/ Nueva 16-18', '29300', 8),
+  (353, 'Archidona', 'Avda Llano de Pablo Picasso, 30', '29300', 9),
+  (354, 'Mollina', 'Avda de la Casería del Rey, 12', '29532', 8),
+  (355, 'MASKOM', 'C/ Archidona 15', '29310', 8),
+  (356, 'DIAMARKET', 'Ctra Antequera-Malaga, Km 64.14', '29310', 2),
+  (357, 'MASKOM', 'Av. JUAN XXIII, 28', '29566', 8),
+  (358, 'MASKOM', 'C/ AGUILAR Y CANO, 4', '29018', NULL);
 
--- 10. TIENDAS EN CAMPAÑA (campaña 1 - Primavera 2026)
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 1);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 2);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 3);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 4);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 5);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 6);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 7);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 8);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 9);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 10);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 11);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 12);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 13);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 14);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 15);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 16);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 17);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 18);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 19);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 20);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 21);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 22);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 23);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 24);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 25);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 26);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 27);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 28);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 29);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 30);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 31);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 32);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 33);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 34);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 35);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 36);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 37);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 38);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 39);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 40);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 41);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 42);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 43);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 44);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 45);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 46);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 47);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 48);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 49);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 50);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 51);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 52);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 53);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 54);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 55);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 56);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 57);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 58);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 59);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 60);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 61);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 62);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 63);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 64);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 65);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 66);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 67);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 68);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 69);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 70);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 71);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 72);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 73);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 74);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 75);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 76);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 77);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 78);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 79);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 80);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 81);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 82);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 83);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 84);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 85);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 86);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 87);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 88);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 89);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 90);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 91);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 92);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 93);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 94);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 95);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 96);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 97);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 98);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 99);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 100);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 101);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 102);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 103);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 104);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 105);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 106);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 107);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 108);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 109);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 110);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 111);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 112);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 113);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 114);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 115);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 116);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 117);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 118);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 119);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 120);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 121);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 122);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 123);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 124);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 125);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 126);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 127);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 128);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 129);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 130);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 131);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 132);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 133);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 134);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 135);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 136);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 137);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 138);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 139);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 140);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 141);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 142);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 143);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 144);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 145);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 146);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 147);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 148);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 149);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 150);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 151);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 152);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 153);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 154);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 155);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 156);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 157);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 158);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 159);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 160);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 161);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 162);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 163);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 164);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 165);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 166);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 167);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 168);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 169);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 170);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 171);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 172);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 173);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 174);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 175);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 176);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 177);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 178);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 179);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 180);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 181);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 182);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 183);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 184);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 185);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 186);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 187);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 188);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 189);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 190);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 191);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 192);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 193);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 194);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 195);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 196);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 197);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 198);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 199);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 200);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 201);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 202);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 203);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 204);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 205);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 206);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 207);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 208);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 209);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 210);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 211);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 212);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 213);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 214);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 215);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 216);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 217);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 218);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 219);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 220);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 221);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 222);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 223);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 224);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 225);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 226);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 227);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 228);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 229);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 230);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 231);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 232);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 233);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 234);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 235);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 236);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 237);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 238);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 239);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 240);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 241);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 242);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 243);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 244);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 245);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 246);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 247);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 248);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 249);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 250);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 251);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 252);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 253);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 254);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 255);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 256);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 257);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 258);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 259);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 260);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 261);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 262);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 263);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 264);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 265);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 266);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 267);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 268);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 269);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 270);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 271);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 272);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 273);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 274);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 275);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 276);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 277);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 278);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 279);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 280);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 281);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 282);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 283);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 284);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 285);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 286);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 287);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 288);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 289);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 290);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 291);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 292);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 293);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 294);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 295);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 296);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 297);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 298);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 299);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 300);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 301);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 302);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 303);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 304);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 305);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 306);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 307);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 308);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 309);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 310);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 311);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 312);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 313);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 314);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 315);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 316);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 317);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 318);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 319);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 320);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 321);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 322);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 323);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 324);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 325);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 326);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 327);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 328);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 329);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 330);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 331);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 332);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 333);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 334);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 335);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 336);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 337);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 338);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 339);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 340);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 341);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 342);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 343);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 344);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 345);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 346);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 347);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 348);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 349);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 350);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 351);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 352);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 353);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 354);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 355);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 356);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 357);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 358);
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES (1, 359);
+-- 11. TIENDAS EN CAMPAÑA (solo las participantes)
+INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES
+  (1, 48),
+  (1, 49),
+  (1, 50),
+  (1, 51),
+  (1, 52),
+  (1, 53),
+  (1, 54),
+  (1, 56),
+  (1, 57),
+  (1, 58),
+  (1, 59),
+  (1, 60),
+  (1, 61),
+  (1, 62),
+  (1, 63),
+  (1, 64),
+  (1, 65),
+  (1, 66),
+  (1, 67),
+  (1, 68),
+  (1, 69),
+  (1, 70),
+  (1, 71),
+  (1, 72),
+  (1, 73),
+  (1, 74),
+  (1, 75),
+  (1, 76),
+  (1, 77),
+  (1, 78),
+  (1, 79),
+  (1, 80),
+  (1, 81),
+  (1, 82),
+  (1, 83),
+  (1, 85),
+  (1, 86),
+  (1, 87),
+  (1, 88),
+  (1, 89),
+  (1, 93),
+  (1, 105),
+  (1, 106),
+  (1, 107),
+  (1, 108),
+  (1, 109),
+  (1, 110),
+  (1, 111),
+  (1, 112),
+  (1, 115),
+  (1, 116),
+  (1, 121),
+  (1, 122),
+  (1, 123),
+  (1, 131),
+  (1, 132),
+  (1, 133),
+  (1, 140),
+  (1, 141),
+  (1, 142),
+  (1, 146),
+  (1, 151),
+  (1, 152),
+  (1, 153),
+  (1, 158),
+  (1, 159),
+  (1, 160),
+  (1, 163),
+  (1, 167),
+  (1, 169),
+  (1, 170),
+  (1, 173),
+  (1, 174),
+  (1, 175),
+  (1, 176),
+  (1, 181),
+  (1, 182),
+  (1, 188),
+  (1, 189),
+  (1, 190),
+  (1, 191),
+  (1, 192),
+  (1, 198),
+  (1, 199),
+  (1, 200),
+  (1, 201),
+  (1, 217),
+  (1, 218),
+  (1, 219),
+  (1, 220),
+  (1, 221),
+  (1, 222),
+  (1, 223),
+  (1, 224),
+  (1, 234),
+  (1, 235),
+  (1, 241),
+  (1, 242),
+  (1, 243),
+  (1, 244),
+  (1, 246),
+  (1, 271),
+  (1, 272),
+  (1, 273),
+  (1, 274),
+  (1, 275),
+  (1, 276),
+  (1, 277),
+  (1, 285),
+  (1, 286),
+  (1, 287),
+  (1, 300),
+  (1, 301),
+  (1, 302),
+  (1, 303),
+  (1, 304),
+  (1, 305),
+  (1, 315),
+  (1, 316),
+  (1, 317),
+  (1, 318),
+  (1, 319),
+  (1, 334),
+  (1, 335),
+  (1, 336),
+  (1, 337),
+  (1, 338),
+  (1, 339),
+  (1, 340),
+  (1, 341),
+  (1, 342),
+  (1, 343),
+  (1, 346),
+  (1, 349),
+  (1, 350),
+  (1, 351),
+  (1, 352),
+  (1, 353),
+  (1, 354),
+  (1, 355),
+  (1, 357),
+  (1, 358);
+
+-- 12. ENTIDADES COLABORADORAS
+INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES
+  (1, 'AAVV TORRIJOS', 'Centro Ciudadano Huelin.Calle Emilio de la Cerda 24,2ª. 29002 MALAGA', NULL),
+  (2, 'ABC ASOCIACIÓN BENEFICA CRISTIANA DIOS ES FIEL', 'Calle Jabalcuza,11
+29130 - Alhaurín de la Torre ( Malaga)', NULL),
+  (3, 'ACCEM', 'Callejón Pericón
+29008 - Málaga', NULL),
+  (4, 'ACCION PLURAL', 'CALLE CANALES,7
+29002 - Málaga', NULL),
+  (5, 'ADINTRE', 'Calle Feria de Jerez s/n
+29640 - Fuengirola, Málaga', NULL),
+  (6, 'ADRA', 'Calle Licurgo, 26
+29004 - Málaga', NULL),
+  (7, 'AECC ASOCIACION ESPAÑOLA CONTRA EL CANCER MALAGA', 'Alameda de Capuchinos, 37-39, 29009 Málaga', NULL),
+  (8, 'AGRUPACIÓN COFRADIAS DE MARBELLA', 'PLAZA DE LA IGLESIA, S/N
+29601 - Marbella, Málaga', NULL),
+  (9, 'ALCER ASOCIACION PARA LA LUCHA CONTRA LAS ENFERMEDADES RENALES', 'Avenida Carlos de Haya, 41 1ºB
+29010 - Malaga', NULL),
+  (10, 'AMANECER EN LA COLONIA ASOCIACIÓN', 'C/ Bilbao, 2
+29660 San Pedro Alcántara', NULL),
+  (11, 'AMFREMAR COMEDOR SOCIAL', 'Practicante Fernández Alcolea, 11', NULL),
+  (12, 'ARPOM - AYUDA RECUPERACION POLITOXICOMANOS MARGINADOS. ALORA', 'Camimo de la Vega Redonda. s/n 
+29500 - Alora', NULL),
+  (13, 'ASIMA ASOCIACION CIUDADANA ANTISIDA DE MALAGA', 'Calle Cruz Verde, 22
+29013 - Málaga', NULL),
+  (14, 'ASIS COMEDOR SOCIAL DE ANTEQUERA', 'C/ Córdoba 29, Antequera, CP
+29200 (Málaga)', NULL),
+  (15, 'ASOCIACIÓN AYUDA SOCIAL PALABRAS DE PODER', 'Calle Tulipan,48', NULL),
+  (16, 'ASOCIACIÓN CENTRO DE VIDA CRISTIANA DE MALAGA', 'Camino de la Corta s/n
+29010 - Málaga', NULL),
+  (17, 'ASOCIACIÓN CONTRA LA POBREZA Y EXCLUSION SOCIAL DE VELEZ-MALAGA', 'Plz de las Indias, 7
+29700 Vélez-Málaga', NULL),
+  (18, 'ASOCIACIÓN CULTURAL BENFICA 100.1 AMANECER', 'CALLE SALESIANOS ,6', NULL),
+  (19, 'ASOCIACIÓN EL VUELO DE LAS LIBELULAS', 'Avda Estrella de Mar, 18
+29630 - Benalmádena, Málaga', NULL),
+  (20, 'ASOCIACIÓN EVANGELICA GRAN LUZ', 'Pza. Hospital Civil 
+29009 - Málaga', NULL),
+  (21, 'ASOCIACIÓN MARROQUI', 'CALLE JINETES, NUM 5
+29012 - Málaga', NULL),
+  (22, 'ASOCIACIÓN NUEVA CULTURA DESARROLLO GITANO', 'Río Viñuela, 1-Villa Carmen 4
+29651 Mijas Costa', NULL),
+  (23, 'ASOCIACIÓN PAPILIO', 'CAMINO VIEJO DE VÉLEZ,5
+29738 - Torre de Benagalbon, Rincón de la Victoria, Málaga', NULL),
+  (24, 'ASOCIACIÓN RED MADRE MALAGA', 'Jaboneros, 7
+29009 - Málaga', NULL),
+  (25, 'ASOCIACIÓN SAN IGNACIO', 'C/ ABUL BEKA 15, 29004 malaga', NULL),
+  (26, 'ASOCIACIÓN SAN VICENTE DE PAUL', 'C/ Eucalipto. Iglesia de la Mosca', NULL),
+  (27, 'AYUNTAMIENTO DE ALAMEDA', 'PLAZA DE ESPAÑA, 5
+29530 - Alameda, Málaga', NULL),
+  (28, 'AYUNTAMIENTO DE ALGARROBO', 'c/Antonio Ruiz Rivas, 2
+29750', NULL),
+  (29, 'AYUNTAMIENTO DE ALGATOCIN', 'C/ FUENTE Nº 2
+29491 - Algatocín, Málaga', NULL),
+  (30, 'AYUNTAMIENTO DE ALMACHAR', NULL, NULL),
+  (31, 'AYUNTAMIENTO DE ALMOGIA', 'Plz de la Constitución, s/n 29150 Almogía, Málaga', NULL),
+  (32, 'AYUNTAMIENTO DE ARCHIDONA', 'PLAZA OCHAVADA Nº1
+29300 - Archidona, Málaga', NULL),
+  (33, 'AYUNTAMIENTO DE ARRIATE', 'Plz de la emigración Arriateña, s/n
+29350 - Arriate, Málaga', NULL),
+  (34, 'AYUNTAMIENTO DE CASABERMEJA', 'C/ LLANETE DE ABAJO, 2
+29160 - Casabermeja, Málaga', NULL),
+  (35, 'AYUNTAMIENTO DE CORTES DE LA FRONTERA', 'PLAZA CARLOS TERCERO
+29380 - Cortes de la Frontera, Málaga', NULL),
+  (36, 'AYUNTAMIENTO DE FUENTE DE PIEDRA', 'Calle Ancha, 9                 29520 - Fuente de Piedra (Málaga)', NULL),
+  (37, 'AYUNTAMIENTO DE HUMILLADERO', 'Avda. El Emigrante, 1                       29531 Humilladero', NULL),
+  (38, 'AYUNTAMIENTO DE JUBRIQUE', 'CALLE CONSTITUCIÓN S/N.BAJOS AYUNTAMIENTO', NULL),
+  (39, 'AYUNTAMIENTO DE MANILVA', 'Calle Mar, 34
+29691 Manilva, Málaga, España', NULL),
+  (40, 'AYUNTAMIENTO DE MOCLINEJO', NULL, NULL),
+  (41, 'AYUNTAMIENTO DE MOLLINA', 'CALLE DE LA ALAMEDA, 1
+29532 - Mollina, Málaga', NULL),
+  (42, 'AYUNTAMIENTO DE MONTEJAQUE', 'Plz Constitución, 4
+29360 - Montejaque, Málaga', NULL),
+  (43, 'AYUNTAMIENTO DE OJEN', 'Camino Marbella, 3
+29610 Ojén, Málaga', NULL),
+  (44, 'AYUNTAMIENTO DE SIERRA DE YEGUAS', 'Plz Andalucia, 1            29328 - Sierra de Yeguas (Málaga)', NULL),
+  (45, 'AYUNTAMIENTO DE TEBA', 'Pl. de la Constitución, 13, 29327 Teba, Málaga', NULL),
+  (46, 'AYUNTAMIENTO DE TORROX', 'Plz de la Constitución, 1                           
+29793 Torrox', NULL),
+  (47, 'AYUNTAMIENTO DE VILLANUEVA  DEL TRABUCO', 'Plaza del Prado, 1
+29313 - Villanueva del Trabuco, Málaga', NULL),
+  (48, 'AYUNTAMIENTO DE VILLANUEVA DE ALGAIDAS', 'C/ Constitución, 16          29310 - Villanueva de Algaidas (Málaga)', NULL),
+  (49, 'AYUNTAMIENTO DEL VALLE DE ABDALAJIS', 'Calle Alameda, 2
+29240 Valle de Abdalajís, Málaga', NULL),
+  (50, 'BUENAS NUEVAS IGLESIA EVANGELICA', 'Camino San Rafael, 91
+29006 Málaga', NULL),
+  (51, 'CARITAS CALVARIO - MARBELLA', 'Calle del Calvario, s/n 
+29601 Marbella', NULL),
+  (52, 'CARITAS CASTRENSE', 'C/ Casas de Campos,18.Bajo Izq
+29001 - Málaga', NULL),
+  (53, 'CARITAS DIOCESANA - HOGAR POZO DULCE', 'C/ Pozos Dulces, - 29008 - Málaga', NULL),
+  (54, 'CARITAS NUEVA ANDALUCIA - MARBELLA', 'Avda. Gustavo Adolfo Bécquer, 40 
+29660 Nueva Andalucía', NULL),
+  (55, 'CARITAS PARROQUIAL SANTO TOMÁS DE AQUINO', 'Calle Salvador Dalí, 3
+29009 - Málaga', NULL),
+  (56, 'CARITAS PURISIMA CONCEPCION. MALAGA', 'Plz Prudencio Jiménez, 1
+29010 - Málaga', NULL),
+  (57, 'CARITAS SAN JOSE DE ESTEPONA', 'Mariana Pineda, 1
+29680 - Estepona, Málaga', NULL),
+  (58, 'CARITAS VIRGEN DEL ROCIO - SAN PEDRO ALCANTARA', 'Avda. Virgen del Rocío, 25                            
+29670 San Pedro de Alcántara', NULL),
+  (59, 'CARMELITAS MISIONERAS COMUNIDAD DE RELIGIOSAS SANTA TERESA', 'Avda. del Carmelo, 12                              29620 Torremolinos, Malaga', NULL),
+  (60, 'CASA MENGA ASOC', 'Plz de Capuchinos, 2
+Antequera', NULL),
+  (61, 'CASA SALESIANA-COLEGIO SAGRDO CORAZON DE JESUS', 'Carretera de Campillos,S/N', NULL),
+  (62, 'CENTRO ACOGIDA DE SAN JUAN DE DIOS', 'Plazuela de San Juan de Dios, 2             29008 Málaga', NULL),
+  (63, 'CESMA CENTRO ESPAÑOL DE SOLIDARIDAD DE MALAGA ALGARROBO-AXARQUIA', 'Carretera Algarrobo, Km 1', NULL),
+  (64, 'CIUDAD DE LOS NIÑOS - HERMANOS OBREROS DE MARIA', 'Finca Los Asperones, s/n  - 29010 - Málaga', NULL),
+  (65, 'COLEGIO LA MILAGROSA-HIJAS DE LA CARIDAD - EL PALO', 'PLAZA VIRGEN MILAGROSA 11, 29017 - Málaga', NULL),
+  (66, 'COMEDOR SOCIAL ADE RONDA', 'C/ Infantes, 51
+29400 Ronda', NULL),
+  (67, 'COMEDOR SOCIAL HIJAS DE LA CARIDAD', 'C/ ARLANZA Nº 7
+29011 - Málaga', NULL),
+  (68, 'COMEDOR SOCIAL YO SOY TU', 'Calle Moreno Nieto, 18
+29011 Málaga', NULL),
+  (69, 'COMUNIDAD RR ADORATRICES CASA EN MÁLAGA', 'Santa María Micaela, s/n
+29013 Málaga', NULL),
+  (70, 'COMUNIDAD SANTA ROSALÍA', 'Calle Bernardo de Balbuena,3
+29591 - Santa Rosalía, Málaga', NULL),
+  (71, 'CONVENTO NUESTRA SEÑORA DE LA PAZ. CLARISAS TRINIDAD', 'Plz Zumaya, 5
+29009 - Málaga', NULL),
+  (72, 'COOPERACIÓN INTERNACIONAL', 'Club Maestranza. Avenida de las Caballerizas, Limonar', NULL),
+  (73, 'CORAJE SOLIDARIO', 'Calle Sta. Isabel 15
+29640 Fuengirola, Málaga', NULL),
+  (74, 'CORAZONES MALAGUEÑOS', 'CAMINO DE SAN RAFAEL', NULL),
+  (75, 'COTOLENGO FUNDACION CASA DEL SAGRADO CORAZON DE JESUS', 'c/ López Pinto
+29002 - Málaga', NULL),
+  (76, 'DESARROLLO E INTEGRACION DIEZ 42', 'Av.Andalucia, 27-Local 7A    
+29010 Málaga', NULL),
+  (77, 'EMAUS OBRA DE AMOR COMEDOR SOCIAL VELEZ-MALAGA', 'C/ Esperanza nº 15
+29700 Vélez- Málaga', NULL),
+  (78, 'EMAUS, OBRA DE AMOR ESTEPONA', 'Calle del Naranjo, 5
+29680 - Estepona, Málaga', NULL),
+  (79, 'EMAUS, OBRA DE AMOR TORREMOLINOS', 'C/ CRUZ Nº 5, 1º
+29620 - Torremolinos, Málaga', NULL),
+  (80, 'FIBROMIALGIA - ASOC DE FIBROMIALGIA Y FATIGA CRONICA DE ARRIATE', 'C/ LA FABRICA S/N
+29350 - Arriate, Málaga', NULL),
+  (81, 'FUNDACIÓN BENÉFICA VIRGEN DE VALVANUZ', 'Huerto de los Claveles, 7 - Bajo 7
+29013 - Málaga', NULL),
+  (82, 'FUNDACION DE LEONES. TORREMOLINOS', 'Calle Tiépolo.S/N.Local 5 y 6
+29620 - Torremolinos, Málaga', NULL),
+  (83, 'FUNDACION LA MERCED MIGRACIONES', 'Plz de las Flores,5
+29005 Málaga', NULL),
+  (84, 'FUNDACION PROLIBERTAS', 'Cruz Blanca, 25
+29200 - Antequera, Málaga', NULL),
+  (85, 'HERMANAS DE LA COMPAÑIA DE LA CRUZ (PIZARRA)', 'Alta, 8
+29560  Pizarra', NULL),
+  (86, 'HERMANAS DE LA CRUZ RONDA', 'Plz Duquesa de Parcent, 7
+29400 - Ronda, Málaga', NULL),
+  (87, 'HERMANITAS DE LOS POBRES DE RONDA', 'Av. Poeta Rilke, 2 B
+29400 - Ronda, Málaga', NULL),
+  (88, 'HOGAR BETANIA', 'C/ Dos Aceras,18
+29012 - Málaga', NULL),
+  (89, 'INSERTA ANDALUCIA', 'CALLE JOSÉ PALANCA 1
+29003 - Málaga', NULL),
+  (90, 'INTEGRACIÓN PARA LA VIDA "INPAVI"', 'Camino de la Corta s/n', NULL),
+  (91, 'JARIFA ASOC ALIMENTOS', 'Calle Atrás, 2
+29500 Álora, Málaga', NULL),
+  (92, 'JOMAD ASOC AYUDA A JOVENES Y MENORES MARGINADOS POR LAS DROGAS', 'C/ Altozano 1-3, 29013 - Málaga', NULL),
+  (93, 'LA UNIÓN DE CIUDAD JARDÍN', 'Avda. Las Postas, s/n - Antiguo Colegio Salvador Rueda
+29014 - MÁLAGA', NULL),
+  (94, 'MAYDAN MALAGA ASOC', 'C/Rafaela 18-2
+29009 Málaga', NULL),
+  (95, 'MENSAJEROS DE LA PAZ ANDALUCIA', 'C. de Prosper Mérimée,17.Bloque 7,2b', NULL),
+  (96, 'MUJERES DE LA LAGUNA', 'JUANA CASTRO 2
+29010 - Málaga', NULL),
+  (97, 'NOVAYA VOLNA', 'C/Antonio Jiménez Ruiz, 54
+29009 Malaga', NULL),
+  (98, 'PATRONATO HOGAR NUESTRA SEÑORA DE LOS ÁNGELES', 'C/ Arroyo de los Angeles,  S/N
+APTDO CORREOS 63
+29011 - Málaga', NULL),
+  (99, 'PENTECOSTAL IGLESIA APOSTOLICA ANTEQUERA', 'Arrayán, 6
+29200 - Antequera, Málaga', NULL),
+  (100, 'PEPE BRAVO CASA DE ACOGIDA', 'C/ Sanchez Rivas Nº 36
+29567 Alozaina, Málaga', NULL),
+  (101, 'RELIGIOSAS DE MARÍA INMACULADA (SERVICIO DOMESTICO)', 'Victoria, 70-72
+29012 Málaga', NULL),
+  (102, 'RELIGIOSAS FILIPENSES HIJAS DE MARIA DOLOROSA - HOGAR SAN CARLOS', 'Llano de la Trinidad
+29007 - Málaga', NULL),
+  (103, 'RESIDENCIA DE ANCIANOS HERMANITAS DE LOS POBRES', 'C/ HEROE DE SOSTOA  Nº 1
+29002 - Málaga', NULL),
+  (104, 'RESIDENCIA DE MAYORES SAN JOSÉ DE LA MONTAÑA', 'Calle Madre Petra, 6
+29240 Valle de Abdalajís, Málaga', NULL),
+  (105, 'RESIDENCIA MONSALVE HERMANAS CARMELITAS DEL SAGRADO CORAZON DE JESUS.', 'C/Mercedes Formica 89
+29140 - Málaga', NULL),
+  (106, 'RESIDENCIA SAN JUAN DE DIOS ANTEQUERA', 'Ctra Granada S/N
+29200 - Antequera, Málaga', NULL),
+  (107, 'SAVE THE CHILDREN', 'Avenida. Nuestra Señora de las Guias, 1', NULL),
+  (108, 'SENDA PROYECTO HOMBRE - RONDA', 'Pasaje Juan de la Cruz, LOCAL 1
+29400 - Ronda, Málaga', NULL),
+  (109, 'THEMIS ASOC DE INMIGRANTES MUJERES Y NIÑOS', 'CL Tejares, 48
+29011 - MALAGA', NULL),
+  (110, 'VIRGEN DE LAS FLORES ALORA RESIDENCIA', 'Av. Pablo Ruiz Picasso, 20 29500 Álora', NULL);
