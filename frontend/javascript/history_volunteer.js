@@ -9,11 +9,39 @@ const historyMeta = document.querySelector('#history-meta');
 const historyBody = document.querySelector('#history-tbody');
 
 const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const AUTH_TOKEN_KEY = 'bancosol_auth_token';
 
 let currentVolunteerId = '';
 let currentPage = 1;
 let currentSize = Number(pageSizeSelect.value);
 let totalPages = 1;
+
+function getStoredToken() {
+    return sessionStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function clearStoredToken() {
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+function isTokenExpired(token) {
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            return true;
+        }
+
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (!payload.exp) {
+            return false;
+        }
+
+        return Date.now() >= payload.exp * 1000;
+    } catch {
+        return true;
+    }
+}
 
 function setMessage(text, type) {
     historyMessage.textContent = text;
@@ -109,6 +137,13 @@ async function fetchHistory(pageToLoad) {
 
     setMessage('Cargando historial...', null);
 
+    const token = getStoredToken();
+    if (!token || isTokenExpired(token)) {
+        clearStoredToken();
+        window.location.href = 'login.html?reason=session-expired';
+        return;
+    }
+
     try {
         const query = new URLSearchParams({
             page: String(pageToLoad),
@@ -121,6 +156,7 @@ async function fetchHistory(pageToLoad) {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
             }
         );
@@ -156,6 +192,12 @@ async function fetchHistory(pageToLoad) {
         refreshPagination();
         setMessage(error.message || 'Error al conectar con el backend.', 'is-error');
     }
+}
+
+const initialToken = getStoredToken();
+if (!initialToken || isTokenExpired(initialToken)) {
+    clearStoredToken();
+    window.location.href = 'login.html?reason=session-expired';
 }
 
 form.addEventListener('submit', (event) => {
