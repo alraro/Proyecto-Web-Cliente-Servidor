@@ -3,7 +3,6 @@ const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const rememberMeInput = document.querySelector('#remember-me');
-const csrfTokenInput = document.querySelector('#csrf-token');
 const message = document.querySelector('#form-message');
 
 const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
@@ -46,24 +45,9 @@ function tokenExpirado(token) {
     }
 }
 
-async function obtenerCsrfToken() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/csrf`);
-        if (!response.ok) {
-            throw new Error('No se pudo cargar CSRF');
-        }
-
-        const payload = await response.json();
-        csrfTokenInput.value = payload.csrfToken || '';
-    } catch {
-        csrfTokenInput.value = '';
-    }
-}
-
-async function comprobarSesionActiva() {
+function comprobarSesionActiva() {
     const token = leerToken();
     if (!token) {
-        await obtenerCsrfToken();
         return;
     }
 
@@ -72,29 +56,10 @@ async function comprobarSesionActiva() {
         message.textContent = 'Tu sesión ha expirado. Inicia sesión de nuevo.';
         message.classList.remove('is-success');
         message.classList.add('is-error');
-        await obtenerCsrfToken();
         return;
     }
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            limpiarToken();
-            await obtenerCsrfToken();
-            return;
-        }
-
-        window.location.href = 'index.html';
-    } catch {
-        limpiarToken();
-        await obtenerCsrfToken();
-    }
+    window.location.href = 'index.html';
 }
 
 comprobarSesionActiva();
@@ -139,24 +104,14 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const csrfToken = csrfTokenInput.value.trim();
-
-        if (!csrfToken) {
-            message.textContent = 'No se pudo validar la seguridad del formulario. Recarga la página.';
-            message.classList.add('is-error');
-            return;
-        }
-
         const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken,
             },
             body: JSON.stringify({
                 email,
                 password,
-                csrfToken,
             }),
         });
 
@@ -165,7 +120,6 @@ form.addEventListener('submit', async (event) => {
         if (!response.ok) {
             message.textContent = payload.message || 'No se pudo iniciar sesion.';
             message.classList.add('is-error');
-            await obtenerCsrfToken();
             return;
         }
 
@@ -182,6 +136,5 @@ form.addEventListener('submit', async (event) => {
     } catch {
         message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
         message.classList.add('is-error');
-        await obtenerCsrfToken();
     }
 });
