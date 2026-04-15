@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
 :root {
-    --blue-dark: #2a286a;
-    --blue-light: #58b9da;
+    --blue-900: #193a6b;
+    --blue-700: #2d65a0;
+    --orange-500: #eb7b31;
     --white: #ffffff;
-    --gray-dark: #353335;
-    --shadow: 0 24px 60px rgba(42, 40, 106, 0.25);
+    --ink: #1f2937;
+    --shadow: 0 24px 60px rgba(25, 58, 107, 0.24);
 }
 
 * {
@@ -18,12 +17,12 @@ html, body {
 
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
-    color: var(--gray-dark);
+    font-family: 'Nunito', sans-serif;
+    color: var(--ink);
     background:
-        radial-gradient(circle at top left, rgba(88, 185, 218, 0.18), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(42, 40, 106, 0.18), transparent 35%),
-        linear-gradient(135deg, #f8fcff 0%, #f5fbf7 48%, #eef3fb 100%);
+        radial-gradient(circle at top left, rgba(247, 176, 117, 0.27), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(45, 101, 160, 0.2), transparent 36%),
+        linear-gradient(135deg, #fffdf9 0%, #f6f9ff 50%, #edf4ff 100%);
 }
 
 .topbar-login {
@@ -55,6 +54,8 @@ body {
     padding: 0.7rem 1rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+    font-weight: 700;
 }
 
 .login-page {
@@ -72,8 +73,8 @@ body {
     padding: 3rem;
     border-radius: 32px;
     color: var(--white);
-    background: linear-gradient(160deg, var(--blue-dark) 0%, #3d3a8c 55%, var(--blue-light) 100%);
-    box-shadow: 0 20px 50px rgba(42, 40, 106, 0.16);
+    background: linear-gradient(160deg, var(--blue-900) 0%, var(--blue-700) 58%, var(--orange-500) 100%);
+    box-shadow: 0 20px 50px rgba(25, 58, 107, 0.24);
 }
 
 .login-hero::before,
@@ -108,15 +109,18 @@ body {
     font-size: 0.875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.14);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
 }
 
 .login-hero h1 {
     margin: 1.5rem 0 1rem;
     max-width: 12ch;
-    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    font-size: clamp(2.3rem, 5.8vw, 4.5rem);
     line-height: 0.95;
     letter-spacing: -0.04em;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .login-hero p {
@@ -136,7 +140,7 @@ body {
 .hero-cards article {
     padding: 1rem 1.1rem;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.16);
     backdrop-filter: blur(10px);
 }
 
@@ -156,7 +160,7 @@ body {
     max-width: 460px;
     margin: 0 auto;
     padding: 2rem;
-    border: 1px solid rgba(42, 40, 106, 0.08);
+    border: 1px solid rgba(25, 58, 107, 0.1);
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 18px 50px rgba(18, 34, 77, 0.1);
@@ -192,7 +196,8 @@ body {
     margin: 0;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--blue-dark);
+    color: var(--blue-900);
+    font-family: 'Montserrat', sans-serif;
 }
 
 .brand-subtitle {
@@ -204,7 +209,8 @@ body {
 .card-copy h2 {
     margin: 0;
     font-size: 2rem;
-    color: var(--gray-dark);
+    color: var(--ink);
+    font-family: 'Montserrat', sans-serif;
 }
 
 .card-copy p {
@@ -221,7 +227,7 @@ body {
     margin: 1rem 0 0.45rem;
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--gray-dark);
+    color: var(--ink);
 }
 
 .input-shell {
@@ -229,15 +235,15 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0.9rem 1rem;
-    border: 1px solid rgba(42, 40, 106, 0.12);
+    border: 1px solid rgba(25, 58, 107, 0.14);
     border-radius: 18px;
     background: #f7fbff;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .input-shell:focus-within {
-    border-color: rgba(88, 185, 218, 0.9);
-    box-shadow: 0 0 0 4px rgba(88, 185, 218, 0.14);
+    border-color: rgba(45, 101, 160, 0.9);
+    box-shadow: 0 0 0 4px rgba(45, 101, 160, 0.14);
     transform: translateY(-1px);
 }
 
@@ -246,7 +252,7 @@ body {
     border: 0;
     outline: none;
     font: inherit;
-    color: var(--gray-dark);
+    color: var(--ink);
     background: transparent;
 }
 
@@ -266,14 +272,14 @@ body {
     font: inherit;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--blue-dark);
-    background: rgba(88, 185, 218, 0.16);
+    color: var(--blue-900);
+    background: rgba(235, 123, 49, 0.15);
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .toggle-password:hover {
-    background: rgba(88, 185, 218, 0.26);
+    background: rgba(235, 123, 49, 0.24);
 }
 
 .form-options {
@@ -291,17 +297,17 @@ body {
     margin: 0;
     font-size: 0.94rem;
     font-weight: 500;
-    color: rgba(53, 51, 53, 0.9);
+    color: rgba(31, 41, 55, 0.9);
 }
 
 .remember-me input {
     width: 1rem;
     height: 1rem;
-    accent-color: var(--blue-light);
+    accent-color: var(--blue-700);
 }
 
 .forgot-link {
-    color: var(--blue-dark);
+    color: var(--blue-900);
     font-size: 0.94rem;
     font-weight: 600;
     text-decoration: none;
@@ -319,15 +325,16 @@ body {
     font: inherit;
     font-weight: 700;
     color: var(--white);
-    background: linear-gradient(135deg, var(--blue-dark), var(--blue-light));
-    box-shadow: 0 16px 30px rgba(42, 40, 106, 0.18);
+    background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+    box-shadow: 0 16px 30px rgba(25, 58, 107, 0.2);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    margin-top: 1.25rem;
 }
 
 .login-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 20px 34px rgba(42, 40, 106, 0.28);
+    box-shadow: 0 20px 34px rgba(25, 58, 107, 0.28);
 }
 
 .login-button:active {
@@ -355,7 +362,7 @@ body {
     margin: 1rem 0 0;
     font-size: 0.95rem;
     text-align: center;
-    color: rgba(53, 51, 53, 0.72);
+    color: rgba(31, 41, 55, 0.72);
 }
 
 .security-note {

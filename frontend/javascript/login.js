@@ -90,7 +90,7 @@ async function comprobarSesionActiva() {
             return;
         }
 
-        window.location.href = 'history_volunteer.html';
+        window.location.href = 'index.html';
     } catch {
         limpiarToken();
         await obtenerCsrfToken();
@@ -177,7 +177,7 @@ form.addEventListener('submit', async (event) => {
         message.classList.add('is-success');
 
         window.setTimeout(() => {
-            window.location.href = 'history_volunteer.html';
+            window.location.href = 'index.html';
         }, 350);
     } catch {
         message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';

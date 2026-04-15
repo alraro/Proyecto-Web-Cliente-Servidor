@@ -6,7 +6,7 @@
 	<title>Bancosol | Crear cuenta</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/register.css">
 </head>
 <body>
@@ -18,14 +18,14 @@
 		<nav class="main-nav main-nav-login" id="main-nav">
 			<a href="index.html">Inicio</a>
 			<a href="login.html">Iniciar sesión</a>
-			<a href="history_volunteer.html">Historial</a>
+			<a href="password.html">Olvidé contraseña</a>
 			<a href="index.html#contacto">Contacto</a>
 		</nav>
 	</header>
 
 	<main class="login-page register-page">
 		<section class="login-hero" aria-hidden="true">
-			<div class="hero-badge">Bancosol</div>
+			<div class="hero-badge">Registro Bancosol</div>
 			<h1>Únete a la red de voluntariado y coordinación solidaria</h1>
 			<p>Crear una cuenta te permite participar en campañas, consultar tu información básica y acceder con una sesión segura desde el primer momento.</p>
 			<div class="hero-cards">
@@ -34,8 +34,8 @@
 					<span>Formulario claro y validación inmediata</span>
 				</article>
 				<article>
-					<strong>Sesión activa</strong>
-					<span>JWT para mantener tu acceso tras registrarte</span>
+					<strong>Acceso posterior</strong>
+					<span>Al terminar, podrás iniciar sesión desde la pestaña de acceso</span>
 				</article>
 			</div>
 		</section>
@@ -73,9 +73,9 @@
 
 				<div class="field-grid">
 					<div class="field-group">
-						<label for="telefono">Teléfono</label>
+						<label for="telefono">Teléfono *</label>
 						<div class="input-shell">
-							<input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel">
+							<input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel" required>
 						</div>
 					</div>
 
@@ -127,7 +127,7 @@
 
 				<button type="submit" class="login-button">Crear cuenta</button>
 				<p class="form-message" id="form-message" role="status" aria-live="polite"></p>
-				<p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="login.html">Inicia sesión</a></p>
+				<p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="login.html">Iniciar sesión</a></p>
 			</form>
 
 			<div class="security-note">

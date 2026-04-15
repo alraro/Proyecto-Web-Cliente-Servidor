@@ -3,10 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Bancosol | Acceso de gestión</title>
+	<title>Bancosol | Inicio de sesión</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/login.css">
 </head>
 <body>
@@ -17,25 +17,25 @@
 
 		<nav class="main-nav main-nav-login" id="main-nav">
 			<a href="index.html">Inicio</a>
-			<a href="index.html#servicios">Campañas</a>
-			<a href="history_volunteer.html">Historial</a>
+			<a href="register.html">No tengo cuenta</a>
+			<a href="password.html">Olvidé contraseña</a>
 			<a href="index.html#contacto">Contacto</a>
 		</nav>
 	</header>
 
 	<main class="login-page">
 		<section class="login-hero" aria-hidden="true">
-			<div class="hero-badge">Bancosol</div>
-			<h1>Accede al sistema de campañas y coordinación solidaria</h1>
-			<p>Un espacio para equipos internos, voluntariado y entidades colaboradoras que trabajan cada día por una distribución más justa de los alimentos.</p>
+			<div class="hero-badge">Acceso Bancosol</div>
+			<h1>Inicia sesión para acceder a la plataforma de gestión solidaria</h1>
+			<p>Desde aquí podrás entrar al espacio de trabajo para campañas, seguimiento de donaciones y coordinación con entidades.</p>
 			<div class="hero-cards">
 				<article>
-					<strong>Voluntariado</strong>
-					<span>Organización clara de tareas y turnos</span>
+					<strong>Inicio seguro</strong>
+					<span>Acceso con token y validaciones del backend</span>
 				</article>
 				<article>
-					<strong>Solidaridad</strong>
-					<span>Coordinación de campañas y recursos</span>
+					<strong>Accesos rápidos</strong>
+					<span>Recuperar contraseña o crear cuenta en segundos</span>
 				</article>
 			</div>
 		</section>
@@ -73,13 +73,13 @@
 						<input type="checkbox" id="remember-me">
 						<span>Recordar acceso</span>
 					</label>
-					<a href="password.html" class="forgot-link">¿Olvidaste tu acceso?</a>
+					<a href="password.html" class="forgot-link">Olvidé contraseña</a>
 				</div>
 
 				<button type="submit" class="login-button">Entrar al espacio</button>
 				<p class="form-message" id="form-message" role="status" aria-live="polite"></p>
 				<p class="form-message">Credenciales de prueba: capitan100@nomail.es / hash_pendiente</p>
-				<p class="auth-switch">¿No tienes cuenta? <a class="forgot-link" href="register.html">Crea una cuenta</a></p>
+				<p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="register.html">Crear cuenta</a></p>
 			</form>
 
 			<div class="security-note">
