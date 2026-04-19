@@ -37,6 +37,16 @@ public class UserEntity {
     @Column(name = "cp", length = 10)
     private String cp;
 
+    private String tokenRecuperacion;
+
+    public String getTokenRecuperacion() {
+        return tokenRecuperacion;
+    }
+    public void setTokenRecuperacion(String tokenRecuperacion) {
+        this.tokenRecuperacion = tokenRecuperacion;
+    }
+
+
     public Integer getIdUsuario() {
         return idUsuario;
     }

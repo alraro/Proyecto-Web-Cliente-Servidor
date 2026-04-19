@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -54,6 +55,9 @@ public class ApiController {
 		signingKey = buildSigningKey(jwtSecret);
 	}
 
+
+
+
 	// Pagina de inicio
 	@GetMapping({"/", "/index"})
 	public String doInit(Model model) {
@@ -85,57 +89,77 @@ public class ApiController {
 	// Endpoint para recuperación de contraseña
 	@PostMapping("/api/auth/password-recovery")
 	@ResponseBody
-	public ResponseEntity<?> recoverPassword(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
-		if (requireHttps && !isSecureRequest(servletRequest)) {
+	public ResponseEntity<?> recoverPassword(@RequestBody Map<String, String> request, 
+											HttpServletRequest servletRequest) {
+		if (requireHttps && !isSecureRequest(servletRequest)) { // Obligamos a usar la conexión segura
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
 		}
 
+		// Sacamos el email del cuerpo de la solicitud, normalizándolo para evitar problemas de formato y unicidad.
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 
+		// Validamos el formato y si está vacío
 		if (email == null || !isValidEmail(email)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Introduce un correo valido"));
 		}
 
-		userRepository.findByEmail(email);
+		// Buscamos al usuario por email
+		UserEntity user = userRepository.findByEmail(email).orElse(null);
 
-		return ResponseEntity.ok(Map.of(
-				"message", "Si el correo existe, recibirás instrucciones para restablecer la contraseña"
-		));
+		if (user != null){
+			String tokenRecuperacion = UUID.randomUUID().toString();
+
+			user.setTokenRecuperacion(tokenRecuperacion);
+
+			userRepository.save(user);
+		}
+		
+		return ResponseEntity.ok(Map.of("message", "Si el correo existe en nuestro sistema, recibirás instrucciones para recuperar tu contraseña"));
 	}
+
+
 
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
-		if (requireHttps && !isSecureRequest(servletRequest)) {
+		if (requireHttps && !isSecureRequest(servletRequest)) { // Obligamos a usar la conexión segura
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
 		}
 
+		// Sacamos email y contraseña
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
 
+		// Validamos el email y contraseña
 		if (email == null || password == null) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Email y contrasena son obligatorios"));
 		}
 
+		// Buscamos al usuario por email
 		UserEntity user = userRepository.findByEmail(email).orElse(null);
+		
+		// Si no existe el usuario, fuera
 		if (user == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Map.of("message", "Credenciales invalidas"));
 		}
 
-		String storedPassword = user.getContrasena();
 
+		String storedPassword = user.getContrasena();
+		// Verificamos la contraseña proporcionada con la almacenada
 		if (!matchesPassword(password, storedPassword)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Map.of("message", "Credenciales invalidas"));
 		}
 
+		// Si no está en hash la cambiamos
 		if (needsMigration(storedPassword)) {
 			user.setContrasena(hashPassword(password));
 			userRepository.save(user);
 		}
 
+		// Generamos token JWT con ID usuario, email y nombre
 		String token = generateToken(user.getIdUsuario(), user.getEmail(), user.getNombre());
 
 		return ResponseEntity.ok(Map.of(
@@ -148,6 +172,8 @@ public class ApiController {
 				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
 		));
 	}
+
+
 
 	// Endpoint para registro
 	@PostMapping("/api/auth/register")
