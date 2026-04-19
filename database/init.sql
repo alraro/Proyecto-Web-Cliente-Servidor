@@ -53,6 +53,7 @@ CREATE TABLE Usuario (
     Telefono    VARCHAR(20),
     Contrasena  VARCHAR(255) NOT NULL,
     Domicilio   TEXT,
+    Localidad   VARCHAR(100),
     CP          VARCHAR(10) REFERENCES Codigo_Postal(CP) ON DELETE SET NULL
 );
 

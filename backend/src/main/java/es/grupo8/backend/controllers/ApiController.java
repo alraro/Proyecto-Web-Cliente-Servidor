@@ -5,7 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -14,13 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.entity.UserEntity;
@@ -28,7 +28,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class ApiController {
@@ -36,11 +36,16 @@ public class ApiController {
 	@Autowired
 	protected UserRepository userRepository;
 
+	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
+	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
 	@Value("${app.jwt.secret:change-this-secret-in-production-change-this-secret-in-production}")
 	private String jwtSecret;
 
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
+
+	@Value("${app.security.require-https:true}")
+	private boolean requireHttps;
 
 	private SecretKey signingKey;
 
@@ -49,39 +54,42 @@ public class ApiController {
 		signingKey = buildSigningKey(jwtSecret);
 	}
 
+	// Pagina de inicio
 	@GetMapping({"/", "/index"})
 	public String doInit(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio");
 		return "index";
 	}
 
+	// Página de login
 	@GetMapping("/login")
 	public String doLogin(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
 		return "login";
 	}
 
+	// Página de registro
 	@GetMapping("/register")
 	public String doRegister(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
 		return "register";
 	}
 
+	// Página de recuperación de contraseña
 	@GetMapping("/password")
 	public String doPassword(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Recuperar contraseña");
 		return "password";
 	}
 
-	@GetMapping("/api/ejemplo")
-	@ResponseBody
-	public List<String> obtenerEstado() {
-		return List.of("Backend funcionando correctamente", "API de ejemplo");
-	}
-
+	// Endpoint para recuperación de contraseña
 	@PostMapping("/api/auth/password-recovery")
 	@ResponseBody
-	public ResponseEntity<?> recoverPassword(@RequestBody Map<String, String> request) {
+	public ResponseEntity<?> recoverPassword(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
+		if (requireHttps && !isSecureRequest(servletRequest)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
+		}
+
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 
 		if (email == null || !isValidEmail(email)) {
@@ -95,9 +103,14 @@ public class ApiController {
 		));
 	}
 
+	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+	public ResponseEntity<?> login(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
+		if (requireHttps && !isSecureRequest(servletRequest)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
+		}
+
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
 
@@ -136,9 +149,14 @@ public class ApiController {
 		));
 	}
 
+	// Endpoint para registro
 	@PostMapping("/api/auth/register")
 	@ResponseBody
-	public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
+	public ResponseEntity<?> register(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
+		if (requireHttps && !isSecureRequest(servletRequest)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
+		}
+
 		String nombre = trimToNull(request == null ? null : request.get("nombre"));
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
@@ -155,7 +173,19 @@ public class ApiController {
 			return ResponseEntity.badRequest().body(Map.of("message", "El email no tiene un formato valido"));
 		}
 
-		if (containsXss(nombre) || containsXss(domicilio) || containsXss(localidad)) {
+		if (!isValidPhone(telefono)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El telefono no tiene un formato valido"));
+		}
+
+		if (!isValidPostalCode(cp)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El codigo postal no es valido"));
+		}
+
+		if (containsUnsafeInput(nombre)
+				|| containsUnsafeInput(domicilio)
+				|| containsUnsafeInput(localidad)
+				|| containsUnsafeInput(telefono)
+				|| containsUnsafeInput(cp)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Se detectaron caracteres no permitidos"));
 		}
 
@@ -174,6 +204,7 @@ public class ApiController {
 		user.setTelefono(telefono);
 		user.setContrasena(hashPassword(password));
 		user.setDomicilio(domicilio);
+		user.setLocalidad(localidad);
 		user.setCp(cp);
 
 		UserEntity createdUser = userRepository.save(user);
@@ -190,22 +221,27 @@ public class ApiController {
 		));
 	}
 
+	// Endpoint para añadir usuario (redirige a formulario de registro)
 	@PostMapping("/anadir")
 	public String doAnadir(Model model) {
 		return this.doRegister(model);
 	}
 
+	// Endpoint para editar usuario (redirige a formulario de registro con datos del usuario)
+	// El ID del usuario a editar se pasa como parámetro "id" en la URL, por ejemplo: /editar?id=5
 	@GetMapping("/editar")
 	public String doEditar(@RequestParam(value = "id", required = false) Integer id, Model model) {
 		model.addAttribute("selectedId", id);
 		return this.doRegister(model);
 	}
 
+	// Endpoint para guardar usuario (redirige a página de inicio)
 	@PostMapping("/guardar")
 	public String doGuardar() {
 		return "redirect:/";
 	}
 
+	// Métodos auxiliares
 	private static String trimToNull(String value) {
 		if (value == null) {
 			return null;
@@ -215,24 +251,82 @@ public class ApiController {
 		return trimmed.isEmpty() ? null : trimmed;
 	}
 
+	// Normaliza el email convirtiéndolo a minúsculas y eliminando espacios innecesarios. Esto ayuda a evitar problemas de unicidad y mejora la consistencia.
 	private static String normalizeEmail(String email) {
 		String trimmed = trimToNull(email);
 		return trimmed == null ? null : trimmed.toLowerCase();
 	}
 
+	// Valida el formato del email usando una expresión regular simple.
 	private static boolean isValidEmail(String email) {
 		return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 	}
 
+	// Valida el formato del teléfono permitiendo dígitos, espacios, guiones y signos de más, con una longitud razonable.
+	private static boolean isValidPhone(String telefono) {
+		return telefono != null && telefono.matches("^[0-9+\\-\\s]{7,20}$");
+	}
+	
+	// Valida que el código postal tenga exactamente 5 dígitos, lo que es común en muchos países.
+	private static boolean isValidPostalCode(String cp) {
+		return cp != null && cp.matches("^[0-9]{5}$");
+	}
+
+	// Verifica si la solicitud se realizó a través de HTTPS, ya sea directamente o mediante un proxy que establezca el encabezado "X-Forwarded-Proto".
+	private static boolean isSecureRequest(HttpServletRequest request) {
+		if (request == null) {
+			return false;
+		}
+
+		if (request.isSecure()) {
+			return true;
+		}
+
+		String forwardedProto = request.getHeader("X-Forwarded-Proto");
+		return forwardedProto != null && "https".equalsIgnoreCase(forwardedProto);
+	}
+
+	// Detecta patrones comunes de ataques XSS y SQL Injection en la entrada del usuario para prevenir vulnerabilidades de seguridad.
 	private static boolean containsXss(String value) {
+		if (value == null) {
+			return false;
+		}
+
 		String lowered = value.toLowerCase();
 		return lowered.contains("<") || lowered.contains(">") || lowered.contains("script");
 	}
 
+	// Detecta patrones comunes de ataques de inyección SQL en la entrada del usuario, como comentarios, operadores lógicos y palabras clave SQL.
+	private static boolean containsPotentialSqlInjection(String value) {
+		if (value == null) {
+			return false;
+		}
+
+		String lowered = value.toLowerCase();
+		return lowered.contains("--")
+				|| lowered.contains(";")
+				|| lowered.contains("/*")
+				|| lowered.contains("*/")
+				|| lowered.contains(" or ")
+				|| lowered.contains(" union ")
+				|| lowered.contains(" drop ")
+				|| lowered.contains(" select ")
+				|| lowered.contains(" insert ")
+				|| lowered.contains(" update ")
+				|| lowered.contains(" delete ");
+	}
+
+	// Combina las detecciones de XSS y SQL Injection para determinar si la entrada del usuario contiene caracteres o patrones potencialmente peligrosos.
+	private static boolean containsUnsafeInput(String value) {
+		return containsXss(value) || containsPotentialSqlInjection(value);
+	}
+
+	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.
 	private static String hashPassword(String rawPassword) {
 		return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
 	}
 
+	// Verifica si la contraseña proporcionada coincide con la contraseña almacenada, manejando tanto contraseñas sin formato como contraseñas hashadas con BCrypt.
 	private static boolean matchesPassword(String rawPassword, String storedPassword) {
 		if (rawPassword == null || storedPassword == null) {
 			return false;
@@ -245,10 +339,12 @@ public class ApiController {
 		return rawPassword.equals(storedPassword);
 	}
 
+	// Determina si la contraseña almacenada necesita ser migrada a un formato hashado con BCrypt
 	private static boolean needsMigration(String storedPassword) {
 		return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
 	}
 
+	// Genera un token JWT que incluye el ID del usuario, su email y nombre como claims, con una fecha de expiración basada en la configuración.
 	private String generateToken(Integer userId, String email, String nombre) {
 		Instant now = Instant.now();
 		return Jwts.builder()
@@ -261,11 +357,12 @@ public class ApiController {
 				.compact();
 	}
 
+	// Construye la clave de firma para JWT a partir de la configuración proporcionada. Intenta decodificarla como Base64, y si falla, la hashea con SHA-256 para obtener una clave de longitud adecuada.
 	private static SecretKey buildSigningKey(String configuredSecret) {
 		try {
 			byte[] decoded = Decoders.BASE64.decode(configuredSecret);
 			return Keys.hmacShaKeyFor(decoded);
-		} catch (IllegalArgumentException ignored) {
+		} catch (RuntimeException ignored) {
 			try {
 				MessageDigest digest = MessageDigest.getInstance("SHA-256");
 				byte[] hash = digest.digest(configuredSecret.getBytes(StandardCharsets.UTF_8));
