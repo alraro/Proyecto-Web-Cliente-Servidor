@@ -91,17 +91,6 @@ class ApiControllerRegisterTest {
     }
 
     @Test
-    void registerRejectsXssOrSqliLikeInput() {
-        Map<String, String> request = validRequest();
-        request.put("nombre", "<script>alert(1)</script>");
-
-        ResponseEntity<?> response = controller.register(request, secureRequest);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        verify(userRepository, never()).save(any(UserEntity.class));
-    }
-
-    @Test
     void registerRejectsDuplicatedEmail() {
         when(userRepository.existsByEmail("usuario@bancosol.org")).thenReturn(true);
 
@@ -128,7 +117,6 @@ class ApiControllerRegisterTest {
         verify(userRepository).save(captor.capture());
         UserEntity saved = captor.getValue();
 
-        assertEquals("Málaga", saved.getLocalidad());
         assertNotEquals("clave123", saved.getContrasena());
         assertTrue(saved.getContrasena().startsWith("$2"));
 
@@ -165,7 +153,6 @@ class ApiControllerRegisterTest {
         request.put("telefono", "600123123");
         request.put("password", "clave123");
         request.put("domicilio", "Calle Larios 1");
-        request.put("localidad", "Málaga");
         request.put("cp", "29001");
         return request;
     }

@@ -20,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.grupo8.backend.dao.UserRepository;
@@ -178,7 +177,8 @@ public class ApiController {
 	// Endpoint para registro
 	@PostMapping("/api/auth/register")
 	@ResponseBody
-	public ResponseEntity<?> register(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
+	public ResponseEntity<?> register(@RequestBody Map<String, String> request, 
+										HttpServletRequest servletRequest) {
 		if (requireHttps && !isSecureRequest(servletRequest)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
 		}
@@ -188,49 +188,46 @@ public class ApiController {
 		String password = trimToNull(request == null ? null : request.get("password"));
 		String telefono = trimToNull(request == null ? null : request.get("telefono"));
 		String domicilio = trimToNull(request == null ? null : request.get("domicilio"));
-		String localidad = trimToNull(request == null ? null : request.get("localidad"));
 		String cp = trimToNull(request == null ? null : request.get("cp"));
 
-		if (nombre == null || email == null || password == null || telefono == null || domicilio == null || localidad == null || cp == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email, telefono, contrasena, domicilio, localidad y CP son obligatorios"));
+		// Comprobamos datos obligatorios
+		if (nombre == null || email == null || password == null || telefono == null || domicilio == null || cp == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email, telefono, contrasena, domicilio y CP son obligatorios"));
 		}
 
+		// Validamos formato de email
 		if (!isValidEmail(email)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "El email no tiene un formato valido"));
 		}
 
+		// Validamos formato telefono
 		if (!isValidPhone(telefono)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "El telefono no tiene un formato valido"));
 		}
 
+		// Validamos formato código postal
 		if (!isValidPostalCode(cp)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "El codigo postal no es valido"));
 		}
 
-		if (containsUnsafeInput(nombre)
-				|| containsUnsafeInput(domicilio)
-				|| containsUnsafeInput(localidad)
-				|| containsUnsafeInput(telefono)
-				|| containsUnsafeInput(cp)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Se detectaron caracteres no permitidos"));
-		}
-
+		// Validamos tamaño minimo contraseña
 		if (password.length() < 6) {
 			return ResponseEntity.badRequest().body(Map.of("message", "La contrasena debe tener al menos 6 caracteres"));
 		}
 
+		// Validamos si existe un usuario con ese email
 		if (userRepository.existsByEmail(email)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body(Map.of("message", "Ya existe un usuario con ese email"));
 		}
 
+		// Creamos el usuario con contraseña hasheada
 		UserEntity user = new UserEntity();
 		user.setNombre(nombre);
 		user.setEmail(email);
 		user.setTelefono(telefono);
 		user.setContrasena(hashPassword(password));
 		user.setDomicilio(domicilio);
-		user.setLocalidad(localidad);
 		user.setCp(cp);
 
 		UserEntity createdUser = userRepository.save(user);
@@ -247,27 +244,28 @@ public class ApiController {
 		));
 	}
 
-	// Endpoint para añadir usuario (redirige a formulario de registro)
+/*
+	// Implementación para futuro
+	// Endpoint para añadir usuario
 	@PostMapping("/anadir")
 	public String doAnadir(Model model) {
 		return this.doRegister(model);
 	}
-
-	// Endpoint para editar usuario (redirige a formulario de registro con datos del usuario)
-	// El ID del usuario a editar se pasa como parámetro "id" en la URL, por ejemplo: /editar?id=5
+	// Endpoint para editar usuario
 	@GetMapping("/editar")
 	public String doEditar(@RequestParam(value = "id", required = false) Integer id, Model model) {
 		model.addAttribute("selectedId", id);
 		return this.doRegister(model);
 	}
-
-	// Endpoint para guardar usuario (redirige a página de inicio)
+	// Endpoint para guardar usuario
 	@PostMapping("/guardar")
 	public String doGuardar() {
 		return "redirect:/";
 	}
+*/
 
 	// Métodos auxiliares
+	// Limpiador de textos, se asegura de no guardar textos vacíos o llenos de espacios
 	private static String trimToNull(String value) {
 		if (value == null) {
 			return null;
@@ -277,13 +275,13 @@ public class ApiController {
 		return trimmed.isEmpty() ? null : trimmed;
 	}
 
-	// Normaliza el email convirtiéndolo a minúsculas y eliminando espacios innecesarios. Esto ayuda a evitar problemas de unicidad y mejora la consistencia.
+	// Normaliza el email convirtiéndolo a minúsculas y eliminando espacios innecesarios
 	private static String normalizeEmail(String email) {
 		String trimmed = trimToNull(email);
 		return trimmed == null ? null : trimmed.toLowerCase();
 	}
 
-	// Valida el formato del email usando una expresión regular simple.
+	// Valida el formato del email usando una expresión regular simple
 	private static boolean isValidEmail(String email) {
 		return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 	}
@@ -310,41 +308,6 @@ public class ApiController {
 
 		String forwardedProto = request.getHeader("X-Forwarded-Proto");
 		return forwardedProto != null && "https".equalsIgnoreCase(forwardedProto);
-	}
-
-	// Detecta patrones comunes de ataques XSS y SQL Injection en la entrada del usuario para prevenir vulnerabilidades de seguridad.
-	private static boolean containsXss(String value) {
-		if (value == null) {
-			return false;
-		}
-
-		String lowered = value.toLowerCase();
-		return lowered.contains("<") || lowered.contains(">") || lowered.contains("script");
-	}
-
-	// Detecta patrones comunes de ataques de inyección SQL en la entrada del usuario, como comentarios, operadores lógicos y palabras clave SQL.
-	private static boolean containsPotentialSqlInjection(String value) {
-		if (value == null) {
-			return false;
-		}
-
-		String lowered = value.toLowerCase();
-		return lowered.contains("--")
-				|| lowered.contains(";")
-				|| lowered.contains("/*")
-				|| lowered.contains("*/")
-				|| lowered.contains(" or ")
-				|| lowered.contains(" union ")
-				|| lowered.contains(" drop ")
-				|| lowered.contains(" select ")
-				|| lowered.contains(" insert ")
-				|| lowered.contains(" update ")
-				|| lowered.contains(" delete ");
-	}
-
-	// Combina las detecciones de XSS y SQL Injection para determinar si la entrada del usuario contiene caracteres o patrones potencialmente peligrosos.
-	private static boolean containsUnsafeInput(String value) {
-		return containsXss(value) || containsPotentialSqlInjection(value);
 	}
 
 	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.

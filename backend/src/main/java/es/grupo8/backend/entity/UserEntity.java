@@ -31,9 +31,6 @@ public class UserEntity {
     @Column(name = "domicilio")
     private String domicilio;
 
-    @Column(name = "localidad", length = 100)
-    private String localidad;
-
     @Column(name = "cp", length = 10)
     private String cp;
 
@@ -45,7 +42,6 @@ public class UserEntity {
     public void setTokenRecuperacion(String tokenRecuperacion) {
         this.tokenRecuperacion = tokenRecuperacion;
     }
-
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -103,11 +99,5 @@ public class UserEntity {
         this.cp = cp;
     }
 
-    public String getLocalidad() {
-        return localidad;
-    }
-
-    public void setLocalidad(String localidad) {
-        this.localidad = localidad;
-    }
+    
 }
