@@ -54,7 +54,8 @@ CREATE TABLE Usuario (
     Contrasena  VARCHAR(255) NOT NULL,
     Domicilio   TEXT,
     CP          VARCHAR(10) REFERENCES Codigo_Postal(CP) ON DELETE SET NULL,
-    Token_Recuperacion VARCHAR(255)
+    Token_Recuperacion VARCHAR(255),
+    Token_Recuperacion_Expira_En TIMESTAMP
 );
 
 -- 6. ENTIDAD COLABORADORA

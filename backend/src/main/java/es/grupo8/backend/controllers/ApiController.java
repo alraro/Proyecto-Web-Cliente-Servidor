@@ -106,11 +106,15 @@ public class ApiController {
 		UserEntity user = userRepository.findByEmail(email).orElse(null);
 
 		if (user != null){
-			String tokenRecuperacion = UUID.randomUUID().toString();
+			String tokenRecuperacionPlano = UUID.randomUUID().toString();
+			String tokenRecuperacionHash = sha256Hex(tokenRecuperacionPlano);
 
-			user.setTokenRecuperacion(tokenRecuperacion);
+			user.setTokenRecuperacion(tokenRecuperacionHash);
+			user.setTokenRecuperacionExpiraEn(Instant.now().plusSeconds(900));
 
 			userRepository.save(user);
+
+			// TODO: enviar tokenRecuperacionPlano por email en el flujo real de reseteo.
 		}
 		
 		return ResponseEntity.ok(Map.of("message", "Si el correo existe en nuestro sistema, recibirás instrucciones para recuperar tu contraseña"));
@@ -359,6 +363,20 @@ public class ApiController {
 			} catch (NoSuchAlgorithmException ex) {
 				throw new IllegalStateException("No se pudo inicializar la clave JWT", ex);
 			}
+		}
+	}
+
+	private static String sha256Hex(String value) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+			StringBuilder hex = new StringBuilder(hash.length * 2);
+			for (byte b : hash) {
+				hex.append(String.format("%02x", b));
+			}
+			return hex.toString();
+		} catch (NoSuchAlgorithmException ex) {
+			throw new IllegalStateException("No se pudo generar hash SHA-256", ex);
 		}
 	}
 }

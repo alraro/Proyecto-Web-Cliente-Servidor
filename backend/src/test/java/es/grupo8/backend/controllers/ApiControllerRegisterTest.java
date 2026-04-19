@@ -3,6 +3,7 @@ package es.grupo8.backend.controllers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -144,6 +145,27 @@ class ApiControllerRegisterTest {
         ResponseEntity<?> response = controller.login(req, insecureRequest);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(userRepository).save(any(UserEntity.class));
+    }
+
+    @Test
+    void recoverPasswordStoresHashedTokenWithExpiration() {
+        UserEntity user = new UserEntity();
+        user.setEmail("usuario@bancosol.org");
+
+        when(userRepository.findByEmail("usuario@bancosol.org")).thenReturn(Optional.of(user));
+
+        Map<String, String> request = new HashMap<>();
+        request.put("email", "usuario@bancosol.org");
+
+        ResponseEntity<?> response = controller.recoverPassword(request, secureRequest);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+        verify(userRepository).save(captor.capture());
+        UserEntity saved = captor.getValue();
+
+        assertTrue(Pattern.matches("^[a-f0-9]{64}$", saved.getTokenRecuperacion()));
+        assertTrue(saved.getTokenRecuperacionExpiraEn() != null);
     }
 
     private Map<String, String> validRequest() {
