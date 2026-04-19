@@ -2,7 +2,7 @@ const form = document.querySelector('#password-recovery-form');
 const emailInput = document.querySelector('#email');
 const message = document.querySelector('#recovery-message');
 
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_BASE_URL = window.location.origin;
 
 if (form && emailInput && message) {
     form.addEventListener('submit', async (event) => {

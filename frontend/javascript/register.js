@@ -11,7 +11,7 @@ const togglePasswordButton = document.querySelector('#toggle-password');
 const toggleConfirmPasswordButton = document.querySelector('#toggle-confirm-password');
 const message = document.querySelector('#form-message');
 
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_BASE_URL = window.location.origin;
 const AUTH_TOKEN_KEY = 'bancosol_auth_token';
 
 function togglePasswordVisibility(input, button) {
