@@ -8,13 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "cadena")
-public class CadenaEntity {
+@Table(name = "chain")
+public class ChainEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cadena")
-    private Integer idCadena;
+    @Column(name = "id_chain")
+    private Integer idChain;
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
@@ -26,12 +26,12 @@ public class CadenaEntity {
     private Boolean participacion = false;
 
 
-    public Integer getIdCadena() {
-        return idCadena;
+    public Integer getIdChain() {
+        return idChain;
     }
 
-    public void setIdCadena(Integer idCadena) {
-        this.idCadena = idCadena;
+    public void setIdChain(Integer idChain) {
+        this.idChain = idChain;
     }
 
     public String getNombre() {
