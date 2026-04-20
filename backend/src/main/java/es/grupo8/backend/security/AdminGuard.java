@@ -23,7 +23,7 @@ public class AdminGuard {
 
     public boolean isAdmin(String authHeader) {
         Integer userId = extractUserId(authHeader);
-        return userId != null && adminRepository.existsAdminById(userId);
+        return userId != null && adminRepository.existsByIdUsuario(userId);
     }
 
     public Integer extractUserId(String authHeader) {
