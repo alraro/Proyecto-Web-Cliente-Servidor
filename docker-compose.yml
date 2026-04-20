@@ -18,7 +18,8 @@ services:
       - ${POSTGRES_PORT:-5432}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
 
   adminer:
     image: adminer:latest
@@ -35,6 +36,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: spring-boot-backend
+    ports:
+      - ${BACKEND_PORT:-8080}:8080
     env_file:
       - ./.env
     environment:
@@ -42,8 +45,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    ports:
-      - ${BACKEND_PORT:-8080}:8080
     depends_on:
       - database
 
