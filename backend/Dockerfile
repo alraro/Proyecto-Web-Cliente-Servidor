@@ -14,8 +14,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Extraer el .jar de la etapa anterior
-COPY --from=build /app/target/*.jar app.jar
+# Extraer el .war de la etapa anterior
+COPY --from=build /app/target/*.war app.war
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.war"]

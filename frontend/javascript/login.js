@@ -2,37 +2,64 @@ const form = document.querySelector('#login-form');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
+const rememberMeInput = document.querySelector('#remember-me');
 const message = document.querySelector('#form-message');
 
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
+const API_BASE_URL = window.location.origin;
 const AUTH_TOKEN_KEY = 'bancosol_auth_token';
 
-async function comprobarSesionActiva() {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+function guardarToken(token, recordarSesion) {
+    sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+
+    if (recordarSesion) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+    } else {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+}
+
+function leerToken() {
+    return sessionStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function limpiarToken() {
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+function tokenExpirado(token) {
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            return true;
+        }
+
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (!payload.exp) {
+            return false;
+        }
+
+        return Date.now() >= payload.exp * 1000;
+    } catch {
+        return true;
+    }
+}
+
+function comprobarSesionActiva() {
+    const token = leerToken();
     if (!token) {
         return;
     }
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            localStorage.removeItem(AUTH_TOKEN_KEY);
-            return;
-        }
-
-        const payload = await response.json();
-        message.textContent = `Sesion activa de ${payload.nombre}.`;
-        message.classList.remove('is-error');
-        message.classList.add('is-success');
-    } catch {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
+    if (tokenExpirado(token)) {
+        limpiarToken();
+        message.textContent = 'Tu sesión ha expirado. Inicia sesión de nuevo.';
+        message.classList.remove('is-success');
+        message.classList.add('is-error');
+        return;
     }
+
+    window.location.href = 'index.html';
 }
 
 comprobarSesionActiva();
@@ -77,7 +104,7 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -97,11 +124,15 @@ form.addEventListener('submit', async (event) => {
         }
 
         if (payload.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, payload.token);
+            guardarToken(payload.token, Boolean(rememberMeInput.checked));
         }
 
         message.textContent = `Bienvenido/a ${payload.nombre}. Login correcto.`;
         message.classList.add('is-success');
+
+        window.setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 350);
     } catch {
         message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
         message.classList.add('is-error');
