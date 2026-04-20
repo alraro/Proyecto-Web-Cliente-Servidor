@@ -1,15 +1,12 @@
 package es.grupo8.backend.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface AdminRepository extends JpaRepository<Object, Integer> {
+import es.grupo8.backend.entity.AdminEntity;
 
-    // Comprueba si un ID de usuario existe en la tabla Administradores.
-    // Query nativa porque la tabla no tiene entidad JPA propia — es una
-    // tabla de una sola columna que actúa como lista de roles.
-    @Query(value = "SELECT COUNT(*) > 0 FROM administradores WHERE id_usuario = :userId",
-           nativeQuery = true)
-    boolean existsAdminById(@Param("userId") Integer userId);
+public interface AdminRepository extends JpaRepository<AdminEntity, Integer> {
+
+    // Spring Data genera automáticamente: SELECT COUNT(*) > 0 FROM administradores
+    // WHERE id_usuario = ? — sin query nativa, sin riesgo de SQL Injection.
+    boolean existsByIdUsuario(Integer idUsuario);
 }
