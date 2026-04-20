@@ -13,21 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<%= contextPath %>/css/login.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var togglePasswordButton = document.querySelector('#toggle-password');
-            var passwordInput = document.querySelector('#password');
-
-            if (togglePasswordButton && passwordInput) {
-                togglePasswordButton.addEventListener('click', function () {
-                    var nextType = passwordInput.type === 'password' ? 'text' : 'password';
-                    passwordInput.type = nextType;
-                    togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-                    togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
-                });
-            }
-        });
-    </script>
 </head>
 
 <body>
@@ -85,7 +70,6 @@
             <label for="password">Contraseña de acceso</label>
             <div class="input-shell password-shell">
                 <input id="password" name="password" type="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
-                <button class="toggle-password" type="button" id="toggle-password" aria-label="Mostrar contraseña">Mostrar</button>
             </div>
 
             <div class="form-options">
@@ -98,6 +82,8 @@
             <button type="submit" class="login-button">Entrar al espacio</button>
             <% if (request.getAttribute("loginError") != null) { %>
                 <p class="form-message is-error" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("loginError") %></p>
+            <% } else if (request.getAttribute("loginSuccess") != null) { %>
+                <p class="form-message is-success" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("loginSuccess") %></p>
             <% } else { %>
                 <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             <% } %>

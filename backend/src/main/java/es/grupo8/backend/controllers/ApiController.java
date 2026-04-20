@@ -66,10 +66,16 @@ public class ApiController {
 
 	// Página de login
 	@GetMapping({"/login"})
-	public String doLogin(@RequestParam(value = "error", required = false) String error, Model model) {
+	public String doLogin(
+			@RequestParam(value = "error", required = false) String error,
+			@RequestParam(value = "success", required = false) String success,
+			Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
 		if (error != null && !error.isBlank()) {
 			model.addAttribute("loginError", error);
+		}
+		if (success != null && !success.isBlank()) {
+			model.addAttribute("loginSuccess", success);
 		}
 		return "login";
 	}
@@ -110,9 +116,77 @@ public class ApiController {
 
 	// Página de registro
 	@GetMapping("/register")
-	public String doRegister(Model model) {
+	public String doRegister(
+			@RequestParam(value = "error", required = false) String error,
+			@RequestParam(value = "success", required = false) String success,
+			Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+		if (error != null && !error.isBlank()) {
+			model.addAttribute("registerError", error);
+		}
+		if (success != null && !success.isBlank()) {
+			model.addAttribute("registerSuccess", success);
+		}
 		return "register";
+	}
+
+	// Registro con formulario tradicional (POST) sin JavaScript
+	@PostMapping("/register")
+	public String doRegisterForm(
+			@RequestParam(value = "nombre", required = false) String nombreParam,
+			@RequestParam(value = "email", required = false) String emailParam,
+			@RequestParam(value = "password", required = false) String passwordParam,
+			@RequestParam(value = "confirmPassword", required = false) String confirmPasswordParam,
+			@RequestParam(value = "telefono", required = false) String telefonoParam,
+			@RequestParam(value = "domicilio", required = false) String domicilioParam,
+			@RequestParam(value = "cp", required = false) String cpParam) {
+
+		String nombre = trimToNull(nombreParam);
+		String email = normalizeEmail(emailParam);
+		String password = trimToNull(passwordParam);
+		String confirmPassword = trimToNull(confirmPasswordParam);
+		String telefono = trimToNull(telefonoParam);
+		String domicilio = trimToNull(domicilioParam);
+		String cp = trimToNull(cpParam);
+
+		if (nombre == null || email == null || password == null || confirmPassword == null) {
+			return "redirect:/register?error=" + urlEncode("Nombre, email y contrasena son obligatorios");
+		}
+
+		if (!isValidEmail(email)) {
+			return "redirect:/register?error=" + urlEncode("El email no tiene un formato valido");
+		}
+
+		if (password.length() < 6) {
+			return "redirect:/register?error=" + urlEncode("La contrasena debe tener al menos 6 caracteres");
+		}
+
+		if (!password.equals(confirmPassword)) {
+			return "redirect:/register?error=" + urlEncode("Las contrasenas no coinciden");
+		}
+
+		if (telefono != null && !isValidPhone(telefono)) {
+			return "redirect:/register?error=" + urlEncode("El telefono no tiene un formato valido");
+		}
+
+		if (cp != null && !isValidPostalCode(cp)) {
+			return "redirect:/register?error=" + urlEncode("El codigo postal no es valido");
+		}
+
+		if (userRepository.existsByEmail(email)) {
+			return "redirect:/register?error=" + urlEncode("Ya existe un usuario con ese email");
+		}
+
+		UserEntity user = new UserEntity();
+		user.setNombre(nombre);
+		user.setEmail(email);
+		user.setTelefono(telefono);
+		user.setContrasena(hashPassword(password));
+		user.setDomicilio(domicilio);
+		user.setCp(cp);
+
+		userRepository.save(user);
+		return "redirect:/login?success=" + urlEncode("Registro correcto. Ya puedes iniciar sesion");
 	}
 
 	// Endpoint para login
