@@ -8,12 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "chain")
+@Table(name = "cadena")
 public class ChainEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_chain")
+    @Column(name = "id_cadena")
     private Integer idChain;
 
     @Column(name = "nombre", nullable = false, length = 255)
