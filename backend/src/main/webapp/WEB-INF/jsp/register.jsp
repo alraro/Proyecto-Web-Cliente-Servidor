@@ -13,128 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<%= contextPath %>/css/register.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var form = document.querySelector('#register-form');
-            var nameInput = document.querySelector('#name');
-            var emailInput = document.querySelector('#email');
-            var telefonoInput = document.querySelector('#telefono');
-            var localidadInput = document.querySelector('#localidad');
-            var passwordInput = document.querySelector('#password');
-            var confirmPasswordInput = document.querySelector('#confirm-password');
-            var domicilioInput = document.querySelector('#domicilio');
-            var cpInput = document.querySelector('#cp');
-            var togglePasswordButton = document.querySelector('#toggle-password');
-            var toggleConfirmPasswordButton = document.querySelector('#toggle-confirm-password');
-            var message = document.querySelector('#form-message');
-            var contextPathValue = '<%= contextPath %>';
-            var API_BASE_URL = contextPathValue + '/api';
-            var AUTH_TOKEN_KEY = 'bancosol_auth_token';
-
-            function togglePasswordVisibility(input, button) {
-                var nextType = input.type === 'password' ? 'text' : 'password';
-                input.type = nextType;
-                button.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-                button.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
-            }
-
-            if (togglePasswordButton && passwordInput) {
-                togglePasswordButton.addEventListener('click', function () {
-                    togglePasswordVisibility(passwordInput, togglePasswordButton);
-                });
-            }
-
-            if (toggleConfirmPasswordButton && confirmPasswordInput) {
-                toggleConfirmPasswordButton.addEventListener('click', function () {
-                    togglePasswordVisibility(confirmPasswordInput, toggleConfirmPasswordButton);
-                });
-            }
-
-            if (form && nameInput && emailInput && telefonoInput && localidadInput && passwordInput && confirmPasswordInput && domicilioInput && cpInput && message) {
-                form.addEventListener('submit', async function (event) {
-                    event.preventDefault();
-
-                    var nombre = nameInput.value.trim();
-                    var email = emailInput.value.trim();
-                    var telefono = telefonoInput.value.trim();
-                    var localidad = localidadInput.value.trim();
-                    var password = passwordInput.value.trim();
-                    var confirmPassword = confirmPasswordInput.value.trim();
-                    var domicilio = domicilioInput.value.trim();
-                    var cp = cpInput.value.trim();
-
-                    message.classList.remove('is-error', 'is-success');
-
-                    if (!nombre || !email || !password || !confirmPassword) {
-                        message.textContent = 'Completa los campos obligatorios para continuar.';
-                        message.classList.add('is-error');
-                        return;
-                    }
-
-                    if (!emailInput.validity.valid) {
-                        message.textContent = 'Ingresa un correo valido.';
-                        message.classList.add('is-error');
-                        emailInput.focus();
-                        return;
-                    }
-
-                    if (password.length < 6) {
-                        message.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-                        message.classList.add('is-error');
-                        passwordInput.focus();
-                        return;
-                    }
-
-                    if (password !== confirmPassword) {
-                        message.textContent = 'Las contraseñas no coinciden.';
-                        message.classList.add('is-error');
-                        confirmPasswordInput.focus();
-                        return;
-                    }
-
-                    try {
-                        var response = await fetch(API_BASE_URL + '/auth/register', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                nombre: nombre,
-                                email: email,
-                                password: password,
-                                telefono: telefono,
-                                domicilio: domicilio,
-                                localidad: localidad,
-                                cp: cp
-                            })
-                        });
-
-                        var payload = await response.json();
-
-                        if (!response.ok) {
-                            message.textContent = payload.message || 'No se pudo completar el registro.';
-                            message.classList.add('is-error');
-                            return;
-                        }
-
-                        if (payload.token) {
-                            localStorage.setItem(AUTH_TOKEN_KEY, payload.token);
-                        }
-
-                        message.textContent = 'Registro correcto. Bienvenido/a ' + payload.nombre + '.';
-                        message.classList.add('is-success');
-
-                        window.setTimeout(function () {
-                            window.location.href = contextPathValue + '/login';
-                        }, 900);
-                    } catch (error) {
-                        message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
-                        message.classList.add('is-error');
-                    }
-                });
-            }
-        });
-    </script>
 </head>
 
 <body>
@@ -181,12 +59,12 @@
             <p>Rellena los datos básicos para darte de alta en el sistema.</p>
         </div>
 
-        <form id="register-form" class="login-form register-form" novalidate>
+        <form id="register-form" class="login-form register-form" method="post" action="<%= contextPath %>/register">
             <div class="field-grid">
                 <div class="field-group">
-                    <label for="name">Nombre completo *</label>
+                    <label for="nombre">Nombre completo *</label>
                     <div class="input-shell">
-                        <input id="name" name="name" type="text" placeholder="Nombre y apellidos" autocomplete="name" required>
+                        <input id="nombre" name="nombre" type="text" placeholder="Nombre y apellidos" autocomplete="name" required>
                     </div>
                 </div>
 
@@ -219,15 +97,13 @@
                     <label for="password">Contraseña *</label>
                     <div class="input-shell password-shell">
                         <input id="password" name="password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
-                        <button class="toggle-password" type="button" id="toggle-password" aria-label="Mostrar contraseña">Mostrar</button>
                     </div>
                 </div>
 
                 <div class="field-group">
-                    <label for="confirm-password">Repetir contraseña *</label>
+                    <label for="confirmPassword">Repetir contraseña *</label>
                     <div class="input-shell password-shell">
-                        <input id="confirm-password" name="confirm-password" type="password" placeholder="Repite la contraseña" autocomplete="new-password" required>
-                        <button class="toggle-password" type="button" id="toggle-confirm-password" aria-label="Mostrar contraseña repetida">Mostrar</button>
+                        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repite la contraseña" autocomplete="new-password" required>
                     </div>
                 </div>
             </div>
@@ -253,7 +129,13 @@
             </div>
 
             <button type="submit" class="login-button">Crear cuenta</button>
-            <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <% if (request.getAttribute("registerError") != null) { %>
+                <p class="form-message is-error" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("registerError") %></p>
+            <% } else if (request.getAttribute("registerSuccess") != null) { %>
+                <p class="form-message is-success" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("registerSuccess") %></p>
+            <% } else { %>
+                <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <% } %>
             <p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="<%= contextPath %>/login">Iniciar sesión</a></p>
         </form>
 

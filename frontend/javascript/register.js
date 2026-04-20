@@ -11,9 +11,6 @@ const togglePasswordButton = document.querySelector('#toggle-password');
 const toggleConfirmPasswordButton = document.querySelector('#toggle-confirm-password');
 const message = document.querySelector('#form-message');
 
-const API_BASE_URL = 'http://localhost:8080';
-const AUTH_TOKEN_KEY = 'bancosol_auth_token';
-
 function togglePasswordVisibility(input, button) {
     const nextType = input.type === 'password' ? 'text' : 'password';
     input.type = nextType;
@@ -73,43 +70,8 @@ form.addEventListener('submit', async (event) => {
         return;
     }
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                nombre,
-                email,
-                password,
-                telefono,
-                domicilio,
-                localidad,
-                cp,
-            }),
-        });
+    message.textContent = 'Se enviará el formulario y, si todo es correcto, volverás a la página de login.';
+    message.classList.add('is-success');
 
-        const payload = await response.json();
-
-        if (!response.ok) {
-            message.textContent = payload.message || 'No se pudo completar el registro.';
-            message.classList.add('is-error');
-            return;
-        }
-
-        if (payload.token) {
-            localStorage.setItem(AUTH_TOKEN_KEY, payload.token);
-        }
-
-        message.textContent = `Registro correcto. Bienvenido/a ${payload.nombre}.`;
-        message.classList.add('is-success');
-
-        window.setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 900);
-    } catch {
-        message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
-        message.classList.add('is-error');
-    }
+    form.submit();
 });

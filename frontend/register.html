@@ -53,12 +53,12 @@
 				<p>Rellena los datos básicos para darte de alta en el sistema.</p>
 			</div>
 
-			<form id="register-form" class="login-form register-form" novalidate>
+			<form id="register-form" class="login-form register-form" method="post" action="http://localhost:8080/register" novalidate>
 				<div class="field-grid">
 					<div class="field-group">
 						<label for="name">Nombre completo *</label>
 						<div class="input-shell">
-							<input id="name" name="name" type="text" placeholder="Nombre y apellidos" autocomplete="name" required>
+							<input id="name" name="nombre" type="text" placeholder="Nombre y apellidos" autocomplete="name" required>
 						</div>
 					</div>
 
@@ -98,7 +98,7 @@
 					<div class="field-group">
 						<label for="confirm-password">Repetir contraseña *</label>
 						<div class="input-shell password-shell">
-							<input id="confirm-password" name="confirm-password" type="password" placeholder="Repite la contraseña" autocomplete="new-password" required>
+							<input id="confirm-password" name="confirmPassword" type="password" placeholder="Repite la contraseña" autocomplete="new-password" required>
 							<button class="toggle-password" type="button" id="toggle-confirm-password" aria-label="Mostrar contraseña repetida">Mostrar</button>
 						</div>
 					</div>

@@ -13,30 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<%= contextPath %>/css/index.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var menuButton = document.querySelector('#menu-button');
-            var mainNav = document.querySelector('#main-nav');
-            var panelMessage = document.querySelector('#panel-message');
-            var quickAccessLinks = document.querySelectorAll('.quick-link');
-
-            if (menuButton && mainNav) {
-                menuButton.addEventListener('click', function () {
-                    var isOpen = mainNav.classList.toggle('is-open');
-                    menuButton.setAttribute('aria-expanded', String(isOpen));
-                });
-            }
-
-            quickAccessLinks.forEach(function (link) {
-                link.addEventListener('mouseenter', function () {
-                    var label = link.textContent && link.textContent.trim();
-                    if (panelMessage && label) {
-                        panelMessage.textContent = 'Vas a ir a: ' + label + '.';
-                    }
-                });
-            });
-        });
-    </script>
 </head>
 
 <body>
@@ -45,9 +21,7 @@
         <img src="<%= contextPath %>/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
     </a>
 
-    <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="main-nav">Menú</button>
-
-    <nav class="main-nav" id="main-nav">
+    <nav class="main-nav is-open" id="main-nav">
         <a href="#inicio" aria-current="page">Inicio</a>
         <a class="nav-cta" href="<%= contextPath %>/login">Iniciar sesión</a>
     </nav>
