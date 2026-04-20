@@ -53,13 +53,11 @@
 				<p>Ingresa tus credenciales para entrar al espacio de trabajo.</p>
 			</div>
 
-			<form id="login-form" class="login-form" novalidate>
+			<form id="login-form" class="login-form" method="post" action="http://localhost:8080/login" novalidate>
 				<label for="email">Correo</label>
 				<div class="input-shell">
-					<input id="email" name="email" type="email" placeholder="capitan100@nomail.es" autocomplete="username" required>
+					<input id="email" name="email" type="email" placeholder="bancosolseguimiento@gmail.com" autocomplete="username" required>
 				</div>
-
-				<input id="csrf-token" name="csrfToken" type="hidden" value="">
 
 				<label for="password">Contraseña de acceso</label>
 				<div class="input-shell password-shell">
@@ -76,7 +74,7 @@
 
 				<button type="submit" class="login-button">Entrar al espacio</button>
 				<p class="form-message" id="form-message" role="status" aria-live="polite"></p>
-				<p class="form-message">Credenciales de prueba: capitan100@nomail.es / hash_pendiente</p>
+				<p class="form-message">Credenciales de prueba: bancosolseguimiento@gmail.com / changeme</p>
 				<p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="register.html">Crear cuenta</a></p>
 			</form>
 
