@@ -27,7 +27,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class ApiController {
@@ -42,9 +41,6 @@ public class ApiController {
 
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
-
-	@Value("${app.security.require-https:false}")
-	private boolean requireHttps;
 
 	private SecretKey signingKey;
 
@@ -80,10 +76,7 @@ public class ApiController {
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
-		if (requireHttps && !isSecureRequest(servletRequest)) { // Obligamos a usar la conexión segura
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
-		}
+	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
 		// Sacamos email y contraseña
 		String email = normalizeEmail(request == null ? null : request.get("email"));
@@ -136,11 +129,7 @@ public class ApiController {
 	// Endpoint para registro
 	@PostMapping("/api/auth/register")
 	@ResponseBody
-	public ResponseEntity<?> register(@RequestBody Map<String, String> request, 
-										HttpServletRequest servletRequest) {
-		if (requireHttps && !isSecureRequest(servletRequest)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
-		}
+	public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
 
 		String nombre = trimToNull(request == null ? null : request.get("nombre"));
 		String email = normalizeEmail(request == null ? null : request.get("email"));
@@ -253,20 +242,6 @@ public class ApiController {
 	// Valida que el código postal tenga exactamente 5 dígitos, lo que es común en muchos países.
 	private static boolean isValidPostalCode(String cp) {
 		return cp != null && cp.matches("^[0-9]{5}$");
-	}
-
-	// Verifica si la solicitud se realizó a través de HTTPS, ya sea directamente o mediante un proxy que establezca el encabezado "X-Forwarded-Proto".
-	private static boolean isSecureRequest(HttpServletRequest request) {
-		if (request == null) {
-			return false;
-		}
-
-		if (request.isSecure()) {
-			return true;
-		}
-
-		String forwardedProto = request.getHeader("X-Forwarded-Proto");
-		return forwardedProto != null && "https".equalsIgnoreCase(forwardedProto);
 	}
 
 	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.
