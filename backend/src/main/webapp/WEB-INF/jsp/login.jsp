@@ -15,73 +15,8 @@
     <link rel="stylesheet" href="<%= contextPath %>/css/login.css">
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var form = document.querySelector('#login-form');
-            var emailInput = document.querySelector('#email');
-            var passwordInput = document.querySelector('#password');
             var togglePasswordButton = document.querySelector('#toggle-password');
-            var rememberMeInput = document.querySelector('#remember-me');
-            var message = document.querySelector('#form-message');
-            var contextPathValue = '<%= contextPath %>';
-            var API_BASE_URL = contextPathValue + '/api';
-            var AUTH_TOKEN_KEY = 'bancosol_auth_token';
-
-            function guardarToken(token, recordarSesion) {
-                sessionStorage.setItem(AUTH_TOKEN_KEY, token);
-
-                if (recordarSesion) {
-                    localStorage.setItem(AUTH_TOKEN_KEY, token);
-                } else {
-                    localStorage.removeItem(AUTH_TOKEN_KEY);
-                }
-            }
-
-            function leerToken() {
-                return sessionStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY);
-            }
-
-            function limpiarToken() {
-                sessionStorage.removeItem(AUTH_TOKEN_KEY);
-                localStorage.removeItem(AUTH_TOKEN_KEY);
-            }
-
-            function tokenExpirado(token) {
-                try {
-                    var parts = token.split('.');
-                    if (parts.length !== 3) {
-                        return true;
-                    }
-
-                    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-                    if (!payload.exp) {
-                        return false;
-                    }
-
-                    return Date.now() >= payload.exp * 1000;
-                } catch (error) {
-                    return true;
-                }
-            }
-
-            function comprobarSesionActiva() {
-                var token = leerToken();
-                if (!token) {
-                    return;
-                }
-
-                if (tokenExpirado(token)) {
-                    limpiarToken();
-                    if (message) {
-                        message.textContent = 'Tu sesión ha expirado. Inicia sesión de nuevo.';
-                        message.classList.remove('is-success');
-                        message.classList.add('is-error');
-                    }
-                    return;
-                }
-
-                window.location.href = contextPathValue + '/';
-            }
-
-            comprobarSesionActiva();
+            var passwordInput = document.querySelector('#password');
 
             if (togglePasswordButton && passwordInput) {
                 togglePasswordButton.addEventListener('click', function () {
@@ -89,72 +24,6 @@
                     passwordInput.type = nextType;
                     togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
                     togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
-                });
-            }
-
-            if (form && emailInput && passwordInput && message) {
-                form.addEventListener('submit', async function (event) {
-                    event.preventDefault();
-
-                    var email = emailInput.value.trim();
-                    var password = passwordInput.value.trim();
-
-                    message.classList.remove('is-error', 'is-success');
-
-                    if (!email || !password) {
-                        message.textContent = 'Completa tu usuario y contraseña para continuar.';
-                        message.classList.add('is-error');
-                        return;
-                    }
-
-                    if (!emailInput.validity.valid) {
-                        message.textContent = 'Ingresa un correo valido.';
-                        message.classList.add('is-error');
-                        emailInput.focus();
-                        return;
-                    }
-
-                    if (password.length < 6) {
-                        message.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-                        message.classList.add('is-error');
-                        passwordInput.focus();
-                        return;
-                    }
-
-                    try {
-                        var response = await fetch(API_BASE_URL + '/auth/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                email: email,
-                                password: password
-                            })
-                        });
-
-                        var payload = await response.json();
-
-                        if (!response.ok) {
-                            message.textContent = payload.message || 'No se pudo iniciar sesion.';
-                            message.classList.add('is-error');
-                            return;
-                        }
-
-                        if (payload.token) {
-                            guardarToken(payload.token, Boolean(rememberMeInput && rememberMeInput.checked));
-                        }
-
-                        message.textContent = 'Bienvenido/a ' + payload.nombre + '. Login correcto.';
-                        message.classList.add('is-success');
-
-                        window.setTimeout(function () {
-                            window.location.href = contextPathValue + '/';
-                        }, 350);
-                    } catch (error) {
-                        message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
-                        message.classList.add('is-error');
-                    }
                 });
             }
         });
@@ -205,7 +74,7 @@
             <p>Ingresa tus credenciales para entrar al espacio de trabajo.</p>
         </div>
 
-        <form id="login-form" class="login-form" novalidate>
+        <form id="login-form" class="login-form" method="post" action="<%= contextPath %>/login">
             <label for="email">Correo</label>
             <div class="input-shell">
                 <input id="email" name="email" type="email" placeholder="capitan100@nomail.es" autocomplete="username" required>
@@ -227,7 +96,11 @@
             </div>
 
             <button type="submit" class="login-button">Entrar al espacio</button>
-            <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <% if (request.getAttribute("loginError") != null) { %>
+                <p class="form-message is-error" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("loginError") %></p>
+            <% } else { %>
+                <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <% } %>
             <p class="form-message">Credenciales de prueba: capitan100@nomail.es / hash_pendiente</p>
             <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="<%= contextPath %>/register">Crear cuenta</a></p>
         </form>

@@ -1,5 +1,6 @@
 package es.grupo8.backend.controllers;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.grupo8.backend.dao.UserRepository;
@@ -42,6 +44,9 @@ public class ApiController {
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
 
+	@Value("${app.frontend.base-url:http://localhost:80}")
+	private String frontendBaseUrl;
+
 	private SecretKey signingKey;
 
 	@PostConstruct
@@ -60,10 +65,47 @@ public class ApiController {
 	}
 
 	// Página de login
-	@GetMapping("/login")
-	public String doLogin(Model model) {
+	@GetMapping({"/login"})
+	public String doLogin(@RequestParam(value = "error", required = false) String error, Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
+		if (error != null && !error.isBlank()) {
+			model.addAttribute("loginError", error);
+		}
 		return "login";
+	}
+
+	// Login con formulario y redirección por rol
+	@PostMapping("/login")
+	public String doLoginForm(
+			@RequestParam(value = "email", required = false) String emailParam,
+			@RequestParam(value = "password", required = false) String passwordParam) {
+
+		final String invalidCredentialsMessage = "No existen esos datos en la base de datos";
+
+		String email = normalizeEmail(emailParam);
+		String password = trimToNull(passwordParam);
+
+		if (email == null || password == null) {
+			return "redirect:/login?error=" + urlEncode("Email y contrasena son obligatorios");
+		}
+
+		UserEntity user = userRepository.findByEmail(email).orElse(null);
+		if (user == null) {
+			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+		}
+
+		String storedPassword = user.getContrasena();
+		if (!matchesPassword(password, storedPassword)) {
+			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+		}
+
+		if (needsMigration(storedPassword)) {
+			user.setContrasena(hashPassword(password));
+			userRepository.save(user);
+		}
+
+		String role = resolveRole(user.getIdUsuario());
+		return "redirect:" + buildFrontendUrl(roleToPath(role));
 	}
 
 	// Página de registro
@@ -112,11 +154,14 @@ public class ApiController {
 
 		// Generamos token JWT con ID usuario, email y nombre
 		String token = generateToken(user.getIdUsuario(), user.getEmail(), user.getNombre());
+		String role = resolveRole(user.getIdUsuario());
 
 		return ResponseEntity.ok(Map.of(
 				"userId", user.getIdUsuario(),
 				"nombre", user.getNombre(),
 				"email", user.getEmail(),
+				"role", role,
+				"redirectUrl", buildFrontendUrl(roleToPath(role)),
 				"message", "Login correcto",
 				"token", token,
 				"tokenType", "Bearer",
@@ -294,6 +339,59 @@ public class ApiController {
 				throw new IllegalStateException("No se pudo inicializar la clave JWT", ex);
 			}
 		}
+	}
+
+	private String resolveRole(Integer userId) {
+		if (userRepository.isAdministrador(userId)) {
+			return "ADMINISTRADOR";
+		}
+
+		if (userRepository.isCoordinador(userId)) {
+			return "COORDINADOR";
+		}
+
+		if (userRepository.isCapitan(userId)) {
+			return "CAPITAN";
+		}
+
+		if (userRepository.isResponsableEntidad(userId)) {
+			return "COLABORADOR";
+		}
+
+		return "COLABORADOR";
+	}
+
+	private static String roleToPath(String role) {
+		if ("ADMINISTRADOR".equals(role)) {
+			return "/administrador.html";
+		}
+
+		if ("COORDINADOR".equals(role)) {
+			return "/coordinador.html";
+		}
+
+		if ("CAPITAN".equals(role)) {
+			return "/capitan.html";
+		}
+
+		return "/colaborador.html";
+	}
+
+	private String buildFrontendUrl(String path) {
+		String base = frontendBaseUrl == null ? "http://localhost:80" : frontendBaseUrl.trim();
+		if (base.endsWith("/")) {
+			base = base.substring(0, base.length() - 1);
+		}
+
+		if (path.startsWith("/")) {
+			return base + path;
+		}
+
+		return base + "/" + path;
+	}
+
+	private static String urlEncode(String value) {
+		return URLEncoder.encode(value, StandardCharsets.UTF_8);
 	}
 
 }
