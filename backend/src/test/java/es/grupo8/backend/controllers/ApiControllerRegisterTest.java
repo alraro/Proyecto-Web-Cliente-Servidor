@@ -43,7 +43,7 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("cp", "");
 
-        ResponseEntity<?> response = controller.register(request, null);
+        ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -54,7 +54,7 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("email", "correo-invalido");
 
-        ResponseEntity<?> response = controller.register(request, null);
+        ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -65,12 +65,12 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("telefono", "abc");
 
-        ResponseEntity<?> response = controller.register(request, null);
+        ResponseEntity<?> response = controller.register(request);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
         Map<String, String> request2 = validRequest();
         request2.put("cp", "29A01");
-        ResponseEntity<?> response2 = controller.register(request2, null);
+        ResponseEntity<?> response2 = controller.register(request2);
         assertEquals(HttpStatus.BAD_REQUEST, response2.getStatusCode());
     }
 
@@ -78,7 +78,7 @@ class ApiControllerRegisterTest {
     void registerRejectsDuplicatedEmail() {
         when(userRepository.existsByEmail("usuario@bancosol.org")).thenReturn(true);
 
-        ResponseEntity<?> response = controller.register(validRequest(), null);
+        ResponseEntity<?> response = controller.register(validRequest());
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -93,7 +93,7 @@ class ApiControllerRegisterTest {
             return user;
         });
 
-        ResponseEntity<?> response = controller.register(validRequest(), null);
+        ResponseEntity<?> response = controller.register(validRequest());
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
@@ -124,7 +124,7 @@ class ApiControllerRegisterTest {
         req.put("email", "legacy@bancosol.org");
         req.put("password", "legacy123");
 
-        ResponseEntity<?> response = controller.login(req, null);
+        ResponseEntity<?> response = controller.login(req);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(userRepository).save(any(UserEntity.class));
     }

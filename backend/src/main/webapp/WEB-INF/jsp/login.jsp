@@ -228,7 +228,11 @@
 
             <button type="submit" class="login-button">Entrar al espacio</button>
             <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+<<<<<<< HEAD
             <p class="form-message">Credenciales de prueba: bancosolseguimiento@gmail.com / changeme</p>
+=======
+            <p class="form-message">Credenciales de prueba: capitan100@nomail.es / hash_pendiente</p>
+>>>>>>> 16792007e52ebc82795991c0445aac3cf012138b
             <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="<%= contextPath %>/register">Crear cuenta</a></p>
         </form>
 

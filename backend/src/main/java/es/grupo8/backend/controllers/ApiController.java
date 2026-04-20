@@ -27,7 +27,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class ApiController {
@@ -77,7 +76,8 @@ public class ApiController {
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody Map<String, String> request, HttpServletRequest servletRequest) {
+	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+
 		// Sacamos email y contraseña
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
@@ -129,8 +129,8 @@ public class ApiController {
 	// Endpoint para registro
 	@PostMapping("/api/auth/register")
 	@ResponseBody
-	public ResponseEntity<?> register(@RequestBody Map<String, String> request, 
-										HttpServletRequest servletRequest) {
+	public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
+
 		String nombre = trimToNull(request == null ? null : request.get("nombre"));
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
