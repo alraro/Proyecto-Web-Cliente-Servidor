@@ -333,23 +333,21 @@ INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
   (1, 'Arantxa', 'bancosolseguimiento@gmail.com', '652032496', 'changeme'),
   (2, 'Cristóbal Aragón', 'aragoncristobal@hotmail.com', '639784306', 'changeme'),
   (3, 'Diego Vazquez', 'dvazquez.ronda59@gmail.com', '617967834', 'changeme'),
-  (4, 'Diego Vazquez', 'dvazquez.ronda59@gmail.com', '617967834', 'changeme'),
-  (5, 'Fran Jimenez', 'rafaelsalcedo@bancosol.info', '647202611', 'changeme'),
+  (5, 'Fran Jimenez', 'franjimenez@bancosol.info', '647202611', 'changeme'),
   (6, 'José M Cobos', 'j-m-cobos@hotmail.com', '639789171', 'changeme'),
-  (7, 'Manuel Ladoux Arroyo', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (7, 'Manuel Ladoux Arroyo', 'mladoux@bancosol.info', NULL, 'changeme'),
   (8, 'Mari Carmen Chamizo', 'mchamizo@bancosol.info', '671562051', 'changeme'),
-  (9, 'Mari Luz Pérez', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (9, 'Mari Luz Pérez', 'mariluzperez@bancosol.info', NULL, 'changeme'),
   (10, 'María Victoria Ruiz', 'mariavictoriaruizjimenez@gmail.com', '656379575', 'changeme'),
-  (11, 'Coord Torremolinos', 'rafaelsalcedo@bancosol.info', NULL, 'changeme'),
+  (11, 'Coord Torremolinos', 'coordtorremolinos@bancosol.info', NULL, 'changeme'),
   (12, 'Vicente Morato', 'vimor@yahoo.es', '627818795', 'changeme'),
-  (13, 'Zona Marbella', 'rafaelsalcedo@bancosol.info', NULL, 'changeme');
+  (13, 'Zona Marbella', 'zonamarbella@bancosol.info', NULL, 'changeme');
 
 -- 9. COORDINADORES (asociados a campaña 1)
 INSERT INTO Coordinadores (ID_Usuario, ID_Campana) VALUES
   (1, 1),
   (2, 1),
   (3, 1),
-  (4, 1),
   (5, 1),
   (6, 1),
   (7, 1),
