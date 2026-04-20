@@ -65,18 +65,9 @@ public class ApiController {
 	}
 
 	// Página de login
-	@GetMapping({"/login"})
-	public String doLogin(
-			@RequestParam(value = "error", required = false) String error,
-			@RequestParam(value = "success", required = false) String success,
-			Model model) {
+	@GetMapping("/login")
+	public String doLogin(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
-		if (error != null && !error.isBlank()) {
-			model.addAttribute("loginError", error);
-		}
-		if (success != null && !success.isBlank()) {
-			model.addAttribute("loginSuccess", success);
-		}
 		return "login";
 	}
 
