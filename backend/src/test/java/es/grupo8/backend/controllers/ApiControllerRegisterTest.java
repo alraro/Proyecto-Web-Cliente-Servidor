@@ -21,37 +21,21 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.entity.UserEntity;
-import jakarta.servlet.http.HttpServletRequest;
 
 class ApiControllerRegisterTest {
 
     private ApiController controller;
     private UserRepository userRepository;
-    private HttpServletRequest secureRequest;
-    private HttpServletRequest insecureRequest;
 
     @BeforeEach
     void setUp() {
         controller = new ApiController();
         userRepository = mock(UserRepository.class);
-        secureRequest = mock(HttpServletRequest.class);
-        insecureRequest = mock(HttpServletRequest.class);
 
         ReflectionTestUtils.setField(controller, "userRepository", userRepository);
         ReflectionTestUtils.setField(controller, "jwtSecret", "change-this-secret-in-production-change-this-secret-in-production");
         ReflectionTestUtils.setField(controller, "jwtExpirationMs", 7200000L);
-        ReflectionTestUtils.setField(controller, "requireHttps", true);
         controller.initJwt();
-
-        when(secureRequest.isSecure()).thenReturn(true);
-        when(insecureRequest.isSecure()).thenReturn(false);
-    }
-
-    @Test
-    void registerRejectsInsecureWhenHttpsRequired() {
-        ResponseEntity<?> response = controller.register(validRequest(), insecureRequest);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        verify(userRepository, never()).save(any(UserEntity.class));
     }
 
     @Test
@@ -59,7 +43,7 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("cp", "");
 
-        ResponseEntity<?> response = controller.register(request, secureRequest);
+        ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -70,7 +54,7 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("email", "correo-invalido");
 
-        ResponseEntity<?> response = controller.register(request, secureRequest);
+        ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -81,12 +65,12 @@ class ApiControllerRegisterTest {
         Map<String, String> request = validRequest();
         request.put("telefono", "abc");
 
-        ResponseEntity<?> response = controller.register(request, secureRequest);
+        ResponseEntity<?> response = controller.register(request);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
         Map<String, String> request2 = validRequest();
         request2.put("cp", "29A01");
-        ResponseEntity<?> response2 = controller.register(request2, secureRequest);
+        ResponseEntity<?> response2 = controller.register(request2);
         assertEquals(HttpStatus.BAD_REQUEST, response2.getStatusCode());
     }
 
@@ -94,7 +78,7 @@ class ApiControllerRegisterTest {
     void registerRejectsDuplicatedEmail() {
         when(userRepository.existsByEmail("usuario@bancosol.org")).thenReturn(true);
 
-        ResponseEntity<?> response = controller.register(validRequest(), secureRequest);
+        ResponseEntity<?> response = controller.register(validRequest());
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         verify(userRepository, never()).save(any(UserEntity.class));
@@ -109,7 +93,7 @@ class ApiControllerRegisterTest {
             return user;
         });
 
-        ResponseEntity<?> response = controller.register(validRequest(), secureRequest);
+        ResponseEntity<?> response = controller.register(validRequest());
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
@@ -127,7 +111,6 @@ class ApiControllerRegisterTest {
 
     @Test
     void loginMigratesLegacyPassword() {
-        ReflectionTestUtils.setField(controller, "requireHttps", false);
         UserEntity legacy = new UserEntity();
         legacy.setIdUsuario(1);
         legacy.setNombre("Usuario Legacy");
@@ -141,7 +124,7 @@ class ApiControllerRegisterTest {
         req.put("email", "legacy@bancosol.org");
         req.put("password", "legacy123");
 
-        ResponseEntity<?> response = controller.login(req, insecureRequest);
+        ResponseEntity<?> response = controller.login(req);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(userRepository).save(any(UserEntity.class));
     }
