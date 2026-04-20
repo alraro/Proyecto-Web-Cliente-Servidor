@@ -186,7 +186,7 @@
             </article>
             <article>
                 <strong>Accesos rápidos</strong>
-                <span>Recuperar contraseña o crear cuenta en segundos</span>
+                    <span>Crear cuenta en segundos</span>
             </article>
         </div>
     </section>
@@ -224,7 +224,6 @@
                     <input type="checkbox" id="remember-me">
                     <span>Recordar acceso</span>
                 </label>
-                <a href="<%= contextPath %>/password" class="forgot-link">Olvidé contraseña</a>
             </div>
 
             <button type="submit" class="login-button">Entrar al espacio</button>

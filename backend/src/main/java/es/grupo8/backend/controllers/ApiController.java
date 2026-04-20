@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -44,7 +43,7 @@ public class ApiController {
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
 
-	@Value("${app.security.require-https:true}")
+	@Value("${app.security.require-https:false}")
 	private boolean requireHttps;
 
 	private SecretKey signingKey;
@@ -77,50 +76,6 @@ public class ApiController {
 		model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
 		return "register";
 	}
-
-	// Página de recuperación de contraseña
-	@GetMapping("/password")
-	public String doPassword(Model model) {
-		model.addAttribute("pageTitle", "Bancosol | Recuperar contraseña");
-		return "password";
-	}
-
-	// Endpoint para recuperación de contraseña
-	@PostMapping("/api/auth/password-recovery")
-	@ResponseBody
-	public ResponseEntity<?> recoverPassword(@RequestBody Map<String, String> request, 
-											HttpServletRequest servletRequest) {
-		if (requireHttps && !isSecureRequest(servletRequest)) { // Obligamos a usar la conexión segura
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "HTTPS requerido"));
-		}
-
-		// Sacamos el email del cuerpo de la solicitud, normalizándolo para evitar problemas de formato y unicidad.
-		String email = normalizeEmail(request == null ? null : request.get("email"));
-
-		// Validamos el formato y si está vacío
-		if (email == null || !isValidEmail(email)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Introduce un correo valido"));
-		}
-
-		// Buscamos al usuario por email
-		UserEntity user = userRepository.findByEmail(email).orElse(null);
-
-		if (user != null){
-			String tokenRecuperacionPlano = UUID.randomUUID().toString();
-			String tokenRecuperacionHash = sha256Hex(tokenRecuperacionPlano);
-
-			user.setTokenRecuperacion(tokenRecuperacionHash);
-			user.setTokenRecuperacionExpiraEn(Instant.now().plusSeconds(900));
-
-			userRepository.save(user);
-
-			// TODO: enviar tokenRecuperacionPlano por email en el flujo real de reseteo.
-		}
-		
-		return ResponseEntity.ok(Map.of("message", "Si el correo existe en nuestro sistema, recibirás instrucciones para recuperar tu contraseña"));
-	}
-
-
 
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
@@ -366,17 +321,4 @@ public class ApiController {
 		}
 	}
 
-	private static String sha256Hex(String value) {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-			StringBuilder hex = new StringBuilder(hash.length * 2);
-			for (byte b : hash) {
-				hex.append(String.format("%02x", b));
-			}
-			return hex.toString();
-		} catch (NoSuchAlgorithmException ex) {
-			throw new IllegalStateException("No se pudo generar hash SHA-256", ex);
-		}
-	}
 }

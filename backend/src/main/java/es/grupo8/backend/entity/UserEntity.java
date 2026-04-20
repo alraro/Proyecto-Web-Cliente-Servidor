@@ -1,7 +1,5 @@
 package es.grupo8.backend.entity;
 
-import java.time.Instant;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,27 +33,7 @@ public class UserEntity {
 
     @Column(name = "cp", length = 10)
     private String cp;
-
-    @Column(name = "token_recuperacion", length = 255)
-    private String tokenRecuperacion;
-
-    @Column(name = "token_recuperacion_expira_en")
-    private Instant tokenRecuperacionExpiraEn;
-
-    public String getTokenRecuperacion() {
-        return tokenRecuperacion;
-    }
-    public void setTokenRecuperacion(String tokenRecuperacion) {
-        this.tokenRecuperacion = tokenRecuperacion;
-    }
-
-    public Instant getTokenRecuperacionExpiraEn() {
-        return tokenRecuperacionExpiraEn;
-    }
-
-    public void setTokenRecuperacionExpiraEn(Instant tokenRecuperacionExpiraEn) {
-        this.tokenRecuperacionExpiraEn = tokenRecuperacionExpiraEn;
-    }
+   
 
     public Integer getIdUsuario() {
         return idUsuario;
