@@ -1059,3 +1059,14 @@ APTDO CORREOS 63
   (109, 'THEMIS ASOC DE INMIGRANTES MUJERES Y NIÑOS', 'CL Tejares, 48
 29011 - MALAGA', NULL),
   (110, 'VIRGEN DE LAS FLORES ALORA RESIDENCIA', 'Av. Pablo Ruiz Picasso, 20 29500 Álora', NULL);
+
+
+-- USUARIOS EXTRA PARA PRUEBAS (admin, capitán, colaborador)
+INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
+  (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
+  (15, 'Capitan Test', 'capitan@bancosol.info', '600000002', 'changeme'),
+  (16, 'Colaborador Test', 'colaborador@bancosol.info', '600000003', 'changeme');
+
+INSERT INTO Administradores (ID_Usuario) VALUES (14);
+
+INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (15, 1);
