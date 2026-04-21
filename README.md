@@ -72,7 +72,7 @@
 ```text
 Proyecto-Web-Cliente-Servidor/
 ├─ frontend/     -> Cliente estático (HTML, CSS, JS) servido con Nginx
-├─ backend/      -> Aplicación Spring Boot (SSR con Thymeleaf + API REST)
+├─ backend/      -> Aplicación Spring Boot (SSR con JSP + API REST)
 ├─ database/     -> Script init.sql para inicializar PostgreSQL
 └─ docker-compose.yml -> Orquestación completa (frontend, backend, db, adminer)
 ```
@@ -95,7 +95,7 @@ docker compose up -d --build
 ### 3) Accesos principales
 
 - Frontend: http://localhost:80
-- Backend SSR (Thymeleaf): http://localhost:8080/inicio
+- Backend SSR (JSP): http://localhost:8080/inicio
 - Backend API REST: http://localhost:8080/api/v1/ejemplo
 - Adminer (gestor web de BD): http://localhost:8081
 
@@ -170,4 +170,14 @@ Notas:
 
 ## Estado del proyecto
 
-Proyecto en evolución continua para prácticas de Cliente-Servidor.
+Estado actual (lo que ya existe):
+
+- Backend único en Spring Boot que centraliza la lógica de negocio, acceso a datos y endpoints API.
+- Renderizado SSR con JSP para páginas base de acceso (`/`, `/login`, `/register`).
+- Frontend estático en `frontend/` con HTML, CSS y JavaScript servido por Nginx.
+- Base de datos PostgreSQL y entorno de ejecución unificado con Docker Compose.
+
+Dirección definida del proyecto (sin entrar en implementación futura):
+
+- Mantener un único backend común.
+- Conectar ese backend con tres variantes de frontend: JSP, HTML/CSS/JavaScript y React.
