@@ -20,6 +20,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
       - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+      - ./database/V2__add_participacion_cadena.sql:/docker-entrypoint-initdb.d/03_v2.sql:ro
 
   adminer:
     image: adminer:latest
