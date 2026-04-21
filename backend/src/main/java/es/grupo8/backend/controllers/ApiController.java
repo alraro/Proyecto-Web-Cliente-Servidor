@@ -44,6 +44,7 @@ public class ApiController {
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
 
+	// Para conectar backend con frontend
 	@Value("${app.frontend.base-url:http://localhost:80}")
 	private String frontendBaseUrl;
 
@@ -179,6 +180,7 @@ public class ApiController {
 		userRepository.save(user);
 		return "redirect:/login?success=" + urlEncode("Registro correcto. Ya puedes iniciar sesion");
 	}
+
 
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
