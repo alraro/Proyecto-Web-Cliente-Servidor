@@ -118,6 +118,11 @@ public class ApiController {
 		}
 
 		String role = resolveRole(user.getIdUser());
+		if ("PENDIENTE".equals(role)) {
+			model.addAttribute("loginError", "No tiene rol asignado.");
+			return "login";
+		}
+
 		return "redirect:" + buildFrontendUrl(roleToPath(role));
 	}
 
@@ -242,6 +247,11 @@ public class ApiController {
 		// Generamos token JWT con ID usuario, email y nombre
 		String token = generateToken(user.getIdUser(), user.getEmail(), user.getName());
 		String role = resolveRole(user.getIdUser());
+
+		if ("PENDIENTE".equals(role)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("message", "No tiene rol asignado."));
+		}
 
 		return ResponseEntity.ok(Map.of(
 				"userId", user.getIdUser(),
@@ -471,7 +481,7 @@ public class ApiController {
 			return "/colaborador.html";
 		}
 
-		return "/user.html";
+		return "/login.html";
 	}
 
 	private String buildFrontendUrl(String path) {
