@@ -11,8 +11,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -104,18 +104,18 @@ public class ApiController {
 			return "login";
 		}
 
-		String storedPassword = user.getContrasena();
+		String storedPassword = user.getPassword();
 		if (!matchesPassword(password, storedPassword)) {
 			model.addAttribute("loginError", "No existen los datos.");
 			return "login";
 		}
 
 		if (needsMigration(storedPassword)) {
-			user.setContrasena(hashPassword(password));
+			user.setPassword(hashPassword(password));
 			userRepository.save(user);
 		}
 
-		String role = resolveRole(user.getIdUsuario());
+		String role = resolveRole(user.getIdUser());
 		return "redirect:" + buildFrontendUrl(roleToPath(role));
 	}
 
@@ -183,12 +183,12 @@ public class ApiController {
 		}
 
 		UserEntity user = new UserEntity();
-		user.setNombre(nombre);
+		user.setName(nombre);
 		user.setEmail(email);
-		user.setTelefono(telefono);
-		user.setContrasena(hashPassword(password));
-		user.setDomicilio(domicilio);
-		user.setCp(cp);
+		user.setPhone(telefono);
+		user.setPassword(hashPassword(password));
+		user.setAddress(domicilio);
+		user.setPostalCode(cp);
 
 		try {
 			userRepository.save(user);
@@ -224,7 +224,7 @@ public class ApiController {
 		}
 
 
-		String storedPassword = user.getContrasena();
+		String storedPassword = user.getPassword();
 		// Verificamos la contraseña proporcionada con la almacenada
 		if (!matchesPassword(password, storedPassword)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -233,17 +233,17 @@ public class ApiController {
 
 		// Si no está en hash la cambiamos
 		if (needsMigration(storedPassword)) {
-			user.setContrasena(hashPassword(password));
+			user.setPassword(hashPassword(password));
 			userRepository.save(user);
 		}
 
 		// Generamos token JWT con ID usuario, email y nombre
-		String token = generateToken(user.getIdUsuario(), user.getEmail(), user.getNombre());
-		String role = resolveRole(user.getIdUsuario());
+		String token = generateToken(user.getIdUser(), user.getEmail(), user.getName());
+		String role = resolveRole(user.getIdUser());
 
 		return ResponseEntity.ok(Map.of(
-				"userId", user.getIdUsuario(),
-				"nombre", user.getNombre(),
+				"userId", user.getIdUser(),
+				"nombre", user.getName(),
 				"email", user.getEmail(),
 				"role", role,
 				"redirectUrl", buildFrontendUrl(roleToPath(role)),
@@ -301,12 +301,12 @@ public class ApiController {
 
 		// Creamos el usuario con contraseña hasheada
 		UserEntity user = new UserEntity();
-		user.setNombre(nombre);
+		user.setName(nombre);
 		user.setEmail(email);
-		user.setTelefono(telefono);
-		user.setContrasena(hashPassword(password));
-		user.setDomicilio(domicilio);
-		user.setCp(cp);
+		user.setPhone(telefono);
+		user.setPassword(hashPassword(password));
+		user.setAddress(domicilio);
+		user.setPostalCode(cp);
 
 		UserEntity createdUser;
 		try {
@@ -315,11 +315,11 @@ public class ApiController {
 			return ResponseEntity.badRequest().body(Map.of("message", "No se pudo crear la cuenta. Revisa email y codigo postal"));
 		}
 
-		String token = generateToken(createdUser.getIdUsuario(), createdUser.getEmail(), createdUser.getNombre());
+		String token = generateToken(createdUser.getIdUser(), createdUser.getEmail(), createdUser.getName());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				"userId", createdUser.getIdUsuario(),
-				"nombre", createdUser.getNombre(),
+				"userId", createdUser.getIdUser(),
+				"nombre", createdUser.getName(),
 				"email", createdUser.getEmail(),
 				"message", "Registro correcto",
 				"token", token,
@@ -433,19 +433,19 @@ public class ApiController {
 	}
 
 	private String resolveRole(Integer userId) {
-		if (userRepository.isAdministrador(userId)) {
+		if (userRepository.isAdmin(userId)) {
 			return "ADMINISTRADOR";
 		}
 
-		if (userRepository.isCoordinador(userId)) {
+		if (userRepository.isCoordinator(userId)) {
 			return "COORDINADOR";
 		}
 
-		if (userRepository.isCapitan(userId)) {
+		if (userRepository.isCaptain(userId)) {
 			return "CAPITAN";
 		}
 
-		if (userRepository.isResponsableEntidad(userId)) {
+		if (userRepository.isPartnerEntityManager(userId)) {
 			return "COLABORADOR";
 		}
 
