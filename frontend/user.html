@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Bancosol | Cuenta pendiente de rol</title>
+	<style>
+		:root {
+			--bg-1: #f3f0e7;
+			--bg-2: #fefaf2;
+			--ink: #1d2b24;
+			--accent: #1f6f43;
+			--accent-soft: #dcefe3;
+			--warn: #7a5c00;
+			--card: #ffffff;
+			--line: #d6dcd7;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at 12% 15%, #fff4d6 0%, transparent 36%),
+				radial-gradient(circle at 88% 80%, #dff1e5 0%, transparent 32%),
+				linear-gradient(145deg, var(--bg-1), var(--bg-2));
+			display: grid;
+			place-items: center;
+			padding: 24px;
+		}
+
+		.panel {
+			width: min(720px, 100%);
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			box-shadow: 0 20px 45px rgba(27, 46, 38, 0.12);
+			overflow: hidden;
+		}
+
+		.panel-head {
+			padding: 20px 24px;
+			background: linear-gradient(120deg, #1f6f43, #2b8f59);
+			color: #ffffff;
+		}
+
+		.panel-head h1 {
+			margin: 0;
+			font-size: 1.35rem;
+			line-height: 1.25;
+		}
+
+		.panel-body {
+			padding: 24px;
+			display: grid;
+			gap: 16px;
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			width: fit-content;
+			background: var(--accent-soft);
+			color: var(--accent);
+			border-radius: 999px;
+			padding: 8px 14px;
+			font-weight: 700;
+			font-size: 0.9rem;
+		}
+
+		.badge::before {
+			content: "";
+			width: 9px;
+			height: 9px;
+			border-radius: 999px;
+			background: #2b8f59;
+		}
+
+		.user-line {
+			margin: 0;
+			font-size: 1rem;
+		}
+
+		.help {
+			margin: 0;
+			padding: 14px;
+			border-left: 4px solid #f0c04a;
+			background: #fff8e5;
+			color: var(--warn);
+			border-radius: 10px;
+			line-height: 1.5;
+		}
+
+		.actions {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 4px;
+		}
+
+		.button {
+			border: none;
+			border-radius: 10px;
+			padding: 10px 14px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			cursor: pointer;
+		}
+
+		.button.primary {
+			background: var(--accent);
+			color: #ffffff;
+		}
+
+		.button.secondary {
+			background: #ecf0ed;
+			color: var(--ink);
+		}
+
+		.muted {
+			color: #5a6b62;
+			font-size: 0.9rem;
+			margin: 0;
+		}
+
+		@media (max-width: 640px) {
+			.panel-head,
+			.panel-body {
+				padding: 18px;
+			}
+
+			.panel-head h1 {
+				font-size: 1.15rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="panel" aria-live="polite">
+		<header class="panel-head">
+			<h1>Cuenta creada correctamente</h1>
+		</header>
+
+		<section class="panel-body">
+			<span class="badge">Estado: rol pendiente</span>
+			<p class="user-line" id="user-line">Usuario autenticado</p>
+			<p class="help">
+				Tu cuenta existe, pero aun no tiene un rol operativo asignado.
+				Mientras tanto, esta sera tu pagina de espera.
+			</p>
+			<p class="muted">
+				Cuando el administrador te asigne un rol, en el siguiente inicio de sesion
+				entraras automaticamente en tu panel correspondiente.
+			</p>
+
+			<div class="actions">
+				<button class="button secondary" id="reload-role" type="button">Comprobar rol</button>
+				<button class="button primary" id="logout" type="button">Cerrar sesion</button>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		(function () {
+			const userLine = document.getElementById('user-line');
+			const reloadRoleButton = document.getElementById('reload-role');
+			const logoutButton = document.getElementById('logout');
+
+			const token = localStorage.getItem('token');
+			const nombre = localStorage.getItem('nombre');
+			const email = localStorage.getItem('email');
+			const role = localStorage.getItem('role');
+
+			if (nombre || email) {
+				userLine.textContent = 'Usuario: ' + (nombre || email || 'sin datos');
+			}
+
+			if (!token) {
+				userLine.textContent = 'No hay sesion activa. Inicia sesion para continuar.';
+			}
+
+			reloadRoleButton.addEventListener('click', function () {
+				window.location.href = '/login.html';
+			});
+
+			logoutButton.addEventListener('click', function () {
+				localStorage.removeItem('token');
+				localStorage.removeItem('nombre');
+				localStorage.removeItem('email');
+				localStorage.removeItem('role');
+				window.location.href = '/login.html';
+			});
+
+			if (role && role !== 'PENDIENTE') {
+				const roleTargets = {
+					ADMINISTRADOR: '/administrador.html',
+					COORDINADOR: '/coordinador.html',
+					CAPITAN: '/capitan.html',
+					COLABORADOR: '/colaborador.html'
+				};
+
+				window.location.href = roleTargets[role] || '/login.html';
+			}
+		})();
+	</script>
+</body>
+</html>

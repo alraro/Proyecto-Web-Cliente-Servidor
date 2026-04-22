@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -30,21 +31,22 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 
+
 @Controller
 public class ApiController {
 
 	@Autowired
 	protected UserRepository userRepository;
 
-
-
+	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
+	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
 	@Value("${app.jwt.secret:change-this-secret-in-production-change-this-secret-in-production}")
 	private String jwtSecret;
 
 	@Value("${app.jwt.expiration-ms:7200000}")
 	private long jwtExpirationMs;
 
-
+	// Para conectar backend con frontend
 	@Value("${app.frontend.base-url:http://localhost:80}")
 	private String frontendBaseUrl;
 
@@ -58,43 +60,56 @@ public class ApiController {
 
 
 
-
+	// Pagina de inicio
 	@GetMapping({"/", "/index"})
 	public String doInit(Model model) {
-		model.addAttribute("pageTitle", "Bancosol | Home");
+		model.addAttribute("pageTitle", "Bancosol | Inicio");
 		return "index";
 	}
 
-
+	// Página de login
 	@GetMapping("/login")
-	public String doLogin(Model model) {
-		model.addAttribute("pageTitle", "Bancosol | Login");
+	public String doLogin(
+			@RequestParam(value = "error", required = false) String error,
+			@RequestParam(value = "success", required = false) String success,
+			Model model) {
+				
+		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
+		if (error != null && !error.isBlank()) {
+			model.addAttribute("loginError", error);
+		}
+		if (success != null && !success.isBlank()) {
+			model.addAttribute("loginSuccess", success);
+		}
 		return "login";
 	}
 
-
+	// Login con formulario y redirección por rol
 	@PostMapping("/login")
 	public String doLoginForm(
 			@RequestParam(value = "email", required = false) String emailParam,
-			@RequestParam(value = "password", required = false) String passwordParam) {
-
-		final String invalidCredentialsMessage = "Those credentials do not exist in the database";
+			@RequestParam(value = "password", required = false) String passwordParam,
+			Model model) {
 
 		String email = normalizeEmail(emailParam);
 		String password = trimToNull(passwordParam);
+		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
 
 		if (email == null || password == null) {
-			return "redirect:/login?error=" + urlEncode("Email and password are required");
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		UserEntity user = userRepository.findByEmail(email).orElse(null);
 		if (user == null) {
-			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		String storedPassword = user.getPassword();
 		if (!matchesPassword(password, storedPassword)) {
-			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		if (needsMigration(storedPassword)) {
@@ -106,13 +121,13 @@ public class ApiController {
 		return "redirect:" + buildFrontendUrl(roleToPath(role));
 	}
 
-
+	// Página de registro
 	@GetMapping("/register")
 	public String doRegister(
 			@RequestParam(value = "error", required = false) String error,
 			@RequestParam(value = "success", required = false) String success,
 			Model model) {
-		model.addAttribute("pageTitle", "Bancosol | Create Account");
+		model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
 		if (error != null && !error.isBlank()) {
 			model.addAttribute("registerError", error);
 		}
@@ -122,114 +137,119 @@ public class ApiController {
 		return "register";
 	}
 
-
+	// Registro con formulario tradicional
 	@PostMapping("/register")
 	public String doRegisterForm(
-			@RequestParam(value = "name", required = false) String nameParam,
+			@RequestParam(value = "nombre", required = false) String nombreParam,
 			@RequestParam(value = "email", required = false) String emailParam,
 			@RequestParam(value = "password", required = false) String passwordParam,
 			@RequestParam(value = "confirmPassword", required = false) String confirmPasswordParam,
-			@RequestParam(value = "phone", required = false) String phoneParam,
-			@RequestParam(value = "address", required = false) String addressParam,
-			@RequestParam(value = "postalCode", required = false) String postalCodeParam) {
+			@RequestParam(value = "telefono", required = false) String telefonoParam,
+			@RequestParam(value = "domicilio", required = false) String domicilioParam,
+			@RequestParam(value = "cp", required = false) String cpParam) {
 
-		String name = trimToNull(nameParam);
+		String nombre = trimToNull(nombreParam);
 		String email = normalizeEmail(emailParam);
 		String password = trimToNull(passwordParam);
 		String confirmPassword = trimToNull(confirmPasswordParam);
-		String phone = trimToNull(phoneParam);
-		String address = trimToNull(addressParam);
-		String postalCode = trimToNull(postalCodeParam);
+		String telefono = trimToNull(telefonoParam);
+		String domicilio = trimToNull(domicilioParam);
+		String cp = trimToNull(cpParam);
 
-		if (name == null || email == null || password == null || confirmPassword == null) {
-			return "redirect:/register?error=" + urlEncode("Name, email, and password are required");
+		if (nombre == null || email == null || password == null || confirmPassword == null) {
+			return "redirect:/register?error=" + urlEncode("Nombre, email y contrasena son obligatorios");
 		}
 
 		if (!isValidEmail(email)) {
-			return "redirect:/register?error=" + urlEncode("Email format is invalid");
+			return "redirect:/register?error=" + urlEncode("El email no tiene un formato valido");
 		}
 
 		if (password.length() < 6) {
-			return "redirect:/register?error=" + urlEncode("Password must be at least 6 characters long");
+			return "redirect:/register?error=" + urlEncode("La contrasena debe tener al menos 6 caracteres");
 		}
 
 		if (!password.equals(confirmPassword)) {
-			return "redirect:/register?error=" + urlEncode("Passwords do not match");
+			return "redirect:/register?error=" + urlEncode("Las contrasenas no coinciden");
 		}
 
-		if (phone != null && !isValidPhone(phone)) {
-			return "redirect:/register?error=" + urlEncode("Phone format is invalid");
+		if (telefono != null && !isValidPhone(telefono)) {
+			return "redirect:/register?error=" + urlEncode("El telefono no tiene un formato valido");
 		}
 
-		if (postalCode != null && !isValidPostalCode(postalCode)) {
-			return "redirect:/register?error=" + urlEncode("Postal code is invalid");
+		if (cp != null && !isValidPostalCode(cp)) {
+			return "redirect:/register?error=" + urlEncode("El codigo postal no es valido");
 		}
 
 		if (userRepository.existsByEmail(email)) {
-			return "redirect:/register?error=" + urlEncode("A user with that email already exists");
+			return "redirect:/register?error=" + urlEncode("Ya existe un usuario con ese email");
 		}
 
 		UserEntity user = new UserEntity();
-		user.setName(name);
+		user.setName(nombre);
 		user.setEmail(email);
-		user.setPhone(phone);
+		user.setPhone(telefono);
 		user.setPassword(hashPassword(password));
-		user.setAddress(address);
-		user.setPostalCode(postalCode);
+		user.setAddress(domicilio);
+		user.setPostalCode(cp);
 
-		userRepository.save(user);
-		return "redirect:/login?success=" + urlEncode("Registration successful. You can now sign in");
+		try {
+			userRepository.save(user);
+		} catch (DataIntegrityViolationException ex) {
+			return "redirect:/register?error=" + urlEncode("No se pudo crear la cuenta. Revisa email y codigo postal");
+		}
+
+		return "redirect:/login?success=" + urlEncode("Registro correcto. Ya puedes iniciar sesion");
 	}
 
 
-
+	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
-
+		// Sacamos email y contraseña
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
 
-
+		// Validamos el email y contraseña
 		if (email == null || password == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required"));
+			return ResponseEntity.badRequest().body(Map.of("message", "Email y contrasena son obligatorios"));
 		}
 
-
+		// Buscamos al usuario por email
 		UserEntity user = userRepository.findByEmail(email).orElse(null);
 		
-
+		// Si no existe el usuario, fuera
 		if (user == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Invalid credentials"));
+					.body(Map.of("message", "No existen los datos"));
 		}
 
 
 		String storedPassword = user.getPassword();
-
+		// Verificamos la contraseña proporcionada con la almacenada
 		if (!matchesPassword(password, storedPassword)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Invalid credentials"));
+					.body(Map.of("message", "Credenciales invalidas"));
 		}
 
-
+		// Si no está en hash la cambiamos
 		if (needsMigration(storedPassword)) {
 			user.setPassword(hashPassword(password));
 			userRepository.save(user);
 		}
 
-
+		// Generamos token JWT con ID usuario, email y nombre
 		String token = generateToken(user.getIdUser(), user.getEmail(), user.getName());
 		String role = resolveRole(user.getIdUser());
 
 		return ResponseEntity.ok(Map.of(
 				"userId", user.getIdUser(),
-				"name", user.getName(),
+				"nombre", user.getName(),
 				"email", user.getEmail(),
 				"role", role,
 				"redirectUrl", buildFrontendUrl(roleToPath(role)),
-				"message", "Login successful",
+				"message", "Login correcto",
 				"token", token,
 				"tokenType", "Bearer",
 				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
@@ -238,66 +258,72 @@ public class ApiController {
 
 
 
-
+	// Endpoint para registro
 	@PostMapping("/api/auth/register")
 	@ResponseBody
 	public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
 
-		String name = trimToNull(request == null ? null : request.get("name"));
+		String nombre = trimToNull(request == null ? null : request.get("nombre"));
 		String email = normalizeEmail(request == null ? null : request.get("email"));
 		String password = trimToNull(request == null ? null : request.get("password"));
-		String phone = trimToNull(request == null ? null : request.get("phone"));
-		String address = trimToNull(request == null ? null : request.get("address"));
-		String postalCode = trimToNull(request == null ? null : request.get("postalCode"));
+		String telefono = trimToNull(request == null ? null : request.get("telefono"));
+		String domicilio = trimToNull(request == null ? null : request.get("domicilio"));
+		String cp = trimToNull(request == null ? null : request.get("cp"));
 
-
-		if (name == null || email == null || password == null || phone == null || address == null || postalCode == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Name, email, phone, password, address, and postal code are required"));
+		// Comprobamos datos obligatorios
+		if (nombre == null || email == null || password == null || telefono == null || domicilio == null || cp == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email, telefono, contrasena, domicilio y CP son obligatorios"));
 		}
 
-
+		// Validamos formato de email
 		if (!isValidEmail(email)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Email format is invalid"));
+			return ResponseEntity.badRequest().body(Map.of("message", "El email no tiene un formato valido"));
 		}
 
-
-		if (!isValidPhone(phone)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Phone format is invalid"));
+		// Validamos formato telefono
+		if (!isValidPhone(telefono)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El telefono no tiene un formato valido"));
 		}
 
-
-		if (!isValidPostalCode(postalCode)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Postal code is invalid"));
+		// Validamos formato código postal
+		if (!isValidPostalCode(cp)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El codigo postal no es valido"));
 		}
 
-
+		// Validamos tamaño minimo contraseña
 		if (password.length() < 6) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Password must be at least 6 characters long"));
+			return ResponseEntity.badRequest().body(Map.of("message", "La contrasena debe tener al menos 6 caracteres"));
 		}
 
-
+		// Validamos si existe un usuario con ese email
 		if (userRepository.existsByEmail(email)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(Map.of("message", "A user with that email already exists"));
+					.body(Map.of("message", "Ya existe un usuario con ese email"));
 		}
 
-
+		// Creamos el usuario con contraseña hasheada
 		UserEntity user = new UserEntity();
-		user.setName(name);
+		user.setName(nombre);
 		user.setEmail(email);
-		user.setPhone(phone);
+		user.setPhone(telefono);
 		user.setPassword(hashPassword(password));
-		user.setAddress(address);
-		user.setPostalCode(postalCode);
+		user.setAddress(domicilio);
+		user.setPostalCode(cp);
 
-		UserEntity createdUser = userRepository.save(user);
+		UserEntity createdUser;
+		try {
+			createdUser = userRepository.save(user);
+		} catch (DataIntegrityViolationException ex) {
+			return ResponseEntity.badRequest().body(Map.of("message", "No se pudo crear la cuenta. Revisa email y codigo postal"));
+		}
+
 		String token = generateToken(createdUser.getIdUser(), createdUser.getEmail(), createdUser.getName());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
 				"userId", createdUser.getIdUser(),
-				"name", createdUser.getName(),
+				"nombre", createdUser.getName(),
 				"email", createdUser.getEmail(),
-				"message", "Registration successful",
+				"message", "Registro correcto",
 				"token", token,
 				"tokenType", "Bearer",
 				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
@@ -305,27 +331,27 @@ public class ApiController {
 	}
 
 /*
-
-
+	// Implementación para futuro
+	// Endpoint para añadir usuario
 	@PostMapping("/anadir")
 	public String doAnadir(Model model) {
 		return this.doRegister(model);
 	}
-
+	// Endpoint para editar usuario
 	@GetMapping("/editar")
 	public String doEditar(@RequestParam(value = "id", required = false) Integer id, Model model) {
 		model.addAttribute("selectedId", id);
 		return this.doRegister(model);
 	}
-
+	// Endpoint para guardar usuario
 	@PostMapping("/guardar")
 	public String doGuardar() {
 		return "redirect:/";
 	}
 */
 
-
-
+	// Métodos auxiliares
+	// Limpiador de textos, se asegura de no guardar textos vacíos o llenos de espacios
 	private static String trimToNull(String value) {
 		if (value == null) {
 			return null;
@@ -335,33 +361,33 @@ public class ApiController {
 		return trimmed.isEmpty() ? null : trimmed;
 	}
 
-
+	// Normaliza el email convirtiéndolo a minúsculas y eliminando espacios innecesarios
 	private static String normalizeEmail(String email) {
 		String trimmed = trimToNull(email);
 		return trimmed == null ? null : trimmed.toLowerCase();
 	}
 
-
+	// Valida el formato del email usando una expresión regular simple
 	private static boolean isValidEmail(String email) {
 		return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 	}
 
-
-	private static boolean isValidPhone(String phone) {
-		return phone != null && phone.matches("^[0-9+\\-\\s]{7,20}$");
+	// Valida el formato del teléfono permitiendo dígitos, espacios, guiones y signos de más, con una longitud razonable.
+	private static boolean isValidPhone(String telefono) {
+		return telefono != null && telefono.matches("^[0-9+\\-\\s]{7,20}$");
 	}
 	
-
-	private static boolean isValidPostalCode(String postalCode) {
-		return postalCode != null && postalCode.matches("^[0-9]{5}$");
+	// Valida que el código postal tenga exactamente 5 dígitos, lo que es común en muchos países.
+	private static boolean isValidPostalCode(String cp) {
+		return cp != null && cp.matches("^[0-9]{5}$");
 	}
 
-
+	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.
 	private static String hashPassword(String rawPassword) {
 		return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
 	}
 
-
+	// Verifica si la contraseña proporcionada coincide con la contraseña almacenada, manejando tanto contraseñas sin formato como contraseñas hashadas con BCrypt.
 	private static boolean matchesPassword(String rawPassword, String storedPassword) {
 		if (rawPassword == null || storedPassword == null) {
 			return false;
@@ -374,25 +400,25 @@ public class ApiController {
 		return rawPassword.equals(storedPassword);
 	}
 
-
+	// Determina si la contraseña almacenada necesita ser migrada a un formato hashado con BCrypt
 	private static boolean needsMigration(String storedPassword) {
 		return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
 	}
 
-
-	private String generateToken(Integer userId, String email, String name) {
+	// Genera un token JWT que incluye el ID del usuario, su email y nombre como claims, con una fecha de expiración basada en la configuración.
+	private String generateToken(Integer userId, String email, String nombre) {
 		Instant now = Instant.now();
 		return Jwts.builder()
 				.subject(String.valueOf(userId))
 				.claim("email", email)
-				.claim("name", name)
+				.claim("nombre", nombre)
 				.issuedAt(Date.from(now))
 				.expiration(Date.from(now.plusMillis(jwtExpirationMs)))
 				.signWith(signingKey)
 				.compact();
 	}
 
-
+	// Construye la clave de firma para JWT a partir de la configuración proporcionada. Intenta decodificarla como Base64, y si falla, la hashea con SHA-256 para obtener una clave de longitud adecuada.
 	private static SecretKey buildSigningKey(String configuredSecret) {
 		try {
 			byte[] decoded = Decoders.BASE64.decode(configuredSecret);
@@ -403,45 +429,49 @@ public class ApiController {
 				byte[] hash = digest.digest(configuredSecret.getBytes(StandardCharsets.UTF_8));
 				return Keys.hmacShaKeyFor(hash);
 			} catch (NoSuchAlgorithmException ex) {
-				throw new IllegalStateException("Failed to initialize JWT key", ex);
+				throw new IllegalStateException("No se pudo inicializar la clave JWT", ex);
 			}
 		}
 	}
 
 	private String resolveRole(Integer userId) {
 		if (userRepository.isAdmin(userId)) {
-			return "ADMIN";
+			return "ADMINISTRADOR";
 		}
 
 		if (userRepository.isCoordinator(userId)) {
-			return "COORDINATOR";
+			return "COORDINADOR";
 		}
 
 		if (userRepository.isCaptain(userId)) {
-			return "CAPTAIN";
+			return "CAPITAN";
 		}
 
 		if (userRepository.isPartnerEntityManager(userId)) {
-			return "COLLABORATOR";
+			return "COLABORADOR";
 		}
 
-		return "COLLABORATOR";
+		return "PENDIENTE";
 	}
 
 	private static String roleToPath(String role) {
-		if ("ADMIN".equals(role)) {
-			return "/admin.html";
+		if ("ADMINISTRADOR".equals(role)) {
+			return "/administrador.html";
 		}
 
-		if ("COORDINATOR".equals(role)) {
-			return "/coordinator.html";
+		if ("COORDINADOR".equals(role)) {
+			return "/coordinador.html";
 		}
 
-		if ("CAPTAIN".equals(role)) {
-			return "/captain.html";
+		if ("CAPITAN".equals(role)) {
+			return "/capitan.html";
 		}
 
-		return "/collaborator.html";
+		if ("COLABORADOR".equals(role)) {
+			return "/colaborador.html";
+		}
+
+		return "/user.html";
 	}
 
 	private String buildFrontendUrl(String path) {
