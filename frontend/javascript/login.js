@@ -4,21 +4,6 @@ const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
-function mostrarErrorDesdeUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const error = params.get('error');
-
-    if (!error) {
-        return;
-    }
-
-    message.textContent = error;
-    message.classList.remove('is-success');
-    message.classList.add('is-error');
-}
-
-mostrarErrorDesdeUrl();
-
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
 
@@ -30,7 +15,7 @@ togglePasswordButton.addEventListener('click', () => {
     );
 });
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const email = emailInput.value.trim();
@@ -58,6 +43,31 @@ form.addEventListener('submit', (event) => {
         return;
     }
 
-    // Si pasa validaciones del cliente, delegamos autenticación y redirección al backend.
-    form.submit();
+    try{
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            message.textContent = data.message || 'Datos erróneos';
+            message.classList.add('is-error');
+            return;
+        }
+
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        }
+    } catch(error){
+        message.textContent = 'No existen los datos.';
+        message.classList.add('is-error');
+    }
 });

@@ -67,8 +67,17 @@ public class ApiController {
 
 	// Página de login
 	@GetMapping("/login")
-	public String doLogin(Model model) {
+	public String doLogin(
+			@RequestParam(value = "error", required = false) String error,
+			@RequestParam(value = "success", required = false) String success,
+			Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
+		if (error != null && !error.isBlank()) {
+			model.addAttribute("loginError", error);
+		}
+		if (success != null && !success.isBlank()) {
+			model.addAttribute("loginSuccess", success);
+		}
 		return "login";
 	}
 
@@ -76,25 +85,28 @@ public class ApiController {
 	@PostMapping("/login")
 	public String doLoginForm(
 			@RequestParam(value = "email", required = false) String emailParam,
-			@RequestParam(value = "password", required = false) String passwordParam) {
-
-		final String invalidCredentialsMessage = "No existen esos datos en la base de datos";
+			@RequestParam(value = "password", required = false) String passwordParam,
+			Model model) {
 
 		String email = normalizeEmail(emailParam);
 		String password = trimToNull(passwordParam);
+		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
 
 		if (email == null || password == null) {
-			return "redirect:/login?error=" + urlEncode("Email y contrasena son obligatorios");
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		UserEntity user = userRepository.findByEmail(email).orElse(null);
 		if (user == null) {
-			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		String storedPassword = user.getContrasena();
 		if (!matchesPassword(password, storedPassword)) {
-			return "redirect:/login?error=" + urlEncode(invalidCredentialsMessage);
+			model.addAttribute("loginError", "No existen los datos.");
+			return "login";
 		}
 
 		if (needsMigration(storedPassword)) {
@@ -202,7 +214,7 @@ public class ApiController {
 		// Si no existe el usuario, fuera
 		if (user == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Credenciales invalidas"));
+					.body(Map.of("message", "No existen los datos"));
 		}
 
 
