@@ -4,8 +4,6 @@ const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
-<<<<<<< HEAD
-=======
 function mostrarErrorDesdeUrl() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
@@ -17,7 +15,6 @@ function mostrarErrorDesdeUrl() {
 
 mostrarErrorDesdeUrl();
 
->>>>>>> 9b410f03f537124ee916c6d3a952c43b75383f6c
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
     passwordInput.type = nextType;
@@ -53,24 +50,6 @@ form.addEventListener('submit', async (event) => {
         return;
     }
 
-<<<<<<< HEAD
-    try{
-        const response = await fetch('http://localhost:8080/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-            message.textContent = data.message || 'Datos erróneos';
-=======
     try {
         const res = await fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
@@ -82,18 +61,10 @@ form.addEventListener('submit', async (event) => {
 
         if (!res.ok) {
             message.textContent = data.message || 'Credenciales incorrectas.';
->>>>>>> 9b410f03f537124ee916c6d3a952c43b75383f6c
             message.classList.add('is-error');
             return;
         }
 
-<<<<<<< HEAD
-        if (data.redirectUrl) {
-            window.location.href = data.redirectUrl;
-        }
-    } catch(error){
-        message.textContent = 'No existen los datos.';
-=======
         // Guardar token y datos del usuario
         localStorage.setItem('token', data.token);
         localStorage.setItem('nombre', data.nombre);
@@ -105,7 +76,6 @@ form.addEventListener('submit', async (event) => {
 
     } catch {
         message.textContent = 'Error al conectar con el servidor.';
->>>>>>> 9b410f03f537124ee916c6d3a952c43b75383f6c
         message.classList.add('is-error');
     }
 });

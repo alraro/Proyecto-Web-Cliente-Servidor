@@ -31,6 +31,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 
+
 @Controller
 public class ApiController {
 
@@ -72,6 +73,7 @@ public class ApiController {
 			@RequestParam(value = "error", required = false) String error,
 			@RequestParam(value = "success", required = false) String success,
 			Model model) {
+				
 		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
 		if (error != null && !error.isBlank()) {
 			model.addAttribute("loginError", error);
@@ -449,7 +451,7 @@ public class ApiController {
 			return "COLABORADOR";
 		}
 
-		return "COLABORADOR";
+		return "PENDIENTE";
 	}
 
 	private static String roleToPath(String role) {
@@ -465,7 +467,11 @@ public class ApiController {
 			return "/capitan.html";
 		}
 
-		return "/colaborador.html";
+		if ("COLABORADOR".equals(role)) {
+			return "/colaborador.html";
+		}
+
+		return "/user.html";
 	}
 
 	private String buildFrontendUrl(String path) {

@@ -1069,12 +1069,6 @@ INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
 
 INSERT INTO administrators (id_user) VALUES (14);
 
-<<<<<<< HEAD
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (15, 1);
-
-INSERT INTO Responsable_entidad_colaboradora (ID_USUARIO, ID_ENTIDAD_COLABORADORA) VALUES (16, NULL);
-=======
 INSERT INTO captains (id_user, id_campaign) VALUES (15, 1);
 
 INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, NULL);
->>>>>>> 9b410f03f537124ee916c6d3a952c43b75383f6c
