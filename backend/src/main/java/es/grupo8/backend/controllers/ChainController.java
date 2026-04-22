@@ -36,9 +36,9 @@ public class ChainController {
     @Autowired
     private AdminGuard adminGuard;
 
-    // GET /api/chains
+
     @GetMapping
-    public ResponseEntity<?> getCadenas(
+    public ResponseEntity<?> getChains(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         if (!adminGuard.isAdmin(authHeader)) {
@@ -56,9 +56,9 @@ public class ChainController {
         return ResponseEntity.ok(chains);
     }
 
-    // POST /api/chains
+
     @PostMapping
-    public ResponseEntity<?> createCadena(
+    public ResponseEntity<?> createChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
@@ -66,45 +66,45 @@ public class ChainController {
             return forbidden();
         }
 
-        String nombre = trimToNull(request == null ? null : (String) request.get("nombre"));
-        String codigo = trimToNull(request == null ? null : (String) request.get("codigo"));
-        Object participacionRaw = request == null ? null : request.get("participacion");
+        String name = trimToNull(request == null ? null : (String) request.get("name"));
+        String code = trimToNull(request == null ? null : (String) request.get("code"));
+        Object participationRaw = request == null ? null : request.get("participation");
 
-        if (nombre == null || codigo == null) {
+        if (name == null || code == null) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Nombre y codigo son obligatorios"));
+                    .body(Map.of("message", "Name and code are required"));
         }
-        if (!isValidCodigo(codigo)) {
+        if (!isValidCode(code)) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "El codigo solo puede contener letras, numeros, guiones y guiones bajos (max 50 caracteres)"));
+                    .body(Map.of("message", "Code can only contain letters, numbers, hyphens, and underscores (max 50 characters)"));
         }
-        if (nombre.length() > 255) {
+        if (name.length() > 255) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "El nombre no puede superar 255 caracteres"));
+                    .body(Map.of("message", "Name cannot exceed 255 characters"));
         }
-        if (chainRepository.existsByCodigo(codigo)) {
+        if (chainRepository.existsByCode(code)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Ya existe una cadena con ese codigo"));
+                    .body(Map.of("message", "A chain with that code already exists"));
         }
 
         ChainEntity chain = new ChainEntity();
-        chain.setNombre(nombre);
-        chain.setCodigo(codigo);
-        chain.setParticipacion(participacionRaw instanceof Boolean b ? b : false);
+        chain.setName(name);
+        chain.setCode(code);
+        chain.setParticipation(participationRaw instanceof Boolean b ? b : false);
 
         ChainEntity saved = chainRepository.save(chain);
 
-        auditLog.info("ACTION=CREATE_CHAIN userId={} timestamp={} cadenaId={} nombre='{}' codigo='{}' participacion={}",
+        auditLog.info("ACTION=CREATE_CHAIN userId={} timestamp={} chainId={} name='{}' code='{}' participation={}",
                 adminGuard.extractUserId(authHeader), Instant.now(),
-                saved.getIdChain(), saved.getNombre(), saved.getCodigo(), saved.getParticipacion());
+                saved.getIdChain(), saved.getName(), saved.getCode(), saved.getParticipation());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toMap(saved,
-                "message", "Cadena creada correctamente"));
+                "message", "Chain created successfully"));
     }
 
-    // PUT /api/chains/{id}
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCadena(
+    public ResponseEntity<?> updateChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
             @RequestBody(required = false) Map<String, Object> request) {
@@ -116,46 +116,46 @@ public class ChainController {
         ChainEntity chain = chainRepository.findById(id).orElse(null);
         if (chain == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Cadena no encontrada"));
+                    .body(Map.of("message", "Chain not found"));
         }
 
-        String nombre = trimToNull(request == null ? null : (String) request.get("nombre"));
-        String codigo = trimToNull(request == null ? null : (String) request.get("codigo"));
-        Object participacionRaw = request == null ? null : request.get("participacion");
+        String name = trimToNull(request == null ? null : (String) request.get("name"));
+        String code = trimToNull(request == null ? null : (String) request.get("code"));
+        Object participationRaw = request == null ? null : request.get("participation");
 
-        if (nombre == null || codigo == null) {
+        if (name == null || code == null) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Nombre y codigo son obligatorios"));
+                    .body(Map.of("message", "Name and code are required"));
         }
-        if (!isValidCodigo(codigo)) {
+        if (!isValidCode(code)) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "El codigo solo puede contener letras, numeros, guiones y guiones bajos (max 50 caracteres)"));
+                    .body(Map.of("message", "Code can only contain letters, numbers, hyphens, and underscores (max 50 characters)"));
         }
-        if (nombre.length() > 255) {
+        if (name.length() > 255) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "El nombre no puede superar 255 caracteres"));
+                    .body(Map.of("message", "Name cannot exceed 255 characters"));
         }
-        if (!codigo.equals(chain.getCodigo()) && chainRepository.existsByCodigo(codigo)) {
+        if (!code.equals(chain.getCode()) && chainRepository.existsByCode(code)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Ya existe una cadena con ese codigo"));
+                    .body(Map.of("message", "A chain with that code already exists"));
         }
 
-        chain.setNombre(nombre);
-        chain.setCodigo(codigo);
-        chain.setParticipacion(participacionRaw instanceof Boolean b ? b : chain.getParticipacion());
+        chain.setName(name);
+        chain.setCode(code);
+        chain.setParticipation(participationRaw instanceof Boolean b ? b : chain.getParticipation());
 
         ChainEntity updated = chainRepository.save(chain);
 
-        auditLog.info("ACTION=UPDATE_CHAIN userId={} timestamp={} cadenaId={} nombre='{}' codigo='{}' participacion={}",
+        auditLog.info("ACTION=UPDATE_CHAIN userId={} timestamp={} chainId={} name='{}' code='{}' participation={}",
                 adminGuard.extractUserId(authHeader), Instant.now(),
-                updated.getIdChain(), updated.getNombre(), updated.getCodigo(), updated.getParticipacion());
+                updated.getIdChain(), updated.getName(), updated.getCode(), updated.getParticipation());
 
-        return ResponseEntity.ok(toMap(updated, "message", "Cadena actualizada correctamente"));
+        return ResponseEntity.ok(toMap(updated, "message", "Chain updated successfully"));
     }
 
-    // DELETE /api/chains/{id}
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCadena(
+    public ResponseEntity<?> deleteChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
@@ -164,39 +164,39 @@ public class ChainController {
         }
         if (!chainRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Cadena no encontrada"));
+                    .body(Map.of("message", "Chain not found"));
         }
 
         chainRepository.deleteById(id);
 
-        auditLog.info("ACTION=DELETE_CHAIN userId={} timestamp={} cadenaId={}",
+        auditLog.info("ACTION=DELETE_CHAIN userId={} timestamp={} chainId={}",
                 adminGuard.extractUserId(authHeader), Instant.now(), id);
 
-        return ResponseEntity.ok(Map.of("message", "Cadena eliminada correctamente"));
+        return ResponseEntity.ok(Map.of("message", "Chain deleted successfully"));
     }
 
-    // ── Helpers privados ──────────────────────────────────────────────────────
+
 
     private static ResponseEntity<?> forbidden() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Acceso restringido a administradores"));
+                .body(Map.of("message", "Access restricted to administrators"));
     }
 
     private static Map<String, Object> toMap(ChainEntity c) {
         return Map.of(
                 "id",            c.getIdChain(),
-                "nombre",        c.getNombre(),
-                "codigo",        c.getCodigo(),
-                "participacion", c.getParticipacion()
+                "name",        c.getName(),
+                "code",        c.getCode(),
+                "participation", c.getParticipation()
         );
     }
 
     private static Map<String, Object> toMap(ChainEntity c, String extraKey, Object extraVal) {
         return Map.of(
                 "id",            c.getIdChain(),
-                "nombre",        c.getNombre(),
-                "codigo",        c.getCodigo(),
-                "participacion", c.getParticipacion(),
+                "name",        c.getName(),
+                "code",        c.getCode(),
+                "participation", c.getParticipation(),
                 extraKey,        extraVal
         );
     }
@@ -207,9 +207,9 @@ public class ChainController {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    private static boolean isValidCodigo(String codigo) {
-        return codigo != null
-                && codigo.length() <= 50
-                && codigo.matches("^[A-Za-z0-9_\\-]+$");
+    private static boolean isValidCode(String code) {
+        return code != null
+                && code.length() <= 50
+                && code.matches("^[A-Za-z0-9_\\-]+$");
     }
 }

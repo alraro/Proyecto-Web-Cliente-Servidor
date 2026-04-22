@@ -41,7 +41,7 @@ class ApiControllerRegisterTest {
     @Test
     void registerRejectsMissingFields() {
         Map<String, String> request = validRequest();
-        request.put("cp", "");
+        request.put("postalCode", "");
 
         ResponseEntity<?> response = controller.register(request);
 
@@ -52,7 +52,7 @@ class ApiControllerRegisterTest {
     @Test
     void registerRejectsInvalidEmail() {
         Map<String, String> request = validRequest();
-        request.put("email", "correo-invalido");
+        request.put("email", "invalid-email");
 
         ResponseEntity<?> response = controller.register(request);
 
@@ -63,20 +63,20 @@ class ApiControllerRegisterTest {
     @Test
     void registerRejectsInvalidPhoneAndPostalCode() {
         Map<String, String> request = validRequest();
-        request.put("telefono", "abc");
+        request.put("phone", "abc");
 
         ResponseEntity<?> response = controller.register(request);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
         Map<String, String> request2 = validRequest();
-        request2.put("cp", "29A01");
+        request2.put("postalCode", "29A01");
         ResponseEntity<?> response2 = controller.register(request2);
         assertEquals(HttpStatus.BAD_REQUEST, response2.getStatusCode());
     }
 
     @Test
     void registerRejectsDuplicatedEmail() {
-        when(userRepository.existsByEmail("usuario@bancosol.org")).thenReturn(true);
+        when(userRepository.existsByEmail("user@bancosol.org")).thenReturn(true);
 
         ResponseEntity<?> response = controller.register(validRequest());
 
@@ -86,10 +86,10 @@ class ApiControllerRegisterTest {
 
     @Test
     void registerCreatesUserWithHashedPasswordAndReturnsCreated() {
-        when(userRepository.existsByEmail("usuario@bancosol.org")).thenReturn(false);
+        when(userRepository.existsByEmail("user@bancosol.org")).thenReturn(false);
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
             UserEntity user = invocation.getArgument(0);
-            user.setIdUsuario(99);
+            user.setIdUser(99);
             return user;
         });
 
@@ -101,21 +101,21 @@ class ApiControllerRegisterTest {
         verify(userRepository).save(captor.capture());
         UserEntity saved = captor.getValue();
 
-        assertNotEquals("clave123", saved.getContrasena());
-        assertTrue(saved.getContrasena().startsWith("$2"));
+        assertNotEquals("password123", saved.getPassword());
+        assertTrue(saved.getPassword().startsWith("$2"));
 
         @SuppressWarnings("unchecked")
         Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals("Registro correcto", body.get("message"));
+        assertEquals("Registration successful", body.get("message"));
     }
 
     @Test
     void loginMigratesLegacyPassword() {
         UserEntity legacy = new UserEntity();
-        legacy.setIdUsuario(1);
-        legacy.setNombre("Usuario Legacy");
+        legacy.setIdUser(1);
+        legacy.setName("Legacy User");
         legacy.setEmail("legacy@bancosol.org");
-        legacy.setContrasena("legacy123");
+        legacy.setPassword("legacy123");
 
         when(userRepository.findByEmail("legacy@bancosol.org")).thenReturn(Optional.of(legacy));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -131,12 +131,12 @@ class ApiControllerRegisterTest {
 
     private Map<String, String> validRequest() {
         Map<String, String> request = new HashMap<>();
-        request.put("nombre", "Usuario Prueba");
-        request.put("email", "usuario@bancosol.org");
-        request.put("telefono", "600123123");
-        request.put("password", "clave123");
-        request.put("domicilio", "Calle Larios 1");
-        request.put("cp", "29001");
+        request.put("name", "Test User");
+        request.put("email", "user@bancosol.org");
+        request.put("phone", "600123123");
+        request.put("password", "password123");
+        request.put("address", "Main Street 1");
+        request.put("postalCode", "29001");
         return request;
     }
 }

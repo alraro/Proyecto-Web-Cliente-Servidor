@@ -1,140 +1,140 @@
--- 1. TIPO DE CAMPAÑA
-CREATE TABLE Tipo_Campana (
-    ID_Tipo   SERIAL PRIMARY KEY,
-    Nombre    VARCHAR(50) NOT NULL UNIQUE
+-- 1. CAMPAIGN TYPE
+CREATE TABLE campaign_types (
+    id_type   SERIAL PRIMARY KEY,
+    name    VARCHAR(50) NOT NULL UNIQUE
 );
 
--- 2. CAMPAÑA
-CREATE TABLE Campana (
-    ID_Campana   SERIAL PRIMARY KEY,
-    Nombre       VARCHAR(255) NOT NULL,
-    ID_Tipo      INT REFERENCES Tipo_Campana(ID_Tipo) ON DELETE SET NULL,
-    Fecha_inicio DATE NOT NULL,
-    Fecha_fin    DATE NOT NULL,
-    CHECK (Fecha_fin >= Fecha_inicio)
+-- 2. CAMPAIGN
+CREATE TABLE campaigns (
+    id_campaign   SERIAL PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL,
+    id_type      INT REFERENCES campaign_types(id_type) ON DELETE SET NULL,
+    start_date DATE NOT NULL,
+    end_date    DATE NOT NULL,
+    CHECK (end_date >= start_date)
 );
 
--- 3. GEOGRAFÍA
-CREATE TABLE Zona_Geografica (
-    ID_Zona  SERIAL PRIMARY KEY,
-    Nombre   VARCHAR(100) NOT NULL UNIQUE
+-- 3. GEOGRAPHY
+CREATE TABLE geographic_zones (
+    id_zone  SERIAL PRIMARY KEY,
+    name   VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE Localidad (
-    ID_Localidad SERIAL PRIMARY KEY,
-    Nombre       VARCHAR(100) NOT NULL,
-    ID_Zona      INT REFERENCES Zona_Geografica(ID_Zona) ON DELETE SET NULL
+CREATE TABLE localities (
+    id_locality SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    id_zone      INT REFERENCES geographic_zones(id_zone) ON DELETE SET NULL
 );
 
-CREATE TABLE Distrito (
-    ID_Distrito  SERIAL PRIMARY KEY,
-    Nombre       VARCHAR(100) NOT NULL,
-    ID_Localidad INT REFERENCES Localidad(ID_Localidad) ON DELETE CASCADE
+CREATE TABLE districts (
+    id_district  SERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    id_locality INT REFERENCES localities(id_locality) ON DELETE CASCADE
 );
 
-CREATE TABLE Codigo_Postal (
-    CP           VARCHAR(10) PRIMARY KEY,
-    ID_Localidad INT NOT NULL REFERENCES Localidad(ID_Localidad) ON DELETE CASCADE,
-    ID_Distrito  INT REFERENCES Distrito(ID_Distrito) ON DELETE SET NULL
+CREATE TABLE postal_codes (
+    postal_code           VARCHAR(10) PRIMARY KEY,
+    id_locality INT NOT NULL REFERENCES localities(id_locality) ON DELETE CASCADE,
+    id_district  INT REFERENCES districts(id_district) ON DELETE SET NULL
 );
 
--- 4. CADENA
-CREATE TABLE Cadena (
-    ID_Cadena SERIAL PRIMARY KEY,
-    Nombre    VARCHAR(255) NOT NULL,
-    Codigo    VARCHAR(50)  UNIQUE NOT NULL
+-- 4. CHAIN
+CREATE TABLE chains (
+    id_chain SERIAL PRIMARY KEY,
+    name    VARCHAR(255) NOT NULL,
+    code    VARCHAR(50)  UNIQUE NOT NULL
 );
 
--- 5. USUARIO
-CREATE TABLE Usuario (
-    ID_Usuario  SERIAL PRIMARY KEY,
-    Nombre      VARCHAR(255) NOT NULL,
-    Email       VARCHAR(255) UNIQUE NOT NULL,
-    Telefono    VARCHAR(20),
-    Contrasena  VARCHAR(255) NOT NULL,
-    Domicilio   TEXT,
-    CP          VARCHAR(10) REFERENCES Codigo_Postal(CP) ON DELETE SET NULL
+-- 5. USER ACCOUNT
+CREATE TABLE user_accounts (
+    id_user  SERIAL PRIMARY KEY,
+    name      VARCHAR(255) NOT NULL,
+    email       VARCHAR(255) UNIQUE NOT NULL,
+    phone    VARCHAR(20),
+    password  VARCHAR(255) NOT NULL,
+    address   TEXT,
+    postal_code          VARCHAR(10) REFERENCES postal_codes(postal_code) ON DELETE SET NULL
 );
 
--- 6. ENTIDAD COLABORADORA
-CREATE TABLE Entidad_Colaboradora (
-    ID_Entidad_Colaboradora SERIAL PRIMARY KEY,
-    Nombre                  VARCHAR(255) NOT NULL,
-    Domicilio               TEXT,
-    Telefono                VARCHAR(20)
+-- 6. PARTNER ENTITY
+CREATE TABLE partner_entities (
+    id_partner_entity SERIAL PRIMARY KEY,
+    name                  VARCHAR(255) NOT NULL,
+    address               TEXT,
+    phone                VARCHAR(20)
 );
 
--- 7. VOLUNTARIO (independiente de Usuario)
-CREATE TABLE Voluntario (
-    ID_Voluntario           SERIAL PRIMARY KEY,
-    Nombre                  VARCHAR(255) NOT NULL,
-    Telefono                VARCHAR(20),
-    Email                   VARCHAR(255),
-    Domicilio               TEXT,
-    ID_Entidad_Colaboradora INT REFERENCES Entidad_Colaboradora(ID_Entidad_Colaboradora) ON DELETE SET NULL
+-- 7. VOLUNTEER (independent from user_account)
+CREATE TABLE volunteers (
+    id_volunteer           SERIAL PRIMARY KEY,
+    name                  VARCHAR(255) NOT NULL,
+    phone                VARCHAR(20),
+    email                   VARCHAR(255),
+    address               TEXT,
+    id_partner_entity INT REFERENCES partner_entities(id_partner_entity) ON DELETE SET NULL
 );
 
--- 8. TIENDA
-CREATE TABLE Tienda (
-    ID_Tienda       SERIAL PRIMARY KEY,
-    Nombre          VARCHAR(255) NOT NULL,
-    Domicilio       TEXT,
-    CP              VARCHAR(10) REFERENCES Codigo_Postal(CP) ON DELETE SET NULL,
-    ID_Cadena       INT REFERENCES Cadena(ID_Cadena) ON DELETE SET NULL,
-    ID_Responsable  INT REFERENCES Usuario(ID_Usuario) ON DELETE SET NULL
+-- 8. STORE
+CREATE TABLE stores (
+    id_store       SERIAL PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    address       TEXT,
+    postal_code              VARCHAR(10) REFERENCES postal_codes(postal_code) ON DELETE SET NULL,
+    id_chain       INT REFERENCES chains(id_chain) ON DELETE SET NULL,
+    id_responsible  INT REFERENCES user_accounts(id_user) ON DELETE SET NULL
 );
 
--- 9. TIENDAS EN CAMPAÑA
-CREATE TABLE Tiendas_en_campana (
-    ID_Campana INT REFERENCES Campana(ID_Campana) ON DELETE CASCADE,
-    ID_Tienda  INT REFERENCES Tienda(ID_Tienda)   ON DELETE CASCADE,
-    PRIMARY KEY (ID_Campana, ID_Tienda)
+-- 9. STORES IN CAMPAIGN
+CREATE TABLE campaign_stores (
+    id_campaign INT REFERENCES campaigns(id_campaign) ON DELETE CASCADE,
+    id_store  INT REFERENCES stores(id_store)   ON DELETE CASCADE,
+    PRIMARY KEY (id_campaign, id_store)
 );
 
--- 10. SUBCLASES DE USUARIO
-CREATE TABLE Administradores (
-    ID_Usuario INT PRIMARY KEY REFERENCES Usuario(ID_Usuario) ON DELETE CASCADE
+-- 10. USER SUBCLASSES
+CREATE TABLE administrators (
+    id_user INT PRIMARY KEY REFERENCES user_accounts(id_user) ON DELETE CASCADE
 );
 
-CREATE TABLE Responsable_entidad_colaboradora (
-    ID_Usuario              INT PRIMARY KEY REFERENCES Usuario(ID_Usuario) ON DELETE CASCADE,
-    ID_Entidad_colaboradora INT REFERENCES Entidad_Colaboradora(ID_Entidad_Colaboradora) ON DELETE CASCADE
+CREATE TABLE partner_entity_managers (
+    id_user              INT PRIMARY KEY REFERENCES user_accounts(id_user) ON DELETE CASCADE,
+    id_partner_entity INT REFERENCES partner_entities(id_partner_entity) ON DELETE CASCADE
 );
 
-CREATE TABLE Coordinadores (
-    ID_Usuario INT REFERENCES Usuario(ID_Usuario) ON DELETE CASCADE,
-    ID_Campana INT REFERENCES Campana(ID_Campana) ON DELETE CASCADE,
-    PRIMARY KEY (ID_Usuario, ID_Campana)
+CREATE TABLE coordinators (
+    id_user INT REFERENCES user_accounts(id_user) ON DELETE CASCADE,
+    id_campaign INT REFERENCES campaigns(id_campaign) ON DELETE CASCADE,
+    PRIMARY KEY (id_user, id_campaign)
 );
 
-CREATE TABLE Capitanes (
-    ID_Usuario INT REFERENCES Usuario(ID_Usuario) ON DELETE CASCADE,
-    ID_Campana INT REFERENCES Campana(ID_Campana) ON DELETE CASCADE,
-    PRIMARY KEY (ID_Usuario, ID_Campana)
+CREATE TABLE captains (
+    id_user INT REFERENCES user_accounts(id_user) ON DELETE CASCADE,
+    id_campaign INT REFERENCES campaigns(id_campaign) ON DELETE CASCADE,
+    PRIMARY KEY (id_user, id_campaign)
 );
 
--- 11. VOLUNTARIO_TURNO
-CREATE TABLE Voluntario_Turno (
-    ID_Voluntario INT,
-    ID_Campana    INT,
-    ID_Tienda     INT,
-    Dia_Turno     DATE NOT NULL,
-    Hora_inicio   TIME NOT NULL,
-    Hora_fin      TIME NOT NULL,
-    Asistencia    BOOLEAN DEFAULT FALSE,
-    Observaciones TEXT,
+-- 11. VOLUNTEER_SHIFT
+CREATE TABLE volunteer_shifts (
+    id_volunteer INT,
+    id_campaign    INT,
+    id_store     INT,
+    shift_day     DATE NOT NULL,
+    start_time   TIME NOT NULL,
+    end_time      TIME NOT NULL,
+    attendance    BOOLEAN DEFAULT FALSE,
+    notes TEXT,
 
-    PRIMARY KEY (ID_Voluntario, ID_Campana, ID_Tienda, Dia_Turno, Hora_inicio),
+    PRIMARY KEY (id_volunteer, id_campaign, id_store, shift_day, start_time),
 
     -- FKs
-    FOREIGN KEY (ID_Voluntario)
-        REFERENCES Voluntario(ID_Voluntario)
+    FOREIGN KEY (id_volunteer)
+        REFERENCES volunteers(id_volunteer)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (ID_Campana, ID_Tienda)
-        REFERENCES Tiendas_en_campana(ID_Campana, ID_Tienda)
+    FOREIGN KEY (id_campaign, id_store)
+        REFERENCES campaign_stores(id_campaign, id_store)
         ON DELETE CASCADE,
 
-    -- Restricción lógica
-    CHECK (Hora_fin > Hora_inicio)
+    -- Logical constraint
+    CHECK (end_time > start_time)
 );

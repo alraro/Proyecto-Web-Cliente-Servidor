@@ -8,7 +8,7 @@ import es.grupo8.backend.entity.ChainEntity;
 
 public interface ChainRepository extends JpaRepository<ChainEntity, Integer> {
 
-    Optional<ChainEntity> findByCodigo(String codigo);
+    Optional<ChainEntity> findByCode(String code);
 
-    boolean existsByCodigo(String codigo);
+    boolean existsByCode(String code);
 }

@@ -38,7 +38,7 @@ public class AdminGuard {
 
     public boolean isAdmin(String authHeader) {
         Integer userId = extractUserId(authHeader);
-        return userId != null && adminRepository.existsByIdUsuario(userId);
+        return userId != null && adminRepository.existsByIdUser(userId);
     }
 
     public Integer extractUserId(String authHeader) {
@@ -66,7 +66,7 @@ public class AdminGuard {
                 byte[] hash = digest.digest(configuredSecret.getBytes(StandardCharsets.UTF_8));
                 return Keys.hmacShaKeyFor(hash);
             } catch (NoSuchAlgorithmException ex) {
-                throw new IllegalStateException("No se pudo inicializar la clave JWT", ex);
+                throw new IllegalStateException("Failed to initialize JWT key", ex);
             }
         }
     }
