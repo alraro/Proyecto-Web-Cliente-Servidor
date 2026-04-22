@@ -13,24 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<%= contextPath %>/css/login.css">
-<<<<<<< HEAD
-=======
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var togglePasswordButton = document.querySelector('#toggle-password');
-            var passwordInput = document.querySelector('#password');
-
-            if (togglePasswordButton && passwordInput) {
-                togglePasswordButton.addEventListener('click', function () {
-                    var nextType = passwordInput.type === 'password' ? 'text' : 'password';
-                    passwordInput.type = nextType;
-                    togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-                    togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
-                });
-            }
-        });
-    </script>
->>>>>>> 75790d2a2dd1b55204ce33b0ba9bc8883c81a76b
 </head>
 
 <body>
@@ -80,7 +62,7 @@
         <form id="login-form" class="login-form" method="post" action="<%= contextPath %>/login">
             <label for="email">Correo</label>
             <div class="input-shell">
-                <input id="email" name="email" type="email" placeholder="capitan100@nomail.es" autocomplete="username" required>
+                <input id="email" name="email" type="email" placeholder="bancosolseguimiento@gmail.com" autocomplete="username" required>
             </div>
 
             <input id="csrf-token" name="csrfToken" type="hidden" value="">
@@ -100,15 +82,12 @@
             <button type="submit" class="login-button">Entrar al espacio</button>
             <% if (request.getAttribute("loginError") != null) { %>
                 <p class="form-message is-error" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("loginError") %></p>
-<<<<<<< HEAD
             <% } else if (request.getAttribute("loginSuccess") != null) { %>
                 <p class="form-message is-success" id="form-message" role="status" aria-live="polite"><%= request.getAttribute("loginSuccess") %></p>
-=======
->>>>>>> 75790d2a2dd1b55204ce33b0ba9bc8883c81a76b
             <% } else { %>
                 <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             <% } %>
-            <p class="form-message">Credenciales de prueba: capitan100@nomail.es / hash_pendiente</p>
+            <p class="form-message">Credenciales de prueba: bancosolseguimiento@gmail.com / hash_pendiente</p>
             <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="<%= contextPath %>/register">Crear cuenta</a></p>
         </form>
 

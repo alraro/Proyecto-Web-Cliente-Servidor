@@ -1070,3 +1070,5 @@ INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
 INSERT INTO Administradores (ID_Usuario) VALUES (14);
 
 INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (15, 1);
+
+INSERT INTO Responsable_entidad_colaboradora (ID_USUARIO, ID_ENTIDAD_COLABORADORA) VALUES (16, NULL);
