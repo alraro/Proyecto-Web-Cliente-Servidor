@@ -122,7 +122,7 @@ public class ApiController {
 		return "register";
 	}
 
-	// Registro con formulario tradicional (POST) sin JavaScript
+	// Registro con formulario tradicional
 	@PostMapping("/register")
 	public String doRegisterForm(
 			@RequestParam(value = "nombre", required = false) String nombreParam,

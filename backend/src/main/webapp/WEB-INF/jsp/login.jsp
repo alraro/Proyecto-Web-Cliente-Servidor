@@ -13,24 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<%= contextPath %>/css/login.css">
-<<<<<<< HEAD
-=======
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var togglePasswordButton = document.querySelector('#toggle-password');
-            var passwordInput = document.querySelector('#password');
-
-            if (togglePasswordButton && passwordInput) {
-                togglePasswordButton.addEventListener('click', function () {
-                    var nextType = passwordInput.type === 'password' ? 'text' : 'password';
-                    passwordInput.type = nextType;
-                    togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-                    togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
-                });
-            }
-        });
-    </script>
->>>>>>> 75790d2a2dd1b55204ce33b0ba9bc8883c81a76b
 </head>
 
 <body>
