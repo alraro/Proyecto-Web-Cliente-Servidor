@@ -6,21 +6,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "administradores")
+@Table(name = "administrators")
 public class AdminEntity {
 
-    // Esta tabla solo tiene una columna — el ID del usuario administrador.
-    // No es @GeneratedValue porque el valor lo asigna la tabla Usuario,
-    // aquí simplemente se referencia.
-    @Id
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
 
-    public Integer getIdUsuario() {
-        return idUsuario;
+
+
+    @Id
+    @Column(name = "id_user")
+    private Integer idUser;
+
+    public Integer getIdUser() {
+        return idUser;
     }
 
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdUser(Integer idUser) {
+        this.idUser = idUser;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -189,7 +190,12 @@ public class ApiController {
 		user.setDomicilio(domicilio);
 		user.setCp(cp);
 
-		userRepository.save(user);
+		try {
+			userRepository.save(user);
+		} catch (DataIntegrityViolationException ex) {
+			return "redirect:/register?error=" + urlEncode("No se pudo crear la cuenta. Revisa email y codigo postal");
+		}
+
 		return "redirect:/login?success=" + urlEncode("Registro correcto. Ya puedes iniciar sesion");
 	}
 
@@ -302,7 +308,13 @@ public class ApiController {
 		user.setDomicilio(domicilio);
 		user.setCp(cp);
 
-		UserEntity createdUser = userRepository.save(user);
+		UserEntity createdUser;
+		try {
+			createdUser = userRepository.save(user);
+		} catch (DataIntegrityViolationException ex) {
+			return ResponseEntity.badRequest().body(Map.of("message", "No se pudo crear la cuenta. Revisa email y codigo postal"));
+		}
+
 		String token = generateToken(createdUser.getIdUsuario(), createdUser.getEmail(), createdUser.getNombre());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(

@@ -6,7 +6,7 @@ class BackendApplicationTests {
 
 	@Test
 	void contextLoads() {
-		// Smoke test básico del módulo de tests.
+
 	}
 
 }

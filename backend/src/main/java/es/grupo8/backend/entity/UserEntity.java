@@ -8,47 +8,47 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "user_accounts")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
-    private Integer idUsuario;
+    @Column(name = "id_user")
+    private Integer idUser;
 
-    @Column(name = "nombre", nullable = false, length = 255)
-    private String nombre;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "telefono", length = 20)
-    private String telefono;
+    @Column(name = "phone", length = 20)
+    private String phone;
 
-    @Column(name = "contrasena", nullable = false, length = 255)
-    private String contrasena;
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
 
-    @Column(name = "domicilio")
-    private String domicilio;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name = "cp", length = 10)
-    private String cp;
+    @Column(name = "postal_code", length = 10)
+    private String postalCode;
    
 
-    public Integer getIdUsuario() {
-        return idUsuario;
+    public Integer getIdUser() {
+        return idUser;
     }
 
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdUser(Integer idUser) {
+        this.idUser = idUser;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -59,36 +59,36 @@ public class UserEntity {
         this.email = email;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getPassword() {
+        return password;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getDomicilio() {
-        return domicilio;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getCp() {
-        return cp;
+    public String getPostalCode() {
+        return postalCode;
     }
 
-    public void setCp(String cp) {
-        this.cp = cp;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     
