@@ -471,7 +471,7 @@ public class ApiController {
 			return "/colaborador.html";
 		}
 
-		return "/user.html";
+		return "/login.html";
 	}
 
 	private String buildFrontendUrl(String path) {
