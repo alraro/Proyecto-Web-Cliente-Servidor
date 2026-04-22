@@ -8,22 +8,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "cadena")
+@Table(name = "chains")
 public class ChainEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cadena")
+    @Column(name = "id_chain")
     private Integer idChain;
 
-    @Column(name = "nombre", nullable = false, length = 255)
-    private String nombre;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
-    @Column(name = "codigo", nullable = false, unique = true, length = 50)
-    private String codigo;
+    @Column(name = "code", nullable = false, unique = true, length = 50)
+    private String code;
 
-    @Column(name = "participacion", nullable = false)
-    private Boolean participacion = false;
+    @Column(name = "participation", nullable = false)
+    private Boolean participation = false;
 
 
     public Integer getIdChain() {
@@ -34,27 +34,27 @@ public class ChainEntity {
         this.idChain = idChain;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getCode() {
+        return code;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public Boolean getParticipacion() {
-        return participacion;
+    public Boolean getParticipation() {
+        return participation;
     }
 
-    public void setParticipacion(Boolean participacion) {
-        this.participacion = participacion;
+    public void setParticipation(Boolean participation) {
+        this.participation = participation;
     }
 }

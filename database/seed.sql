@@ -1,21 +1,21 @@
 -- ============================================================
--- INSERTS GENERADOS DESDE APP_CAMPAÑAS.xlsm
--- Siguen el esquema CREATE TABLE definido en el modelo
+-- INSERTS GENERATED FROM APP_CAMPAÑAS.xlsm
+-- They follow the CREATE TABLE schema defined in the model
 -- ============================================================
 -- ============================================================
 -- SEED DATA generated from APP_CAMPAÑAS.xlsm
 -- ============================================================
 
--- 1. TIPO DE CAMPAÑA
-INSERT INTO Tipo_Campana (ID_Tipo, Nombre) VALUES
-  (1, 'Colecta de Alimentos');
+-- 1. CAMPAIGN TYPE
+INSERT INTO campaign_types (id_type, name) VALUES
+  (1, 'Food Collection');
 
--- 2. CAMPAÑA
-INSERT INTO Campana (ID_Campana, Nombre, ID_Tipo, Fecha_inicio, Fecha_fin) VALUES
-  (1, 'Campaña Primavera', 1, '2026-05-09', '2026-05-10');
+-- 2. CAMPAIGN
+INSERT INTO campaigns (id_campaign, name, id_type, start_date, end_date) VALUES
+  (1, 'Spring Campaign', 1, '2026-05-09', '2026-05-10');
 
--- 3. ZONAS GEOGRÁFICAS
-INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES
+-- 3. GEOGRAPHIC ZONES
+INSERT INTO geographic_zones (id_zone, name) VALUES
   (1, 'Antequera'),
   (2, 'Axarquía'),
   (3, 'Guadalhorce'),
@@ -24,8 +24,8 @@ INSERT INTO Zona_Geografica (ID_Zona, Nombre) VALUES
   (6, 'Costa del Sol Occidental'),
   (7, 'Málaga');
 
--- 4. LOCALIDADES
-INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES
+-- 4. LOCALITIES
+INSERT INTO localities (id_locality, name, id_zone) VALUES
   (1, 'Alameda', 1),
   (2, 'Alcaucín', 2),
   (3, 'Alfarnate', 2),
@@ -131,8 +131,8 @@ INSERT INTO Localidad (ID_Localidad, Nombre, ID_Zona) VALUES
   (103, 'Moclinejo', NULL),
   (104, '#N/A', NULL);
 
--- 5. DISTRITOS (todos pertenecen a Málaga)
-INSERT INTO Distrito (ID_Distrito, Nombre, ID_Localidad) VALUES
+-- 5. DISTRICTS (all belong to Malaga)
+INSERT INTO districts (id_district, name, id_locality) VALUES
   (1, 'Centro', 37),
   (2, 'Este', 37),
   (3, 'Ciudad Jardín', 37),
@@ -145,8 +145,8 @@ INSERT INTO Distrito (ID_Distrito, Nombre, ID_Localidad) VALUES
   (10, 'Puerto de la Torre', 37),
   (11, 'Teatinos-Universidad', 37);
 
--- 6. CÓDIGOS POSTALES
-INSERT INTO Codigo_Postal (CP, ID_Localidad, ID_Distrito) VALUES
+-- 6. POSTAL CODES
+INSERT INTO postal_codes (postal_code, id_locality, id_district) VALUES
   ('29001', 37, NULL),
   ('29002', 37, NULL),
   ('29003', 37, NULL),
@@ -313,8 +313,8 @@ INSERT INTO Codigo_Postal (CP, ID_Localidad, ID_Distrito) VALUES
   ('29792', 91, NULL),
   ('29793', 88, NULL);
 
--- 7. CADENAS
-INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES
+-- 7. CHAINS
+INSERT INTO chains (id_chain, name, code) VALUES
   (1, 'CARREFOUR', 'CARREFOUR'),
   (2, 'DIA', 'DIA'),
   (3, 'EL CORTE INGLES', 'ECI'),
@@ -327,9 +327,9 @@ INSERT INTO Cadena (ID_Cadena, Nombre, Codigo) VALUES
   (10, 'SUMA', 'SUMA'),
   (11, 'ALCAMPO', 'ALCAMPO');
 
--- 8. USUARIOS (coordinadores)
--- Contraseña por defecto: 'changeme' (hash simulado)
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
+-- 8. USERS (coordinator)
+-- Default password: 'changeme' (simulated hash)
+INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (1, 'Arantxa', 'bancosolseguimiento@gmail.com', '652032496', 'changeme'),
   (2, 'Cristóbal Aragón', 'aragoncristobal@hotmail.com', '639784306', 'changeme'),
   (3, 'Diego Vazquez', 'dvazquez.ronda59@gmail.com', '617967834', 'changeme'),
@@ -343,8 +343,8 @@ INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
   (12, 'Vicente Morato', 'vimor@yahoo.es', '627818795', 'changeme'),
   (13, 'Zona Marbella', 'zonamarbella@bancosol.info', NULL, 'changeme');
 
--- 9. COORDINADORES (asociados a campaña 1)
-INSERT INTO Coordinadores (ID_Usuario, ID_Campana) VALUES
+-- 9. COORDINATORS (assigned to campaign 1)
+INSERT INTO coordinators (id_user, id_campaign) VALUES
   (1, 1),
   (2, 1),
   (3, 1),
@@ -358,8 +358,8 @@ INSERT INTO Coordinadores (ID_Usuario, ID_Campana) VALUES
   (12, 1),
   (13, 1);
 
--- 10. TIENDAS
-INSERT INTO Tienda (ID_Tienda, Nombre, Domicilio, CP, ID_Cadena) VALUES
+-- 10. STORES
+INSERT INTO stores (id_store, name, address, postal_code, id_chain) VALUES
   (1, 'ECHEVERRIA', 'Avda Pio Baroja, 6', '29017', 1),
   (2, 'CANDADO', 'Avda Principal del Candado, 2', '29018', 1),
   (3, 'ATARAZANA', 'c/  Atarazanas, s/n', '29005', 1),
@@ -721,8 +721,8 @@ Cártama Pueblo', '29570', 8),
   (357, 'MASKOM', 'Av. JUAN XXIII, 28', '29566', 8),
   (358, 'MASKOM', 'C/ AGUILAR Y CANO, 4', '29018', NULL);
 
--- 11. TIENDAS EN CAMPAÑA (solo las participantes)
-INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES
+-- 11. STORES IN CAMPAIGN (only participating ones)
+INSERT INTO campaign_stores (id_campaign, id_store) VALUES
   (1, 48),
   (1, 49),
   (1, 50),
@@ -866,8 +866,8 @@ INSERT INTO Tiendas_en_campana (ID_Campana, ID_Tienda) VALUES
   (1, 357),
   (1, 358);
 
--- 12. ENTIDADES COLABORADORAS
-INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Telefono) VALUES
+-- 12. PARTNER ENTITIES
+INSERT INTO partner_entities (id_partner_entity, name, address, phone) VALUES
   (1, 'AAVV TORRIJOS', 'Centro Ciudadano Huelin.Calle Emilio de la Cerda 24,2ª. 29002 MALAGA', NULL),
   (2, 'ABC ASOCIACIÓN BENEFICA CRISTIANA DIOS ES FIEL', 'Calle Jabalcuza,11
 29130 - Alhaurín de la Torre ( Malaga)', NULL),
@@ -891,7 +891,7 @@ INSERT INTO Entidad_Colaboradora (ID_Entidad_Colaboradora, Nombre, Domicilio, Te
 29500 - Alora', NULL),
   (13, 'ASIMA ASOCIACION CIUDADANA ANTISIDA DE MALAGA', 'Calle Cruz Verde, 22
 29013 - Málaga', NULL),
-  (14, 'ASIS COMEDOR SOCIAL DE ANTEQUERA', 'C/ Córdoba 29, Antequera, CP
+  (14, 'ASIS COMEDOR SOCIAL DE ANTEQUERA', 'C/ Córdoba 29, Antequera, postal_code
 29200 (Málaga)', NULL),
   (15, 'ASOCIACIÓN AYUDA SOCIAL PALABRAS DE PODER', 'Calle Tulipan,48', NULL),
   (16, 'ASOCIACIÓN CENTRO DE VIDA CRISTIANA DE MALAGA', 'Camino de la Corta s/n
@@ -1061,14 +1061,14 @@ APTDO CORREOS 63
   (110, 'VIRGEN DE LAS FLORES ALORA RESIDENCIA', 'Av. Pablo Ruiz Picasso, 20 29500 Álora', NULL);
 
 
--- USUARIOS EXTRA PARA PRUEBAS (admin, capitán, colaborador)
-INSERT INTO Usuario (ID_Usuario, Nombre, Email, Telefono, Contrasena) VALUES
+-- EXTRA USERS FOR TESTING (admin, captain, collaborator)
+INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
-  (15, 'Capitan Test', 'capitan@bancosol.info', '600000002', 'changeme'),
-  (16, 'Colaborador Test', 'colaborador@bancosol.info', '600000003', 'changeme');
+  (15, 'Captain Test', 'capitan@bancosol.info', '600000002', 'changeme'),
+  (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme');
 
-INSERT INTO Administradores (ID_Usuario) VALUES (14);
+INSERT INTO administrators (id_user) VALUES (14);
 
-INSERT INTO Capitanes (ID_Usuario, ID_Campana) VALUES (15, 1);
+INSERT INTO captains (id_user, id_campaign) VALUES (15, 1);
 
-INSERT INTO Responsable_entidad_colaboradora (ID_USUARIO, ID_ENTIDAD_COLABORADORA) VALUES (16, NULL);
+INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, NULL);
