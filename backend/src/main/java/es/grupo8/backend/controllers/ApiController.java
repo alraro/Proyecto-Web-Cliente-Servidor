@@ -466,19 +466,19 @@ public class ApiController {
 
 	private static String roleToPath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
-			return "/administrador.html";
+			return "/admin.html";
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinador.html";
+			return "/coordinator.html";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/capitan.html";
+			return "/captain.html";
 		}
 
 		if ("COLABORADOR".equals(role)) {
-			return "/colaborador.html";
+			return "/collaborator.html";
 		}
 
 		return "/login.html";

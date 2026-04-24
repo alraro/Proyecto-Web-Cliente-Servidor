@@ -74,7 +74,29 @@ body {
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
-.btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.btn-logout:hover { 
+    background: #fee2e2; 
+    color: #b91c1c; 
+    border-color: #fecaca; 
+}
+
+.btn-edit {
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-edit:hover { 
+    background: #fee2e2; 
+    color: #b91c1c; 
+    border-color: #fecaca; 
+}
 
 /* LAYOUT */
 .page-wrapper {
@@ -348,4 +370,148 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     margin-top: 0.5rem;
     min-height: 1.2rem;
     color: #dc2626;
+}
+
+.menu-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 1.25rem; 
+    margin-top: 1rem; 
+
+}
+
+.menu-card { 
+    background: rgba(255,255,255,0.9); 
+    border: 1px solid rgba(25,58,107,0.1); 
+    border-radius: 20px; 
+    padding: 1.75rem; 
+    text-decoration: none; 
+    color: inherit; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.75rem; 
+    box-shadow: 0 4px 20px rgba(25,58,107,0.07); 
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; 
+    position: relative; 
+    overflow: hidden; 
+}
+
+.menu-card:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 12px 32px rgba(25,58,107,0.14); 
+    border-color: rgba(45,101,160,0.3); 
+}
+
+.menu-card.disabled { 
+    opacity: 0.55; 
+    cursor: not-allowed; 
+    pointer-events: none; 
+}
+
+.menu-card-icon { 
+    width: 48px; 
+    height: 48px; 
+    border-radius: 14px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.5rem; 
+}
+
+.icon-blue   { 
+    background: rgba(25,58,107,0.1); 
+}
+
+.icon-orange { 
+    background: rgba(235,123,49,0.12); 
+}
+
+.icon-green  { 
+    background: rgba(34,197,94,0.12); 
+}
+
+.icon-purple { 
+    background: rgba(139,92,246,0.12); 
+}
+
+.icon-red    { 
+    background: rgba(239,68,68,0.12); 
+}
+
+.icon-teal   { 
+    background: rgba(20,184,166,0.12); 
+}
+
+.menu-card h3 { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 1.05rem; 
+    font-weight: 700; 
+    color: #193a6b; 
+    margin: 0; 
+}
+
+.menu-card p { 
+    font-size: 0.88rem; 
+    color: rgba(31,41,55,0.6); 
+    margin: 0; 
+    line-height: 1.5; 
+}
+.menu-card-arrow { 
+    margin-top: auto; 
+    font-size: 0.82rem; 
+    font-weight: 700; 
+    color: #2d65a0; 
+}
+.badge-soon { 
+    position: absolute; 
+    top: 1rem; 
+    right: 1rem; 
+    padding: 0.2rem 0.6rem; 
+    border-radius: 999px; 
+    background: #f1f5f9; 
+    color: #64748b; 
+    font-size: 0.72rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+}
+.welcome-bar { 
+    background: linear-gradient(135deg, #193a6b, #2d65a0); 
+    border-radius: 20px; 
+    padding: 1.75rem 2rem; 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 1rem; 
+    flex-wrap: wrap; 
+}
+.welcome-bar h2 { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    margin: 0 0 0.3rem; 
+}
+.welcome-bar p { 
+    margin: 0; 
+    opacity: 0.8; 
+    font-size: 0.92rem; 
+}
+.welcome-bar .role-pill { 
+    padding: 0.4rem 1rem; 
+    border-radius: 999px; 
+    background: rgba(255,255,255,0.15); 
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    white-space: nowrap; 
+}
+
+.section-title { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 0.78rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 0.1em; 
+    color: rgba(31,41,55,0.45); 
+    margin: 2rem 0 0; 
 }
