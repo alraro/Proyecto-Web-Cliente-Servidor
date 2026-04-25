@@ -1,8 +1,6 @@
--- Migración: añadir campo Participacion a la tabla Cadena
+-- Migration: add participation field to chain table
 
-ALTER TABLE Cadena
-    ADD COLUMN Participacion BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE chains
+    ADD COLUMN participation BOOLEAN NOT NULL DEFAULT FALSE;
 
-COMMENT ON COLUMN Cadena.Participacion IS 'Indica si la cadena participa activamente en campañas';
-
--- docker exec -i <nombre_contenedor_postgres> psql -U <usuario> -d <bbdd> < database/V2__add_participacion_cadena.sql
+COMMENT ON COLUMN chains.participation IS 'Indicates whether the chain actively participates in campaigns';

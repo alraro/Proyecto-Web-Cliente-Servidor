@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Panel de Administración</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/admin.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Administrador</span>
+            </div>
+            <button class="btn-edit" id="btn-edit">Editar perfil</button>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="welcome-bar">
+            <div>
+                <h2>Bienvenido, <span id="welcome-name">Admin</span> 👋</h2>
+                <p>Desde aquí puedes gestionar todos los aspectos de las campañas de Bancosol.</p>
+            </div>
+            <span class="role-pill">🔑 Administrador</span>
+        </div>
+
+        <p class="section-title">Gestión</p>
+        <div class="menu-grid">
+            <a class="menu-card" href="admin-chains.html">
+                <div class="menu-card-icon icon-blue">🏪</div>
+                <h3>Cadenas de supermercados</h3>
+                <p>Crear, editar y eliminar cadenas. Activar o desactivar su participación en campañas.</p>
+                <span class="menu-card-arrow">Ir a cadenas →</span>
+            </a>
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-orange">📢</div>
+                <h3>Campañas</h3>
+                <p>Crear y gestionar campañas de recogida de alimentos, asignar fechas y zonas.</p>
+                <span class="menu-card-arrow">Ir a campañas →</span>
+            </a>
+            <a class="menu-card" href="admin-stores.html">
+                <div class="menu-card-icon icon-green">🏬</div>
+                <h3>Tiendas</h3>
+                <p>Gestionar las tiendas participantes, asignar cadenas y códigos postales.</p>
+                <span class="menu-card-arrow">Ir a tiendas →</span>
+            </a>
+        </div>
+
+        <p class="section-title">Usuarios y accesos</p>
+        <div class="menu-grid">
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-purple">✅</div>
+                <h3>Validar registros</h3>
+                <p>Revisar y aprobar o rechazar las solicitudes de nuevos usuarios que esperan acceso.</p>
+                <span class="menu-card-arrow">Ver solicitudes →</span>
+            </a>
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-teal">👥</div>
+                <h3>Usuarios</h3>
+                <p>Ver todos los usuarios registrados, cambiar roles y gestionar permisos.</p>
+                <span class="menu-card-arrow">Ir a usuarios →</span>
+            </a>
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-orange">🤝</div>
+                <h3>Entidades colaboradoras</h3>
+                <p>Gestionar las asociaciones y entidades que colaboran en las campañas.</p>
+                <span class="menu-card-arrow">Ir a entidades →</span>
+            </a>
+        </div>
+
+        <p class="section-title">Operativa de campaña</p>
+        <div class="menu-grid">
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-green">🙋</div>
+                <h3>Voluntarios</h3>
+                <p>Consultar y gestionar los turnos y asistencia de voluntarios por tienda.</p>
+                <span class="menu-card-arrow">Ir a voluntarios →</span>
+            </a>
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-red">⚓</div>
+                <h3>Capitanes</h3>
+                <p>Asignar capitanes a tiendas y campañas, ver su estado y actividad.</p>
+                <span class="menu-card-arrow">Ir a capitanes →</span>
+            </a>
+            <a class="menu-card disabled">
+                <span class="badge-soon">Próximamente</span>
+                <div class="menu-card-icon icon-blue">🗺️</div>
+                <h3>Coordinadores</h3>
+                <p>Ver y asignar coordinadores por zona geográfica y campaña.</p>
+                <span class="menu-card-arrow">Ir a coordinadores →</span>
+            </a>
+        </div>
+    </main>
+
+</body>
+</html>

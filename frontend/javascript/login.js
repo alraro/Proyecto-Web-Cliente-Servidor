@@ -2,77 +2,24 @@ const form = document.querySelector('#login-form');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
-const rememberMeInput = document.querySelector('#remember-me');
 const message = document.querySelector('#form-message');
 
-const API_BASE_URL = window.location.origin;
-const AUTH_TOKEN_KEY = 'bancosol_auth_token';
-
-function guardarToken(token, recordarSesion) {
-    sessionStorage.setItem(AUTH_TOKEN_KEY, token);
-
-    if (recordarSesion) {
-        localStorage.setItem(AUTH_TOKEN_KEY, token);
-    } else {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-    }
+function mostrarErrorDesdeUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (!error) return;
+    message.textContent = error;
+    message.classList.remove('is-success');
+    message.classList.add('is-error');
 }
 
-function leerToken() {
-    return sessionStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY);
-}
-
-function limpiarToken() {
-    sessionStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-}
-
-function tokenExpirado(token) {
-    try {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-            return true;
-        }
-
-        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-        if (!payload.exp) {
-            return false;
-        }
-
-        return Date.now() >= payload.exp * 1000;
-    } catch {
-        return true;
-    }
-}
-
-function comprobarSesionActiva() {
-    const token = leerToken();
-    if (!token) {
-        return;
-    }
-
-    if (tokenExpirado(token)) {
-        limpiarToken();
-        message.textContent = 'Tu sesión ha expirado. Inicia sesión de nuevo.';
-        message.classList.remove('is-success');
-        message.classList.add('is-error');
-        return;
-    }
-
-    window.location.href = 'index.html';
-}
-
-comprobarSesionActiva();
+mostrarErrorDesdeUrl();
 
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
-
     passwordInput.type = nextType;
     togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-    togglePasswordButton.setAttribute(
-        'aria-label',
-        nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña'
-    );
+    togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
 });
 
 form.addEventListener('submit', async (event) => {
@@ -90,7 +37,7 @@ form.addEventListener('submit', async (event) => {
     }
 
     if (!emailInput.validity.valid) {
-        message.textContent = 'Ingresa un correo valido.';
+        message.textContent = 'Ingresa un correo válido.';
         message.classList.add('is-error');
         emailInput.focus();
         return;
@@ -104,37 +51,31 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        const res = await fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                password,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
 
-        const payload = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
-            message.textContent = payload.message || 'No se pudo iniciar sesion.';
+        if (!res.ok) {
+            message.textContent = data.message || 'Credenciales incorrectas.';
             message.classList.add('is-error');
             return;
         }
 
-        if (payload.token) {
-            guardarToken(payload.token, Boolean(rememberMeInput.checked));
-        }
+        // Guardar token y datos del usuario
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('nombre', data.nombre);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('role', data.role);
 
-        message.textContent = `Bienvenido/a ${payload.nombre}. Login correcto.`;
-        message.classList.add('is-success');
+        // Redirigir según rol
+        window.location.href = data.redirectUrl;
 
-        window.setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 350);
     } catch {
-        message.textContent = 'No se pudo conectar con el backend. Revisa que este levantado.';
+        message.textContent = 'Error al conectar con el servidor.';
         message.classList.add('is-error');
     }
 });

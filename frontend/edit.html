@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Editar perfil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/edit.css">
+</head>
+<body>
+    <header class="topbar topbar-login">
+        <a class="brand" href="index.html" aria-label="Bancosol inicio">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+        </a>
+
+        <nav class="main-nav main-nav-login" id="main-nav">
+            <a href="index.html">Inicio</a>
+            <a href="#" id="role-return-link">Mi panel</a>
+            <a href="index.html#contacto">Contacto</a>
+        </nav>
+    </header>
+
+        <section class="login-card register-card edit-card" aria-labelledby="edit-title">
+            <div class="brand-lockup">
+                <img src="assets/Bancosol.png" alt="Bancosol" class="logo">
+                <div>
+                    <p class="brand-name">Bancosol</p>
+                    <p class="brand-subtitle">Editar información de usuario</p>
+                </div>
+            </div>
+
+            <div class="card-copy">
+                <h2 id="edit-title">Mi perfil</h2>
+            </div>
+
+            <form id="edit-form" class="login-form register-form edit-form" novalidate>
+                <div class="field-grid">
+                    <div class="field-group">
+                        <label for="name">Nombre completo</label>
+                        <div class="input-shell readonly-shell">
+                            <input id="name" name="nombre" type="text" autocomplete="name" readonly>
+                        </div>
+                        <p class="field-note">Este dato no se puede editar.</p>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="email">Correo *</label>
+                        <div class="input-shell">
+                            <input id="email" name="email" type="email" placeholder="usuario@bancosol.org" autocomplete="email" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field-group">
+                        <label for="telefono">Teléfono</label>
+                        <div class="input-shell">
+                            <input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="localidad">Localidad</label>
+                        <div class="input-shell">
+                            <input id="localidad" name="localidad" type="text" placeholder="Málaga" autocomplete="address-level2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field-group full-width">
+                        <label for="domicilio">Domicilio</label>
+                        <div class="input-shell">
+                            <input id="domicilio" name="domicilio" type="text" placeholder="Calle, número, piso..." autocomplete="street-address">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field-group">
+                        <label for="cp">Código postal</label>
+                        <div class="input-shell">
+                            <input id="cp" name="cp" type="text" placeholder="29001" autocomplete="postal-code">
+                        </div>
+                    </div>
+
+                    <p class="help-text full-width">Los cambios se guardan en tu perfil y se aplican a tu sesión actual.</p>
+                </div>
+
+                <div class="edit-actions">
+                    <button type="submit" class="login-button">Guardar cambios</button>
+                    <button type="button" class="secondary-button" id="cancel-button">Cancelar</button>
+                </div>
+
+                <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer" aria-label="Pie de página">
+        <img src="assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+        <p>Bancosol · Banco de alimentos</p>
+    </footer>
+
+    <script src="javascript/edit.js"></script>
+</body>
+</html>
