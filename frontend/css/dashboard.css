@@ -1,0 +1,148 @@
+/* dashboard.css — RF-32 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Nunito', sans-serif; background: #f3f4f6; color: #1f2937; }
+
+/* Topbar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(25, 58, 107, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+.brand .logo { width: 140px; height: auto; }
+
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: rgba(25, 58, 107, 0.07);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #193a6b;
+}
+
+.user-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.btn-logout {
+    padding: 0.5rem 1.1rem;
+    border: 1px solid rgba(25, 58, 107, 0.1);
+    border-radius: 999px;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-logout:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* Controls bar */
+.controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .75rem;
+    background: #fff; padding: .75rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.controls select, .controls button {
+    padding: .4rem .75rem; border-radius: .375rem;
+    border: 1px solid #d1d5db; font-size: .875rem;
+}
+.btn-refresh { background: #3b82f6; color: #fff; border-color: #3b82f6; cursor: pointer; }
+.btn-refresh:hover { background: #2563eb; }
+.last-updated { font-size: .75rem; color: #6b7280; margin-left: auto; }
+
+/* Main layout */
+.dashboard-main { padding: 1.5rem; max-width: 1400px; margin: auto; }
+
+.page-header {
+    margin-bottom: 1.25rem;
+}
+
+.page-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #193a6b;
+    letter-spacing: -0.03em;
+}
+
+.page-header p {
+    margin-top: .35rem;
+    color: rgba(31, 41, 55, 0.6);
+    font-size: 1rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .88rem;
+    font-weight: 700;
+    color: #2d65a0;
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+/* KPI row */
+.kpi-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.kpi-card {
+    flex: 1; min-width: 150px; background: #fff; border-radius: .5rem;
+    padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    display: flex; flex-direction: column; align-items: center; gap: .25rem;
+}
+.kpi-label { font-size: .75rem; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; }
+.kpi-value { font-size: 1.75rem; font-weight: 700; color: #1e3a5f; }
+
+/* Charts grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 1.25rem;
+}
+.chart-card {
+    background: #fff; border-radius: .5rem; padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.chart-card--wide { grid-column: 1 / -1; }
+.chart-card h3 { font-size: .95rem; margin-bottom: .75rem; color: #374151; }
+.chart-wrap { position: relative; height: 280px; }
+
+/* Estado vacío / spinner / error */
+.no-selection, .spinner, .error-msg {
+    text-align: center; padding: 3rem; font-size: 1rem; color: #6b7280;
+}
+.error-msg { color: #dc2626; background: #fee2e2; border-radius: .5rem; }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .topbar { padding: .8rem 1rem; }
+    .topbar-right { width: 100%; justify-content: flex-end; gap: .6rem; }
+    .user-badge { padding: .4rem .65rem; font-size: .82rem; }
+    .btn-logout { padding: .45rem .8rem; font-size: .82rem; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .kpi-row { flex-direction: column; }
+}
