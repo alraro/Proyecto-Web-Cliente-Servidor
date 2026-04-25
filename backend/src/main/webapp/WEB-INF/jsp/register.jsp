@@ -29,21 +29,7 @@
 </header>
 
 <main class="login-page register-page">
-    <section class="login-hero" aria-hidden="true">
-        <div class="hero-badge">Registro Bancosol</div>
-        <h1>Únete a la red de voluntariado y coordinación solidaria</h1>
-        <p>Crear una cuenta te permite participar en campañas, consultar tu información básica y acceder con una sesión segura desde el primer momento.</p>
-        <div class="hero-cards">
-            <article>
-                <strong>Alta rápida</strong>
-                <span>Formulario claro y validación inmediata</span>
-            </article>
-            <article>
-                <strong>Acceso posterior</strong>
-                <span>Al terminar, podrás iniciar sesión desde la pestaña de acceso</span>
-            </article>
-        </div>
-    </section>
+    
 
     <section class="login-card register-card" aria-labelledby="register-title">
         <div class="brand-lockup">
@@ -138,11 +124,6 @@
             <% } %>
             <p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="<%= contextPath %>/login">Iniciar sesión</a></p>
         </form>
-
-        <div class="security-note">
-            <span class="security-dot"></span>
-            <p>Los datos enviados se almacenan en la tabla Usuario de PostgreSQL y la sesión se firma con JWT.</p>
-        </div>
     </section>
 </main>
 

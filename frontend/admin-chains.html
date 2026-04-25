@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bancosol | Administrador</title>
+    <title>Bancosol | Cadenas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/administrador.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
-    <!-- TOPBAR -->
     <header class="topbar">
         <a class="brand" href="index.html">
             <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
@@ -25,19 +24,18 @@
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="administrador.html" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.88rem;font-weight:700;color:#2d65a0;text-decoration:none;margin-bottom:1rem;">← Volver al menú</a>
+            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
             <h1>Cadenas de supermercados</h1>
-            <p>Gestión de cadenas de supermercados participantes en las campañas.</p>
+            <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <h2>Cadenas</h2>
+                <h2>Listado de cadenas</h2>
                 <div class="card-actions">
-                    <button class="btn btn-primary" id="btn-nueva-cadena">+ Nueva cadena</button>
+                    <button class="btn btn-primary" id="btn-nueva">+ Nueva cadena</button>
                 </div>
             </div>
             <div class="table-wrap">
@@ -59,31 +57,35 @@
         </div>
     </main>
 
-    <!-- MODAL CREAR / EDITAR -->
+    <!-- MODAL -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <h3 id="modal-title">Nueva cadena</h3>
+
             <div class="form-group">
-                <label for="input-nombre">Nombre</label>
-                <input type="text" id="input-nombre" placeholder="Ej: MERCADONA" maxlength="255">
+                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <input type="text" id="input-nombre" placeholder="Ej: Mercadona" maxlength="255">
             </div>
             <div class="form-group">
-                <label for="input-codigo">Código</label>
-                <input type="text" id="input-codigo" placeholder="Ej: MERCADONA" maxlength="50">
+                <label for="input-codigo">Código <span style="color:#dc2626">*</span></label>
+                <input type="text" id="input-codigo" placeholder="Ej: MERC" maxlength="50">
+                <p style="font-size:.78rem;color:var(--ink-light);margin-top:.3rem;">Solo letras, números, guiones y guiones bajos.</p>
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="input-participacion">
-                <label for="input-participacion">Participa activamente en campañas</label>
+                <label for="input-participacion">Participa en campañas activas</label>
             </div>
+
             <p class="form-message" id="modal-error"></p>
+
             <div class="modal-footer">
-                <button class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
-                <button class="btn btn-primary" id="btn-modal-save">Guardar</button>
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
+    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
     <script>
@@ -91,24 +93,13 @@
 
         // ── Auth ──────────────────────────────────────────────────────────────
         function getToken() { return localStorage.getItem('token'); }
-        function getUser()  { return localStorage.getItem('nombre') || 'Administrador'; }
-
         function authHeaders() {
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + getToken()
-            };
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
         }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-
-        // Si no hay token, redirigir al login
         if (!getToken()) { window.location.href = 'login.html'; }
-
-        document.getElementById('user-name').textContent = getUser();
+        document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
         document.getElementById('btn-logout').addEventListener('click', logout);
 
         // ── Toast ─────────────────────────────────────────────────────────────
@@ -121,7 +112,7 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        // ── Render tabla ──────────────────────────────────────────────────────
+        // ── Tabla ─────────────────────────────────────────────────────────────
         function renderTable(chains) {
             const tbody = document.getElementById('chains-tbody');
             if (!chains.length) {
@@ -131,95 +122,119 @@
             tbody.innerHTML = chains.map(c => `
                 <tr>
                     <td>${c.id}</td>
-                    <td><strong>${c.nombre}</strong></td>
-                    <td><code>${c.codigo}</code></td>
+                    <td><strong>${escHtml(c.name)}</strong></td>
+                    <td><code style="background:#f1f5f9;padding:.2rem .5rem;border-radius:6px;font-size:.85rem;">${escHtml(c.code)}</code></td>
                     <td>
-                        <span class="badge ${c.participacion ? 'badge-yes' : 'badge-no'}">
-                            ${c.participacion ? '✓ Sí' : '— No'}
-                        </span>
+                        ${c.participation
+                            ? '<span class="badge badge-yes">✓ Sí</span>'
+                            : '<span class="badge badge-no">— No</span>'}
                     </td>
                     <td>
                         <div class="td-actions">
-                            <button class="btn btn-edit btn-sm" onclick="openEdit(${c.id}, '${escHtml(c.nombre)}', '${escHtml(c.codigo)}', ${c.participacion})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteCadena(${c.id}, '${escHtml(c.nombre)}')">Eliminar</button>
+                            <button class="btn btn-edit btn-sm" onclick="abrirEditar(${c.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarCadena(${c.id}, '${escAttr(c.name)}')">Eliminar</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function escHtml(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        function escHtml(v) {
+            return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function escAttr(v) {
+            return String(v ?? '').replace(/'/g, "\\'");
         }
 
         // ── Cargar cadenas ────────────────────────────────────────────────────
-        async function loadChains() {
+        async function cargarCadenas() {
             try {
                 const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
-                if (res.status === 403) { logout(); return; }
+                if (res.status === 401 || res.status === 403) { logout(); return; }
+                if (!res.ok) {
+                    document.getElementById('chains-tbody').innerHTML =
+                        '<tr><td colspan="5" class="table-empty">Error al cargar las cadenas.</td></tr>';
+                    return;
+                }
                 const data = await res.json();
                 renderTable(data);
             } catch {
                 document.getElementById('chains-tbody').innerHTML =
-                    '<tr><td colspan="5" class="table-empty">Error al conectar con el servidor.</td></tr>';
+                    '<tr><td colspan="5" class="table-empty">No se puede conectar con el servidor. ¿Está el backend en marcha?</td></tr>';
             }
         }
 
         // ── Modal ─────────────────────────────────────────────────────────────
-        let editingId = null;
+        let editandoId = null;
 
-        function openModal(title) {
-            document.getElementById('modal-title').textContent = title;
+        function abrirModal(titulo) {
+            document.getElementById('modal-title').textContent = titulo;
             document.getElementById('modal-error').textContent = '';
             document.getElementById('modal-backdrop').classList.add('open');
+            document.getElementById('input-nombre').focus();
         }
 
-        function closeModal() {
+        function cerrarModal() {
             document.getElementById('modal-backdrop').classList.remove('open');
             document.getElementById('input-nombre').value = '';
             document.getElementById('input-codigo').value = '';
             document.getElementById('input-participacion').checked = false;
             document.getElementById('modal-error').textContent = '';
-            editingId = null;
+            editandoId = null;
         }
 
-        function openCreate() {
-            editingId = null;
-            openModal('Nueva cadena');
+        function abrirCrear() {
+            editandoId = null;
+            abrirModal('Nueva cadena');
         }
 
-        function openEdit(id, nombre, codigo, participacion) {
-            editingId = id;
-            document.getElementById('input-nombre').value = nombre;
-            document.getElementById('input-codigo').value = codigo;
-            document.getElementById('input-participacion').checked = participacion;
-            openModal('Editar cadena');
+        async function abrirEditar(id) {
+            // Buscamos en la tabla en memoria para no hacer una llamada extra
+            try {
+                const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
+                const lista = await res.json();
+                const cadena = lista.find(c => c.id === id);
+                if (!cadena) { showToast('Cadena no encontrada.', 'error'); return; }
+
+                editandoId = cadena.id;
+                document.getElementById('input-nombre').value = cadena.name;
+                document.getElementById('input-codigo').value = cadena.code;
+                document.getElementById('input-participacion').checked = !!cadena.participation;
+                abrirModal('Editar cadena');
+            } catch {
+                showToast('Error al cargar la cadena.', 'error');
+            }
         }
 
-        document.getElementById('btn-nueva-cadena').addEventListener('click', openCreate);
-        document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('btn-nueva').addEventListener('click', abrirCrear);
+        document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
         document.getElementById('modal-backdrop').addEventListener('click', e => {
-            if (e.target === document.getElementById('modal-backdrop')) closeModal();
+            if (e.target === document.getElementById('modal-backdrop')) cerrarModal();
         });
 
-        // ── Guardar (crear o editar) ───────────────────────────────────────────
-        document.getElementById('btn-modal-save').addEventListener('click', async () => {
-            const nombre = document.getElementById('input-nombre').value.trim();
-            const codigo = document.getElementById('input-codigo').value.trim();
+        // ── Guardar ───────────────────────────────────────────────────────────
+        document.getElementById('btn-guardar').addEventListener('click', async () => {
+            const nombre        = document.getElementById('input-nombre').value.trim();
+            const codigo        = document.getElementById('input-codigo').value.trim();
             const participacion = document.getElementById('input-participacion').checked;
-            const errorEl = document.getElementById('modal-error');
+            const errorEl       = document.getElementById('modal-error');
 
-            if (!nombre || !codigo) {
-                errorEl.textContent = 'Nombre y código son obligatorios.';
+            // Validación cliente
+            if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
+            if (!codigo) { errorEl.textContent = 'El código es obligatorio.'; return; }
+            if (!/^[A-Za-z0-9_\-]+$/.test(codigo)) {
+                errorEl.textContent = 'El código solo puede contener letras, números, guiones y guiones bajos.';
                 return;
             }
+            if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
+            if (codigo.length > 50)  { errorEl.textContent = 'El código no puede superar 50 caracteres.'; return; }
 
-            const body = JSON.stringify({ nombre, codigo, participacion });
-            const url  = editingId ? `${BACKEND}/api/chains/${editingId}` : `${BACKEND}/api/chains`;
-            const method = editingId ? 'PUT' : 'POST';
+            const body   = JSON.stringify({ name: nombre, code: codigo, participation: participacion });
+            const url    = editandoId ? `${BACKEND}/api/chains/${editandoId}` : `${BACKEND}/api/chains`;
+            const method = editandoId ? 'PUT' : 'POST';
 
             try {
-                const res = await fetch(url, { method, headers: authHeaders(), body });
+                const res  = await fetch(url, { method, headers: authHeaders(), body });
                 const data = await res.json();
 
                 if (!res.ok) {
@@ -227,39 +242,36 @@
                     return;
                 }
 
-                closeModal();
-                showToast(editingId ? 'Cadena actualizada.' : 'Cadena creada.');
-                loadChains();
+                cerrarModal();
+                showToast(editandoId ? 'Cadena actualizada correctamente.' : 'Cadena creada correctamente.');
+                cargarCadenas();
             } catch {
                 errorEl.textContent = 'Error de conexión con el servidor.';
             }
         });
 
         // ── Eliminar ──────────────────────────────────────────────────────────
-        async function deleteCadena(id, nombre) {
-            if (!confirm(`¿Eliminar la cadena "${nombre}"? Esta acción no se puede deshacer.`)) return;
-
+        async function eliminarCadena(id, nombre) {
+            if (!confirm(`¿Eliminar la cadena "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
             try {
                 const res = await fetch(`${BACKEND}/api/chains/${id}`, {
                     method: 'DELETE',
                     headers: authHeaders()
                 });
-
                 if (!res.ok) {
                     const data = await res.json();
                     showToast(data.message || 'Error al eliminar.', 'error');
                     return;
                 }
-
                 showToast('Cadena eliminada.');
-                loadChains();
+                cargarCadenas();
             } catch {
                 showToast('Error de conexión con el servidor.', 'error');
             }
         }
 
         // ── Init ──────────────────────────────────────────────────────────────
-        loadChains();
+        cargarCadenas();
     </script>
 </body>
 </html>
