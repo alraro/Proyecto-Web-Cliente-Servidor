@@ -103,6 +103,35 @@ body {
     padding: 2rem;
 }
 
+.admin-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1rem 0 1.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-tab {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--blue-900);
+    background: rgba(25, 58, 107, 0.08);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.admin-tab:hover {
+    background: rgba(25, 58, 107, 0.15);
+}
+
+.admin-tab.is-active {
+    background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+    color: var(--white);
+    border-color: transparent;
+}
+
 .page-header {
     margin-bottom: 2rem;
 }

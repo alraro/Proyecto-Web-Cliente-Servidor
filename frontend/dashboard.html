@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Dashboard de Cobertura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="javascript/dashboard.js" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" href="index.html">
+        <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name">Administrador</span>
+        </div>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+    </div>
+</header>
+
+<main class="dashboard-main">
+
+    <div class="page-header">
+        <a href="admin.html" class="back-link">← Volver al panel</a>
+        <h1>Dashboard de Cobertura</h1>
+        <p>Visualiza métricas de cobertura por cadena, localidad y zona geográfica.</p>
+    </div>
+
+    <!-- Selector de campaña + auto-refresh -->
+    <section class="controls">
+        <label for="campaignSelect">Campaña:</label>
+        <select id="campaignSelect">
+            <option value="">— Selecciona una campaña —</option>
+        </select>
+        <label for="refreshInterval">Actualizar cada:</label>
+        <select id="refreshInterval">
+            <option value="0">Manual</option>
+            <option value="30000">30 segundos</option>
+            <option value="60000" selected>1 minuto</option>
+            <option value="300000">5 minutos</option>
+        </select>
+        <button id="refreshBtn" class="btn-refresh">↻ Actualizar</button>
+        <span id="lastUpdated" class="last-updated"></span>
+    </section>
+
+    <!-- KPI cards -->
+    <section class="kpi-row" id="kpiRow" style="display:none">
+        <div class="kpi-card">
+            <span class="kpi-label">Tiendas en campaña</span>
+            <span class="kpi-value" id="kpiStores">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Estado</span>
+            <span class="kpi-value" id="kpiStatus">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Cadenas cubiertas</span>
+            <span class="kpi-value" id="kpiChains">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Zonas cubiertas</span>
+            <span class="kpi-value" id="kpiZones">—</span>
+        </div>
+    </section>
+
+    <!-- Gráficos -->
+    <section class="charts-grid" id="chartsGrid" style="display:none">
+        <div class="chart-card">
+            <h3>Cobertura por Cadena</h3>
+            <div class="chart-wrap"><canvas id="chainChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3>Cobertura por Localidad</h3>
+            <div class="chart-wrap"><canvas id="localityChart"></canvas></div>
+        </div>
+        <div class="chart-card chart-card--wide">
+            <h3>Cobertura por Zona Geográfica</h3>
+            <div class="chart-wrap"><canvas id="zoneChart"></canvas></div>
+        </div>
+    </section>
+
+    <div id="noSelection" class="no-selection">
+        Selecciona una campaña para ver las métricas de cobertura.
+    </div>
+    <div id="loadingSpinner" class="spinner" style="display:none">Cargando datos…</div>
+    <div id="errorMsg" class="error-msg" style="display:none"></div>
+
+</main>
+
+</body>
+</html>
