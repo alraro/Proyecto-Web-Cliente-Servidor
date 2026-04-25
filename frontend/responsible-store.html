@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Mi Tienda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/administrador.css">
+    <style>
+        /* Info de tienda */
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .info-item { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:.9rem 1.1rem; }
+        .info-item label { display:block; font-size:.75rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.3rem; }
+        .info-item span  { font-size:1rem; font-weight:600; color:#1e293b; }
+        /* Turnos */
+        .badge-attendance { display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:.75rem; font-weight:700; }
+        .badge-yes { background:#d1fae5; color:#065f46; }
+        .badge-no  { background:#fee2e2; color:#991b1b; }
+        .badge-pending { background:#fef9c3; color:#92400e; }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Responsable</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <h1>Mi tienda</h1>
+            <p>Información de tu tienda asignada y turnos programados.</p>
+        </div>
+
+        <div class="card" id="card-tienda" style="display:none;">
+            <div class="card-header"><h2 id="store-title">Cargando...</h2></div>
+            <div class="info-grid" id="info-grid"></div>
+        </div>
+
+        <div class="card" id="card-turnos" style="display:none;">
+            <div class="card-header"><h2>Turnos programados</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campaña</th>
+                            <th>Voluntario</th>
+                            <th>Hora fin</th>
+                            <th>Asistencia</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shifts-tbody">
+                        <tr><td colspan="5" class="table-empty">Cargando turnos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="error-msg" style="display:none;padding:2rem;text-align:center;color:#dc2626;font-weight:600;"></div>
+    </main>
+
+    <script>
+        const BACKEND = 'http://localhost:8080';
+
+        function getToken()  { return localStorage.getItem('token'); }
+        function getUser()   { return localStorage.getItem('nombre') || 'Responsable'; }
+        function getStoreId(){ return localStorage.getItem('storeId'); }
+        function authHeaders(){ return { 'Content-Type':'application/json', 'Authorization':'Bearer '+getToken() }; }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        if (!getToken()) { window.location.href = 'login.html'; }
+        document.getElementById('user-name').textContent = getUser();
+        document.getElementById('btn-logout').addEventListener('click', logout);
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function renderStoreInfo(store) {
+            document.getElementById('store-title').textContent = store.name || 'Tienda';
+            document.getElementById('card-tienda').style.display = '';
+
+            const fields = [
+                { label: 'Nombre',        value: store.name       },
+                { label: 'Domicilio',     value: store.address    },
+                { label: 'Código postal', value: store.postalCode },
+                { label: 'Localidad',     value: store.locality   },
+                { label: 'Zona geog.',    value: store.zone       },
+                { label: 'Cadena',        value: store.chainName  },
+            ];
+
+            document.getElementById('info-grid').innerHTML = fields.map(f => `
+                <div class="info-item">
+                    <label>${f.label}</label>
+                    <span>${f.value || '—'}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderShifts(shifts) {
+            document.getElementById('card-turnos').style.display = '';
+            const tbody = document.getElementById('shifts-tbody');
+
+            if (!shifts || !shifts.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay turnos programados.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = shifts.map(s => {
+                let attendanceBadge;
+                if (s.attendance === true)       attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
+                else if (s.attendance === false)  attendanceBadge = '<span class="badge-attendance badge-no">✗ No</span>';
+                else                             attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
+
+                return `
+                    <tr>
+                        <td>${s.campaignName || '—'}</td>
+                        <td>${s.volunteerName || '—'}</td>
+                        <td>${s.endTime || '—'}</td>
+                        <td>${attendanceBadge}</td>
+                        <td>${s.notes || '—'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadStoreDetail() {
+            const storeId = getStoreId();
+            if (!storeId) {
+                showError('No tienes ninguna tienda asignada. Contacta con el administrador.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BACKEND}/api/stores/${storeId}/detail`, {
+                    headers: authHeaders()
+                });
+
+                if (res.status === 401) { logout(); return; }
+                if (res.status === 403) {
+                    showError('No tienes permiso para ver esta tienda.');
+                    return;
+                }
+                if (res.status === 404) {
+                    showError('Tienda no encontrada.');
+                    return;
+                }
+                if (!res.ok) {
+                    showError('Error al cargar la información de la tienda.');
+                    return;
+                }
+
+                const data = await res.json();
+                renderStoreInfo(data);
+                renderShifts(data.scheduledShifts);
+
+            } catch {
+                showError('Error de conexión con el servidor.');
+            }
+        }
+
+        loadStoreDetail();
+    </script>
+</body>
+</html>

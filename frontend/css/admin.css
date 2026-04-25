@@ -24,7 +24,6 @@ body {
     min-height: 100vh;
 }
 
-/* TOPBAR */
 .topbar {
     display: flex;
     align-items: center;
@@ -98,7 +97,6 @@ body {
     border-color: #fecaca; 
 }
 
-/* LAYOUT */
 .page-wrapper {
     max-width: 1100px;
     margin: 0 auto;
@@ -123,7 +121,6 @@ body {
     font-size: 1rem;
 }
 
-/* CARD */
 .card {
     background: rgba(255,255,255,0.9);
     border: 1px solid var(--border);
@@ -151,7 +148,6 @@ body {
 
 .card-actions { display: flex; gap: 0.75rem; align-items: center; }
 
-/* BUTTONS */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -188,7 +184,6 @@ body {
 
 .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.82rem; }
 
-/* BADGE participacion */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -201,7 +196,6 @@ body {
 .badge-yes { background: #dcfce7; color: #15803d; }
 .badge-no  { background: #f1f5f9; color: #64748b; }
 
-/* TABLE */
 .table-wrap { overflow-x: auto; }
 
 table {
@@ -234,7 +228,6 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
 
 .td-actions { display: flex; gap: 0.5rem; }
 
-/* EMPTY / LOADING */
 .table-empty {
     padding: 3rem;
     text-align: center;
@@ -242,7 +235,6 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     font-size: 0.95rem;
 }
 
-/* MODAL */
 .modal-backdrop {
     display: none;
     position: fixed;
