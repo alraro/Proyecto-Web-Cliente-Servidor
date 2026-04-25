@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.ChainRepository;
-import es.grupo8.backend.dao.LocalityRepository;
 import es.grupo8.backend.dao.PostalCodeRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.entity.ChainEntity;
@@ -41,7 +40,6 @@ public class StoreController {
     @Autowired private StoreRepository     storeRepository;
     @Autowired private ChainRepository     chainRepository;
     @Autowired private PostalCodeRepository postalCodeRepository;
-    @Autowired private LocalityRepository  localityRepository;
     @Autowired private AdminGuard          adminGuard;
 
     @GetMapping
