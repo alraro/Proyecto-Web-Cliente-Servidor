@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Cadenas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Administrador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <h1>Cadenas de supermercados</h1>
+            <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Listado de cadenas</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary" id="btn-nueva">+ Nueva cadena</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Código</th>
+                            <th>Participación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chains-tbody">
+                        <tr><td colspan="5" class="table-empty">Cargando cadenas...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Nueva cadena</h3>
+
+            <div class="form-group">
+                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <input type="text" id="input-nombre" placeholder="Ej: Mercadona" maxlength="255">
+            </div>
+            <div class="form-group">
+                <label for="input-codigo">Código <span style="color:#dc2626">*</span></label>
+                <input type="text" id="input-codigo" placeholder="Ej: MERC" maxlength="50">
+                <p style="font-size:.78rem;color:var(--ink-light);margin-top:.3rem;">Solo letras, números, guiones y guiones bajos.</p>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="input-participacion">
+                <label for="input-participacion">Participa en campañas activas</label>
+            </div>
+
+            <p class="form-message" id="modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        const BACKEND = 'http://localhost:8080';
+
+        // ── Auth ──────────────────────────────────────────────────────────────
+        function getToken() { return localStorage.getItem('token'); }
+        function authHeaders() {
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
+        }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        if (!getToken()) { window.location.href = 'login.html'; }
+        document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
+        document.getElementById('btn-logout').addEventListener('click', logout);
+
+        // ── Toast ─────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // ── Tabla ─────────────────────────────────────────────────────────────
+        function renderTable(chains) {
+            const tbody = document.getElementById('chains-tbody');
+            if (!chains.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay cadenas registradas.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = chains.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td><strong>${escHtml(c.name)}</strong></td>
+                    <td><code style="background:#f1f5f9;padding:.2rem .5rem;border-radius:6px;font-size:.85rem;">${escHtml(c.code)}</code></td>
+                    <td>
+                        ${c.participation
+                            ? '<span class="badge badge-yes">✓ Sí</span>'
+                            : '<span class="badge badge-no">— No</span>'}
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <button class="btn btn-edit btn-sm" onclick="abrirEditar(${c.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarCadena(${c.id}, '${escAttr(c.name)}')">Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function escHtml(v) {
+            return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function escAttr(v) {
+            return String(v ?? '').replace(/'/g, "\\'");
+        }
+
+        // ── Cargar cadenas ────────────────────────────────────────────────────
+        async function cargarCadenas() {
+            try {
+                const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
+                if (!res.ok) {
+                    document.getElementById('chains-tbody').innerHTML =
+                        '<tr><td colspan="5" class="table-empty">Error al cargar las cadenas.</td></tr>';
+                    return;
+                }
+                const data = await res.json();
+                renderTable(data);
+            } catch {
+                document.getElementById('chains-tbody').innerHTML =
+                    '<tr><td colspan="5" class="table-empty">No se puede conectar con el servidor. ¿Está el backend en marcha?</td></tr>';
+            }
+        }
+
+        // ── Modal ─────────────────────────────────────────────────────────────
+        let editandoId = null;
+
+        function abrirModal(titulo) {
+            document.getElementById('modal-title').textContent = titulo;
+            document.getElementById('modal-error').textContent = '';
+            document.getElementById('modal-backdrop').classList.add('open');
+            document.getElementById('input-nombre').focus();
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-backdrop').classList.remove('open');
+            document.getElementById('input-nombre').value = '';
+            document.getElementById('input-codigo').value = '';
+            document.getElementById('input-participacion').checked = false;
+            document.getElementById('modal-error').textContent = '';
+            editandoId = null;
+        }
+
+        function abrirCrear() {
+            editandoId = null;
+            abrirModal('Nueva cadena');
+        }
+
+        async function abrirEditar(id) {
+            // Buscamos en la tabla en memoria para no hacer una llamada extra
+            try {
+                const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
+                const lista = await res.json();
+                const cadena = lista.find(c => c.id === id);
+                if (!cadena) { showToast('Cadena no encontrada.', 'error'); return; }
+
+                editandoId = cadena.id;
+                document.getElementById('input-nombre').value = cadena.name;
+                document.getElementById('input-codigo').value = cadena.code;
+                document.getElementById('input-participacion').checked = !!cadena.participation;
+                abrirModal('Editar cadena');
+            } catch {
+                showToast('Error al cargar la cadena.', 'error');
+            }
+        }
+
+        document.getElementById('btn-nueva').addEventListener('click', abrirCrear);
+        document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
+        document.getElementById('modal-backdrop').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-backdrop')) cerrarModal();
+        });
+
+        // ── Guardar ───────────────────────────────────────────────────────────
+        document.getElementById('btn-guardar').addEventListener('click', async () => {
+            const nombre        = document.getElementById('input-nombre').value.trim();
+            const codigo        = document.getElementById('input-codigo').value.trim();
+            const participacion = document.getElementById('input-participacion').checked;
+            const errorEl       = document.getElementById('modal-error');
+
+            // Validación cliente
+            if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
+            if (!codigo) { errorEl.textContent = 'El código es obligatorio.'; return; }
+            if (!/^[A-Za-z0-9_\-]+$/.test(codigo)) {
+                errorEl.textContent = 'El código solo puede contener letras, números, guiones y guiones bajos.';
+                return;
+            }
+            if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
+            if (codigo.length > 50)  { errorEl.textContent = 'El código no puede superar 50 caracteres.'; return; }
+
+            const body   = JSON.stringify({ name: nombre, code: codigo, participation: participacion });
+            const url    = editandoId ? `${BACKEND}/api/chains/${editandoId}` : `${BACKEND}/api/chains`;
+            const method = editandoId ? 'PUT' : 'POST';
+
+            try {
+                const res  = await fetch(url, { method, headers: authHeaders(), body });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errorEl.textContent = data.message || 'Error al guardar.';
+                    return;
+                }
+
+                cerrarModal();
+                showToast(editandoId ? 'Cadena actualizada correctamente.' : 'Cadena creada correctamente.');
+                cargarCadenas();
+            } catch {
+                errorEl.textContent = 'Error de conexión con el servidor.';
+            }
+        });
+
+        // ── Eliminar ──────────────────────────────────────────────────────────
+        async function eliminarCadena(id, nombre) {
+            if (!confirm(`¿Eliminar la cadena "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
+            try {
+                const res = await fetch(`${BACKEND}/api/chains/${id}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                if (!res.ok) {
+                    const data = await res.json();
+                    showToast(data.message || 'Error al eliminar.', 'error');
+                    return;
+                }
+                showToast('Cadena eliminada.');
+                cargarCadenas();
+            } catch {
+                showToast('Error de conexión con el servidor.', 'error');
+            }
+        }
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        cargarCadenas();
+    </script>
+</body>
+</html>

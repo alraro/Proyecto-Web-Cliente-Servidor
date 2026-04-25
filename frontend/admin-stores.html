@@ -9,12 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <style>
-        .filters-bar { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+        .filters-bar { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid var(--border); }
         .filters-bar select { flex:1 1 160px; padding:.45rem .75rem; border-radius:8px;
-            border:1.5px solid #d1d5db; font-family:inherit; font-size:.88rem; }
+            border:1.5px solid #d1d5db; font-family:inherit; font-size:.88rem; background:#fff; color:var(--ink); }
         .filters-bar button { padding:.45rem 1rem; border-radius:8px; border:none;
-            background:#2d65a0; color:#fff; font-weight:700; cursor:pointer; font-size:.88rem; }
+            background:var(--blue-700); color:#fff; font-weight:700; cursor:pointer; font-size:.88rem; }
         .filters-bar button.btn-clear { background:#e5e7eb; color:#374151; }
+        .filters-bar button.btn-clear:hover { background:#d1d5db; }
     </style>
 </head>
 <body>
@@ -34,7 +35,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:#2d65a0;text-decoration:none;margin-bottom:1rem;">← Volver al menú</a>
+            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
             <h1>Tiendas</h1>
             <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
         </div>
@@ -47,10 +48,17 @@
                 </div>
             </div>
 
-            <div class="filters-bar" id="filters-bar">
-                <select id="filter-chain"><option value="">Todas las cadenas</option></select>
-                <select id="filter-locality"><option value="">Todas las localidades</option></select>
-                <select id="filter-zone"><option value="">Todas las zonas</option></select>
+            <!-- FILTROS -->
+            <div class="filters-bar">
+                <select id="filter-zone">
+                    <option value="">Todas las zonas</option>
+                </select>
+                <select id="filter-locality">
+                    <option value="">Todas las localidades</option>
+                </select>
+                <select id="filter-chain">
+                    <option value="">Todas las cadenas</option>
+                </select>
                 <button id="btn-apply-filters">Filtrar</button>
                 <button class="btn-clear" id="btn-clear-filters">Limpiar</button>
             </div>
@@ -77,12 +85,13 @@
         </div>
     </main>
 
+    <!-- MODAL CREAR / EDITAR -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="max-width:520px;">
             <h3 id="modal-title">Nueva tienda</h3>
 
             <div class="form-group">
-                <label for="input-nombre">Nombre <span style="color:red">*</span></label>
+                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
                 <input type="text" id="input-nombre" placeholder="Nombre de la tienda" maxlength="255">
             </div>
             <div class="form-group">
@@ -91,7 +100,7 @@
             </div>
             <div class="form-group">
                 <label for="input-cp">Código postal</label>
-                <input type="text" id="input-cp" placeholder="Ej: 28001" maxlength="5" pattern="[0-9]{5}">
+                <input type="text" id="input-cp" placeholder="Ej: 28001" maxlength="5">
             </div>
             <div class="form-group">
                 <label for="input-chain">Cadena</label>
@@ -113,15 +122,12 @@
     <script>
         const BACKEND = 'http://localhost:8080';
 
-        function getToken() { return localStorage.getItem('token'); }
-        function getUser()  { return localStorage.getItem('nombre') || 'Administrador'; }
-        function authHeaders() {
-            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
-        }
-        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+        function getToken()    { return localStorage.getItem('token'); }
+        function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+        function logout()      { localStorage.clear(); window.location.href = 'login.html'; }
 
         if (!getToken()) { window.location.href = 'login.html'; }
-        document.getElementById('user-name').textContent = getUser();
+        document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
         document.getElementById('btn-logout').addEventListener('click', logout);
 
         function showToast(msg, type = 'success') {
@@ -133,60 +139,108 @@
             setTimeout(() => t.remove(), 3500);
         }
 
+        function escHtml(v) {
+            return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
+
+        // ── Datos auxiliares ──────────────────────────────────────────────────
+        let allChains     = [];
+        let allLocalities = [];   // { id, name, zoneId }
+        let allZones      = [];   // { id, name }
+
+        async function loadAuxData() {
+            try {
+                const [resChains, resLoc, resZones] = await Promise.all([
+                    fetch(BACKEND + '/api/chains',     { headers: authHeaders() }),
+                    fetch(BACKEND + '/api/localities', { headers: authHeaders() }),
+                    fetch(BACKEND + '/api/zones',      { headers: authHeaders() })
+                ]);
+
+                if (resChains.ok)  allChains     = await resChains.json();
+                if (resLoc.ok)     allLocalities = await resLoc.json();
+                if (resZones.ok)   allZones      = await resZones.json();
+
+            } catch { /* si falla, los selects quedan vacíos pero no rompe nada */ }
+
+            // Poblar select de zonas (filtro)
+            const fz = document.getElementById('filter-zone');
+            allZones.forEach(z => {
+                const o = document.createElement('option');
+                o.value = z.id; o.textContent = z.name;
+                fz.appendChild(o);
+            });
+
+            // Poblar select de localidades (filtro) — todas al inicio
+            poblarLocalidades('');
+
+            // Poblar select de cadenas (filtro y modal)
+            const fc  = document.getElementById('filter-chain');
+            const fch = document.getElementById('input-chain');
+            allChains.forEach(c => {
+                [fc, fch].forEach(sel => {
+                    const o = document.createElement('option');
+                    o.value = c.id; o.textContent = c.name;
+                    sel.appendChild(o);
+                });
+            });
+        }
+
+        // Cuando cambia la zona en el filtro, actualizar localidades
+        document.getElementById('filter-zone').addEventListener('change', function () {
+            document.getElementById('filter-locality').value = '';
+            poblarLocalidades(this.value);
+        });
+
+        function poblarLocalidades(zoneId) {
+            const sel = document.getElementById('filter-locality');
+            // Guardar valor actual para restaurarlo si sigue siendo válido
+            const valorActual = sel.value;
+            sel.innerHTML = '<option value="">Todas las localidades</option>';
+
+            const lista = zoneId
+                ? allLocalities.filter(l => String(l.zoneId) === String(zoneId))
+                : allLocalities;
+
+            lista.forEach(l => {
+                const o = document.createElement('option');
+                o.value = l.id; o.textContent = l.name;
+                sel.appendChild(o);
+            });
+
+            // Restaurar selección si sigue existiendo
+            if (valorActual && lista.some(l => String(l.id) === String(valorActual))) {
+                sel.value = valorActual;
+            }
+        }
+
+        // ── Tabla ─────────────────────────────────────────────────────────────
         function renderTable(stores) {
             const tbody = document.getElementById('stores-tbody');
             if (!stores.length) {
-                tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas registradas.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td></tr>';
                 return;
             }
             tbody.innerHTML = stores.map(s => `
                 <tr>
                     <td>${s.id}</td>
-                    <td><strong>${esc(s.name)}</strong></td>
-                    <td>${esc(s.address || '—')}</td>
-                    <td>${esc(s.locality || '—')}</td>
-                    <td>${esc(s.postalCode || '—')}</td>
-                    <td>${esc(s.zone || '—')}</td>
-                    <td>${esc(s.chainName || '—')}</td>
+                    <td><strong>${escHtml(s.name)}</strong></td>
+                    <td>${escHtml(s.address || '—')}</td>
+                    <td>${escHtml(s.locality || '—')}</td>
+                    <td>${escHtml(s.postalCode || '—')}</td>
+                    <td>${escHtml(s.zone || '—')}</td>
+                    <td>${escHtml(s.chainName || '—')}</td>
                     <td>
                         <div class="td-actions">
                             <button class="btn btn-edit btn-sm" onclick="openEdit(${s.id})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteStore(${s.id}, '${esc(s.name)}')">Eliminar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteStore(${s.id}, '${escAttr(s.name)}')">Eliminar</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
-        function esc(v) { return String(v ?? '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-        // Cargar datos auxiliares
-        let allChains    = [];
-        let allLocalities = [];
-        let allZones     = [];
-
-        async function loadAuxData() {
-            try {
-                const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
-                if (res.ok) {
-                    allChains = await res.json();
-                    // Poblar select cadenas del modal
-                    const sel = document.getElementById('input-chain');
-                    allChains.forEach(c => {
-                        const o = document.createElement('option');
-                        o.value = c.id; o.textContent = c.name;
-                        sel.appendChild(o);
-                    });
-                    // Poblar filtro cadenas
-                    const fc = document.getElementById('filter-chain');
-                    allChains.forEach(c => {
-                        const o = document.createElement('option');
-                        o.value = c.id; o.textContent = c.name;
-                        fc.appendChild(o);
-                    });
-                }
-            } catch {}
-        }
-
+        // ── Cargar tiendas ────────────────────────────────────────────────────
         async function loadStores() {
             const chainId    = document.getElementById('filter-chain').value;
             const localityId = document.getElementById('filter-locality').value;
@@ -200,41 +254,51 @@
             const url = BACKEND + '/api/stores' + (params.toString() ? '?' + params : '');
             try {
                 const res = await fetch(url, { headers: authHeaders() });
-                if (res.status === 403) { logout(); return; }
+                if (res.status === 401 || res.status === 403) { logout(); return; }
                 const data = await res.json();
                 renderTable(data);
             } catch {
                 document.getElementById('stores-tbody').innerHTML =
-                    '<tr><td colspan="8" class="table-empty">Error al conectar con el servidor.</td></tr>';
+                    '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
             }
         }
 
         document.getElementById('btn-apply-filters').addEventListener('click', loadStores);
         document.getElementById('btn-clear-filters').addEventListener('click', () => {
-            document.getElementById('filter-chain').value    = '';
+            document.getElementById('filter-zone').value     = '';
             document.getElementById('filter-locality').value = '';
-            document.getElementById('filter-zone').value    = '';
+            document.getElementById('filter-chain').value    = '';
+            poblarLocalidades('');
             loadStores();
         });
 
+        // ── Modal ─────────────────────────────────────────────────────────────
         let editingId = null;
 
-        function openModal(title) {
-            document.getElementById('modal-title').textContent = title;
+        function openModal(titulo) {
+            document.getElementById('modal-title').textContent = titulo;
             document.getElementById('modal-error').textContent = '';
             document.getElementById('modal-backdrop').classList.add('open');
+            document.getElementById('input-nombre').focus();
         }
         function closeModal() {
             document.getElementById('modal-backdrop').classList.remove('open');
-            document.getElementById('input-nombre').value = '';
+            document.getElementById('input-nombre').value    = '';
             document.getElementById('input-domicilio').value = '';
-            document.getElementById('input-cp').value = '';
-            document.getElementById('input-chain').value = '';
+            document.getElementById('input-cp').value        = '';
+            document.getElementById('input-chain').value     = '';
             document.getElementById('modal-error').textContent = '';
             editingId = null;
         }
 
-        function openCreate() { editingId = null; openModal('Nueva tienda'); }
+        document.getElementById('btn-nueva-tienda').addEventListener('click', () => {
+            editingId = null;
+            openModal('Nueva tienda');
+        });
+        document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
+        document.getElementById('modal-backdrop').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-backdrop')) closeModal();
+        });
 
         async function openEdit(id) {
             try {
@@ -242,20 +306,15 @@
                 if (!res.ok) { showToast('Error al cargar la tienda.', 'error'); return; }
                 const s = await res.json();
                 editingId = s.id;
-                document.getElementById('input-nombre').value   = s.name    || '';
-                document.getElementById('input-domicilio').value = s.address || '';
-                document.getElementById('input-cp').value       = s.postalCode || '';
-                document.getElementById('input-chain').value    = s.chainId  || '';
+                document.getElementById('input-nombre').value    = s.name       || '';
+                document.getElementById('input-domicilio').value = s.address    || '';
+                document.getElementById('input-cp').value        = s.postalCode || '';
+                document.getElementById('input-chain').value     = s.chainId    || '';
                 openModal('Editar tienda');
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        document.getElementById('btn-nueva-tienda').addEventListener('click', openCreate);
-        document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
-        document.getElementById('modal-backdrop').addEventListener('click', e => {
-            if (e.target === document.getElementById('modal-backdrop')) closeModal();
-        });
-
+        // ── Guardar ───────────────────────────────────────────────────────────
         document.getElementById('btn-modal-save').addEventListener('click', async () => {
             const nombre    = document.getElementById('input-nombre').value.trim();
             const domicilio = document.getElementById('input-domicilio').value.trim();
@@ -267,12 +326,7 @@
             if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
             if (cp && !/^\d{5}$/.test(cp)) { errorEl.textContent = 'El código postal debe tener exactamente 5 dígitos.'; return; }
 
-            const body = JSON.stringify({
-                name: nombre,
-                address: domicilio || null,
-                postalCode: cp || null,
-                chainId: chainId ? parseInt(chainId) : null
-            });
+            const body   = JSON.stringify({ name: nombre, address: domicilio || null, postalCode: cp || null, chainId: chainId ? parseInt(chainId) : null });
             const url    = editingId ? `${BACKEND}/api/stores/${editingId}` : `${BACKEND}/api/stores`;
             const method = editingId ? 'PUT' : 'POST';
 
@@ -286,20 +340,19 @@
             } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
         });
 
+        // ── Eliminar ──────────────────────────────────────────────────────────
         async function deleteStore(id, nombre) {
-            if (!confirm(`¿Eliminar la tienda "${nombre}"? Esta acción no se puede deshacer.`)) return;
+            if (!confirm(`¿Eliminar la tienda "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
             try {
-                const res = await fetch(`${BACKEND}/api/stores/${id}`, {
-                    method: 'DELETE', headers: authHeaders()
-                });
+                const res = await fetch(`${BACKEND}/api/stores/${id}`, { method: 'DELETE', headers: authHeaders() });
                 if (!res.ok) { const d = await res.json(); showToast(d.message || 'Error al eliminar.', 'error'); return; }
                 showToast('Tienda eliminada.');
                 loadStores();
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        loadAuxData();
-        loadStores();
+        // ── Init ──────────────────────────────────────────────────────────────
+        loadAuxData().then(() => loadStores());
     </script>
 </body>
 </html>
