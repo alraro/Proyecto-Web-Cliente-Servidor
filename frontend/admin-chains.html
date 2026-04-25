@@ -7,11 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/administrador.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
-    <!-- TOPBAR -->
     <header class="topbar">
         <a class="brand" href="index.html">
             <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
@@ -25,7 +24,6 @@
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main class="page-wrapper">
         <div class="page-header">
             <a href="administrador.html" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.88rem;font-weight:700;color:#2d65a0;text-decoration:none;margin-bottom:1rem;">← Volver al menú</a>
@@ -59,7 +57,6 @@
         </div>
     </main>
 
-    <!-- MODAL CREAR / EDITAR -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <h3 id="modal-title">Nueva cadena</h3>
@@ -83,13 +80,11 @@
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
 
     <script>
         const BACKEND = 'http://localhost:8080';
 
-        // ── Auth ──────────────────────────────────────────────────────────────
         function getToken() { return localStorage.getItem('token'); }
         function getUser()  { return localStorage.getItem('nombre') || 'Administrador'; }
 
@@ -105,13 +100,11 @@
             window.location.href = 'login.html';
         }
 
-        // Si no hay token, redirigir al login
         if (!getToken()) { window.location.href = 'login.html'; }
 
         document.getElementById('user-name').textContent = getUser();
         document.getElementById('btn-logout').addEventListener('click', logout);
 
-        // ── Toast ─────────────────────────────────────────────────────────────
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -121,7 +114,6 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        // ── Render tabla ──────────────────────────────────────────────────────
         function renderTable(chains) {
             const tbody = document.getElementById('chains-tbody');
             if (!chains.length) {
@@ -152,7 +144,6 @@
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
 
-        // ── Cargar cadenas ────────────────────────────────────────────────────
         async function loadChains() {
             try {
                 const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
@@ -165,7 +156,6 @@
             }
         }
 
-        // ── Modal ─────────────────────────────────────────────────────────────
         let editingId = null;
 
         function openModal(title) {
@@ -202,7 +192,6 @@
             if (e.target === document.getElementById('modal-backdrop')) closeModal();
         });
 
-        // ── Guardar (crear o editar) ───────────────────────────────────────────
         document.getElementById('btn-modal-save').addEventListener('click', async () => {
             const nombre = document.getElementById('input-nombre').value.trim();
             const codigo = document.getElementById('input-codigo').value.trim();
@@ -235,7 +224,6 @@
             }
         });
 
-        // ── Eliminar ──────────────────────────────────────────────────────────
         async function deleteCadena(id, nombre) {
             if (!confirm(`¿Eliminar la cadena "${nombre}"? Esta acción no se puede deshacer.`)) return;
 
@@ -258,7 +246,6 @@
             }
         }
 
-        // ── Init ──────────────────────────────────────────────────────────────
         loadChains();
     </script>
 </body>
