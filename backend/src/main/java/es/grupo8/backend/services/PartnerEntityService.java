@@ -2,6 +2,7 @@ package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.entity.PartnerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,5 +125,40 @@ public class PartnerEntityService {
                 entity.getAddress(),
                 entity.getPhone()
         );
+    }
+
+    public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
+        PartnerEntity entity = partnerEntityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+        return toDto(entity);
+    }
+
+    public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) {
+        PartnerEntity entity = new PartnerEntity();
+        entity.setName(request.getName());
+        entity.setAddress(request.getAddress());
+        entity.setPhone(request.getPhone());
+
+        PartnerEntity savedEntity = partnerEntityRepository.save(entity);
+        return toDto(savedEntity);
+    }
+
+    public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) {
+        PartnerEntity entity = partnerEntityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+
+        entity.setName(request.getName());
+        entity.setAddress(request.getAddress());
+        entity.setPhone(request.getPhone());
+
+        PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
+        return toDto(updatedEntity);
+    }
+
+    public void deletePartnerEntity(Integer id) {
+        if (!partnerEntityRepository.existsById(id)) {
+            throw new RuntimeException("Partner entity not found with ID: " + id);
+        }
+        partnerEntityRepository.deleteById(id);
     }
 }
