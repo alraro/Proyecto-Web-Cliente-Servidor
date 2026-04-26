@@ -60,7 +60,7 @@ public class CampaignAssignmentController {
 	private CaptainRepository captainRepository;
 
 	@GetMapping
-	public ResponseEntity<?> listCampaigns(
+	public ResponseEntity<?> getCampaigns(
 			@RequestHeader(value = "Authorization", required = false) String authHeader) {
 
 		// RF-14 requires explicit admin verification at the start of every endpoint.

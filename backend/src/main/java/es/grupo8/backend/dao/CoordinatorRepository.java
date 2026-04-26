@@ -11,11 +11,21 @@ import es.grupo8.backend.entity.CoordinatorId;
 
 public interface CoordinatorRepository extends JpaRepository<Coordinator, CoordinatorId> {
 
-	List<Coordinator> findByIdIdCampaign(Integer idCampaign);
+    // Validar si el usuario es coordinador de alguna campaña
+    boolean existsByIdUser_IdUser(Integer userId);
 
-	boolean existsByIdIdUserAndIdIdCampaign(Integer idUser, Integer idCampaign);
+    // Comprobar si es coordinador de una campaña concreta
+    boolean existsByIdUser_IdUserAndIdCampaign_Id(Integer userId, Integer campaignId);
 
-	@Transactional
-	@Modifying
-	void deleteByIdIdUserAndIdIdCampaign(Integer idUser, Integer idCampaign);
+    // Find all coordinators for a specific campaign
+    List<Coordinator> findByIdIdCampaign(Integer campaignId);
+
+    // Check if a user is assigned as coordinator for a specific campaign
+    boolean existsByIdIdUserAndIdIdCampaign(Integer userId, Integer campaignId);
+
+    // Delete coordinator assignment for a user in a specific campaign
+    @Transactional
+    @Modifying
+    void deleteByIdIdUserAndIdIdCampaign(Integer userId, Integer campaignId);
+
 }

@@ -97,11 +97,11 @@ class CampaignAssignmentControllerTest {
      * Verifies that listing campaigns is forbidden when the authenticated user is not an administrator.
      */
     @Test
-    void listCampaigns_whenNotAdmin_returns403() {
+    void getCampaigns_whenNotAdmin_returns403() {
         // Simulate a non-admin caller.
         when(adminGuard.isAdmin(AUTH_HEADER)).thenReturn(false);
 
-        ResponseEntity<?> response = controller.listCampaigns(AUTH_HEADER);
+        ResponseEntity<?> response = controller.getCampaigns(AUTH_HEADER);
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
