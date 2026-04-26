@@ -28,4 +28,9 @@ public interface CoordinatorRepository extends JpaRepository<Coordinator, Coordi
     @Modifying
     void deleteByIdIdUserAndIdIdCampaign(Integer userId, Integer campaignId);
 
+    // Delete all coordinator assignments for a specific campaign
+    @Transactional
+    @Modifying
+    void deleteAllByIdIdCampaign(Integer idCampaign);
+
 }

@@ -18,4 +18,8 @@ public interface CaptainRepository extends JpaRepository<Captain, CaptainId> {
 	@Transactional
 	@Modifying
 	void deleteByIdIdUserAndIdIdCampaign(Integer idUser, Integer idCampaign);
+
+	@Transactional
+	@Modifying
+	void deleteAllByIdIdCampaign(Integer idCampaign);
 }
