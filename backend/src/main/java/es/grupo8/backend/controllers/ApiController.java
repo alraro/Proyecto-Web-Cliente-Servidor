@@ -20,7 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -118,6 +120,11 @@ public class ApiController {
 		}
 
 		String role = resolveRole(user.getIdUser());
+		if ("PENDIENTE".equals(role)) {
+			model.addAttribute("loginError", "No tiene rol asignado.");
+			return "login";
+		}
+
 		return "redirect:" + buildFrontendUrl(roleToPath(role));
 	}
 
@@ -243,6 +250,11 @@ public class ApiController {
 		String token = generateToken(user.getIdUser(), user.getEmail(), user.getName());
 		String role = resolveRole(user.getIdUser());
 
+		if ("PENDIENTE".equals(role)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("message", "No tiene rol asignado."));
+		}
+
 		return ResponseEntity.ok(Map.of(
 				"userId", user.getIdUser(),
 				"nombre", user.getName(),
@@ -327,6 +339,112 @@ public class ApiController {
 				"token", token,
 				"tokenType", "Bearer",
 				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
+		));
+	}
+
+	// Endpoint para obtener el perfil del usuario
+	@GetMapping("/api/auth/profile")
+	@ResponseBody
+	public ResponseEntity<?> getOwnProfile(
+			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+		// Obtenemos el ID del usuario
+		Integer userId = extractUserIdFromAuthHeader(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "Token invalido o ausente"));
+		}
+
+		// Obtenemos el usuario de la base de datos
+		UserEntity user = userRepository.findById(userId).orElse(null);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("message", "Usuario no encontrado"));
+		}
+
+		String role = resolveRole(userId);
+
+		return ResponseEntity.ok(Map.of(
+				"userId", user.getIdUser(),
+				"nombre", user.getName(),
+				"email", user.getEmail(),
+				"telefono", user.getPhone() == null ? "" : user.getPhone(),
+				"domicilio", user.getAddress() == null ? "" : user.getAddress(),
+				"cp", user.getPostalCode() == null ? "" : user.getPostalCode(),
+				"role", role,
+				"redirectUrl", buildFrontendUrl(roleToPath(role))
+		));
+	}
+
+	// Endpoint para actualizar el perfil del usuario
+	@PutMapping("/api/auth/profile")
+	@ResponseBody
+	public ResponseEntity<?> updateOwnProfile(
+			@RequestHeader(value = "Authorization", required = false) String authHeader,
+			@RequestBody Map<String, String> request) {
+
+		Integer userId = extractUserIdFromAuthHeader(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "Token invalido o ausente"));
+		}
+
+		UserEntity user = userRepository.findById(userId).orElse(null);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("message", "Usuario no encontrado"));
+		}
+
+		String email = normalizeEmail(request == null ? null : request.get("email"));
+		String telefono = trimToNull(request == null ? null : request.get("telefono"));
+		String domicilio = trimToNull(request == null ? null : request.get("domicilio"));
+		String cp = trimToNull(request == null ? null : request.get("cp"));
+
+		if (email == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El email es obligatorio"));
+		}
+
+		if (!isValidEmail(email)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El email no tiene un formato valido"));
+		}
+
+		if (telefono != null && !isValidPhone(telefono)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El telefono no tiene un formato valido"));
+		}
+
+		if (cp != null && !isValidPostalCode(cp)) {
+			return ResponseEntity.badRequest().body(Map.of("message", "El codigo postal no es valido"));
+		}
+
+		if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmail(email)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(Map.of("message", "Ya existe un usuario con ese email"));
+		}
+
+		user.setEmail(email);
+		user.setPhone(telefono);
+		user.setAddress(domicilio);
+		user.setPostalCode(cp);
+
+		UserEntity updated;
+		try {
+			updated = userRepository.save(user);
+		} catch (DataIntegrityViolationException ex) {
+			return ResponseEntity.badRequest().body(Map.of("message", "No se pudo actualizar el perfil"));
+		}
+
+		String role = resolveRole(userId);
+
+		return ResponseEntity.ok(Map.of(
+				"userId", updated.getIdUser(),
+				"nombre", updated.getName(),
+				"email", updated.getEmail(),
+				"telefono", updated.getPhone() == null ? "" : updated.getPhone(),
+				"domicilio", updated.getAddress() == null ? "" : updated.getAddress(),
+				"cp", updated.getPostalCode() == null ? "" : updated.getPostalCode(),
+				"role", role,
+				"redirectUrl", buildFrontendUrl(roleToPath(role)),
+				"message", "Perfil actualizado correctamente"
 		));
 	}
 
@@ -434,6 +552,24 @@ public class ApiController {
 		}
 	}
 
+	private Integer extractUserIdFromAuthHeader(String authHeader) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return null;
+		}
+
+		try {
+			String subject = Jwts.parser()
+					.verifyWith(signingKey)
+					.build()
+					.parseSignedClaims(authHeader.substring(7).trim())
+					.getPayload()
+					.getSubject();
+			return subject == null ? null : Integer.valueOf(subject);
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
 	private String resolveRole(Integer userId) {
 		if (userRepository.isAdmin(userId)) {
 			return "ADMINISTRADOR";
@@ -456,19 +592,19 @@ public class ApiController {
 
 	private static String roleToPath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
-			return "/administrador.html";
+			return "/admin.html";
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinador.html";
+			return "/coordinator.html";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/capitan.html";
+			return "/captain.html";
 		}
 
 		if ("COLABORADOR".equals(role)) {
-			return "/colaborador.html";
+			return "/collaborator.html";
 		}
 
 		return "/login.html";
