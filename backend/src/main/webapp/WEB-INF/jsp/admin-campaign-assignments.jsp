@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bancosol | Campaign Assignments</title>
+    <title>Bancosol | Asignación a Campañas</title>
     <link rel="stylesheet" href="/css/administrador.css">
 </head>
 <body>
@@ -22,17 +22,14 @@
 <main class="admin-page" aria-label="Campaign assignments page">
     <section class="page-header">
         <a href="/admin" class="back-link">&larr; Back to menu</a>
-        <h1>Campaign Assignments</h1>
-        <p>Assign coordinators and captains to each campaign.</p>
+        <h1>Asignación a Campañas</h1>
+        <p>Asigna coordinadores y capitanes a cada campaña de recogida.</p>
     </section>
 
     <section class="card campaign-selector" aria-label="Campaign selector">
-        <label for="campaign-select">Campaign</label>
-        <div class="row-inline">
-            <select id="campaign-select">
-                <option value="">Select a campaign...</option>
-            </select>
-            <button type="button" id="btn-load">Load assignments</button>
+        <label for="campaign-select">Campaña</label>
+        <option value="">Selecciona una campaña...</option>
+        <button type="button" id="btn-load">Cargar asignaciones</button>
         </div>
     </section>
 
