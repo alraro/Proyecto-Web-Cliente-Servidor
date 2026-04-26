@@ -62,6 +62,15 @@ public class AdminController {
     }
 
     /**
+     * Serves the campaign management JSP (RF-10/RF-11).
+     * Linked from: frontend/admin.html → "Campañas" menu card.
+     */
+    @GetMapping("/admin-campaigns")
+    public String adminCampaigns() {
+        return "admin-campaigns";
+    }
+
+    /**
      * Handles the "Back to menu" link inside admin JSP views.
      *
      * The JSPs live at localhost:8080 but the admin panel lives at localhost:80.
