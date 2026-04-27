@@ -40,9 +40,10 @@ public class PartnerEntityController {
 			@RequestParam(required = false) String sort,
 			@RequestParam(required = false) String search) {
 
+		System.out.println("Received request GET for partner entities with params - page: " + page + ", size: " + size + ", sort: " + sort + ", search: " + search);
 		PaginatedResponse<PartnerEntityResponseDto> response =
 				partnerEntityService.getAllPartnerEntities(page, size, sort, search);
-
+		System.out.println("Returning response successfully (200 OK) for partner entities list");
 		return ResponseEntity.ok(response);
 	}
 
@@ -79,7 +80,12 @@ public class PartnerEntityController {
 	public ResponseEntity<Void> deletePartnerEntity(
 		@PathVariable Integer id) {
 		System.out.println("Received request DELETE to remove partner entity with ID: " + id);
-		partnerEntityService.deletePartnerEntity(id);
+		try {
+			partnerEntityService.deletePartnerEntity(id);
+		} catch (RuntimeException e) {
+			System.out.println("Error deleting partner entity with ID: " + id + " - " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 		System.out.println("Partner entity deleted successfully with ID: " + id);
 		return ResponseEntity.noContent().build();
 	}

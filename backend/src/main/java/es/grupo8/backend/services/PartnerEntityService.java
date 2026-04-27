@@ -127,23 +127,27 @@ public class PartnerEntityService {
         );
     }
 
-    public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
+    public PartnerEntityResponseDto getPartnerEntityById(Integer id) throws RuntimeException {
         PartnerEntity entity = partnerEntityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
         return toDto(entity);
     }
 
-    public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) {
+    public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) throws RuntimeException {
         PartnerEntity entity = new PartnerEntity();
         entity.setName(request.getName());
         entity.setAddress(request.getAddress());
         entity.setPhone(request.getPhone());
 
-        PartnerEntity savedEntity = partnerEntityRepository.save(entity);
-        return toDto(savedEntity);
+        try {
+            PartnerEntity savedEntity = partnerEntityRepository.save(entity);
+            return toDto(savedEntity);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid data provided for creating partner entity, entity is Null: " + e.getMessage());
+        }
     }
 
-    public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) {
+    public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) throws RuntimeException {
         PartnerEntity entity = partnerEntityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
 
@@ -151,11 +155,15 @@ public class PartnerEntityService {
         entity.setAddress(request.getAddress());
         entity.setPhone(request.getPhone());
 
-        PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
-        return toDto(updatedEntity);
+        try {
+            PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
+            return toDto(updatedEntity);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid data provided for updating partner entity, entity is Null: " + e.getMessage());
+        }
     }
 
-    public void deletePartnerEntity(Integer id) {
+    public void deletePartnerEntity(Integer id) throws RuntimeException {
         if (!partnerEntityRepository.existsById(id)) {
             throw new RuntimeException("Partner entity not found with ID: " + id);
         }
