@@ -170,7 +170,7 @@
             });
 
             // Poblar select de localidades (filtro) — todas al inicio
-            poblarLocalidades('');
+            populateLocalities('');
 
             // Poblar select de cadenas (filtro y modal)
             const fc  = document.getElementById('filter-chain');
@@ -187,10 +187,10 @@
         // Cuando cambia la zona en el filtro, actualizar localidades
         document.getElementById('filter-zone').addEventListener('change', function () {
             document.getElementById('filter-locality').value = '';
-            poblarLocalidades(this.value);
+            populateLocalities(this.value);
         });
 
-        function poblarLocalidades(zoneId) {
+        function populateLocalities(zoneId) {
             const sel = document.getElementById('filter-locality');
             // Guardar valor actual para restaurarlo si sigue siendo válido
             const valorActual = sel.value;
@@ -264,7 +264,7 @@
             document.getElementById('filter-zone').value     = '';
             document.getElementById('filter-locality').value = '';
             document.getElementById('filter-chain').value    = '';
-            poblarLocalidades('');
+            populateLocalities('');
             loadStores();
         });
 

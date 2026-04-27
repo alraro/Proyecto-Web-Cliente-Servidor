@@ -4,7 +4,7 @@ const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
-function mostrarErrorDesdeUrl() {
+function showErrorFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
     if (!error) return;
@@ -13,7 +13,7 @@ function mostrarErrorDesdeUrl() {
     message.classList.add('is-error');
 }
 
-mostrarErrorDesdeUrl();
+showErrorFromUrl();
 
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
