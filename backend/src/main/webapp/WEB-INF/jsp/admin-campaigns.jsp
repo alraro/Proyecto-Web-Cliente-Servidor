@@ -232,13 +232,13 @@
         // NEW
         async function loadStoreFilters() {
             const [chains, zones, localities] = await Promise.all([
-                fetchJson("/api/chains", authOpts),
-                fetchJson("/api/zones", authOpts),
-                fetchJson("/api/localities", authOpts)
+                fetchArray("/api/chains", authOpts),
+                fetchArray("/api/zones", authOpts),
+                fetchArray("/api/localities", authOpts)
             ]);
 
             storeFilterChain.innerHTML = '<option value="">Todas las cadenas</option>';
-            (chains || []).forEach((chain) => {
+            chains.forEach((chain) => {
                 const option = document.createElement("option");
                 option.value = String(chain.id);
                 option.textContent = chain.name || "Sin nombre";
@@ -246,7 +246,7 @@
             });
 
             storeFilterZone.innerHTML = '<option value="">Todas las zonas</option>';
-            (zones || []).forEach((zone) => {
+            zones.forEach((zone) => {
                 const option = document.createElement("option");
                 option.value = String(zone.id);
                 option.textContent = zone.name || "Sin nombre";
@@ -254,7 +254,7 @@
             });
 
             storeFilterLocality.innerHTML = '<option value="">Todas las localidades</option>';
-            (localities || []).forEach((locality) => {
+            localities.forEach((locality) => {
                 const option = document.createElement("option");
                 option.value = String(locality.id);
                 option.textContent = locality.name || "Sin nombre";
@@ -274,7 +274,7 @@
             if (localityId) params.append("localityId", localityId);
 
             const url = params.toString() ? `/api/stores?${params.toString()}` : "/api/stores";
-            allFilteredStores = await fetchJson(url, authOpts);
+            allFilteredStores = await fetchArray(url, authOpts);
             renderAvailableList();
         }
 
@@ -382,10 +382,10 @@
             typeSelect.value = "";
             startInput.value = "";
             endInput.value = "";
+            showModal();
             selectedStores = new Map();
             await loadAvailableStores();
             renderSelectedList();
-            showModal();
         }
 
         // MODIFIED
@@ -404,16 +404,40 @@
                 startInput.value = campaign.startDate || "";
                 endInput.value = campaign.endDate || "";
 
+                showModal();
+
                 selectedStores = new Map();
-                const storeData = await fetchJson("/api/campaigns/" + campaignId + "/stores", authOpts);
-                if (storeData && storeData.stores) {
-                    storeData.stores.forEach(s => selectedStores.set(Number(s.id), s));
+                try {
+                    const storeData = await fetchJson("/api/campaigns/" + campaignId + "/stores", authOpts);
+                    if (storeData && storeData.stores) {
+                        storeData.stores.forEach(s => selectedStores.set(Number(s.id), s));
+                    }
+                } catch (storeError) {
+                    console.error("Error loading campaign stores", storeError);
                 }
                 await loadAvailableStores();
                 renderSelectedList();
-                showModal();
             } catch (error) {
                 showMessage(error.message || "No se pudieron cargar los datos de la campaña.", true);
+            }
+        }
+
+        async function fetchArray(url, options) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    return [];
+                }
+                const data = await response.json().catch(() => []);
+                if (Array.isArray(data)) {
+                    return data;
+                }
+                if (data && Array.isArray(data.value)) {
+                    return data.value;
+                }
+                return [];
+            } catch (error) {
+                return [];
             }
         }
 
