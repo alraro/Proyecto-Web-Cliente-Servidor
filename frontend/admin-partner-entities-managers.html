@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Responsables de Entidad Colaboradora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-partner-entities-managers.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Administrador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" class="back-link">← Volver al panel</a>
+            <h1>Responsables de Entidad Colaboradora</h1>
+            <p>Gestiona los usuarios con rol de responsable de entidad colaboradora y actualiza sus datos.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Listado de responsables</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary" id="btn-convertir">+ Convertir usuario</button>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" id="filter-search" placeholder="Buscar por nombre, email, teléfono..." class="filter-search">
+                <select id="filter-sort-by">
+                    <option value="id">Ordenar por ID</option>
+                    <option value="name">Ordenar por Nombre</option>
+                    <option value="email">Ordenar por Email</option>
+                </select>
+                <select id="filter-sort-order">
+                    <option value="asc">Ascendente</option>
+                    <option value="desc">Descendente</option>
+                </select>
+                <button id="btn-apply-filters">Filtrar</button>
+                <button class="btn-clear" id="btn-clear-filters">Limpiar</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Usuario</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Entidad Socia</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="managers-tbody">
+                        <tr><td colspan="6" class="table-empty">Cargando responsables...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="btn-prev-page" onclick="previousPage()">← Anterior</button>
+                <span class="pagination-info">
+                    Página <span id="current-page">1</span> de <span id="total-pages">1</span>
+                </span>
+                <button id="btn-next-page" onclick="nextPage()">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select" onchange="changePageSize()">
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="convert-modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="convert-modal-title">
+            <h3 id="convert-modal-title">Convertir usuario a responsable</h3>
+
+            <div class="form-group">
+                <label for="input-convert-user-id">ID de usuario <span class="required">*</span></label>
+                <input type="number" id="input-convert-user-id" placeholder="Ej: 16" min="1">
+            </div>
+
+            <div class="form-group">
+                <label for="input-convert-partner-entity-id">ID de entidad socia (opcional)</label>
+                <input type="number" id="input-convert-partner-entity-id" placeholder="Ej: 3" min="1">
+            </div>
+
+            <p class="form-message" id="convert-modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-convert-cancel">Cancelar</button>
+                <button class="btn btn-primary" id="btn-convert-save">Convertir</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="edit-modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+            <h3 id="edit-modal-title">Editar responsable</h3>
+
+            <div class="form-group">
+                <label for="input-name">Nombre <span class="required">*</span></label>
+                <input type="text" id="input-name" placeholder="Nombre completo" maxlength="255">
+            </div>
+
+            <div class="form-group">
+                <label for="input-email">Email <span class="required">*</span></label>
+                <input type="text" id="input-email" placeholder="correo@ejemplo.com" maxlength="255">
+            </div>
+
+            <div class="form-group">
+                <label for="input-phone">Teléfono</label>
+                <input type="text" id="input-phone" placeholder="Ej: +34 912345678" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label for="input-address">Dirección</label>
+                <input type="text" id="input-address" placeholder="Calle, número..." maxlength="1000">
+            </div>
+
+            <div class="form-group">
+                <label for="input-postal-code">Código postal</label>
+                <input type="text" id="input-postal-code" placeholder="Ej: 29001" maxlength="10">
+            </div>
+
+            <div class="form-group">
+                <label for="input-partner-entity-id">ID de entidad socia</label>
+                <input type="number" id="input-partner-entity-id" placeholder="Ej: 3" min="1">
+            </div>
+
+            <p class="form-message" id="edit-modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-edit-cancel">Cancelar</button>
+                <button class="btn btn-primary" id="btn-edit-save">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="javascript/admin-partner-entities-managers.js"></script>
+</body>
+</html>
