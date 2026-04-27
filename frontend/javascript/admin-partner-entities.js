@@ -8,6 +8,8 @@ function authHeaders() {
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 if (!getToken()) { window.location.href = 'login.html'; }
+const role = (localStorage.getItem('role') || '').toUpperCase();
+if (role !== 'ADMINISTRADOR') { window.location.href = 'login.html'; }
 document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
 document.getElementById('btn-logout').addEventListener('click', logout);
 
