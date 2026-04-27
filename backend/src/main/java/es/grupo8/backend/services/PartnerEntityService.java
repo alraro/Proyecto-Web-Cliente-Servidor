@@ -41,9 +41,14 @@ public class PartnerEntityService {
                     .toList();
         }
 
-        // Aplicar ordenamiento
+        // Aplicar ordenamiento (por defecto por ID si no se especifica)
         if (sort != null && !sort.trim().isEmpty()) {
             allEntities = applySorting(allEntities, sort);
+        } else {
+            // Ordenar por ID por defecto
+            allEntities = allEntities.stream()
+                    .sorted(Comparator.comparing(PartnerEntity::getId))
+                    .toList();
         }
 
         // Calcular paginación
