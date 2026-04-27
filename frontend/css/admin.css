@@ -536,3 +536,31 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     color: rgba(31,41,55,0.45); 
     margin: 2rem 0 0; 
 }
+
+.back-link-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--blue-700);
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.required-asterisk {
+    color: #dc2626;
+}
+
+.field-help {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    margin-top: 0.3rem;
+}
+
+.inline-code {
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
