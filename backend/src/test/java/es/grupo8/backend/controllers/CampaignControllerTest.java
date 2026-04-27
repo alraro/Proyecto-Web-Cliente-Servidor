@@ -216,7 +216,7 @@ class CampaignControllerTest {
         when(adminGuard.isAdmin(AUTH_HEADER)).thenReturn(true);
         when(campaignRepository.findById(1)).thenReturn(Optional.of(sampleCampaign));
         when(campaignTypeRepository.findById(2)).thenReturn(Optional.of(sampleTypeA));
-        when(campaignRepository.existsByNameAndIdCampaignNot("Gran Recogida Otono 2025", 1)).thenReturn(true);
+        when(campaignRepository.existsByNameAndIdNot("Gran Recogida Otono 2025", 1)).thenReturn(true);
 
         ResponseEntity<?> response = controller.updateCampaign(AUTH_HEADER, 1, validRequest());
 
@@ -234,7 +234,7 @@ class CampaignControllerTest {
         when(adminGuard.extractUserId(AUTH_HEADER)).thenReturn(999);
         when(campaignRepository.findById(1)).thenReturn(Optional.of(sampleCampaign));
         when(campaignTypeRepository.findById(2)).thenReturn(Optional.of(sampleTypeA));
-        when(campaignRepository.existsByNameAndIdCampaignNot("Gran Recogida Otono 2025", 1)).thenReturn(false);
+        when(campaignRepository.existsByNameAndIdNot("Gran Recogida Otono 2025", 1)).thenReturn(false);
         when(campaignRepository.save(any(Campaign.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ResponseEntity<?> response = controller.updateCampaign(AUTH_HEADER, 1, validRequest());

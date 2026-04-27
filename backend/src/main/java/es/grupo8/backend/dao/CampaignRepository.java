@@ -10,11 +10,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, Integer> {
 
 	boolean existsByName(String name);
 
-	boolean existsByNameAndIdCampaignNot(String name, Integer idCampaign);
+	boolean existsByNameAndIdNot(String name, Integer id);
 
 	List<Campaign> findByOrderByStartDateDesc();
 
-	List<Campaign> findByTypeIdType(Integer idType);
+	List<Campaign> findByIdTypeId(Integer id);
 
-	boolean existsByTypeIdType(Integer idType);
+	boolean existsByIdTypeId(Integer id);
 }

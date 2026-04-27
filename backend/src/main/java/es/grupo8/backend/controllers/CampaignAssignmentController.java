@@ -59,7 +59,7 @@ public class CampaignAssignmentController {
 	@Autowired
 	private CaptainRepository captainRepository;
 
-	@GetMapping
+	@GetMapping("/admin-list")
 	public ResponseEntity<?> getCampaigns(
 			@RequestHeader(value = "Authorization", required = false) String authHeader) {
 

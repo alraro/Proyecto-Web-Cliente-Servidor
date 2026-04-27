@@ -219,7 +219,7 @@ public class CampaignController {
 					.body(Map.of("message", "Campaign type not found"));
 		}
 
-		if (campaignRepository.existsByNameAndIdCampaignNot(name, id)) {
+		if (campaignRepository.existsByNameAndIdNot(name, id)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body(Map.of("message", "A campaign with this name already exists"));
 		}
