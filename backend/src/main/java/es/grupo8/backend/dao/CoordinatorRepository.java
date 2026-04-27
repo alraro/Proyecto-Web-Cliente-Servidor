@@ -11,7 +11,13 @@ import es.grupo8.backend.entity.CoordinatorId;
 @Repository
 public interface CoordinatorRepository extends JpaRepository<Coordinator, CoordinatorId> {
 
-    // Check if user is coordinator of any campaign
+    // Tu método (HEAD) - Lo mantenemos para que tu Controlador siga funcionando
     @Query("SELECT COUNT(c) > 0 FROM Coordinator c WHERE c.idUser.idUser = :userId")
     boolean isUserCoordinator(@Param("userId") Integer userId);
+
+    // Los métodos de tu compañero (dev) - Los mantenemos para no romper su parte
+    boolean existsByIdUser_IdUser(Integer userId);
+
+    boolean existsByIdUser_IdUserAndIdCampaign_Id(Integer userId, Integer campaignId);
+
 }

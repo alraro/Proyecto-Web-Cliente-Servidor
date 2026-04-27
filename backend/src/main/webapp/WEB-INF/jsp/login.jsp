@@ -29,22 +29,6 @@
 </header>
 
 <main class="login-page">
-    <section class="login-hero" aria-hidden="true">
-        <div class="hero-badge">Acceso Bancosol</div>
-        <h1>Inicia sesión para acceder a la plataforma de gestión solidaria</h1>
-        <p>Desde aquí podrás entrar al espacio de trabajo para campañas, seguimiento de donaciones y coordinación con entidades.</p>
-        <div class="hero-cards">
-            <article>
-                <strong>Inicio seguro</strong>
-                <span>Acceso con token y validaciones del backend</span>
-            </article>
-            <article>
-                <strong>Accesos rápidos</strong>
-                    <span>Crear cuenta en segundos</span>
-            </article>
-        </div>
-    </section>
-
     <section class="login-card" aria-labelledby="login-title">
         <div class="brand-lockup">
             <img src="<%= contextPath %>/assets/Bancosol.png" alt="Bancosol" class="logo">
@@ -90,11 +74,6 @@
             <p class="form-message">Credenciales de prueba: bancosolseguimiento@gmail.com / hash_pendiente</p>
             <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="<%= contextPath %>/register">Crear cuenta</a></p>
         </form>
-
-        <div class="security-note">
-            <span class="security-dot"></span>
-            <p>Acceso protegido para la coordinación de campañas, donaciones y entidades.</p>
-        </div>
     </section>
 </main>
 
