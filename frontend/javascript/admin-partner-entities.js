@@ -51,6 +51,16 @@ function escAttr(v) {
     return String(v ?? '').replace(/'/g, "\\'");
 }
 
+function isValidPhone(phone) {
+    if (!phone) return true;
+
+    const normalized = phone.replace(/\s+/g, ' ').trim();
+    const phonePattern = /^\+?[0-9()\- ]{7,20}$/;
+    const digitsOnly = normalized.replace(/\D/g, '');
+
+    return phonePattern.test(normalized) && digitsOnly.length >= 7 && digitsOnly.length <= 15;
+}
+
 // ── Paginación ───────────────────────────────────────────────────────────
 let currentPage = 0;
 let pageSize = 20;
@@ -206,6 +216,10 @@ document.getElementById('btn-guardar').addEventListener('click', async () => {
     if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
     if (direccion.length > 500) { errorEl.textContent = 'La dirección no puede superar 500 caracteres.'; return; }
     if (telefono.length > 20) { errorEl.textContent = 'El teléfono no puede superar 20 caracteres.'; return; }
+    if (!isValidPhone(telefono)) {
+        errorEl.textContent = 'El teléfono debe tener entre 7 y 15 dígitos y solo puede incluir +, espacios, paréntesis o guiones.';
+        return;
+    }
 
     const body   = JSON.stringify({
         name: nombre,

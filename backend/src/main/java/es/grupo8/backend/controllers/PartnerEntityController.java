@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
+import java.util.Map;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @RestController
 @RequestMapping("/api/partner-entities")
@@ -88,5 +90,11 @@ public class PartnerEntityController {
 		}
 		System.out.println("Partner entity deleted successfully with ID: " + id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("message", e.getMessage()));
 	}
 }

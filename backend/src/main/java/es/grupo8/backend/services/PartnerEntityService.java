@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class PartnerEntityService {
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9()\\-\\s]{7,20}$");
 
     @Autowired
     private PartnerEntityRepository partnerEntityRepository;
@@ -139,10 +142,12 @@ public class PartnerEntityService {
     }
 
     public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) throws RuntimeException {
+        validateRequest(request);
+
         PartnerEntity entity = new PartnerEntity();
-        entity.setName(request.getName());
-        entity.setAddress(request.getAddress());
-        entity.setPhone(request.getPhone());
+        entity.setName(request.getName().trim());
+        entity.setAddress(trimToNull(request.getAddress()));
+        entity.setPhone(normalizePhone(request.getPhone()));
 
         try {
             PartnerEntity savedEntity = partnerEntityRepository.save(entity);
@@ -153,12 +158,14 @@ public class PartnerEntityService {
     }
 
     public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) throws RuntimeException {
+        validateRequest(request);
+
         PartnerEntity entity = partnerEntityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
 
-        entity.setName(request.getName());
-        entity.setAddress(request.getAddress());
-        entity.setPhone(request.getPhone());
+        entity.setName(request.getName().trim());
+        entity.setAddress(trimToNull(request.getAddress()));
+        entity.setPhone(normalizePhone(request.getPhone()));
 
         try {
             PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
@@ -173,5 +180,45 @@ public class PartnerEntityService {
             throw new RuntimeException("Partner entity not found with ID: " + id);
         }
         partnerEntityRepository.deleteById(id);
+    }
+
+    private void validateRequest(PartnerEntityRequestDto request) {
+        if (request == null) {
+            throw new IllegalArgumentException("La solicitud es inválida.");
+        }
+
+        String name = request.getName() == null ? "" : request.getName().trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("El nombre es obligatorio.");
+        }
+        if (name.length() > 255) {
+            throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
+        }
+
+        String phone = normalizePhone(request.getPhone());
+        if (phone != null) {
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
+                throw new IllegalArgumentException("El teléfono tiene un formato inválido.");
+            }
+
+            String digitsOnly = phone.replaceAll("\\D", "");
+            if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+                throw new IllegalArgumentException("El teléfono debe tener entre 7 y 15 dígitos.");
+            }
+        }
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private String normalizePhone(String phone) {
+        String trimmed = trimToNull(phone);
+        if (trimmed == null) {
+            return null;
+        }
+        return trimmed.replaceAll("\\s+", " ");
     }
 }
