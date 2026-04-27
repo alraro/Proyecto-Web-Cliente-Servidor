@@ -30,6 +30,7 @@ import es.grupo8.backend.entity.Locality;
 import es.grupo8.backend.entity.PostalCode;
 import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.security.CoordinatorGuard;
 
 @RestController
 @RequestMapping("/api/stores")
@@ -41,6 +42,7 @@ public class StoreController {
     @Autowired private ChainRepository     chainRepository;
     @Autowired private PostalCodeRepository postalCodeRepository;
     @Autowired private AdminGuard          adminGuard;
+    @Autowired private CoordinatorGuard    coordinatorGuard;
 
     @GetMapping
     public ResponseEntity<?> getStores(
@@ -49,7 +51,8 @@ public class StoreController {
             @RequestParam(required = false) Integer localityId,
             @RequestParam(required = false) Integer zoneId) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        // Allow access to admins and coordinators
+        if (!adminGuard.isAdmin(authHeader) && !coordinatorGuard.isCoordinator(authHeader)) {
             return forbidden();
         }
 

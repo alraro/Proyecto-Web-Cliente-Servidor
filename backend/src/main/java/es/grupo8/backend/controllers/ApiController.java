@@ -6,7 +6,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
@@ -19,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.UserRepository;
+import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.UserEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -39,6 +45,9 @@ public class ApiController {
 
 	@Autowired
 	protected UserRepository userRepository;
+
+	@Autowired
+	protected CampaignRepository campaignRepository;
 
 	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
 	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
@@ -568,6 +577,78 @@ public class ApiController {
 		} catch (Exception ex) {
 			return null;
 		}
+	}
+
+	// Endpoint para obtener todas las campañas
+	@GetMapping("/api/campaigns")
+	@ResponseBody
+	public ResponseEntity<?> getCampaigns(
+			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+		Integer userId = extractUserIdFromAuthHeader(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "Token invalido o ausente"));
+		}
+
+		String role = resolveRole(userId);
+		if (!"ADMINISTRADOR".equals(role) && !"COORDINADOR".equals(role) && !"CAPITAN".equals(role)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("message", "No tienes permiso para ver las campañas"));
+		}
+
+		List<Campaign> campaigns = campaignRepository.findAll();
+		List<Map<String, Object>> result = campaigns.stream()
+				.map(c -> {
+					Map<String, Object> map = new HashMap<>();
+					map.put("id", c.getId());
+					map.put("name", c.getName());
+					map.put("startDate", c.getStartDate());
+					map.put("endDate", c.getEndDate());
+					map.put("type", c.getIdType() != null ? c.getIdType().getName() : "");
+					return map;
+				})
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(result);
+	}
+
+	// Endpoint para obtener tiendas de una campaña
+	@GetMapping("/api/campaigns/{id}/stores")
+	@ResponseBody
+	public ResponseEntity<?> getCampaignStores(
+			@PathVariable("id") Integer campaignId,
+			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+		Integer userId = extractUserIdFromAuthHeader(authHeader);
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "Token invalido o ausente"));
+		}
+
+		String role = resolveRole(userId);
+		if (!"ADMINISTRADOR".equals(role) && !"COORDINADOR".equals(role) && !"CAPITAN".equals(role)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("message", "No tienes permiso para ver las tiendas"));
+		}
+
+		Campaign campaign = campaignRepository.findById(campaignId).orElse(null);
+		if (campaign == null) {
+			return ResponseEntity.badRequest()
+					.body(Map.of("message", "Campaña no encontrada"));
+		}
+
+		List<Map<String, Object>> stores = campaign.getStores().stream()
+				.map(s -> {
+					Map<String, Object> map = new HashMap<>();
+					map.put("id", s.getId());
+					map.put("name", s.getName());
+					map.put("address", s.getAddress() != null ? s.getAddress() : "");
+					return map;
+				})
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(stores);
 	}
 
 	private String resolveRole(Integer userId) {
