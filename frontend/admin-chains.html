@@ -57,8 +57,7 @@
         </div>
     </main>
 
-    <!-- MODAL -->
-    <div class="modal-backdrop" id="modal-backdrop">
+   <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <h3 id="modal-title">Nueva cadena</h3>
 
@@ -85,13 +84,11 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
     <script>
         const BACKEND = 'http://localhost:8080';
 
-        // ── Auth ──────────────────────────────────────────────────────────────
         function getToken() { return localStorage.getItem('token'); }
         function authHeaders() {
             return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
@@ -102,7 +99,6 @@
         document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
         document.getElementById('btn-logout').addEventListener('click', logout);
 
-        // ── Toast ─────────────────────────────────────────────────────────────
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -112,7 +108,6 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        // ── Tabla ─────────────────────────────────────────────────────────────
         function renderTable(chains) {
             const tbody = document.getElementById('chains-tbody');
             if (!chains.length) {
@@ -146,8 +141,7 @@
             return String(v ?? '').replace(/'/g, "\\'");
         }
 
-        // ── Cargar cadenas ────────────────────────────────────────────────────
-        async function cargarCadenas() {
+        async function loadChains() {
             try {
                 const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
                 if (res.status === 401 || res.status === 403) { logout(); return; }
@@ -164,7 +158,6 @@
             }
         }
 
-        // ── Modal ─────────────────────────────────────────────────────────────
         let editandoId = null;
 
         function abrirModal(titulo) {
@@ -244,7 +237,7 @@
 
                 cerrarModal();
                 showToast(editandoId ? 'Cadena actualizada correctamente.' : 'Cadena creada correctamente.');
-                cargarCadenas();
+                loadChains();
             } catch {
                 errorEl.textContent = 'Error de conexión con el servidor.';
             }
@@ -264,14 +257,14 @@
                     return;
                 }
                 showToast('Cadena eliminada.');
-                cargarCadenas();
+                loadChains();
             } catch {
                 showToast('Error de conexión con el servidor.', 'error');
             }
         }
 
         // ── Init ──────────────────────────────────────────────────────────────
-        cargarCadenas();
+        loadChains();
     </script>
 </body>
 </html>

@@ -48,7 +48,6 @@
                 </div>
             </div>
 
-            <!-- FILTROS -->
             <div class="filters-bar">
                 <select id="filter-zone">
                     <option value="">Todas las zonas</option>
@@ -85,7 +84,6 @@
         </div>
     </main>
 
-    <!-- MODAL CREAR / EDITAR -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="max-width:520px;">
             <h3 id="modal-title">Nueva tienda</h3>
@@ -144,7 +142,7 @@
         }
         function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
 
-        // ── Datos auxiliares ──────────────────────────────────────────────────
+        // Datos auxiliares
         let allChains     = [];
         let allLocalities = [];   // { id, name, zoneId }
         let allZones      = [];   // { id, name }
@@ -214,7 +212,6 @@
             }
         }
 
-        // ── Tabla ─────────────────────────────────────────────────────────────
         function renderTable(stores) {
             const tbody = document.getElementById('stores-tbody');
             if (!stores.length) {
@@ -240,7 +237,6 @@
             `).join('');
         }
 
-        // ── Cargar tiendas ────────────────────────────────────────────────────
         async function loadStores() {
             const chainId    = document.getElementById('filter-chain').value;
             const localityId = document.getElementById('filter-locality').value;
@@ -272,7 +268,6 @@
             loadStores();
         });
 
-        // ── Modal ─────────────────────────────────────────────────────────────
         let editingId = null;
 
         function openModal(titulo) {
@@ -314,7 +309,6 @@
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        // ── Guardar ───────────────────────────────────────────────────────────
         document.getElementById('btn-modal-save').addEventListener('click', async () => {
             const nombre    = document.getElementById('input-nombre').value.trim();
             const domicilio = document.getElementById('input-domicilio').value.trim();
@@ -340,7 +334,6 @@
             } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
         });
 
-        // ── Eliminar ──────────────────────────────────────────────────────────
         async function deleteStore(id, nombre) {
             if (!confirm(`¿Eliminar la tienda "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
             try {
@@ -351,7 +344,6 @@
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        // ── Init ──────────────────────────────────────────────────────────────
         loadAuxData().then(() => loadStores());
     </script>
 </body>
