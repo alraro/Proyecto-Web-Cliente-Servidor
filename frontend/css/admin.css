@@ -537,6 +537,80 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     margin: 2rem 0 0; 
 }
 
+.hidden {
+    display: none !important;
+}
+
+.page-header-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+#global-message {
+    margin: 0.2rem 0 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.93rem;
+    font-weight: 700;
+}
+
+#global-message.success {
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    color: #166534;
+}
+
+#global-message.error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.btn-secondary {
+    background: rgba(235, 123, 49, 0.12);
+    color: #eb7b31;
+}
+
+.btn-secondary:hover {
+    background: rgba(235, 123, 49, 0.22);
+}
+
+.form-group select,
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(25, 58, 107, 0.18);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 0.93rem;
+    color: var(--ink);
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.form-group select:focus,
+.form-group input[type="date"]:focus {
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 3px rgba(45, 101, 160, 0.14);
+}
+
+#modal-error {
+    margin-top: 0.6rem;
+    color: #b91c1c;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
 .back-link-inline {
     display: inline-flex;
     align-items: center;
