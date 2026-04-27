@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CampaignTypeRepository;
 import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
@@ -57,6 +58,9 @@ public class CampaignController {
 
 	@Autowired
 	private CaptainRepository captainRepository;
+
+	@Autowired
+	private CampaignStoreRepository campaignStoreRepository;
 
 	@GetMapping("/campaign-types")
 	@Operation(summary = "List all campaign types")
@@ -263,6 +267,8 @@ public class CampaignController {
 
 		coordinatorRepository.deleteAllByIdIdCampaign(id);
 		captainRepository.deleteAllByIdIdCampaign(id);
+		// RF-12: remove store assignments before deleting the campaign
+		campaignStoreRepository.deleteByIdCampaign_Id(id);
 		campaignRepository.deleteById(id);
 
 		logAudit("DELETE_CAMPAIGN", authHeader, id, campaign.getName());

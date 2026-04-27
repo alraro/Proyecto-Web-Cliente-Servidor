@@ -78,6 +78,36 @@
             </div>
         </div>
 
+        <!-- NEW: Store selector section -->
+        <div class="store-selector-section">
+            <h3 class="store-selector-title">Tiendas participantes</h3>
+
+            <div class="store-filter-row">
+                <select id="store-filter-chain">
+                    <option value="">Todas las cadenas</option>
+                </select>
+                <select id="store-filter-zone">
+                    <option value="">Todas las zonas</option>
+                </select>
+                <select id="store-filter-locality">
+                    <option value="">Todas las localidades</option>
+                </select>
+                <button type="button" id="btn-store-filter" class="btn btn-secondary btn-sm">Filtrar</button>
+                <button type="button" id="btn-store-clear" class="btn btn-secondary btn-sm">Limpiar</button>
+            </div>
+
+            <div class="store-dual-panel">
+                <div class="store-panel">
+                    <h4>Disponibles <span id="available-count" class="badge">0</span></h4>
+                    <ul id="available-stores" class="store-list"></ul>
+                </div>
+                <div class="store-panel">
+                    <h4>Seleccionadas <span id="selected-count" class="badge">0</span></h4>
+                    <ul id="selected-stores" class="store-list"></ul>
+                </div>
+            </div>
+        </div>
+
         <div id="modal-error" hidden></div>
 
         <div class="modal-actions">
@@ -101,6 +131,9 @@
             return;
         }
 
+        // NEW: auth options for calls that only require Authorization header
+        const authOpts = { headers: { Authorization: "Bearer " + token } };
+
         const userNameEl = document.getElementById("user-name");
         userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
 
@@ -120,7 +153,21 @@
         const startInput = document.getElementById("campaign-start");
         const endInput = document.getElementById("campaign-end");
 
+        // NEW: store selector elements
+        const storeFilterChain = document.getElementById("store-filter-chain");
+        const storeFilterZone = document.getElementById("store-filter-zone");
+        const storeFilterLocality = document.getElementById("store-filter-locality");
+        const btnStoreFilter = document.getElementById("btn-store-filter");
+        const btnStoreClear = document.getElementById("btn-store-clear");
+        const availableStoresEl = document.getElementById("available-stores");
+        const selectedStoresEl = document.getElementById("selected-stores");
+        const availableCountEl = document.getElementById("available-count");
+        const selectedCountEl = document.getElementById("selected-count");
+
         let currentCampaignId = null;
+        // NEW
+        let selectedStores = new Map(); // Map<storeId(Number), storeObject>
+        let allFilteredStores = []; // result of last GET /api/stores call
         let currentCampaigns = [];
         let cachedTypes = [];
 
@@ -132,6 +179,37 @@
         btnNew.addEventListener("click", openCreateModal);
         btnCancelModal.addEventListener("click", hideModal);
         btnSave.addEventListener("click", saveCampaign);
+
+        // NEW
+        btnStoreFilter.addEventListener("click", loadAvailableStores);
+        btnStoreClear.addEventListener("click", () => {
+            storeFilterChain.value = "";
+            storeFilterZone.value = "";
+            storeFilterLocality.value = "";
+            loadAvailableStores();
+        });
+
+        availableStoresEl.addEventListener("click", e => {
+            const btn = e.target.closest(".btn-add-store");
+            if (!btn) return;
+            const li = btn.closest("li");
+            const storeId = Number(li.dataset.storeid);
+            const store = allFilteredStores.find(s => Number(s.id) === storeId);
+            if (store) {
+                selectedStores.set(storeId, store);
+            }
+            renderAvailableList();
+            renderSelectedList();
+        });
+
+        selectedStoresEl.addEventListener("click", e => {
+            const btn = e.target.closest(".btn-remove-store");
+            if (!btn) return;
+            const li = btn.closest("li");
+            selectedStores.delete(Number(li.dataset.storeid));
+            renderAvailableList();
+            renderSelectedList();
+        });
 
         modalEl.addEventListener("click", (event) => {
             if (event.target === modalEl) {
@@ -145,8 +223,100 @@
         try {
             await loadCampaignTypes();
             await loadCampaigns();
+            // NEW
+            await loadStoreFilters();
         } catch (error) {
             showMessage(error.message || "No se pudieron cargar los datos de campañas.", true);
+        }
+
+        // NEW
+        async function loadStoreFilters() {
+            const [chains, zones, localities] = await Promise.all([
+                fetchJson("/api/chains", authOpts),
+                fetchJson("/api/zones", authOpts),
+                fetchJson("/api/localities", authOpts)
+            ]);
+
+            storeFilterChain.innerHTML = '<option value="">Todas las cadenas</option>';
+            (chains || []).forEach((chain) => {
+                const option = document.createElement("option");
+                option.value = String(chain.id);
+                option.textContent = chain.name || "Sin nombre";
+                storeFilterChain.appendChild(option);
+            });
+
+            storeFilterZone.innerHTML = '<option value="">Todas las zonas</option>';
+            (zones || []).forEach((zone) => {
+                const option = document.createElement("option");
+                option.value = String(zone.id);
+                option.textContent = zone.name || "Sin nombre";
+                storeFilterZone.appendChild(option);
+            });
+
+            storeFilterLocality.innerHTML = '<option value="">Todas las localidades</option>';
+            (localities || []).forEach((locality) => {
+                const option = document.createElement("option");
+                option.value = String(locality.id);
+                option.textContent = locality.name || "Sin nombre";
+                storeFilterLocality.appendChild(option);
+            });
+        }
+
+        // NEW
+        async function loadAvailableStores() {
+            const chainId = (storeFilterChain.value || "").trim();
+            const zoneId = (storeFilterZone.value || "").trim();
+            const localityId = (storeFilterLocality.value || "").trim();
+
+            const params = new URLSearchParams();
+            if (chainId) params.append("chainId", chainId);
+            if (zoneId) params.append("zoneId", zoneId);
+            if (localityId) params.append("localityId", localityId);
+
+            const url = params.toString() ? `/api/stores?${params.toString()}` : "/api/stores";
+            allFilteredStores = await fetchJson(url, authOpts);
+            renderAvailableList();
+        }
+
+        // NEW
+        function renderAvailableList() {
+            const availableStores = (allFilteredStores || []).filter((store) => !selectedStores.has(Number(store.id)));
+            availableStoresEl.innerHTML = "";
+
+            if (!availableStores.length) {
+                availableStoresEl.innerHTML = '<li class="store-list-empty">Sin tiendas disponibles con estos filtros.</li>';
+                availableCountEl.textContent = "0";
+                return;
+            }
+
+            availableStores.forEach((store) => {
+                const li = document.createElement("li");
+                li.dataset.storeid = String(store.id);
+                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} — ${escapeHtml(store.locality || "-")} <button type="button" class="btn-add-store btn btn-sm btn-primary">+</button>`;
+                availableStoresEl.appendChild(li);
+            });
+
+            availableCountEl.textContent = String(availableStores.length);
+        }
+
+        // NEW
+        function renderSelectedList() {
+            selectedStoresEl.innerHTML = "";
+
+            if (!selectedStores.size) {
+                selectedStoresEl.innerHTML = '<li class="store-list-empty">Sin tiendas seleccionadas.</li>';
+                selectedCountEl.textContent = "0";
+                return;
+            }
+
+            Array.from(selectedStores.values()).forEach((store) => {
+                const li = document.createElement("li");
+                li.dataset.storeid = String(store.id);
+                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>`;
+                selectedStoresEl.appendChild(li);
+            });
+
+            selectedCountEl.textContent = String(selectedStores.size);
         }
 
         async function loadCampaignTypes() {
@@ -203,7 +373,8 @@
             });
         }
 
-        function openCreateModal() {
+        // MODIFIED
+        async function openCreateModal() {
             currentCampaignId = null;
             modalTitle.textContent = "Nueva campaña";
             clearModalError();
@@ -211,9 +382,13 @@
             typeSelect.value = "";
             startInput.value = "";
             endInput.value = "";
+            selectedStores = new Map();
+            await loadAvailableStores();
+            renderSelectedList();
             showModal();
         }
 
+        // MODIFIED
         async function openEditModal(campaignId) {
             clearModalError();
             try {
@@ -228,12 +403,21 @@
                 typeSelect.value = (campaign.type && campaign.type.id != null) ? String(campaign.type.id) : "";
                 startInput.value = campaign.startDate || "";
                 endInput.value = campaign.endDate || "";
+
+                selectedStores = new Map();
+                const storeData = await fetchJson("/api/campaigns/" + campaignId + "/stores", authOpts);
+                if (storeData && storeData.stores) {
+                    storeData.stores.forEach(s => selectedStores.set(Number(s.id), s));
+                }
+                await loadAvailableStores();
+                renderSelectedList();
                 showModal();
             } catch (error) {
                 showMessage(error.message || "No se pudieron cargar los datos de la campaña.", true);
             }
         }
 
+        // MODIFIED
         async function saveCampaign() {
             const name = (nameInput.value || "").trim();
             const typeIdRaw = (typeSelect.value || "").trim();
@@ -266,21 +450,47 @@
             };
 
             try {
+                let campaignResponse;
+                let campaignIdToSync;
+
                 if (currentCampaignId == null) {
-                    await fetchJson("/api/campaigns", {
+                    campaignResponse = await fetchJson("/api/campaigns", {
                         method: "POST",
                         headers: authHeaders(token),
                         body: JSON.stringify(body)
                     });
-                    hideModal();
-                    showMessage("Campaña creada correctamente.", false);
+                    campaignIdToSync = campaignResponse && campaignResponse.campaign ? Number(campaignResponse.campaign.id) : null;
                 } else {
-                    await fetchJson(`/api/campaigns/${currentCampaignId}`, {
+                    campaignResponse = await fetchJson(`/api/campaigns/${currentCampaignId}`, {
                         method: "PUT",
                         headers: authHeaders(token),
                         body: JSON.stringify(body)
                     });
-                    hideModal();
+                    campaignIdToSync = currentCampaignId;
+                }
+
+                let syncStoresFailed = false;
+                if (campaignIdToSync != null) {
+                    try {
+                        await fetchJson(`/api/campaigns/${campaignIdToSync}/stores`, {
+                            method: "PUT",
+                            headers: {
+                                Authorization: "Bearer " + token,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ storeIds: [...selectedStores.keys()] })
+                        });
+                    } catch (syncError) {
+                        syncStoresFailed = true;
+                    }
+                }
+
+                hideModal();
+                if (syncStoresFailed) {
+                    showMessage("La campaña se guardó pero hubo un error al sincronizar las tiendas.", true);
+                } else if (currentCampaignId == null) {
+                    showMessage("Campaña creada correctamente.", false);
+                } else {
                     showMessage("Campaña actualizada correctamente.", false);
                 }
                 await loadCampaigns();
