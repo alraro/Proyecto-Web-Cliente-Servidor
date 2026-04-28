@@ -73,6 +73,13 @@ form.addEventListener('submit', async (event) => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('role', data.role);
 
+        // Guardar storeId si el rol es Responsable de Tienda
+        if (data.storeId != null) {
+            localStorage.setItem('storeId', data.storeId);
+        } else {
+            localStorage.removeItem('storeId');
+        }
+
         // Redirigir según rol
         window.location.href = data.redirectUrl;
 
