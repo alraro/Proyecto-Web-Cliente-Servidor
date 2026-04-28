@@ -107,11 +107,15 @@
         }
 
         try {
-            const campaigns = await fetchJson("/api/campaigns", {
+            const data = await fetchJson("/api/campaigns?size=200&sort=startDate,desc", {
                 method: "GET",
                 headers: authHeaders(token)
             });
-            populateCampaignSelect(campaigns);
+            
+            // Extraemos el array, ya sea que venga directo o dentro de "content"
+            const campaignsArray = Array.isArray(data) ? data : (data.content || []);
+            
+            populateCampaignSelect(campaignsArray);
         } catch (error) {
             showMessage(error.message || "No se pudieron cargar las campañas", true);
         }
@@ -192,8 +196,8 @@
             };
         }
 
-        async function loadCampaignData(campaignId) {
-            const [assignments, availableCoordinators] = await Promise.all([
+       async function loadCampaignData(campaignId) {
+            const [assignments, availableCoordinatorsData] = await Promise.all([
                 fetchJson(`/api/campaigns/${campaignId}/assignments`, {
                     method: "GET",
                     headers: authHeaders(token)
@@ -204,7 +208,14 @@
                 })
             ]);
 
+            // Extraemos el array, ya sea que venga directo o dentro de la propiedad "content" por la paginación de Spring
+            const availableCoordinators = Array.isArray(availableCoordinatorsData) 
+                ? availableCoordinatorsData 
+                : (availableCoordinatorsData.content || []);
+
             renderCoordinatorsTable(assignments?.coordinators || []);
+            
+            // Pasamos el array limpio al desplegable
             populateSelect(coordinatorSelect, availableCoordinators, "Selecciona un coordinador...");
         }
 

@@ -1,3 +1,5 @@
+const API_BASE = 'http://localhost:8080';
+
 const form = document.querySelector('#login-form');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
@@ -51,7 +53,7 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/login', {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -74,7 +76,8 @@ form.addEventListener('submit', async (event) => {
         // Redirigir según rol
         window.location.href = data.redirectUrl;
 
-    } catch {
+    } catch(e) {
+        console.log(e)
         message.textContent = 'Error al conectar con el servidor.';
         message.classList.add('is-error');
     }

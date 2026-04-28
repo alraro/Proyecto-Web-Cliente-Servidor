@@ -107,11 +107,15 @@
         }
 
         try {
-            const campaigns = await fetchJson("/api/campaigns", {
+            const data = await fetchJson("/api/campaigns?size=200&sort=startDate,desc", {
                 method: "GET",
                 headers: authHeaders(token)
             });
-            populateCampaignSelect(campaigns);
+            
+            // Extraemos el array, ya sea que venga directo o dentro de "content"
+            const campaignsArray = Array.isArray(data) ? data : (data.content || []);
+            
+            populateCampaignSelect(campaignsArray);
         } catch (error) {
             showMessage(error.message || "No se pudieron cargar las campañas", true);
         }
@@ -193,7 +197,7 @@
         }
 
         async function loadCampaignData(campaignId) {
-            const [assignments, availableCaptains] = await Promise.all([
+            const [assignments, availableCaptainsData] = await Promise.all([
                 fetchJson(`/api/campaigns/${campaignId}/assignments`, {
                     method: "GET",
                     headers: authHeaders(token)
@@ -204,9 +208,16 @@
                 })
             ]);
 
+            // IGUAL QUE ANTES: Comprobamos si es un array o si viene dentro de .content
+            const availableCaptains = Array.isArray(availableCaptainsData) 
+                ? availableCaptainsData 
+                : (availableCaptainsData.content || []);
+
             renderCaptainsTable(assignments?.captains || []);
+            
+            // Ahora pasamos la lista limpia
             populateSelect(captainSelect, availableCaptains, "Selecciona un capitán...");
-        }
+}
 
         async function fetchJson(url, options) {
             try {

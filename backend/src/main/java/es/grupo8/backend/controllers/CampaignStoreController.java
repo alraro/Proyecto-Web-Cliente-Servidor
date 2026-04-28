@@ -205,7 +205,7 @@ public class CampaignStoreController {
 			validatedStores.add(store);
 		}
 
-		campaignStoreRepository.deleteByIdCampaign_Id(campaignId);
+		campaignStoreRepository.deleteByCampaignId(campaignId);
 
 		for (Store store : validatedStores) {
 			CampaignStoreId id = new CampaignStoreId();

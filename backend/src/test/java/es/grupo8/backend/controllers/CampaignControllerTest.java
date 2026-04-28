@@ -294,13 +294,13 @@ class CampaignControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(coordinatorRepository).deleteAllByIdIdCampaign(1);
         verify(captainRepository).deleteAllByIdIdCampaign(1);
-        verify(campaignStoreRepository).deleteByIdCampaign_Id(1);
+        verify(campaignStoreRepository).deleteByCampaignId(1);
         verify(campaignRepository).deleteById(1);
 
         InOrder inOrder = inOrder(coordinatorRepository, captainRepository, campaignStoreRepository, campaignRepository);
         inOrder.verify(coordinatorRepository).deleteAllByIdIdCampaign(1);
         inOrder.verify(captainRepository).deleteAllByIdIdCampaign(1);
-        inOrder.verify(campaignStoreRepository).deleteByIdCampaign_Id(1);
+        inOrder.verify(campaignStoreRepository).deleteByCampaignId(1);
         inOrder.verify(campaignRepository).deleteById(1);
 
         boolean actionLogged = listAppender.list.stream()

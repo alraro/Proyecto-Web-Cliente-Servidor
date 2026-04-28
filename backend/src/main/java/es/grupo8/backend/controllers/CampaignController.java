@@ -347,7 +347,7 @@ public class CampaignController {
 		coordinatorRepository.deleteAllByIdIdCampaign(id);
 		captainRepository.deleteAllByIdIdCampaign(id);
 		// RF-12: remove store assignments before deleting the campaign
-		campaignStoreRepository.deleteByIdCampaign_Id(id);
+		campaignStoreRepository.deleteByCampaignId(id);
 		campaignRepository.deleteById(id);
 
 		logAudit("DELETE_CAMPAIGN", authHeader, id, campaign.getName());

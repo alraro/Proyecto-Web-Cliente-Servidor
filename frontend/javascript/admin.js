@@ -1,3 +1,5 @@
+const API_BASE = 'http://localhost:8080';
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('token')) {
         window.location.href = 'login.html';
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const nombre = localStorage.getItem('nombre') || '';
     if (token) {
-        const backendLinks = document.querySelectorAll('a.menu-card[href^="http://localhost:8080/admin-"]');
+        const backendLinks = document.querySelectorAll(`a.menu-card[href^="${API_BASE}/admin-"]`);
         backendLinks.forEach((link) => {
             try {
                 const targetUrl = new URL(link.href);

@@ -24,9 +24,10 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
         @Modifying
         void deleteByIdCampaign_IdAndIdStore_Id(Integer campaignId, Integer storeId);
 
-        @Transactional
         @Modifying
-        void deleteByIdCampaign_Id(Integer campaignId);
+        @Transactional
+        @Query("DELETE FROM CampaignStore cs WHERE cs.id.idCampaign = :campaignId")
+        void deleteByCampaignId(@Param("campaignId") Integer campaignId);
 
     // Cobertura por Cadena para una campaña concreta
     @Query("select s.idChain.name, COUNT(DISTINCT s.id), COUNT(DISTINCT cs.idStore.id) " +
