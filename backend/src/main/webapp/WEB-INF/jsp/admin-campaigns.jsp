@@ -335,11 +335,15 @@
         }
 
         async function loadCampaigns() {
-            currentCampaigns = await fetchJson("/api/campaigns", {
+            const data = await fetchJson("/api/campaigns?size=200&sort=startDate,desc", {
                 method: "GET",
                 headers: authHeaders(token)
             });
-            renderCampaignsTable(currentCampaigns || []);
+            // GET /api/campaigns now returns a paginated envelope {content, pagination, summary}.
+            // The CRUD view only needs the full list — no pagination needed here.
+            // We request all campaigns by using a large page size so no paging UI is required.
+            currentCampaigns = Array.isArray(data) ? data : (data.content || []);
+            renderCampaignsTable(currentCampaigns);
         }
 
         function renderCampaignsTable(campaigns) {

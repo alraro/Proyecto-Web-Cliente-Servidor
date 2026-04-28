@@ -18,6 +18,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,6 +30,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CampaignTypeRepository;
 import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
@@ -43,6 +48,7 @@ class CampaignControllerTest {
     private CampaignTypeRepository campaignTypeRepository;
     private CoordinatorRepository coordinatorRepository;
     private CaptainRepository captainRepository;
+    private CampaignStoreRepository campaignStoreRepository;
 
     private CampaignType sampleTypeA;
     private CampaignType sampleTypeB;
@@ -58,12 +64,14 @@ class CampaignControllerTest {
         campaignTypeRepository = mock(CampaignTypeRepository.class);
         coordinatorRepository = mock(CoordinatorRepository.class);
         captainRepository = mock(CaptainRepository.class);
+        campaignStoreRepository = mock(CampaignStoreRepository.class);
 
         ReflectionTestUtils.setField(controller, "adminGuard", adminGuard);
         ReflectionTestUtils.setField(controller, "campaignRepository", campaignRepository);
         ReflectionTestUtils.setField(controller, "campaignTypeRepository", campaignTypeRepository);
         ReflectionTestUtils.setField(controller, "coordinatorRepository", coordinatorRepository);
         ReflectionTestUtils.setField(controller, "captainRepository", captainRepository);
+        ReflectionTestUtils.setField(controller, "campaignStoreRepository", campaignStoreRepository);
 
         sampleTypeA = new CampaignType();
         sampleTypeA.setId(2);
@@ -286,11 +294,13 @@ class CampaignControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(coordinatorRepository).deleteAllByIdIdCampaign(1);
         verify(captainRepository).deleteAllByIdIdCampaign(1);
+        verify(campaignStoreRepository).deleteByIdCampaign_Id(1);
         verify(campaignRepository).deleteById(1);
 
-        InOrder inOrder = inOrder(coordinatorRepository, captainRepository, campaignRepository);
+        InOrder inOrder = inOrder(coordinatorRepository, captainRepository, campaignStoreRepository, campaignRepository);
         inOrder.verify(coordinatorRepository).deleteAllByIdIdCampaign(1);
         inOrder.verify(captainRepository).deleteAllByIdIdCampaign(1);
+        inOrder.verify(campaignStoreRepository).deleteByIdCampaign_Id(1);
         inOrder.verify(campaignRepository).deleteById(1);
 
         boolean actionLogged = listAppender.list.stream()
@@ -304,22 +314,33 @@ class CampaignControllerTest {
 
     @Test
     void listCampaigns_returns200WithCampaignList() {
-        when(campaignRepository.findByOrderByStartDateDesc()).thenReturn(List.of(sampleCampaign, secondCampaign));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Campaign> page = new PageImpl<>(List.of(sampleCampaign, secondCampaign), pageable, 2);
 
-        ResponseEntity<?> response = controller.getCampaigns();
+        when(campaignRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(campaignRepository.countByStartDateLessThanEqualAndEndDateGreaterThanEqual(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(1L);
+        when(campaignRepository.countByEndDateBefore(any(LocalDate.class))).thenReturn(1L);
+        when(campaignRepository.countByStartDateAfter(any(LocalDate.class))).thenReturn(1L);
+
+        ResponseEntity<?> response = controller.getCampaigns(null, 0, 10, "startDate,desc");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> body = (List<Map<String, Object>>) response.getBody();
-        assertEquals(2, body.size());
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
 
-        Map<String, Object> first = body.get(0);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> content = (List<Map<String, Object>>) body.get("content");
+        assertEquals(2, content.size());
+
+        Map<String, Object> first = content.get(0);
         assertTrue(first.containsKey("id"));
         assertTrue(first.containsKey("name"));
         assertTrue(first.containsKey("type"));
         assertTrue(first.containsKey("startDate"));
         assertTrue(first.containsKey("endDate"));
+        assertTrue(first.containsKey("status"));
     }
 
     @Test
