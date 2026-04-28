@@ -182,12 +182,10 @@
         }
 
         async function openEdit(id) {
-            // Buscamos en la tabla en memoria para no hacer una llamada extra
             try {
-                const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
-                const lista = await res.json();
-                const cadena = lista.find(c => c.id === id);
-                if (!cadena) { showToast('Cadena no encontrada.', 'error'); return; }
+                const res = await fetch(BACKEND + '/api/chains/' + id, { headers: authHeaders() });
+                if (!res.ok) { showToast('Error al cargar la cadena.', 'error'); return; }
+                const cadena = await res.json();
 
                 editingId = cadena.id;
                 document.getElementById('input-nombre').value = cadena.name;
