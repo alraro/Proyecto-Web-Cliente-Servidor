@@ -1065,10 +1065,69 @@ APTDO CORREOS 63
 INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
   (15, 'Captain Test', 'capitan@bancosol.info', '600000002', 'changeme'),
-  (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme');
+  (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme'),
+  (21, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
 
 INSERT INTO administrators (id_user) VALUES (14);
 
 INSERT INTO captains (id_user, id_campaign) VALUES (15, 1);
 
 INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, NULL);
+
+-- ============================================================
+-- SEQUENCE RESYNC (PostgreSQL)
+-- Prevent duplicate ID errors after manual inserts with explicit IDs.
+-- ============================================================
+SELECT setval(
+  pg_get_serial_sequence('campaign_types', 'id_type'),
+  COALESCE((SELECT MAX(id_type) FROM campaign_types), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('campaigns', 'id_campaign'),
+  COALESCE((SELECT MAX(id_campaign) FROM campaigns), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('geographic_zones', 'id_zone'),
+  COALESCE((SELECT MAX(id_zone) FROM geographic_zones), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('localities', 'id_locality'),
+  COALESCE((SELECT MAX(id_locality) FROM localities), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('districts', 'id_district'),
+  COALESCE((SELECT MAX(id_district) FROM districts), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('chains', 'id_chain'),
+  COALESCE((SELECT MAX(id_chain) FROM chains), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('user_accounts', 'id_user'),
+  COALESCE((SELECT MAX(id_user) FROM user_accounts), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('stores', 'id_store'),
+  COALESCE((SELECT MAX(id_store) FROM stores), 1),
+  true
+);
+
+SELECT setval(
+  pg_get_serial_sequence('partner_entities', 'id_partner_entity'),
+  COALESCE((SELECT MAX(id_partner_entity) FROM partner_entities), 1),
+  true
+);
