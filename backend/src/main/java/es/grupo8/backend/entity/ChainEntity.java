@@ -22,7 +22,7 @@ public class ChainEntity {
     @Column(name = "code", nullable = false, unique = true, length = 50)
     private String code;
 
-    @Column(name = "participation", nullable = false)
+    @Column(name = "participation", nullable = false, columnDefinition = "boolean default false")
     private Boolean participation = false;
 
 
