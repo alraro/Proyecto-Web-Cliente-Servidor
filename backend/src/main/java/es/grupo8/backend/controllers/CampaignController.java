@@ -3,6 +3,7 @@ package es.grupo8.backend.controllers;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -11,6 +12,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.CampaignRepository;
@@ -78,14 +84,87 @@ public class CampaignController {
 	}
 
 	@GetMapping("/campaigns")
-	@Operation(summary = "List all campaigns ordered by start date descending")
+	@Operation(summary = "List campaigns with optional status filter and pagination")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaigns listed successfully")
+			@ApiResponse(responseCode = "200", description = "Campaigns listed successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid status value")
 	})
-	public ResponseEntity<?> getCampaigns() {
-		List<Map<String, Object>> response = campaignRepository.findByOrderByStartDateDesc().stream()
+	public ResponseEntity<?> getCampaigns(
+			@RequestParam(required = false) String status,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "startDate,desc") String sort) {
+
+		if (status != null && !status.equalsIgnoreCase("ACTIVE")
+				&& !status.equalsIgnoreCase("PAST")
+				&& !status.equalsIgnoreCase("FUTURE")) {
+			return ResponseEntity.badRequest()
+					.body(Map.of("message", "Invalid status. Use ACTIVE, PAST or FUTURE"));
+		}
+
+		if (size > 50) {
+			size = 50;
+		}
+		if (size < 1) {
+			size = 10;
+		}
+
+		Sort sortObject = Sort.by(Sort.Direction.DESC, "startDate");
+		String[] sortParts = sort == null ? new String[0] : sort.split(",");
+		if (sortParts.length == 2) {
+			String field = sortParts[0] == null ? "" : sortParts[0].trim();
+			String direction = sortParts[1] == null ? "" : sortParts[1].trim();
+			boolean allowedField = Arrays.asList("startDate", "endDate", "name").contains(field);
+			if (allowedField) {
+				if ("asc".equalsIgnoreCase(direction)) {
+					sortObject = Sort.by(Sort.Direction.ASC, field);
+				} else if ("desc".equalsIgnoreCase(direction)) {
+					sortObject = Sort.by(Sort.Direction.DESC, field);
+				}
+			}
+		}
+
+		Pageable pageable = PageRequest.of(page, size, sortObject);
+
+		LocalDate today = LocalDate.now();
+		long totalActive = campaignRepository
+				.countByStartDateLessThanEqualAndEndDateGreaterThanEqual(today, today);
+		long totalPast = campaignRepository.countByEndDateBefore(today);
+		long totalFuture = campaignRepository.countByStartDateAfter(today);
+
+		Page<Campaign> campaignPage;
+		if (status == null) {
+			campaignPage = campaignRepository.findAll(pageable);
+		} else {
+			campaignPage = switch (status.toUpperCase()) {
+				case "PAST" -> campaignRepository.findByEndDateBefore(today, pageable);
+				case "FUTURE" -> campaignRepository.findByStartDateAfter(today, pageable);
+				default -> campaignRepository
+						.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(today, today, pageable);
+			};
+		}
+
+		List<Map<String, Object>> content = campaignPage.getContent().stream()
 				.map(this::toCampaignMap)
 				.collect(Collectors.toList());
+
+		Map<String, Object> pagination = new LinkedHashMap<>();
+		pagination.put("page", campaignPage.getNumber());
+		pagination.put("size", campaignPage.getSize());
+		pagination.put("totalElements", campaignPage.getTotalElements());
+		pagination.put("totalPages", campaignPage.getTotalPages());
+		pagination.put("isFirst", campaignPage.isFirst());
+		pagination.put("isLast", campaignPage.isLast());
+
+		Map<String, Object> summary = new LinkedHashMap<>();
+		summary.put("totalActive", totalActive);
+		summary.put("totalPast", totalPast);
+		summary.put("totalFuture", totalFuture);
+
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("content", content);
+		response.put("pagination", pagination);
+		response.put("summary", summary);
 
 		return ResponseEntity.ok(response);
 	}
@@ -287,7 +366,19 @@ public class CampaignController {
 		response.put("type", campaignTypeToMap(campaign.getIdType()));
 		response.put("startDate", campaign.getStartDate() == null ? null : campaign.getStartDate().toString());
 		response.put("endDate", campaign.getEndDate() == null ? null : campaign.getEndDate().toString());
+		response.put("status", computeStatus(campaign.getStartDate(), campaign.getEndDate()));
 		return response;
+	}
+
+	private static String computeStatus(LocalDate startDate, LocalDate endDate) {
+		LocalDate today = LocalDate.now();
+		if (endDate != null && endDate.isBefore(today)) {
+			return "PAST";
+		}
+		if (startDate != null && startDate.isAfter(today)) {
+			return "FUTURE";
+		}
+		return "ACTIVE";
 	}
 
 	private Map<String, Object> campaignTypeToMap(CampaignType type) {

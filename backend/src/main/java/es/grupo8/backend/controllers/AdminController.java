@@ -71,6 +71,17 @@ public class AdminController {
     }
 
     /**
+     * Serves the public campaign listing JSP (RF-13).
+     * Accessible to all authenticated roles — not admin-only.
+     * Linked from: frontend/admin.html → "Ver campañas" card or direct URL.
+     * Maps to: WEB-INF/jsp/campaigns.jsp
+     */
+    @GetMapping("/campaigns")
+    public String campaigns() {
+        return "campaigns";
+    }
+
+    /**
      * Handles the "Back to menu" link inside admin JSP views.
      *
      * The JSPs live at localhost:8080 but the admin panel lives at localhost:80.
