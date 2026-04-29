@@ -26,7 +26,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
             <h1>Cadenas de supermercados</h1>
             <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
         </div>
@@ -62,13 +62,13 @@
             <h3 id="modal-title">Nueva cadena</h3>
 
             <div class="form-group">
-                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
                 <input type="text" id="input-nombre" placeholder="Ej: Mercadona" maxlength="255">
             </div>
             <div class="form-group">
-                <label for="input-codigo">Código <span style="color:#dc2626">*</span></label>
+                <label for="input-codigo">Código <span class="required-asterisk">*</span></label>
                 <input type="text" id="input-codigo" placeholder="Ej: MERC" maxlength="50">
-                <p style="font-size:.78rem;color:var(--ink-light);margin-top:.3rem;">Solo letras, números, guiones y guiones bajos.</p>
+                <p class="field-help">Solo letras, números, guiones y guiones bajos.</p>
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="input-participacion">
@@ -118,7 +118,7 @@
                 <tr>
                     <td>${c.id}</td>
                     <td><strong>${escHtml(c.name)}</strong></td>
-                    <td><code style="background:#f1f5f9;padding:.2rem .5rem;border-radius:6px;font-size:.85rem;">${escHtml(c.code)}</code></td>
+                    <td><code class="inline-code">${escHtml(c.code)}</code></td>
                     <td>
                         ${c.participation
                             ? '<span class="badge badge-yes">✓ Sí</span>'

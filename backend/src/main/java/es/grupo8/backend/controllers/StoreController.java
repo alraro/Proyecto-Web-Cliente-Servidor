@@ -2,6 +2,7 @@ package es.grupo8.backend.controllers;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -258,4 +259,12 @@ public class StoreController {
         String t = v.trim();
         return t.isEmpty() ? null : t;
     }
+
+    public static Map<String, Object> toMap(Store store) {
+      Map<String, Object> map = new LinkedHashMap<>();
+      map.put("id", store.getId());
+      map.put("name", store.getName());
+      map.put("address", store.getAddress());
+      return map;
+  }
 }
