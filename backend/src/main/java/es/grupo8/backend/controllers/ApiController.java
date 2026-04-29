@@ -6,7 +6,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
@@ -19,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +30,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
+import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.UserEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -39,6 +46,12 @@ public class ApiController {
 
 	@Autowired
 	protected UserRepository userRepository;
+
+	@Autowired
+	protected CampaignRepository campaignRepository;
+
+	@Autowired
+	protected StoreRepository storeRepository;
 
 	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
 	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
@@ -255,17 +268,25 @@ public class ApiController {
 					.body(Map.of("message", "No tiene rol asignado."));
 		}
 
-		return ResponseEntity.ok(Map.of(
-				"userId", user.getIdUser(),
-				"nombre", user.getName(),
-				"email", user.getEmail(),
-				"role", role,
-				"redirectUrl", buildFrontendUrl(roleToPath(role)),
-				"message", "Login correcto",
-				"token", token,
-				"tokenType", "Bearer",
-				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
-		));
+		// HashMap porque Map.of() no acepta null (storeId puede ser null)
+		Map<String, Object> loginResponse = new HashMap<>();
+		loginResponse.put("userId",           user.getIdUser());
+		loginResponse.put("nombre",           user.getName());
+		loginResponse.put("email",            user.getEmail());
+		loginResponse.put("role",             role);
+		loginResponse.put("redirectUrl",      buildFrontendUrl(roleToPath(role)));
+		loginResponse.put("message",          "Login correcto");
+		loginResponse.put("token",            token);
+		loginResponse.put("tokenType",        "Bearer");
+		loginResponse.put("expiresInSeconds", Math.max(1, jwtExpirationMs / 1000));
+
+		// Si es Responsable de Tienda, incluir storeId para que el frontend sepa a qué tienda ir
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			storeRepository.findByIdResponsible_IdUser(user.getIdUser())
+					.ifPresent(s -> loginResponse.put("storeId", s.getId()));
+		}
+
+		return ResponseEntity.ok(loginResponse);
 	}
 
 
@@ -587,6 +608,10 @@ public class ApiController {
 			return "COLABORADOR";
 		}
 
+		if (storeRepository.existsByIdResponsible_IdUser(userId)) {
+			return "RESPONSABLE_TIENDA";
+		}
+
 		return "PENDIENTE";
 	}
 
@@ -605,6 +630,10 @@ public class ApiController {
 
 		if ("COLABORADOR".equals(role)) {
 			return "/collaborator.html";
+		}
+
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			return "/responsible-store.html";
 		}
 
 		return "/login.html";

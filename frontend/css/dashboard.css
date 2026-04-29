@@ -3,6 +3,11 @@
 
 body { font-family: 'Nunito', sans-serif; background: #f3f4f6; color: #1f2937; }
 
+<<<<<<< HEAD
+=======
+.is-hidden { display: none !important; }
+
+>>>>>>> 0e3a5fca7fce2ae2c60f0da4c5478a007236bafe
 /* Topbar */
 .topbar {
     display: flex;

@@ -36,26 +36,9 @@ public class CoordinatorGuard {
         this.signingKey = key;
     }
 
-    /**
-     * Check if the user has Coordinator role for a specific campaign
-     */
-    public boolean isCoordinator(String authHeader, Integer campaignId) {
-        Integer userId = extractUserId(authHeader);
-        if (userId == null || campaignId == null) {
-            return false;
-        }
-        return coordinatorRepository.existsByIdUser_IdUserAndIdCampaign_Id(userId, campaignId);
-    }
-
-    /**
-     * Check if user is coordinator for any campaign
-     */
     public boolean isCoordinator(String authHeader) {
         Integer userId = extractUserId(authHeader);
-        if (userId == null) {
-            return false;
-        }
-        return coordinatorRepository.existsByIdUser_IdUser(userId);
+        return userId != null && coordinatorRepository.isUserCoordinator(userId);
     }
 
     public Integer extractUserId(String authHeader) {

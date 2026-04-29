@@ -1,0 +1,63 @@
+.hidden {
+    display: none !important;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+}
+
+.info-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.info-item span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.badge-attendance {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-yes {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-no {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-pending {
+    background: #fef9c3;
+    color: #92400e;
+}
+
+.error-panel {
+    padding: 2rem;
+    text-align: center;
+    color: #dc2626;
+    font-weight: 600;
+}

@@ -16,6 +16,11 @@ services:
       - ./.env
     ports:
       - ${POSTGRES_PORT:-5432}:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
@@ -47,7 +52,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
 volumes:
   postgres_data:

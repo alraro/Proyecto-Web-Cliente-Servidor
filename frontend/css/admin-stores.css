@@ -1,0 +1,43 @@
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.filters-bar select {
+    flex: 1 1 160px;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    font-family: inherit;
+    font-size: 0.88rem;
+    background: #fff;
+    color: var(--ink);
+}
+
+.filters-bar button {
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background: var(--blue-700);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+
+.filters-bar button.btn-clear {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.filters-bar button.btn-clear:hover {
+    background: #d1d5db;
+}
+
+.modal-store {
+    max-width: 520px;
+}
