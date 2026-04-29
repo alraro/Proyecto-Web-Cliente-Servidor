@@ -142,7 +142,7 @@ public class ChainController {
         return ResponseEntity.ok(Map.of("message", "Chain deleted successfully"));
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // Helpers
 
     private static ResponseEntity<?> forbidden() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
