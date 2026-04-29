@@ -1,9 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Gestión de Turnos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/coordinator.css">
+    <script src="javascript/coordinator.js" defer></script>
 </head>
-
 <body>
-    Bienvenido Coordinador
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Coordinador</span>
+            </div>
+            <button class="btn-edit" id="btn-edit">Editar perfil</button>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="welcome-bar">
+            <div>
+                <h2>Gestión de Turnos y Asignaciones 👋</h2>
+                <p>Desde aquí puedes asignar voluntarios y capitanes a los turnos de campaña.</p>
+            </div>
+            <span class="role-pill">🎯 Coordinador</span>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alert-container"></div>
+
+        <!-- Shift Assignment Section -->
+        <section class="assignment-section">
+            <h3 class="section-title">Asignar Voluntario a Turno</h3>
+            
+            <form id="volunteer-assignment-form" class="assignment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="campaign-select">Campaña</label>
+                        <select id="campaign-select" required>
+                            <option value="">Seleccionar campaña...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-select">Tienda</label>
+                        <select id="store-select" required disabled>
+                            <option value="">Seleccionar tienda...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="shift-date">Fecha del turno</label>
+                        <input type="date" id="shift-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="start-time">Hora de inicio</label>
+                        <input type="time" id="start-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end-time">Hora de fin</label>
+                        <input type="time" id="end-time" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="volunteer-select">Voluntario</label>
+                        <select id="volunteer-select" required disabled>
+                            <option value="">Seleccionar voluntario...</option>
+                        </select>
+                    </div>
+                    <div class="form-group volunteer-count">
+                        <label>Voluntarios actuales</label>
+                        <span id="current-volunteer-count" class="count-display">0 / 10</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-assign-volunteer">
+                    Asignar Voluntario
+                </button>
+            </form>
+        </section>
+
+        <!-- Captain Assignment Section -->
+        <section class="assignment-section">
+            <h3 class="section-title">Asignar Capitán a Campaña</h3>
+            
+            <form id="captain-assignment-form" class="assignment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="captain-campaign-select">Campaña</label>
+                        <select id="captain-campaign-select" required>
+                            <option value="">Seleccionar campaña...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="captain-select">Usuario (Capitán)</label>
+                        <select id="captain-select" required disabled>
+                            <option value="">Seleccionar capitán...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-assign-captain">
+                    Asignar Capitán
+                </button>
+            </form>
+        </section>
+
+        <!-- Current Assignments Section -->
+        <section class="assignments-list-section">
+            <h3 class="section-title">Turnos Asignados</h3>
+            
+            <div class="filters-row">
+                <div class="form-group">
+                    <label for="filter-campaign">Filtrar por campaña</label>
+                    <select id="filter-campaign">
+                        <option value="">Todas las campañas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filter-store">Filtrar por tienda</label>
+                    <select id="filter-store">
+                        <option value="">Todas las tiendas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filter-date">Filtrar por fecha</label>
+                    <input type="date" id="filter-date">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="assignments-table">
+                    <thead>
+                        <tr>
+                            <th>Voluntario</th>
+                            <th>Campaña</th>
+                            <th>Tienda</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignments-tbody">
+                        <tr class="empty-row">
+                            <td colspan="6">No hay asignaciones para mostrar</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 </body>
+</html>

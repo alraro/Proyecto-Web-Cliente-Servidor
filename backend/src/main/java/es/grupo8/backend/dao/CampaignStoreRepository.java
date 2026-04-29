@@ -14,6 +14,9 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
     /** Devuelve todas las CampaignStore asociadas a una tienda concreta */
     List<CampaignStore> findByIdStore_Id(Integer storeId);
 
+    /** Get all stores for a specific campaign */
+    List<CampaignStore> findByIdCampaign_Id(Integer campaignId);
+
     // Cobertura por Cadena para una campaña concreta
     @Query("select s.idChain.name, COUNT(DISTINCT s.id), COUNT(DISTINCT cs.idStore.id) " +
             "from Store s " +
