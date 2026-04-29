@@ -68,7 +68,15 @@ public class ExportController {
 
 
     private byte[] exportStores() throws IOException {
+        List<Store> stores = storeRepository.findAll();
 
+        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+            Sheet sheet = wb.createSheet("Tiendas");
+            CellStyle headerStyle = createHeaderStyle(wb);
+
+            String[] cols = {"ID", "Nombre", "Dirección", "Codigo Postal", "Localidad", "Zona", "Cadena"};
+            
+        }
     }
 
 
