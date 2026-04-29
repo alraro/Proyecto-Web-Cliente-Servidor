@@ -83,3 +83,7 @@
 - **Pull Requests:** Obligatorio crear un pull request para cada rama, con una descripción clara de los cambios realizados y la funcionalidad implementada. Prohibido fusionar ramas sin una revisión previa. El repositorio no permite pushear a main y a dev directamente, por lo que es obligatorio crear un pull request para fusionar cualquier rama a main o dev.
 - **Revisiones de Código:** Cada pull request debe ser revisado por al menos un miembro del equipo antes de ser fusionado. Prohibido fusionar pull requests sin una revisión adecuada.
 - **Commits:** Mensajes de commit claros y descriptivos.
+
+## 8. Limitaciones de directorios de trabajo
+- Debes de limitarte en la medida de lo posible a trabajar solo en los directorios relacionados con la funcionalidad que estes implementando, evitando modificar o tocar código de otras funcionalidades o módulos que no estén relacionados con tu tarea, para evitar conflictos y problemas de integración. Prohibido modificar código de otras funcionalidades o módulos que no estén relacionados con tu tarea, a menos que sea absolutamente necesario para la implementación de tu funcionalidad y siempre con una justificación clara en el pull request.
+- En caso de que sea necesario modificar código de otras funcionalidades o módulos, se debe de comunicar previamente al equipo y obtener su aprobación antes de realizar cualquier cambio. Prohibido modificar código de otras funcionalidades o módulos sin una comunicación previa y una aprobación clara del equipo.
