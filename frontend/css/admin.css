@@ -554,3 +554,243 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     color: rgba(31,41,55,0.45); 
     margin: 2rem 0 0; 
 }
+
+.hidden {
+    display: none !important;
+}
+
+.page-header-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+#global-message {
+    margin: 0.2rem 0 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.93rem;
+    font-weight: 700;
+}
+
+#global-message.success {
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    color: #166534;
+}
+
+#global-message.error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.btn-secondary {
+    background: rgba(235, 123, 49, 0.12);
+    color: #eb7b31;
+}
+
+.btn-secondary:hover {
+    background: rgba(235, 123, 49, 0.22);
+}
+
+.form-group select,
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(25, 58, 107, 0.18);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 0.93rem;
+    color: var(--ink);
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.form-group select:focus,
+.form-group input[type="date"]:focus {
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 3px rgba(45, 101, 160, 0.14);
+}
+
+#modal-error {
+    margin-top: 0.6rem;
+    color: #b91c1c;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.back-link-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--blue-700);
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.required-asterisk {
+    color: #dc2626;
+}
+
+.field-help {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    margin-top: 0.3rem;
+}
+
+.inline-code {
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+#campaign-modal .modal {
+    max-width: 960px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.store-selector-section {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+}
+
+.store-selector-section h3,
+.store-selector-title {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--blue-900);
+}
+
+.store-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.store-filter-row select {
+    flex: 1;
+    min-width: 120px;
+}
+
+.store-dual-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.store-panel h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--blue-900);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.store-selector-section .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    padding: 0 0.3rem;
+    border-radius: 9999px;
+    background: var(--blue-700);
+    color: var(--white);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.store-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.store-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
+}
+
+.store-list li:last-child {
+    border-bottom: none;
+}
+
+.store-list li:hover {
+    background: rgba(25, 58, 107, 0.03);
+}
+
+.store-list-empty {
+    color: var(--ink-light);
+    font-style: italic;
+    padding: 0.75rem !important;
+    justify-content: center !important;
+    border: none !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+}
+
+.btn-add-store {
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+    background: var(--surface);
+    color: var(--blue-700);
+}
+
+.btn-add-store:hover {
+    background: var(--white);
+}
+
+.btn-remove-store {
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+    background: var(--surface);
+    color: var(--orange-500);
+}
+
+.btn-remove-store:hover {
+    background: var(--white);
+}
+
+@media (max-width: 640px) {
+    .store-dual-panel {
+        grid-template-columns: 1fr;
+    }
+}

@@ -3,6 +3,8 @@
 
 body { font-family: 'Nunito', sans-serif; background: #f3f4f6; color: #1f2937; }
 
+.is-hidden { display: none !important; }
+
 /* Topbar */
 .topbar {
     display: flex;

@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.UserEntity;
@@ -48,6 +49,9 @@ public class ApiController {
 
 	@Autowired
 	protected CampaignRepository campaignRepository;
+
+	@Autowired
+	protected StoreRepository storeRepository;
 
 	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
 	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
@@ -264,17 +268,25 @@ public class ApiController {
 					.body(Map.of("message", "No tiene rol asignado."));
 		}
 
-		return ResponseEntity.ok(Map.of(
-				"userId", user.getIdUser(),
-				"nombre", user.getName(),
-				"email", user.getEmail(),
-				"role", role,
-				"redirectUrl", buildFrontendUrl(roleToPath(role)),
-				"message", "Login correcto",
-				"token", token,
-				"tokenType", "Bearer",
-				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
-		));
+		// HashMap porque Map.of() no acepta null (storeId puede ser null)
+		Map<String, Object> loginResponse = new HashMap<>();
+		loginResponse.put("userId",           user.getIdUser());
+		loginResponse.put("nombre",           user.getName());
+		loginResponse.put("email",            user.getEmail());
+		loginResponse.put("role",             role);
+		loginResponse.put("redirectUrl",      buildFrontendUrl(roleToPath(role)));
+		loginResponse.put("message",          "Login correcto");
+		loginResponse.put("token",            token);
+		loginResponse.put("tokenType",        "Bearer");
+		loginResponse.put("expiresInSeconds", Math.max(1, jwtExpirationMs / 1000));
+
+		// Si es Responsable de Tienda, incluir storeId para que el frontend sepa a qué tienda ir
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			storeRepository.findByIdResponsible_IdUser(user.getIdUser())
+					.ifPresent(s -> loginResponse.put("storeId", s.getId()));
+		}
+
+		return ResponseEntity.ok(loginResponse);
 	}
 
 
@@ -579,78 +591,6 @@ public class ApiController {
 		}
 	}
 
-	// Endpoint para obtener todas las campañas
-	@GetMapping("/api/campaigns")
-	@ResponseBody
-	public ResponseEntity<?> getCampaigns(
-			@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-		Integer userId = extractUserIdFromAuthHeader(authHeader);
-		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Token invalido o ausente"));
-		}
-
-		String role = resolveRole(userId);
-		if (!"ADMINISTRADOR".equals(role) && !"COORDINADOR".equals(role) && !"CAPITAN".equals(role)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "No tienes permiso para ver las campañas"));
-		}
-
-		List<Campaign> campaigns = campaignRepository.findAll();
-		List<Map<String, Object>> result = campaigns.stream()
-				.map(c -> {
-					Map<String, Object> map = new HashMap<>();
-					map.put("id", c.getId());
-					map.put("name", c.getName());
-					map.put("startDate", c.getStartDate());
-					map.put("endDate", c.getEndDate());
-					map.put("type", c.getIdType() != null ? c.getIdType().getName() : "");
-					return map;
-				})
-				.collect(Collectors.toList());
-
-		return ResponseEntity.ok(result);
-	}
-
-	// Endpoint para obtener tiendas de una campaña
-	@GetMapping("/api/campaigns/{id}/stores")
-	@ResponseBody
-	public ResponseEntity<?> getCampaignStores(
-			@PathVariable("id") Integer campaignId,
-			@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-		Integer userId = extractUserIdFromAuthHeader(authHeader);
-		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Token invalido o ausente"));
-		}
-
-		String role = resolveRole(userId);
-		if (!"ADMINISTRADOR".equals(role) && !"COORDINADOR".equals(role) && !"CAPITAN".equals(role)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "No tienes permiso para ver las tiendas"));
-		}
-
-		Campaign campaign = campaignRepository.findById(campaignId).orElse(null);
-		if (campaign == null) {
-			return ResponseEntity.badRequest()
-					.body(Map.of("message", "Campaña no encontrada"));
-		}
-
-		List<Map<String, Object>> stores = campaign.getStores().stream()
-				.map(s -> {
-					Map<String, Object> map = new HashMap<>();
-					map.put("id", s.getId());
-					map.put("name", s.getName());
-					map.put("address", s.getAddress() != null ? s.getAddress() : "");
-					return map;
-				})
-				.collect(Collectors.toList());
-
-		return ResponseEntity.ok(stores);
-	}
-
 	private String resolveRole(Integer userId) {
 		if (userRepository.isAdmin(userId)) {
 			return "ADMINISTRADOR";
@@ -666,6 +606,10 @@ public class ApiController {
 
 		if (userRepository.isPartnerEntityManager(userId)) {
 			return "COLABORADOR";
+		}
+
+		if (storeRepository.existsByIdResponsible_IdUser(userId)) {
+			return "RESPONSABLE_TIENDA";
 		}
 
 		return "PENDIENTE";
@@ -686,6 +630,10 @@ public class ApiController {
 
 		if ("COLABORADOR".equals(role)) {
 			return "/collaborator.html";
+		}
+
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			return "/responsible-store.html";
 		}
 
 		return "/login.html";

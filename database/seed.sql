@@ -1065,7 +1065,10 @@ APTDO CORREOS 63
 INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
   (15, 'Captain Test', 'capitan@bancosol.info', '600000002', 'changeme'),
-  (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme');
+  (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme'),
+  (21, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
+
+UPDATE stores SET id_responsible = 21 WHERE id_store = 1;  
 
 INSERT INTO administrators (id_user) VALUES (14);
 

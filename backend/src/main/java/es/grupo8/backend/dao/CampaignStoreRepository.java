@@ -2,9 +2,11 @@ package es.grupo8.backend.dao;
  
 import java.util.List;
  
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
@@ -13,6 +15,19 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
  
     /** Devuelve todas las CampaignStore asociadas a una tienda concreta */
     List<CampaignStore> findByIdStore_Id(Integer storeId);
+
+        List<CampaignStore> findByIdCampaign_Id(Integer campaignId);
+
+        boolean existsByIdCampaign_IdAndIdStore_Id(Integer campaignId, Integer storeId);
+
+        @Transactional
+        @Modifying
+        void deleteByIdCampaign_IdAndIdStore_Id(Integer campaignId, Integer storeId);
+
+        @Modifying
+        @Transactional
+        @Query("DELETE FROM CampaignStore cs WHERE cs.id.idCampaign = :campaignId")
+        void deleteByCampaignId(@Param("campaignId") Integer campaignId);
 
     // Cobertura por Cadena para una campaña concreta
     @Query("select s.idChain.name, COUNT(DISTINCT s.id), COUNT(DISTINCT cs.idStore.id) " +

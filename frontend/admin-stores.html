@@ -8,15 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
-    <style>
-        .filters-bar { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid var(--border); }
-        .filters-bar select { flex:1 1 160px; padding:.45rem .75rem; border-radius:8px;
-            border:1.5px solid #d1d5db; font-family:inherit; font-size:.88rem; background:#fff; color:var(--ink); }
-        .filters-bar button { padding:.45rem 1rem; border-radius:8px; border:none;
-            background:var(--blue-700); color:#fff; font-weight:700; cursor:pointer; font-size:.88rem; }
-        .filters-bar button.btn-clear { background:#e5e7eb; color:#374151; }
-        .filters-bar button.btn-clear:hover { background:#d1d5db; }
-    </style>
+    <link rel="stylesheet" href="css/admin-stores.css">
 </head>
 <body>
 
@@ -35,7 +27,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
             <h1>Tiendas</h1>
             <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
         </div>
@@ -48,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- FILTROS -->
             <div class="filters-bar">
                 <select id="filter-zone">
                     <option value="">Todas las zonas</option>
@@ -85,13 +76,12 @@
         </div>
     </main>
 
-    <!-- MODAL CREAR / EDITAR -->
     <div class="modal-backdrop" id="modal-backdrop">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="max-width:520px;">
+        <div class="modal modal-store" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <h3 id="modal-title">Nueva tienda</h3>
 
             <div class="form-group">
-                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
                 <input type="text" id="input-nombre" placeholder="Nombre de la tienda" maxlength="255">
             </div>
             <div class="form-group">
@@ -144,7 +134,7 @@
         }
         function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
 
-        // ── Datos auxiliares ──────────────────────────────────────────────────
+        // Datos auxiliares
         let allChains     = [];
         let allLocalities = [];   // { id, name, zoneId }
         let allZones      = [];   // { id, name }
@@ -172,7 +162,7 @@
             });
 
             // Poblar select de localidades (filtro) — todas al inicio
-            poblarLocalidades('');
+            populateLocalities('');
 
             // Poblar select de cadenas (filtro y modal)
             const fc  = document.getElementById('filter-chain');
@@ -189,10 +179,10 @@
         // Cuando cambia la zona en el filtro, actualizar localidades
         document.getElementById('filter-zone').addEventListener('change', function () {
             document.getElementById('filter-locality').value = '';
-            poblarLocalidades(this.value);
+            populateLocalities(this.value);
         });
 
-        function poblarLocalidades(zoneId) {
+        function populateLocalities(zoneId) {
             const sel = document.getElementById('filter-locality');
             // Guardar valor actual para restaurarlo si sigue siendo válido
             const valorActual = sel.value;
@@ -214,7 +204,6 @@
             }
         }
 
-        // ── Tabla ─────────────────────────────────────────────────────────────
         function renderTable(stores) {
             const tbody = document.getElementById('stores-tbody');
             if (!stores.length) {
@@ -240,7 +229,6 @@
             `).join('');
         }
 
-        // ── Cargar tiendas ────────────────────────────────────────────────────
         async function loadStores() {
             const chainId    = document.getElementById('filter-chain').value;
             const localityId = document.getElementById('filter-locality').value;
@@ -268,11 +256,10 @@
             document.getElementById('filter-zone').value     = '';
             document.getElementById('filter-locality').value = '';
             document.getElementById('filter-chain').value    = '';
-            poblarLocalidades('');
+            populateLocalities('');
             loadStores();
         });
 
-        // ── Modal ─────────────────────────────────────────────────────────────
         let editingId = null;
 
         function openModal(titulo) {
@@ -314,7 +301,6 @@
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        // ── Guardar ───────────────────────────────────────────────────────────
         document.getElementById('btn-modal-save').addEventListener('click', async () => {
             const nombre    = document.getElementById('input-nombre').value.trim();
             const domicilio = document.getElementById('input-domicilio').value.trim();
@@ -340,7 +326,6 @@
             } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
         });
 
-        // ── Eliminar ──────────────────────────────────────────────────────────
         async function deleteStore(id, nombre) {
             if (!confirm(`¿Eliminar la tienda "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
             try {
@@ -351,7 +336,6 @@
             } catch { showToast('Error de conexión.', 'error'); }
         }
 
-        // ── Init ──────────────────────────────────────────────────────────────
         loadAuxData().then(() => loadStores());
     </script>
 </body>
