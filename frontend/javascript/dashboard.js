@@ -1,4 +1,3 @@
-// ── Utilidades ────────────────────────────────────────────────────────────────
 const TOKEN_KEY = 'token';
 const API_BASE = 'http://localhost:8080';
 const getToken  = () => localStorage.getItem(TOKEN_KEY);
@@ -20,12 +19,12 @@ async function apiFetch(url) {
     return res.json();
 }
 
-// ── Estado global ────────────────────────────────────────────────────────────
-let charts = {};          // Chart.js instances
+
+let charts = {};
 let refreshTimer = null;
 let currentCampaignId = null;
 
-// ── Inicialización ───────────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
@@ -45,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('refreshBtn').addEventListener('click', () => loadMetrics(currentCampaignId));
 });
 
+// Función para cargar campañas y llenar el select
 async function loadCampaigns() {
     try {
         const campaigns = await apiFetch('/api/dashboard/campaigns');
@@ -52,7 +52,7 @@ async function loadCampaigns() {
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
-            opt.textContent = `${c.name} ${c.active ? '🟢' : '⚪'} (${c.startDate} → ${c.endDate})`;
+            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${c.startDate} → ${c.endDate})`;
             sel.appendChild(opt);
         });
 
@@ -76,24 +76,27 @@ function onCampaignChange(e) {
     }
 }
 
-// ── Carga de métricas ────────────────────────────────────────────────────────
+// Cargamos datos para mostrar KPIs y gráficos
 async function loadMetrics(campaignId) {
     if (!campaignId) return;
-    showLoading(true);
+    showLoading(true); // Mostramos spinner de carga
     hideError();
 
     try {
+        // Obtenemos los datos por cadena, localidad y zona
         const [chainData, localityData, zoneData] = await Promise.all([
             apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/chain`),
             apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/locality`),
             apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/zone`),
         ]);
 
+        // Mostramos el gráfico de cada una de las coberturas
         updateKPIs(chainData, zoneData);
         renderChart('chainChart',    chainData,    'bar',        'Cadenas');
         renderChart('localityChart', localityData, 'bar',        'Localidades');
         renderChart('zoneChart',     zoneData,     'horizontalBar', 'Zonas');
 
+        // Se muestran contenedores de datos
         document.getElementById('kpiRow').style.display    = 'flex';
         document.getElementById('chartsGrid').style.display = 'grid';
         document.getElementById('noSelection').style.display = 'none';
@@ -117,7 +120,7 @@ function updateKPIs(chainData, zoneData) {
     document.getElementById('kpiZones').textContent  = zonesActive;
 }
 
-// ── Renderizado de gráficos ──────────────────────────────────────────────────
+// Configuramos y dibujamos el gráfico usando Chart.js
 function renderChart(canvasId, data, type, dimensionLabel) {
     const canvas = document.getElementById(canvasId);
     const labels  = data.map(d => d.label);
@@ -174,7 +177,8 @@ function renderChart(canvasId, data, type, dimensionLabel) {
     });
 }
 
-// ── Auto-refresh ─────────────────────────────────────────────────────────────
+
+// Actualizamos por el intervalo seleccionado
 function resetTimer() {
     if (refreshTimer) clearInterval(refreshTimer);
     const ms = parseInt(document.getElementById('refreshInterval').value);
@@ -183,10 +187,11 @@ function resetTimer() {
     }
 }
 
-// ── UI helpers ───────────────────────────────────────────────────────────────
+
 function showLoading(on) {
     document.getElementById('loadingSpinner').style.display = on ? 'block' : 'none';
 }
+// Mostramos vista inicial
 function showNoSelection() {
     document.getElementById('kpiRow').style.display     = 'none';
     document.getElementById('chartsGrid').style.display = 'none';
@@ -194,7 +199,7 @@ function showNoSelection() {
 }
 function showError(msg) {
     const el = document.getElementById('errorMsg');
-    el.textContent = `⚠️ ${msg}`;
+    el.textContent = `Error: ${msg}`;
     el.style.display = 'block';
 }
 function hideError() {
