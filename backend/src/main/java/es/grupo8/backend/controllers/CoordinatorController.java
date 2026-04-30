@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/shifts")
+@RequestMapping("/api/coordinator/shifts")
 @Tag(name = "Turnos de recogida", description = "API para gestionar turnos de recogida de alimentos")
 @SecurityRequirement(name = "Bearer Authentication")
 public class CoordinatorController {

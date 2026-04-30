@@ -1,5 +1,6 @@
 package es.grupo8.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -27,11 +28,13 @@ public class Volunteer {
     @Column(name = "address", length = Integer.MAX_VALUE)
     private String address;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "id_partner_entity")
     private PartnerEntity idPartnerEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "idVolunteer")
     private Set<VolunteerShift> volunteerShifts = new LinkedHashSet<>();
 

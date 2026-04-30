@@ -41,6 +41,17 @@ public class CoordinatorGuard {
         return userId != null && coordinatorRepository.isUserCoordinator(userId);
     }
 
+    /**
+     * Check if the user has Coordinator role for a specific campaign
+     */
+    public boolean isCoordinator(String authHeader, Integer campaignId) {
+        Integer userId = extractUserId(authHeader);
+        if (userId == null || campaignId == null) {
+            return false;
+        }
+        return coordinatorRepository.isUserCoordinatorForCampaign(userId, campaignId);
+    }
+
     public Integer extractUserId(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
         try {

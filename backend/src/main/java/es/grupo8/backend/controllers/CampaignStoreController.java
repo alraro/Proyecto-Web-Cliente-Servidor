@@ -29,6 +29,7 @@ import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
 import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.security.CoordinatorGuard;
 
 /**
  * RF-12: administration of campaign-store assignments.
@@ -48,6 +49,9 @@ public class CampaignStoreController {
 	private AdminGuard adminGuard;
 
 	@Autowired
+	private CoordinatorGuard coordinatorGuard;
+
+	@Autowired
 	private CampaignRepository campaignRepository;
 
 	@Autowired
@@ -61,7 +65,7 @@ public class CampaignStoreController {
 			@RequestHeader(value = "Authorization", required = false) String authHeader,
 			@PathVariable Integer campaignId) {
 
-		if (!adminGuard.isAdmin(authHeader)) {
+		if (!adminGuard.isAdmin(authHeader) && !coordinatorGuard.isCoordinator(authHeader)) {
 			return forbidden();
 		}
 
