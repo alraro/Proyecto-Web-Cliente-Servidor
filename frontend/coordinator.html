@@ -28,18 +28,17 @@
     <main class="page-wrapper">
         <div class="welcome-bar">
             <div>
-                <h2>Bienvenido, <span id="welcome-name">Coordinador</span> 👋</h2>
-                <p>Desde aquí puedes gestionar los turnos de recogida de alimentos de las campañas.</p>
+                <h2>Gestión de Turnos y Asignaciones 👋</h2>
+                <p>Desde aquí puedes crear turnos y asignar voluntarios a las campañas.</p>
             </div>
-            <span class="role-pill">📋 Coordinador</span>
+            <span class="role-pill">Coordinador</span>
         </div>
 
-        <p class="section-title">Gestión de Turnos</p>
-        
-        <!-- Formulario para crear turno -->
-        <div class="form-card">
-            <h3>Crear nuevo turno de recogida</h3>
-            <form id="shift-form">
+        <div id="alert-container"></div>
+
+        <section class="assignment-section">
+            <h3 class="section-title">Crear nuevo turno de recogida</h3>
+            <form id="shift-form" class="assignment-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="campaign-select">Campaña *</label>
@@ -79,61 +78,50 @@
 
                 <div class="form-group">
                     <label for="location">Ubicación específica</label>
-                    <input type="text" id="location" placeholder="Ej: Entrada principal, calle lateral..." maxlength="500">
+                    <input type="text" id="location" placeholder="Ej: Entrada principal..." maxlength="500">
                 </div>
 
-                <div class="form-group">
-                    <label for="observations">Observaciones</label>
-                    <textarea id="observations" rows="3" placeholder="Notas adicionales para el turno..." maxlength="1000"></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary" id="btn-create-shift">Crear turno</button>
-                    <button type="reset" class="btn-secondary">Limpiar formulario</button>
-                </div>
+                <button type="submit" class="btn-primary" id="btn-create-shift">Crear turno</button>
             </form>
-            <div id="form-message" class="form-message"></div>
-        </div>
+        </section>
 
-        <!-- Lista de turnos -->
+        <section class="assignment-section">
+            <h3 class="section-title">Asignar Voluntario a Turno Existente</h3>
+            <form id="volunteer-assignment-form" class="assignment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="shift-assign-select">Turno *</label>
+                        <select id="shift-assign-select" required disabled>
+                            <option value="">Selecciona primero una campaña</option>
+                        </select>
+                    </div>
+                    <div class="form-group volunteer-count">
+                        <label>Voluntarios asignados / necesarios</label>
+                        <span id="current-volunteer-count" class="count-display">-- / --</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="volunteer-select">Voluntario *</label>
+                        <select id="volunteer-select" required disabled>
+                            <option value="">Seleccionar voluntario...</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="assignment-message" class="form-message"></div>
+                <button type="submit" class="btn-primary">Asignar Voluntario</button>
+            </form>
+        </section>
+
         <div class="shifts-list-card">
             <div class="shifts-list-header">
-                <h3>Turnos de la campaña</h3>
-                <button class="btn-refresh" id="btn-refresh-shifts">🔄 Actualizar</button>
+                <h3>Turnos Actuales</h3>
+                <button class="btn-refresh" id="btn-refresh-shifts">Actualizar</button>
             </div>
             <div id="shifts-container">
                 <p class="empty-message">Selecciona una campaña para ver los turnos.</p>
             </div>
         </div>
     </main>
-
-    <!-- Modal para editar perfil -->
-    <div id="profile-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="modal-close" id="close-profile-modal">&times;</span>
-            <h3>Editar perfil</h3>
-            <form id="profile-form">
-                <div class="form-group">
-                    <label for="profile-name">Nombre</label>
-                    <input type="text" id="profile-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="profile-email">Email</label>
-                    <input type="email" id="profile-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="profile-phone">Teléfono</label>
-                    <input type="tel" id="profile-phone">
-                </div>
-                <div class="form-group">
-                    <label for="profile-address">Domicilio</label>
-                    <input type="text" id="profile-address">
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </body>
 </html>

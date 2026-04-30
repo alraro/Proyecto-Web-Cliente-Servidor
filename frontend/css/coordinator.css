@@ -256,6 +256,82 @@ body {
     border: 1px solid var(--error-color);
 }
 
+/* Assignment Section */
+.assignment-section {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.assignment-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.volunteer-count {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.count-display {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding: 0.75rem;
+    background: #f5f5f5;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.count-display.over-capacity {
+    color: var(--error-color);
+    background: #FFEBEE;
+    border-color: var(--error-color);
+}
+
+/* Alert container */
+#alert-container {
+    margin-bottom: 1.5rem;
+}
+
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.alert-warning {
+    background: #FFF8E1;
+    color: #E65100;
+    border: 1px solid #FFB300;
+}
+
+.alert-error {
+    background: #FFEBEE;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+.alert-success {
+    background: #E8F5E9;
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
 /* Shifts List Card */
 .shifts-list-card {
     background: var(--card-bg);

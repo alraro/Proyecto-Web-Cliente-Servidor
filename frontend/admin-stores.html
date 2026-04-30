@@ -76,6 +76,7 @@
         </div>
     </main>
 
+    <!-- MODAL CREAR / EDITAR -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal modal-store" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <h3 id="modal-title">Nueva tienda</h3>
@@ -229,6 +230,7 @@
             `).join('');
         }
 
+        // ── Cargar tiendas ────────────────────────────────────────────────────
         async function loadStores() {
             const chainId    = document.getElementById('filter-chain').value;
             const localityId = document.getElementById('filter-locality').value;
@@ -260,6 +262,7 @@
             loadStores();
         });
 
+        // ── Modal ─────────────────────────────────────────────────────────────
         let editingId = null;
 
         function openModal(titulo) {
@@ -326,6 +329,7 @@
             } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
         });
 
+        // ── Eliminar ──────────────────────────────────────────────────────────
         async function deleteStore(id, nombre) {
             if (!confirm(`¿Eliminar la tienda "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
             try {

@@ -19,6 +19,10 @@ public interface CoordinatorRepository extends JpaRepository<Coordinator, Coordi
     @Query("SELECT COUNT(c) > 0 FROM Coordinator c WHERE c.idUser.idUser = :userId")
     boolean isUserCoordinator(@Param("userId") Integer userId);
 
+    // Check if user is coordinator for a specific campaign
+    @Query("SELECT COUNT(c) > 0 FROM Coordinator c WHERE c.idUser.idUser = :userId AND c.idCampaign.id = :campaignId")
+    boolean isUserCoordinatorForCampaign(@Param("userId") Integer userId, @Param("campaignId") Integer campaignId);
+
     // Los métodos de tu compañero (dev) - Los mantenemos para no romper su parte
     boolean existsByIdUser_IdUser(Integer userId);
 
