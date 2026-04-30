@@ -51,6 +51,8 @@
 
 
 ## 6. Guías, Buenas Prácticas y Rutas
+### Convenciones Generales
+- **Idioma:** Todo el código, comentarios y documentación deben estar en inglés, para mantener la coherencia y facilitar la colaboración con desarrolladores de habla inglesa. Prohibido el uso de otros idiomas en el código, comentarios o documentación.
 ### Backend
 - **Convenciones de Código:** Tipado estricto obligatorio. Retornos de funciones explícitos. Argumentos de funciones con tipos claros y tabulados multinivel si son muchos y muy largos. Se usara camelCase para nombres de variables, funciones y métodos, y PascalCase para clases y entidades.
 - **Rutas y Endpoints:** 
