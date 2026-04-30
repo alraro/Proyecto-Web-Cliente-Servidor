@@ -18,9 +18,8 @@
 - **Estructura de directorios base:**
   - `/src/main/java/es/grupo8/backend/controllers`: Los controladores que manejan las rutas y endpoints de la API y los endpoints SSR si hay.
   - `/src/main/java/es/grupo8/backend/services`: Servicios que contienen la lógica de negocio y orquestan las operaciones entre los controladores y los repositorios.
-  - `/src/main/java/es/grupo8/backend/repositories`: Repositorios que interactúan directamente con la base de datos, utilizando JPA/Hibernate.
   - `/src/main/java/es/grupo8/backend/config`: Configuraciones generales del proyecto, como seguridad, CORS, etc.
-  - `/src/main/java/es/grupo8/backend/dao`: Objetos de acceso a datos, si se utilizan para mapear consultas personalizadas o vistas.
+  - `/src/main/java/es/grupo8/backend/dao`: Repositorios de acceso a datos, si se utilizan para mapear consultas personalizadas o vistas, el nombre de los archivos sigue el patron [Nombre]Repository.java.
   - `/src/main/java/es/grupo8/backend/dto`: Objetos de transferencia de datos, para definir las estructuras de datos que se envían y reciben a través de la API.
   - `/src/main/java/es/grupo8/backend/entity`: Clases que representan las entidades de la base de datos, anotadas con JPA.
   - `/src/main/java/es/grupo8/backend/security`: Configuraciones y clases relacionadas con la seguridad, como filtros, proveedores de autenticación, etc.
@@ -53,20 +52,21 @@
 
 ## 6. Guías, Buenas Prácticas y Rutas
 ### Backend
-- **Convenciones de Código:** Tipado estricto obligatorio. Retornos de funciones explícitos. Argumentos de funciones con tipos claros y tabulados multinivel si son muchos y muy largos.
+- **Convenciones de Código:** Tipado estricto obligatorio. Retornos de funciones explícitos. Argumentos de funciones con tipos claros y tabulados multinivel si son muchos y muy largos. Se usara camelCase para nombres de variables, funciones y métodos, y PascalCase para clases y entidades.
 - **Rutas y Endpoints:** 
-    - Para enpoints de API: /api/[recurso]/[acción] (ej: /api/partner-entity-managers/:id). Para endpoints SSR: /[recurso]/[acción] (ej: /campaigns/list).
-    - Prohibido el uso de rutas dinámicas sin un patrón claro (ej: /api/*).
+    - Para enpoints de API: `/api/[recurso]` (ej: `/api/partner-entity-managers/:id`). Para endpoints SSR: `/[recurso]` (ej: `/campaigns/list`).
+    - Prohibido el uso de rutas dinámicas sin un patrón claro (ej: `/api/*`).
     - **Servicios:** Carpeta services. Cada servicio debe tener una responsabilidad clara y única. Prohibido mezclar lógica de negocio con lógica de acceso a datos con logica de endpoints.
-    - **DTOs:** Carpeta dao. Obligatorio el uso de DTOs para la comunicación entre capas y con el frontend. Prohibido exponer entidades directamente a través de la API.
+    - **DTOs:** Carpeta dto. Obligatorio el uso de DTOs para la comunicación entre capas y con el frontend. Prohibido exponer entidades directamente a través de la API.
     - **Controllers:** Deben ser delgados, delegando la mayor parte de la lógica a los servicios. Prohibido incluir lógica de negocio o acceso a datos en los controladores, y manejar casos de error.
     - **Repositorios:** Solo deben contener métodos para interactuar con la base de datos. Prohibido incluir lógica de negocio o validaciones en los repositorios.
-    - **Tests:** Obligatorio el uso de pruebas unitarias para servicios y controladores, con una cobertura mínima del 80%. Prohibido escribir pruebas que dependan de la base de datos o de servicios externos (mockear siempre).
-    - **DAO:** Deben contener métodos para interactuar con la base de datos. Prohibido incluir lógica de negocio o validaciones en los DAOs.
+    - **Tests:** Obligatorio el uso de pruebas unitarias para servicios y controladores. Prohibido escribir pruebas que dependan de la base de datos o de servicios externos (mockear siempre).
+    - **DAO:** Carpeta dao. Deben contener métodos para interactuar con la base de datos. Prohibido incluir lógica de negocio o validaciones en los DAOs.
 - **Estructura General:** Cada módulo o funcionalidad debe de tener sus entities, Repositories, Services, Controllers y DTOs correspondientes, evitando mezclar funcionalidades en un mismo módulo.
 - **Documentacion:** Cada clase y método debe tener una documentación clara y concisa que explique su propósito, parámetros y retorno. Prohibido dejar código sin documentar o con documentación vaga o incompleta. 
 - **Manejo de Errores:** Uso de excepciones personalizadas para casos específicos (ej: `EntityNotFoundException`, `ValidationException`). Prohibido el uso de excepciones genéricas (`Exception`) para manejar errores comunes.
 - **Logging:** Logging por consola simplemente para desarrollo, con mensajes claros y consistentes.
+- **Paginacion y filtrado:** Prohibido devolver listas completas de entidades sin paginacion, es obligatorio reutilizar la case de respuesta paginada ya existente de forma coherente. El filtrado y ordenacion de resultados debe ser implementado a nivel de base de datos siempre que sea posible, evitando filtrar o ordenar grandes conjuntos de datos en memoria.
 
 ### Frontend
 - **Convenciones de Código:** Uso de ES6+ obligatorio. Prohibido el uso de var, preferencia por const y let. Funciones flecha para funciones anónimas.
@@ -74,9 +74,12 @@
 - **Llamadas a la API:** Uso de `fetch` para llamadas a la API, con manejo adecuado de errores y respuestas. Prohibido el uso de librerías externas para llamadas a la API (ej: axios) en esta etapa del proyecto.
 - **Estilos:** Uso exclusivo de `CSS`.
 
-- **Documentación:** Cada archivo debe tener un comentario al inicio que explique su propósito y cualquier dependencia o relación con otros archivos. Prohibido dejar archivos sin documentación o con documentación vaga o incompleta.
+- **Documentación:** Cada archivo y función debe incluir un comentario claro indicando propósito, dependencias, parámetros y retornos. Prohibido dejar código sin documentar o con descripciones vagas.
 
-- **Implementaciones legacy:** En esta etapa del proyecto ya hay bastantes funcionalidades y endpoints implementados tanto en frontend como en el backend, por lo que si se tiene que manejar codigo legacy, se debera aprovechar para refactorizarlo y mejorarlo, siguiendo las mismas reglas y convenciones que el nuevo código. Prohibido dejar código legacy que usemos sin refactorizar o con malas prácticas, aunque funcione correctamente.
+
+- **Implementaciones legacy:** En esta etapa del proyecto ya hay bastantes funcionalidades y endpoints implementados tanto en frontend como en el backend, por lo que si se tiene que manejar codigo legacy, hay 2 situaciones:
+    1. Si el codigo legacy es de una funcionalidad relacionada con la tarea que se implementa, se debera revisar de paso para que cumpla las guias y buenas practicas definidas en este documento, reutilizando clases, funciones y metodos (e.g reutilizacion de clase de respuestas paginadas, uso de DTOs, Services, modulos de html, etc...)
+    2. Si el codigo legacy no es de una funcionalidad relacionada con la tarea que se implementa, se debera evitar modificarlo o tocarlo en la medida de lo posible, para evitar introducir errores o problemas de integracion. Prohibido modificar o tocar codigo legacy que no este relacionado con la tarea que se implementa, a menos que sea absolutamente necesario para la implementacion de la funcionalidad y siempre con una justificacion clara en el pull request.
 
 ## 7. Flujo de trabajo git
 - **Branching:** Uso de ramas para cada funcionalidad o bugfix, siguiendo la convención `feature/[nombre-funcionalidad]` o `bugfix/[descripcion-bug]`. Prohibido trabajar directamente en la rama main y dev.
@@ -89,4 +92,10 @@
 - En caso de que sea necesario modificar código de otras funcionalidades o módulos, se debe de comunicar previamente al equipo y obtener su aprobación antes de realizar cualquier cambio. Prohibido modificar código de otras funcionalidades o módulos sin una comunicación previa y una aprobación clara del equipo.
 
 ## 9. Limitacion de implementacion de librerias o patrones nuevos
-- Ahora mismo la estructura de la parte de partner-entities tanto en el backend como en el frontend sigue las practicas que nos han enseñado en la universidad. Nuestro profesor nos ha dado una serie de pautas y convenciones para seguir en el proyecto, y es importante que sigamos esas pautas para mantener la coherencia y la calidad del código. Prohibido implementar nuevas librerías o patrones de diseño sin una justificación clara y una aprobación previa del equipo, para evitar introducir complejidad innecesaria o inconsistencias en el proyecto. Esto incluye omitir cosas de despliegue o https en etapas tempranas del proyecto, ya que no es necesario para el desarrollo y puede introducir complejidad innecesaria en esta etapa. Prohibido implementar nuevas librerías o patrones de diseño sin una justificación clara y una aprobación previa del equipo, para evitar introducir complejidad innecesaria o inconsistencias en el proyecto.
+- Ahora mismo la estructura de la parte de partner-entities tanto en el backend como en el frontend sigue las practicas que nos han enseñado en la universidad. Nuestro profesor nos ha dado una serie de pautas y convenciones para seguir en el proyecto, y es importante que sigamos esas pautas para mantener la coherencia y la calidad del código. Prohibido implementar nuevas librerías o patrones de diseño sin una justificación clara y una aprobación previa del equipo, para evitar introducir complejidad innecesaria o inconsistencias en el proyecto. Esto incluye omitir cosas de despliegue o https en etapas tempranas del proyecto, ya que no es necesario para el desarrollo y puede introducir complejidad innecesaria en esta etapa.
+
+## 10. Variables de entorno
+- Si por necesidad del proyecto se deben crear variables de entorno nuevas, estas deberan actualizarse tambien en el archivo .env.example con el mismo valor.
+
+## 11. Uso opcional de definicion de requisitos con Markdown
+- Si el desarrollador lo indica en la peticion a copilot, se leeran los requisitos y funcionalidades a implementar de un archivo .md de la carpeta requirements en la raiz del proyecto. Si esto es asi, el estado de la implementacion de la funcionalidad debera de actualizarse en dicho archivo, indicando partes de la implementacion pendientes, en proceso o completadas, en una seccion al final del archivo sin tocar los requisitos escritos previamente.
