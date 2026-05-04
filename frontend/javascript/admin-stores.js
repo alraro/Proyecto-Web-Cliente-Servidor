@@ -18,10 +18,11 @@ function showToast(msg, type = 'success') {
 }
 
 function escHtml(v) {
-    return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
 
+// Datos auxiliares
 let allChains     = [];
 let allLocalities = [];
 let allZones      = [];
@@ -33,11 +34,9 @@ async function loadAuxData() {
             fetch(BACKEND + '/api/localities', { headers: authHeaders() }),
             fetch(BACKEND + '/api/zones',      { headers: authHeaders() })
         ]);
-
         if (resChains.ok)  allChains     = await resChains.json();
         if (resLoc.ok)     allLocalities = await resLoc.json();
         if (resZones.ok)   allZones      = await resZones.json();
-
     } catch { /* los selects quedan vacíos pero no rompe nada */ }
 
     const fz = document.getElementById('filter-zone');
@@ -69,21 +68,23 @@ function populateLocalities(zoneId) {
     const sel = document.getElementById('filter-locality');
     const valorActual = sel.value;
     sel.innerHTML = '<option value="">Todas las localidades</option>';
-
     const lista = zoneId
         ? allLocalities.filter(l => String(l.zoneId) === String(zoneId))
         : allLocalities;
-
     lista.forEach(l => {
         const o = document.createElement('option');
         o.value = l.id; o.textContent = l.name;
         sel.appendChild(o);
     });
-
     if (valorActual && lista.some(l => String(l.id) === String(valorActual))) {
         sel.value = valorActual;
     }
 }
+
+// Paginación
+let currentPage = 0;
+let pageSize    = 20;
+let totalPages  = 1;
 
 function renderTable(stores) {
     const tbody = document.getElementById('stores-tbody');
@@ -110,7 +111,7 @@ function renderTable(stores) {
     `).join('');
 }
 
-async function loadStores() {
+async function loadStores(page = 0) {
     const chainId    = document.getElementById('filter-chain').value;
     const localityId = document.getElementById('filter-locality').value;
     const zoneId     = document.getElementById('filter-zone').value;
@@ -119,26 +120,48 @@ async function loadStores() {
     if (chainId)    params.append('chainId',    chainId);
     if (localityId) params.append('localityId', localityId);
     if (zoneId)     params.append('zoneId',     zoneId);
+    params.append('page', page);
+    params.append('size', pageSize);
 
-    const url = BACKEND + '/api/stores' + (params.toString() ? '?' + params : '');
     try {
-        const res = await fetch(url, { headers: authHeaders() });
+        const res = await fetch(BACKEND + '/api/stores?' + params, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         const data = await res.json();
-        renderTable(data);
+
+        currentPage = page;
+        totalPages  = data.totalPages || 1;
+
+        document.getElementById('current-page').textContent = currentPage + 1;
+        document.getElementById('total-pages').textContent  = totalPages;
+        document.getElementById('btn-prev-page').disabled   = currentPage === 0;
+        document.getElementById('btn-next-page').disabled   = currentPage >= totalPages - 1;
+
+        renderTable(data.content || []);
     } catch {
         document.getElementById('stores-tbody').innerHTML =
             '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
     }
 }
 
-document.getElementById('btn-apply-filters').addEventListener('click', loadStores);
+function previousPage() {
+    if (currentPage > 0) loadStores(currentPage - 1);
+}
+function nextPage() {
+    if (currentPage < totalPages - 1) loadStores(currentPage + 1);
+}
+function changePageSize() {
+    pageSize = parseInt(document.getElementById('page-size-select').value);
+    loadStores(0);
+}
+
+// Filtros
+document.getElementById('btn-apply-filters').addEventListener('click', () => loadStores(0));
 document.getElementById('btn-clear-filters').addEventListener('click', () => {
     document.getElementById('filter-zone').value     = '';
     document.getElementById('filter-locality').value = '';
     document.getElementById('filter-chain').value    = '';
     populateLocalities('');
-    loadStores();
+    loadStores(0);
 });
 
 let editingId = null;
@@ -182,6 +205,7 @@ async function openEdit(id) {
     } catch { showToast('Error de conexión.', 'error'); }
 }
 
+// Guardar
 document.getElementById('btn-modal-save').addEventListener('click', async () => {
     const nombre    = document.getElementById('input-nombre').value.trim();
     const domicilio = document.getElementById('input-domicilio').value.trim();
@@ -203,7 +227,7 @@ document.getElementById('btn-modal-save').addEventListener('click', async () => 
         if (!res.ok) { errorEl.textContent = data.message || 'Error al guardar.'; return; }
         closeModal();
         showToast(editingId ? 'Tienda actualizada.' : 'Tienda creada.');
-        loadStores();
+        loadStores(currentPage);
     } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
 });
 
@@ -213,8 +237,8 @@ async function deleteStore(id, nombre) {
         const res = await fetch(`${BACKEND}/api/stores/${id}`, { method: 'DELETE', headers: authHeaders() });
         if (!res.ok) { const d = await res.json(); showToast(d.message || 'Error al eliminar.', 'error'); return; }
         showToast('Tienda eliminada.');
-        loadStores();
+        loadStores(currentPage);
     } catch { showToast('Error de conexión.', 'error'); }
 }
 
-loadAuxData().then(() => loadStores());
+loadAuxData().then(() => loadStores(0));

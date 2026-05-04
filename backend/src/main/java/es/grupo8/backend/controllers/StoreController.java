@@ -2,6 +2,7 @@ package es.grupo8.backend.controllers;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,7 +43,9 @@ public class StoreController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Integer chainId,
             @RequestParam(required = false) Integer localityId,
-            @RequestParam(required = false) Integer zoneId) {
+            @RequestParam(required = false) Integer zoneId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
 
         if (!adminGuard.isAdmin(authHeader) && !coordinatorGuard.isCoordinator(authHeader)) {
             return forbidden();
@@ -71,15 +74,32 @@ public class StoreController {
                     .collect(Collectors.toList());
         }
 
-        List<StoreResponseDto> result = stores.stream()
-            .sorted(Comparator.comparing(Store::getId, Comparator.nullsLast(Integer::compareTo)))
+        List<StoreResponseDto> all = stores.stream()
                 .map(StoreController::toDto)
                 .collect(Collectors.toList());
 
-        auditLog.info("ACTION=LIST_STORES userId={} timestamp={} filters=[chainId={},localityId={},zoneId={}] count={}",
-                adminGuard.extractUserId(authHeader), Instant.now(), chainId, localityId, zoneId, result.size());
+        // Paginación en memoria (mismo patrón que PartnerEntityService)
+        page = Math.max(0, page);
+        size = Math.max(1, Math.min(size, 100));
+        long totalElements = all.size();
+        int  totalPages    = (int) Math.ceil((double) totalElements / size);
+        int  from          = page * size;
+        int  to            = Math.min(from + size, (int) totalElements);
+        List<StoreResponseDto> content = from >= all.size() ? List.of() : all.subList(from, to);
 
-        return ResponseEntity.ok(result);
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("content",       content);
+        response.put("page",          page);
+        response.put("size",          size);
+        response.put("totalElements", totalElements);
+        response.put("totalPages",    totalPages);
+        response.put("hasNext",       page < totalPages - 1);
+        response.put("hasPrevious",   page > 0);
+
+        auditLog.info("ACTION=LIST_STORES userId={} timestamp={} filters=[chainId={},localityId={},zoneId={}] page={} size={} total={}",
+                adminGuard.extractUserId(authHeader), Instant.now(), chainId, localityId, zoneId, page, size, totalElements);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -258,4 +278,12 @@ public class StoreController {
         String t = v.trim();
         return t.isEmpty() ? null : t;
     }
+
+    public static Map<String, Object> toMap(Store store) {
+      Map<String, Object> map = new LinkedHashMap<>();
+      map.put("id", store.getId());
+      map.put("name", store.getName());
+      map.put("address", store.getAddress());
+      return map;
+  }
 }
