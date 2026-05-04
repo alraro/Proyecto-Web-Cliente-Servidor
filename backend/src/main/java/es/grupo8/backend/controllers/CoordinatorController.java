@@ -30,7 +30,6 @@ import es.grupo8.backend.entity.Shift;
 import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.security.CoordinatorGuard;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

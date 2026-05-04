@@ -794,3 +794,59 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
         grid-template-columns: 1fr;
     }
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.pagination button {
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: var(--blue-700);
+    color: #fff;
+    border-color: var(--blue-700);
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background: var(--blue-700);
+    color: #fff;
+    border-color: var(--blue-700);
+}
+
+.pagination-info {
+    font-size: 0.88rem;
+    color: var(--ink-light);
+    margin: 0 1rem;
+}
+
+.pagination-select {
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
