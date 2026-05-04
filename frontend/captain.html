@@ -10,8 +10,54 @@
     <link rel="stylesheet" href="css/admin.css">
     <script src="javascript/captain.js" defer></script>
     <style>
-        .selector-row { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin-top:.5rem; }
-        .selector-row select { flex:1; min-width:200px; }
+        /* ── Padding interior de tarjetas ──────────────────────────────────── */
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ── Cabecera de tarjeta con título ────────────────────────────────── */
+        .card-head {
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-head h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--blue-900);
+            margin: 0;
+        }
+
+        /* ── Fila selector campaña + botón ────────────────────────────────── */
+        .selector-row {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: .6rem;
+        }
+        .selector-row select {
+            flex: 1;
+            min-width: 220px;
+            padding: .65rem 1rem;
+            border: 1px solid rgba(25,58,107,.18);
+            border-radius: var(--radius-sm);
+            font: inherit;
+            font-size: .93rem;
+            color: var(--ink);
+            background: var(--surface);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .selector-row select:focus {
+            border-color: var(--blue-700);
+            box-shadow: 0 0 0 3px rgba(45,101,160,.14);
+        }
+
+        /* ── Espacio entre tarjetas ────────────────────────────────────────── */
+        .card + .card {
+            margin-top: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -42,20 +88,26 @@
 
     <div id="global-message" hidden></div>
 
+    <!-- Selector de campaña -->
     <div class="card">
-        <div class="form-group">
-            <label for="campaign-select">Campaña</label>
-            <div class="selector-row">
-                <select id="campaign-select">
-                    <option value="">Selecciona una campaña...</option>
-                </select>
-                <button type="button" id="btn-load" class="btn btn-secondary">Cargar capitanes</button>
+        <div class="card-body">
+            <div class="form-group" style="margin-bottom:0">
+                <label for="campaign-select">Campaña</label>
+                <div class="selector-row">
+                    <select id="campaign-select">
+                        <option value="">Selecciona una campaña...</option>
+                    </select>
+                    <button type="button" id="btn-load" class="btn btn-secondary">Cargar capitanes</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Capitanes asignados -->
     <div class="card">
-        <h2>Capitanes asignados</h2>
+        <div class="card-head">
+            <h2>Capitanes asignados</h2>
+        </div>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -72,15 +124,17 @@
         </div>
     </div>
 
+    <!-- Añadir capitán -->
     <div class="card">
-        <h2>Añadir capitán</h2>
-        <div class="form-group">
-            <label for="captain-select">Capitán disponible</label>
-            <div class="selector-row">
-                <select id="captain-select">
-                    <option value="">Selecciona un capitán...</option>
-                </select>
-                <button type="button" id="btn-assign" class="btn btn-primary">Asignar</button>
+        <div class="card-body">
+            <div class="form-group" style="margin-bottom:0">
+                <label for="captain-select">Añadir capitán</label>
+                <div class="selector-row">
+                    <select id="captain-select">
+                        <option value="">Selecciona un capitán...</option>
+                    </select>
+                    <button type="button" id="btn-assign" class="btn btn-primary">Asignar</button>
+                </div>
             </div>
         </div>
     </div>
