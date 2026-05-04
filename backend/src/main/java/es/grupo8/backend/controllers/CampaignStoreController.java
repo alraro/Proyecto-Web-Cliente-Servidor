@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.StoreRepository;
+import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
@@ -71,10 +72,10 @@ public class CampaignStoreController {
 					.body(Map.of("message", "Campaign not found"));
 		}
 
-		List<Map<String, Object>> stores = new ArrayList<>();
+		List<StoreResponseDto> stores = new ArrayList<>();
 		for (CampaignStore campaignStore : campaignStoreRepository.findByIdCampaign_Id(campaignId)) {
 			if (campaignStore != null && campaignStore.getIdStore() != null) {
-				stores.add(StoreController.toMap(campaignStore.getIdStore()));
+				stores.add(StoreController.toDto(campaignStore.getIdStore()));
 			}
 		}
 
@@ -232,10 +233,6 @@ public class CampaignStoreController {
 	private static ResponseEntity<?> forbidden() {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN)
 				.body(Map.of("message", "Access restricted to administrators"));
-	}
-
-	private static String valueAsString(Object value) {
-		return value == null ? null : String.valueOf(value);
 	}
 
 	private static Integer valueAsInteger(Object value) {

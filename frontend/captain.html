@@ -1,9 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Gestión de Capitanes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/captain.js" defer></script>
+    <style>
+        .selector-row { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin-top:.5rem; }
+        .selector-row select { flex:1; min-width:200px; }
+    </style>
 </head>
-
 <body>
-    Bienvenido Capitán
+
+<header class="topbar">
+    <a class="brand" href="index.html">
+        <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name">Administrador</span>
+        </div>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+    </div>
+</header>
+
+<main class="page-wrapper">
+    <div class="page-header">
+        <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+        <div class="page-header-row">
+            <div>
+                <h1>Gestión de Capitanes</h1>
+                <p>Asigna capitanes a campañas de recogida.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="global-message" hidden></div>
+
+    <div class="card">
+        <div class="form-group">
+            <label for="campaign-select">Campaña</label>
+            <div class="selector-row">
+                <select id="campaign-select">
+                    <option value="">Selecciona una campaña...</option>
+                </select>
+                <button type="button" id="btn-load" class="btn btn-secondary">Cargar capitanes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Capitanes asignados</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="captains-tbody">
+                    <tr><td colspan="3" class="table-empty">Selecciona una campaña para ver los capitanes asignados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Añadir capitán</h2>
+        <div class="form-group">
+            <label for="captain-select">Capitán disponible</label>
+            <div class="selector-row">
+                <select id="captain-select">
+                    <option value="">Selecciona un capitán...</option>
+                </select>
+                <button type="button" id="btn-assign" class="btn btn-primary">Asignar</button>
+            </div>
+        </div>
+    </div>
+</main>
+
 </body>
+</html>
