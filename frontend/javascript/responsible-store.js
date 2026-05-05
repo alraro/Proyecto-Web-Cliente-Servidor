@@ -48,9 +48,9 @@ function renderShifts(shifts) {
 
     tbody.innerHTML = shifts.map(s => {
         let attendanceBadge;
-        if (s.attendance === true)      attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
+        if (s.attendance === true)       attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
         else if (s.attendance === false) attendanceBadge = '<span class="badge-attendance badge-no">✗ No</span>';
-        else                            attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
+        else                             attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
 
         return `
             <tr>

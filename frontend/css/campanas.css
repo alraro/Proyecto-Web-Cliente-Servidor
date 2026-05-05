@@ -1,0 +1,28 @@
+.chips-bar { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+
+.chip {
+    padding:.45rem 1rem; border-radius:999px; border:1px solid var(--border);
+    background:rgba(25,58,107,.07); font:inherit; font-size:.85rem; font-weight:700;
+    color:var(--blue-900); cursor:pointer; transition:all .2s;
+}
+.chip:hover { background:rgba(25,58,107,.14); }
+.chip.chip-selected { background:linear-gradient(135deg,var(--blue-900),var(--blue-700)); color:#fff; border-color:transparent; }
+
+.filter-bar { display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem; font-size:.9rem; font-weight:600; }
+.filter-bar select {
+    padding:.5rem .9rem; border:1px solid rgba(25,58,107,.18); border-radius:var(--radius-sm);
+    font:inherit; font-size:.88rem; background:var(--surface); color:var(--ink); outline:none;
+}
+
+.badge-active { background:#dcfce7; color:#15803d; padding:.2rem .65rem; border-radius:999px; font-size:.8rem; font-weight:700; }
+.badge-future { background:#dbeafe; color:#1d4ed8; padding:.2rem .65rem; border-radius:999px; font-size:.8rem; font-weight:700; }
+.badge-past   { background:#f1f5f9; color:#64748b; padding:.2rem .65rem; border-radius:999px; font-size:.8rem; font-weight:700; }
+
+.pagination { display:flex; align-items:center; justify-content:center; gap:1rem; margin-top:1.25rem; }
+.pagination button {
+    padding:.5rem 1rem; border:1px solid var(--border); border-radius:var(--radius-sm);
+    background:transparent; font:inherit; font-size:.88rem; font-weight:700; cursor:pointer;
+}
+.pagination button:disabled { opacity:.4; cursor:not-allowed; }
+
+#page-info { font-size:.88rem; color:var(--ink-light); font-weight:600; }
