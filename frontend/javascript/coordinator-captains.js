@@ -76,8 +76,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         captainsTbody.innerHTML = '';
         if (!captains.length) {
             captainsTbody.innerHTML = "<tr><td colspan='2' class='table-empty'>No hay capitanes asignados a esta campaña.</td></tr>";
+            // Párrafo informativo bajo la tabla cuando no hay capitanes
+            const info = document.getElementById('captains-info');
+            if (info) info.hidden = false;
             return;
         }
+        const info = document.getElementById('captains-info');
+        if (info) info.hidden = true;
         captains.forEach(c => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -105,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: authHeaders(token),
                 body: JSON.stringify({ name, email, password, campaignId: Number(campaignId) })
             });
-            showMessage('Capitán registrado. Quedará pendiente de validación por el administrador.', false);
+            showMessage('Solicitud enviada correctamente. El administrador recibirá tu petición y deberá aprobarla.', false);
             document.getElementById('new-name').value = '';
             document.getElementById('new-email').value = '';
             document.getElementById('new-password').value = '';

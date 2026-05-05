@@ -1,11 +1,12 @@
 .role-pill {
-    background: #fff3e0;
-    color: #e65100;
-    border: 1px solid #ffcc80;
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+    border: 1.5px solid rgba(255,255,255,0.45);
     border-radius: 20px;
     padding: 6px 16px;
     font-size: 0.85rem;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
     white-space: nowrap;
+    backdrop-filter: blur(4px);
 }

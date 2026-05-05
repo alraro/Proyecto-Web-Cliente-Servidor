@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CaptainRepository;
+import es.grupo8.backend.dao.CaptainRequestRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
@@ -31,7 +32,7 @@ import es.grupo8.backend.dao.VolunteerShiftRepository;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.Captain;
-import es.grupo8.backend.entity.CaptainId;
+import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
@@ -44,13 +45,14 @@ public class CoordinatorDashboardController {
 
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
-    @Autowired private CoordinatorGuard       coordinatorGuard;
-    @Autowired private CoordinatorRepository  coordinatorRepository;
-    @Autowired private CaptainRepository      captainRepository;
-    @Autowired private CampaignStoreRepository campaignStoreRepository;
-    @Autowired private UserRepository         userRepository;
-    @Autowired private VolunteerRepository    volunteerRepository;
-    @Autowired private VolunteerShiftRepository volunteerShiftRepository;
+    @Autowired private CoordinatorGuard          coordinatorGuard;
+    @Autowired private CoordinatorRepository     coordinatorRepository;
+    @Autowired private CaptainRepository         captainRepository;
+    @Autowired private CaptainRequestRepository  captainRequestRepository;
+    @Autowired private CampaignStoreRepository   campaignStoreRepository;
+    @Autowired private UserRepository            userRepository;
+    @Autowired private VolunteerRepository       volunteerRepository;
+    @Autowired private VolunteerShiftRepository  volunteerShiftRepository;
 
     // ── GET /api/coordinator/my-campaigns ────────────────────────────────────
 
@@ -348,41 +350,44 @@ public class CoordinatorDashboardController {
                     .body(Map.of("message", "La contraseña debe tener al menos 6 caracteres"));
         }
 
-        if (userRepository.existsByEmail(email.toLowerCase())) {
+        String normalizedEmail = email.toLowerCase();
+
+        // Rechazar si ya existe un usuario con ese email
+        if (userRepository.existsByEmail(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Ya existe un usuario con ese email"));
+                    .body(Map.of("message", "Ya existe un usuario registrado con ese email"));
         }
 
-        // Crear usuario nuevo
-        UserEntity newUser = new UserEntity();
-        newUser.setName(name);
-        newUser.setEmail(email.toLowerCase());
-        newUser.setPassword(BCrypt.hashpw(password, BCrypt.gensalt(10)));
-        UserEntity savedUser = userRepository.save(newUser);
+        // Rechazar si ya hay una solicitud PENDIENTE para ese email
+        if (captainRequestRepository.existsByEmailAndStatus(normalizedEmail, "PENDIENTE")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Ya existe una solicitud pendiente para ese email"));
+        }
 
-        // Asignar rol CAPITÁN en la campaña
-        CaptainId captainId = new CaptainId();
-        captainId.setIdUser(savedUser.getIdUser());
-        captainId.setIdCampaign(campaignId);
+        // Guardar solicitud (no crear usuario ni asignar rol todavía)
+        UserEntity coordinator = new UserEntity();
+        coordinator.setIdUser(coordinatorUserId);
 
         Campaign campaign = new Campaign();
         campaign.setId(campaignId);
 
-        Captain captain = new Captain();
-        captain.setId(captainId);
-        captain.setIdUser(savedUser);
-        captain.setIdCampaign(campaign);
-        captainRepository.save(captain);
+        CaptainRequest req = new CaptainRequest();
+        req.setName(name);
+        req.setEmail(normalizedEmail);
+        req.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt(10)));
+        req.setIdCampaign(campaign);
+        req.setIdCoordinator(coordinator);
+        req.setStatus("PENDIENTE");
 
-        auditLog.info("ACTION=REGISTER_CAPTAIN_BY_COORDINATOR coordinatorUserId={} timestamp={} newUserId={} campaignId={}",
-                coordinatorUserId, Instant.now(), savedUser.getIdUser(), campaignId);
+        CaptainRequest saved = captainRequestRepository.save(req);
 
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("userId",  savedUser.getIdUser());
-        resp.put("name",    savedUser.getName());
-        resp.put("email",   savedUser.getEmail());
-        resp.put("message", "Capitán registrado. Pendiente de validación por el administrador.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(resp);
+        auditLog.info("ACTION=REQUEST_CAPTAIN coordinatorUserId={} timestamp={} campaignId={} requestId={}",
+                coordinatorUserId, Instant.now(), campaignId, saved.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message",   "Solicitud enviada. El administrador deberá aprobarla.",
+                "requestId", saved.getId()
+        ));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

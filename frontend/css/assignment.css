@@ -46,3 +46,40 @@
 .card + .card {
     margin-top: 1.5rem;
 }
+
+/* Badges de estado para solicitudes */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+.status-pending  { background: #fff3cd; color: #7a5c00; }
+.status-approved { background: #d4edda; color: #155724; }
+.status-rejected { background: #f8d7da; color: #721c24; }
+
+/* Botones pequeños de acción en tabla */
+.btn.btn-sm {
+    padding: 4px 12px;
+    font-size: .82rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    font-family: inherit;
+}
+.btn-approve {
+    background: #198754;
+    color: #fff;
+}
+.btn-approve:hover { background: #157347; }
+.btn-reject {
+    background: #dc3545;
+    color: #fff;
+    margin-left: .35rem;
+}
+.btn-reject:hover { background: #b02a37; }
+
+.action-cell { white-space: nowrap; }
