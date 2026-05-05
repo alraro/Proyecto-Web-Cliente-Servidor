@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Gestión de Coordinadores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/assignment.css">
+    <script src="javascript/admin-coordinators.js" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" href="index.html">
+        <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name">Administrador</span>
+        </div>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+    </div>
+</header>
+
+<main class="page-wrapper">
+    <div class="page-header">
+        <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+        <div class="page-header-row">
+            <div>
+                <h1>Gestión de Coordinadores</h1>
+                <p>Asigna coordinadores a campañas de recogida.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="global-message" hidden></div>
+
+    <!-- Selector de campaña -->
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group" style="margin-bottom:0">
+                <label for="campaign-select">Campaña</label>
+                <div class="selector-row">
+                    <select id="campaign-select">
+                        <option value="">Selecciona una campaña...</option>
+                    </select>
+                    <button type="button" id="btn-load" class="btn btn-secondary">Cargar coordinadores</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coordinadores asignados -->
+    <div class="card">
+        <div class="card-head">
+            <h2>Coordinadores asignados</h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="coordinators-tbody">
+                    <tr><td colspan="3" class="table-empty">Selecciona una campaña para ver los coordinadores asignados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Añadir coordinador -->
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group" style="margin-bottom:0">
+                <label for="coordinator-select">Añadir coordinador</label>
+                <div class="selector-row">
+                    <select id="coordinator-select">
+                        <option value="">Selecciona un coordinador...</option>
+                    </select>
+                    <button type="button" id="btn-assign" class="btn btn-primary">Asignar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

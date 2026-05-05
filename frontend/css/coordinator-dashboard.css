@@ -1,0 +1,14 @@
+.role-pill {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.icon-teal  { background: #e0f2f1; color: #00796b; }
+.icon-green { background: #e8f5e9; color: #2e7d32; }
