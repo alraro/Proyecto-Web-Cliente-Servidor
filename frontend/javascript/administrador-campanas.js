@@ -45,7 +45,7 @@ async function fetchArray(url, options) {
         const res = await fetch(url, options);
         if (!res.ok) return [];
         const data = await res.json().catch(() => []);
-        return Array.isArray(data) ? data : (data.value || []);
+        return Array.isArray(data) ? data : (data.content || data.value || []);
     } catch { return []; }
 }
 
@@ -116,7 +116,8 @@ async function loadAvailableStores() {
     if (zoneId)     params.append('zoneId',     zoneId);
     if (localityId) params.append('localityId', localityId);
 
-    const url = API_BASE + '/api/stores' + (params.toString() ? '?' + params.toString() : '');
+    params.append('size', '100');
+    const url = API_BASE + '/api/stores?' + params.toString();
     allFilteredStores = await fetchArray(url, { headers: { Authorization: 'Bearer ' + getToken() } });
     renderAvailableList();
 }
