@@ -46,7 +46,7 @@ function renderTable(chains) {
 }
 
 function escHtml(v) {
-    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function escAttr(v) {
     return String(v ?? '').replace(/'/g, "\\'");

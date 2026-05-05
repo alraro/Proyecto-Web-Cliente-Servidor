@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Campañas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/administrador-campanas.js" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" href="index.html">
+        <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name">Administrador</span>
+        </div>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+    </div>
+</header>
+
+<main class="page-wrapper">
+    <div class="page-header">
+        <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+        <div class="page-header-row">
+            <div>
+                <h1>Gestión de Campañas</h1>
+                <p>Crea, edita y elimina campañas de recogida de alimentos.</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-new">+ Nueva campaña</button>
+        </div>
+    </div>
+
+    <div id="global-message" hidden></div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table id="campaigns-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Fecha inicio</th>
+                        <th>Fecha fin</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="campaigns-tbody">
+                    <tr><td colspan="5" class="table-empty">Cargando campañas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- Modal CRUD campaña -->
+<div class="modal-backdrop hidden" id="campaign-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title">Nueva campaña</h2>
+
+        <div class="form-group">
+            <label for="campaign-name">Nombre</label>
+            <input id="campaign-name" type="text" maxlength="100" placeholder="Nombre de la campaña">
+        </div>
+
+        <div class="form-group">
+            <label for="campaign-type">Tipo</label>
+            <select id="campaign-type"><option value="">Selecciona un tipo...</option></select>
+        </div>
+
+        <div class="form-group">
+            <label for="campaign-start">Fecha de inicio</label>
+            <input id="campaign-start" type="date">
+        </div>
+
+        <div class="form-group">
+            <label for="campaign-end">Fecha de fin</label>
+            <input id="campaign-end" type="date">
+        </div>
+
+        <!-- Selector de tiendas -->
+        <div class="store-selector-section">
+            <h3 class="store-selector-title">Tiendas participantes</h3>
+            <div class="store-filter-row">
+                <select id="store-filter-chain"><option value="">Todas las cadenas</option></select>
+                <select id="store-filter-zone"><option value="">Todas las zonas</option></select>
+                <select id="store-filter-locality"><option value="">Todas las localidades</option></select>
+                <button type="button" id="btn-store-filter" class="btn btn-secondary btn-sm">Filtrar</button>
+                <button type="button" id="btn-store-clear" class="btn btn-secondary btn-sm">Limpiar</button>
+            </div>
+            <div class="store-dual-panel">
+                <div class="store-panel">
+                    <h4>Disponibles <span id="available-count" class="badge">0</span></h4>
+                    <ul id="available-stores" class="store-list"></ul>
+                </div>
+                <div class="store-panel">
+                    <h4>Seleccionadas <span id="selected-count" class="badge">0</span></h4>
+                    <ul id="selected-stores" class="store-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-error" hidden></div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="btn-cancel-modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-save">Guardar</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
