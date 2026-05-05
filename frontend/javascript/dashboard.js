@@ -2,6 +2,19 @@ const TOKEN_KEY = 'token';
 const API_BASE = 'http://localhost:8080';
 const getToken  = () => localStorage.getItem(TOKEN_KEY);
 
+function formatDate(dateString){
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+
+    if(isNaN(date.getTime())) return dateString;
+
+    return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    })
+}
+
 function logout() {
     localStorage.clear();
     window.location.href = 'login.html';
@@ -52,7 +65,11 @@ async function loadCampaigns() {
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
-            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${c.startDate} → ${c.endDate})`;
+
+            const start = formatDate(c.startDate);
+            const end   = formatDate(c.endDate);
+
+            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${start} → ${end})`;
             sel.appendChild(opt);
         });
 
