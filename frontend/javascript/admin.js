@@ -8,8 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const userNameEl = document.getElementById('user-name');
     const welcomeNameEl = document.getElementById('welcome-name');
-    const btnEdit = document.getElementById('btn-edit');
-    const btnLogout = document.getElementById('btn-logout');
+    
 
     if (userNameEl) {
         userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
@@ -19,18 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeNameEl.textContent = localStorage.getItem('nombre') || 'Admin';
     }
 
-    if (btnEdit) {
-        btnEdit.addEventListener('click', () => {
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
             window.location.href = 'edit.html';
-        });
-    }
-
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
+            
+        } else if(e.target.id === 'btn-logout'){
             localStorage.clear();
             window.location.href = 'login.html';
-        });
-    }
+        }
+    })
 
     const token = localStorage.getItem('token');
     const nombre = localStorage.getItem('nombre') || '';
