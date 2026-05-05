@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Gestión de Usuarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-users.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Administrador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <h1>Gestión de Usuarios</h1>
+            <p>Administra todos los usuarios del sistema, sus roles y permisos.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Listado de usuarios</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary" id="btn-nuevo">+ Nuevo usuario</button>
+                </div>
+            </div>
+            <!-- FILTROS -->
+            <div class="filters-bar">
+                <input type="text" id="filter-search" placeholder="Buscar por nombre o ID..." class="filter-search">
+                <select id="filter-sort-by">
+                    <option value="id">Ordenar por ID</option>
+                    <option value="name">Ordenar por Nombre</option>
+                </select>
+                <select id="filter-sort-order">
+                    <option value="asc">Ascendente</option>
+                    <option value="desc">Descendente</option>
+                </select>
+                <select id="filter-role">
+                    <option value="">Todos los roles</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="COORDINATOR">Coordinador</option>
+                    <option value="CAPTAIN">Capitán</option>
+                    <option value="PARTNER_ENTITY_MANAGER">Responsable de Entidad</option>
+                </select>
+                <button id="btn-apply-filters">Filtrar</button>
+                <button class="btn-clear" id="btn-clear-filters">Limpiar</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Roles</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="6" class="table-empty">Cargando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="btn-prev-page" onclick="previousPage()">← Anterior</button>
+                <span class="pagination-info">
+                    Página <span id="current-page">1</span> de <span id="total-pages">1</span>
+                </span>
+                <button id="btn-next-page" onclick="nextPage()">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select" onchange="changePageSize()">
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Nuevo usuario</h3>
+
+            <div class="form-group">
+                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <input type="text" id="input-nombre" placeholder="Ej: Juan Pérez" maxlength="255">
+            </div>
+            <div class="form-group">
+                <label for="input-email">Email <span style="color:#dc2626">*</span></label>
+                <input type="email" id="input-email" placeholder="Ej: juan@ejemplo.com" maxlength="255">
+            </div>
+            <div class="form-group">
+                <label for="input-password">Contraseña <span style="color:#dc2626">*</span></label>
+                <input type="password" id="input-password" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group">
+                <label for="input-telefono">Teléfono</label>
+                <input type="text" id="input-telefono" placeholder="Ej: +34 912345678" maxlength="20">
+            </div>
+            <div class="form-group">
+                <label for="input-direccion">Dirección</label>
+                <input type="text" id="input-direccion" placeholder="Calle, número...">
+            </div>
+            <div class="form-group">
+                <label for="input-codigo-postal">Código Postal</label>
+                <input type="text" id="input-codigo-postal" placeholder="Ej: 28001" maxlength="10">
+            </div>
+            <div class="form-group" id="form-group-role">
+                <label for="input-role">Rol <span style="color:#dc2626">*</span></label>
+                <select id="input-role">
+                    <option value="">Seleccionar rol...</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="COORDINATOR">Coordinador</option>
+                    <option value="CAPTAIN">Capitán</option>
+                    <option value="PARTNER_ENTITY_MANAGER">Responsable de Entidad</option>
+                </select>
+            </div>
+
+            <p class="form-message" id="modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="javascript/admin-users.js"></script>
+</body>
+</html>
