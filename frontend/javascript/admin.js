@@ -6,13 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const userNameEl = document.getElementById('user-name');
     const welcomeNameEl = document.getElementById('welcome-name');
-    
-
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
 
     if (welcomeNameEl) {
         welcomeNameEl.textContent = localStorage.getItem('nombre') || 'Admin';
@@ -21,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         if(e.target.id === 'btn-edit'){
             window.location.href = 'edit.html';
-            
+
         } else if(e.target.id === 'btn-logout'){
             localStorage.clear();
             window.location.href = 'login.html';

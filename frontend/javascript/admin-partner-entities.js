@@ -28,12 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const userNameEl = document.getElementById('user-name');
-
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-
     document.addEventListener('click', (e) => {
         if (e.target.id === 'btn-edit') {
             window.location.href = 'edit.html';

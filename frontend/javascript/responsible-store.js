@@ -6,9 +6,23 @@ function getStoreId() { return localStorage.getItem('storeId'); }
 function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) { window.location.href = 'login.html'; }
-document.getElementById('user-name').textContent = getUser();
-document.getElementById('btn-logout').addEventListener('click', logout);
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            logout();
+        }
+    })
+});
 
 function showError(msg) {
     const el = document.getElementById('error-msg');

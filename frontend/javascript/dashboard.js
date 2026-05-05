@@ -41,14 +41,16 @@ let currentCampaignId = null;
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-    const btnLogout = document.getElementById('btn-logout');
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-    if (btnLogout) {
-        btnLogout.addEventListener('click', logout);
-    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    })
 
     await loadCampaigns();
 
