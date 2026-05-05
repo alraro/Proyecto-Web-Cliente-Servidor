@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\aleja\\\\Proyecto-Web-Cliente-Servidor\" -Recurse -Directory)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Format-Table FullName)"
+    ]
+  }
+}
