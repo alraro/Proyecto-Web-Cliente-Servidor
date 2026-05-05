@@ -2,13 +2,13 @@
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 
-# Copiar solo el pom.xml primero para aprovechar la caché de capas de Docker
+# Copiamos el pom primero para cachear la descarga de dependencias en una capa separada.
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn -B -DskipTests dependency:go-offline
 
-# Copiar el código fuente y compilar
+# El código fuente invalida solo la última capa, no toda la resolución de dependencias.
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn -B -DskipTests package
 
 # Etapa 2: Ejecución (Contenedor final ligero)
 FROM eclipse-temurin:17-jre-alpine

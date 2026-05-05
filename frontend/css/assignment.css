@@ -1,0 +1,48 @@
+/* Padding interior de tarjetas con contenido de formulario */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Cabecera de tarjeta con título sobre tabla */
+.card-head {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.card-head h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--blue-900);
+    margin: 0;
+}
+
+/* Fila selector + botón de acción */
+.selector-row {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: .6rem;
+}
+.selector-row select {
+    flex: 1;
+    min-width: 220px;
+    padding: .65rem 1rem;
+    border: 1px solid rgba(25, 58, 107, .18);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: .93rem;
+    color: var(--ink);
+    background: var(--surface);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.selector-row select:focus {
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 3px rgba(45, 101, 160, .14);
+}
+
+/* Separación entre tarjetas consecutivas */
+.card + .card {
+    margin-top: 1.5rem;
+}
