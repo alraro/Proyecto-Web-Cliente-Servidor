@@ -7,6 +7,7 @@ let cachedTypes = [];
 
 function getToken() { return localStorage.getItem('token'); }
 
+
 function authHeaders() {
     return {
         'Content-Type': 'application/json',
@@ -307,10 +308,18 @@ async function loadCampaignTypes() {
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    })
+
+
     document.getElementById('btn-new').addEventListener('click', openCreateModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', hideModal);
     document.getElementById('btn-save').addEventListener('click', saveCampaign);
