@@ -6,9 +6,22 @@ function authHeaders() {
 }
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) { window.location.href = 'login.html'; }
-document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-document.getElementById('btn-logout').addEventListener('click', logout);
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            logout();
+        }
+    })
+});
+
 
 function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
@@ -32,8 +45,8 @@ function renderTable(chains) {
             <td><code class="inline-code">${escHtml(c.code)}</code></td>
             <td>
                 ${c.participation
-                    ? '<span class="badge badge-yes">✓ Sí</span>'
-                    : '<span class="badge badge-no">— No</span>'}
+            ? '<span class="badge badge-yes">✓ Sí</span>'
+            : '<span class="badge badge-no">— No</span>'}
             </td>
             <td>
                 <div class="td-actions">
@@ -115,10 +128,10 @@ document.getElementById('modal-backdrop').addEventListener('click', e => {
 });
 
 document.getElementById('btn-guardar').addEventListener('click', async () => {
-    const nombre        = document.getElementById('input-nombre').value.trim();
-    const codigo        = document.getElementById('input-codigo').value.trim();
+    const nombre = document.getElementById('input-nombre').value.trim();
+    const codigo = document.getElementById('input-codigo').value.trim();
     const participacion = document.getElementById('input-participacion').checked;
-    const errorEl       = document.getElementById('modal-error');
+    const errorEl = document.getElementById('modal-error');
 
     if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
     if (!codigo) { errorEl.textContent = 'El código es obligatorio.'; return; }
@@ -127,14 +140,14 @@ document.getElementById('btn-guardar').addEventListener('click', async () => {
         return;
     }
     if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
-    if (codigo.length > 50)  { errorEl.textContent = 'El código no puede superar 50 caracteres.'; return; }
+    if (codigo.length > 50) { errorEl.textContent = 'El código no puede superar 50 caracteres.'; return; }
 
-    const body   = JSON.stringify({ name: nombre, code: codigo, participation: participacion });
-    const url    = editingId ? `${BACKEND}/api/chains/${editingId}` : `${BACKEND}/api/chains`;
+    const body = JSON.stringify({ name: nombre, code: codigo, participation: participacion });
+    const url = editingId ? `${BACKEND}/api/chains/${editingId}` : `${BACKEND}/api/chains`;
     const method = editingId ? 'PUT' : 'POST';
 
     try {
-        const res  = await fetch(url, { method, headers: authHeaders(), body });
+        const res = await fetch(url, { method, headers: authHeaders(), body });
         const data = await res.json();
 
         if (!res.ok) {

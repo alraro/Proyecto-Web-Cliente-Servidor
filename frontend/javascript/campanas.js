@@ -81,10 +81,18 @@ function updateChips() {
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('token')) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    })
+
+
 
     document.querySelectorAll('.chip').forEach(chip => {
         chip.addEventListener('click', () => {

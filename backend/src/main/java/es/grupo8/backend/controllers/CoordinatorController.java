@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.ShiftRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.entity.Campaign;
@@ -53,6 +56,9 @@ public class CoordinatorController {
 
     @Autowired
     private StoreRepository storeRepository;
+
+    @Autowired
+    private CampaignStoreRepository campaignStoreRepository;
 
     @Autowired
     private CoordinatorGuard coordinatorGuard;
@@ -241,6 +247,38 @@ public class CoordinatorController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Tiendas de una campaña para el Coordinador",
+            description = "Devuelve las tiendas asignadas a una campaña para que el coordinador pueda seleccionarla al crear un turno.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de tiendas de la campaña"),
+            @ApiResponse(responseCode = "404", description = "Campaña no encontrada")
+    })
+    @GetMapping("/campaign/{campaignId}/stores")
+    public ResponseEntity<?> getStoresForCampaign(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer campaignId) {
+
+        Campaign campaign = campaignRepository.findById(campaignId).orElse(null);
+        if (campaign == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Campaña no encontrada"));
+        }
+
+        List<Map<String, Object>> stores = campaignStoreRepository.findByIdCampaign_Id(campaignId)
+                .stream()
+                .filter(cs -> cs.getIdStore() != null)
+                .map(cs -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id",   cs.getIdStore().getId());
+                    m.put("name", cs.getIdStore().getName());
+                    return m;
+                })
+                .sorted(Comparator.comparing(m -> (String) m.get("name")))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(stores);
     }
 
     private Map<String, Object> shiftToMap(Shift shift) {
