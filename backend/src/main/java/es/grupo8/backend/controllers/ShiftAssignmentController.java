@@ -355,9 +355,12 @@ public class ShiftAssignmentController {
                 .filter(v -> !alreadyAssigned.contains(v.getId()))
                 .map(v -> {
                     Map<String, Object> m = new HashMap<>();
-                    m.put("volunteerId", v.getId());
-                    m.put("name",        v.getName());
-                    m.put("email",       v.getEmail());
+                    m.put("volunteerId",      v.getId());
+                    m.put("name",             v.getName());
+                    m.put("email",            v.getEmail());
+                    m.put("phone",            v.getPhone());
+                    m.put("partnerEntityName",
+                          v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getName() : null);
                     return m;
                 })
                 .collect(Collectors.toList());
