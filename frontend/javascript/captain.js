@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const captainSelect   = document.getElementById('captain-select');
     const btnAssign       = document.getElementById('btn-assign');
 
-    if (!token) {
+    if (!token || localStorage.getItem('role') !== 'CAPITAN') {
         window.location.href = 'login.html';
         return;
     }

@@ -8,7 +8,7 @@ function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken()) {
+    if (!getToken() || localStorage.getItem('role') !== 'RESPONSABLE_TIENDA') {
         window.location.href = 'login.html';
         return;
     }
