@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Crear Turno</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/coordinator.css">
+    <script src="javascript/crear-turno.js" defer></script>
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Coordinador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+
+        <div class="welcome-bar">
+            <div>
+                <h2>Crear turno de recogida</h2>
+                <p>Define los turnos de voluntarios para una campaña y tienda.</p>
+            </div>
+            <span class="role-pill">Coordinador</span>
+        </div>
+
+        <!-- Selección de campaña y tienda -->
+        <div class="form-card">
+            <h3>Selecciona campaña y tienda</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="campaign-select">Campaña <span style="color:var(--error-color)">*</span></label>
+                    <select id="campaign-select">
+                        <option value="">Selecciona una campaña...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="store-select">Tienda <span style="color:var(--error-color)">*</span></label>
+                    <select id="store-select" disabled>
+                        <option value="">Selecciona primero una campaña...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de creación de turno -->
+        <div class="form-card" id="shift-form-card" style="display:none;">
+            <h3>Datos del turno</h3>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shift-day">Día <span style="color:var(--error-color)">*</span></label>
+                    <input type="date" id="shift-day">
+                </div>
+                <div class="form-group">
+                    <label for="volunteers-needed">Nº voluntarios necesarios <span style="color:var(--error-color)">*</span></label>
+                    <input type="number" id="volunteers-needed" min="1" placeholder="Ej: 5">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start-time">Hora de inicio <span style="color:var(--error-color)">*</span></label>
+                    <input type="time" id="start-time">
+                </div>
+                <div class="form-group">
+                    <label for="end-time">Hora de fin <span style="color:var(--error-color)">*</span></label>
+                    <input type="time" id="end-time">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Ubicación específica</label>
+                <input type="text" id="location" placeholder="Ej: Entrada principal, junto a los carritos" maxlength="500">
+            </div>
+
+            <div class="form-group">
+                <label for="observations">Observaciones</label>
+                <textarea id="observations" rows="3" placeholder="Observaciones adicionales..." maxlength="1000"></textarea>
+            </div>
+
+            <div id="form-message" class="form-message"></div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-primary" id="btn-submit">Crear turno</button>
+                <button type="button" class="btn-secondary" id="btn-reset">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- Listado de turnos de la campaña -->
+        <div class="shifts-list-card" id="shifts-card" style="display:none;">
+            <div class="shifts-list-header">
+                <h3>Turnos creados para esta campaña</h3>
+                <button class="btn-refresh" id="btn-refresh">↻ Actualizar</button>
+            </div>
+            <div id="shifts-container">
+                <p class="empty-message">Cargando turnos...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal de asignación de voluntarios y capitanes -->
+    <div class="modal hidden" id="assignment-modal">
+        <div class="modal-content" style="max-width:680px;max-height:85vh;overflow-y:auto;">
+            <span class="modal-close" id="modal-close" role="button" aria-label="Cerrar">×</span>
+            <h3 id="modal-title">Asignaciones del turno</h3>
+
+            <div id="modal-shift-info" style="background:#f5f5f5;border-radius:6px;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:.9rem;color:var(--text-light);"></div>
+
+            <!-- Voluntarios -->
+            <h4 style="margin-bottom:.5rem;">Voluntarios</h4>
+            <div id="capacity-indicator" style="margin-bottom:.75rem;font-weight:600;font-size:.9rem;"></div>
+            <div id="modal-volunteers" style="margin-bottom:1rem;"></div>
+            <div class="form-group">
+                <label>Añadir voluntario</label>
+                <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+                    <select id="volunteer-select" style="flex:1;min-width:180px;padding:.6rem;border:1px solid var(--border-color);border-radius:5px;font-family:inherit;">
+                        <option value="">Selecciona un voluntario...</option>
+                    </select>
+                    <button id="btn-assign-volunteer" class="btn-primary">Asignar</button>
+                </div>
+                <p id="volunteer-feedback" class="form-message" style="display:none;margin-top:.5rem;"></p>
+            </div>
+
+            <!-- Capitanes -->
+            <h4 style="margin-bottom:.5rem;margin-top:1.5rem;">Capitanes</h4>
+            <div id="modal-captains" style="margin-bottom:1rem;"></div>
+            <div class="form-group">
+                <label>Añadir capitán</label>
+                <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+                    <select id="captain-select" style="flex:1;min-width:180px;padding:.6rem;border:1px solid var(--border-color);border-radius:5px;font-family:inherit;">
+                        <option value="">Selecciona un capitán...</option>
+                    </select>
+                    <button id="btn-assign-captain" class="btn-primary">Asignar</button>
+                </div>
+                <p id="captain-feedback" class="form-message" style="display:none;margin-top:.5rem;"></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
