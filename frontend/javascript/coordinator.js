@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnAssign          = document.getElementById('btn-assign');
 
 
-    if (!localStorage.getItem('token')) {
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'COORDINADOR') {
         window.location.href = 'login.html';
         return;
     }

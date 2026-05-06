@@ -79,7 +79,10 @@ function updateChips() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('token')) { window.location.href = 'login.html'; return; }
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+        window.location.href = 'login.html';
+        return;
+    }
 
 
     document.addEventListener('click', (e) => {
