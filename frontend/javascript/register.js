@@ -73,5 +73,26 @@ form.addEventListener('submit', async (event) => {
     message.textContent = 'Se enviará el formulario y, si todo es correcto, volverás a la página de login.';
     message.classList.add('is-success');
 
-    form.submit();
+    const formData = new FormData(form);
+    const data = new URLSearchParams(formData);
+
+    try{
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: data,
+        });
+
+        if (response.ok){
+            window.location.href = 'login.html';
+        } else{
+            message.textContent = 'Error al registrar el usuario. Intenta nuevamente.';
+            message.classList.remove('is-success');
+            message.classList.add('is-error');
+        }
+    } catch(error) {
+        message.textContent = 'Error de conexión. Intenta nuevamente más tarde.';
+        message.classList.remove('is-success');
+        message.classList.add('is-error');
+        console.error('Error:', error);
+    }
 });

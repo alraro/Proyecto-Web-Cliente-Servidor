@@ -81,6 +81,7 @@ a {
 
 .main-nav a:hover {
     background: rgba(25, 58, 107, 0.08);
+    color: rgba(31, 41, 55, 0.9) !important;
     transform: translateY(-1px);
 }
 
@@ -91,7 +92,7 @@ a {
 .nav-cta,
 .primary-action {
     background: linear-gradient(140deg, var(--blue-900), var(--blue-700));
-    color: #ffffff;
+    color: #ffffff !important;
     font-weight: 700;
     box-shadow: var(--shadow);
 }
