@@ -1,12 +1,27 @@
 const BACKEND = 'http://localhost:8080';
 
-function getToken()    { return localStorage.getItem('token'); }
+function getToken() { return localStorage.getItem('token'); }
 function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-function logout()      { localStorage.clear(); window.location.href = 'login.html'; }
+function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) { window.location.href = 'login.html'; }
-document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-document.getElementById('btn-logout').addEventListener('click', logout);
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            logout();
+        }
+    })
+});
+
+
 
 function showToast(msg, type = 'success') {
     const c = document.getElementById('toast-container');
@@ -23,20 +38,20 @@ function escHtml(v) {
 function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
 
 // Datos auxiliares
-let allChains     = [];
+let allChains = [];
 let allLocalities = [];
-let allZones      = [];
+let allZones = [];
 
 async function loadAuxData() {
     try {
         const [resChains, resLoc, resZones] = await Promise.all([
-            fetch(BACKEND + '/api/chains',     { headers: authHeaders() }),
+            fetch(BACKEND + '/api/chains', { headers: authHeaders() }),
             fetch(BACKEND + '/api/localities', { headers: authHeaders() }),
-            fetch(BACKEND + '/api/zones',      { headers: authHeaders() })
+            fetch(BACKEND + '/api/zones', { headers: authHeaders() })
         ]);
-        if (resChains.ok)  allChains     = await resChains.json();
-        if (resLoc.ok)     allLocalities = await resLoc.json();
-        if (resZones.ok)   allZones      = await resZones.json();
+        if (resChains.ok) allChains = await resChains.json();
+        if (resLoc.ok) allLocalities = await resLoc.json();
+        if (resZones.ok) allZones = await resZones.json();
     } catch { /* los selects quedan vacíos pero no rompe nada */ }
 
     const fz = document.getElementById('filter-zone');
@@ -48,7 +63,7 @@ async function loadAuxData() {
 
     populateLocalities('');
 
-    const fc  = document.getElementById('filter-chain');
+    const fc = document.getElementById('filter-chain');
     const fch = document.getElementById('input-chain');
     allChains.forEach(c => {
         [fc, fch].forEach(sel => {
@@ -83,8 +98,8 @@ function populateLocalities(zoneId) {
 
 // Paginación
 let currentPage = 0;
-let pageSize    = 20;
-let totalPages  = 1;
+let pageSize = 20;
+let totalPages = 1;
 
 function renderTable(stores) {
     const tbody = document.getElementById('stores-tbody');
@@ -112,14 +127,14 @@ function renderTable(stores) {
 }
 
 async function loadStores(page = 0) {
-    const chainId    = document.getElementById('filter-chain').value;
+    const chainId = document.getElementById('filter-chain').value;
     const localityId = document.getElementById('filter-locality').value;
-    const zoneId     = document.getElementById('filter-zone').value;
+    const zoneId = document.getElementById('filter-zone').value;
 
     const params = new URLSearchParams();
-    if (chainId)    params.append('chainId',    chainId);
+    if (chainId) params.append('chainId', chainId);
     if (localityId) params.append('localityId', localityId);
-    if (zoneId)     params.append('zoneId',     zoneId);
+    if (zoneId) params.append('zoneId', zoneId);
     params.append('page', page);
     params.append('size', pageSize);
 
@@ -129,12 +144,12 @@ async function loadStores(page = 0) {
         const data = await res.json();
 
         currentPage = page;
-        totalPages  = data.totalPages || 1;
+        totalPages = data.totalPages || 1;
 
         document.getElementById('current-page').textContent = currentPage + 1;
-        document.getElementById('total-pages').textContent  = totalPages;
-        document.getElementById('btn-prev-page').disabled   = currentPage === 0;
-        document.getElementById('btn-next-page').disabled   = currentPage >= totalPages - 1;
+        document.getElementById('total-pages').textContent = totalPages;
+        document.getElementById('btn-prev-page').disabled = currentPage === 0;
+        document.getElementById('btn-next-page').disabled = currentPage >= totalPages - 1;
 
         renderTable(data.content || []);
     } catch {
@@ -157,9 +172,9 @@ function changePageSize() {
 // Filtros
 document.getElementById('btn-apply-filters').addEventListener('click', () => loadStores(0));
 document.getElementById('btn-clear-filters').addEventListener('click', () => {
-    document.getElementById('filter-zone').value     = '';
+    document.getElementById('filter-zone').value = '';
     document.getElementById('filter-locality').value = '';
-    document.getElementById('filter-chain').value    = '';
+    document.getElementById('filter-chain').value = '';
     populateLocalities('');
     loadStores(0);
 });
@@ -174,10 +189,10 @@ function openModal(titulo) {
 }
 function closeModal() {
     document.getElementById('modal-backdrop').classList.remove('open');
-    document.getElementById('input-nombre').value    = '';
+    document.getElementById('input-nombre').value = '';
     document.getElementById('input-domicilio').value = '';
-    document.getElementById('input-cp').value        = '';
-    document.getElementById('input-chain').value     = '';
+    document.getElementById('input-cp').value = '';
+    document.getElementById('input-chain').value = '';
     document.getElementById('modal-error').textContent = '';
     editingId = null;
 }
@@ -197,32 +212,32 @@ async function openEdit(id) {
         if (!res.ok) { showToast('Error al cargar la tienda.', 'error'); return; }
         const s = await res.json();
         editingId = s.id;
-        document.getElementById('input-nombre').value    = s.name       || '';
-        document.getElementById('input-domicilio').value = s.address    || '';
-        document.getElementById('input-cp').value        = s.postalCode || '';
-        document.getElementById('input-chain').value     = s.chainId    || '';
+        document.getElementById('input-nombre').value = s.name || '';
+        document.getElementById('input-domicilio').value = s.address || '';
+        document.getElementById('input-cp').value = s.postalCode || '';
+        document.getElementById('input-chain').value = s.chainId || '';
         openModal('Editar tienda');
     } catch { showToast('Error de conexión.', 'error'); }
 }
 
 // Guardar
 document.getElementById('btn-modal-save').addEventListener('click', async () => {
-    const nombre    = document.getElementById('input-nombre').value.trim();
+    const nombre = document.getElementById('input-nombre').value.trim();
     const domicilio = document.getElementById('input-domicilio').value.trim();
-    const cp        = document.getElementById('input-cp').value.trim();
-    const chainId   = document.getElementById('input-chain').value;
-    const errorEl   = document.getElementById('modal-error');
+    const cp = document.getElementById('input-cp').value.trim();
+    const chainId = document.getElementById('input-chain').value;
+    const errorEl = document.getElementById('modal-error');
 
     if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
     if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }
     if (cp && !/^\d{5}$/.test(cp)) { errorEl.textContent = 'El código postal debe tener exactamente 5 dígitos.'; return; }
 
-    const body   = JSON.stringify({ name: nombre, address: domicilio || null, postalCode: cp || null, chainId: chainId ? parseInt(chainId) : null });
-    const url    = editingId ? `${BACKEND}/api/stores/${editingId}` : `${BACKEND}/api/stores`;
+    const body = JSON.stringify({ name: nombre, address: domicilio || null, postalCode: cp || null, chainId: chainId ? parseInt(chainId) : null });
+    const url = editingId ? `${BACKEND}/api/stores/${editingId}` : `${BACKEND}/api/stores`;
     const method = editingId ? 'PUT' : 'POST';
 
     try {
-        const res  = await fetch(url, { method, headers: authHeaders(), body });
+        const res = await fetch(url, { method, headers: authHeaders(), body });
         const data = await res.json();
         if (!res.ok) { errorEl.textContent = data.message || 'Error al guardar.'; return; }
         closeModal();
