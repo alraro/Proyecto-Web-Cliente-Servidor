@@ -66,12 +66,13 @@
                             <th>Nombre</th>
                             <th>Teléfono</th>
                             <th>Email</th>
+                            <th>Entidad</th>
                             <th>Estado</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody id="collaborators-tbody">
-                        <tr><td colspan="5" class="table-empty">Selecciona una campaña para ver los colaboradores.</td></tr>
+                        <tr><td colspan="6" class="table-empty">Selecciona una campaña para ver los colaboradores.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -96,9 +97,15 @@
                     <label for="edit-email">Email</label>
                     <input type="email" id="edit-email" placeholder="email@ejemplo.com">
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group">
                     <label for="edit-address">Dirección</label>
                     <input type="text" id="edit-address" placeholder="Dirección (opcional)">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="edit-partner-entity">Entidad colaboradora (opcional)</label>
+                    <select id="edit-partner-entity">
+                        <option value="">Sin entidad (voluntario independiente)</option>
+                    </select>
                 </div>
             </div>
             <div class="card-body" style="padding-top:0;display:flex;gap:.5rem">

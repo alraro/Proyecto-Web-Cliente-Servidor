@@ -26,6 +26,7 @@ import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.CaptainRequestRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
+import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
 import es.grupo8.backend.dao.VolunteerShiftRepository;
@@ -33,6 +34,7 @@ import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainRequest;
+import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
@@ -53,6 +55,7 @@ public class CoordinatorDashboardController {
     @Autowired private UserRepository            userRepository;
     @Autowired private VolunteerRepository       volunteerRepository;
     @Autowired private VolunteerShiftRepository  volunteerShiftRepository;
+    @Autowired private PartnerEntityRepository   partnerEntityRepository;
 
     // ── GET /api/coordinator/my-campaigns ────────────────────────────────────
 
@@ -109,7 +112,7 @@ public class CoordinatorDashboardController {
             return forbidden();
         }
 
-        List<Volunteer> volunteers = volunteerRepository.findAll();
+        List<Volunteer> volunteers = volunteerRepository.findAllByOrderByNameAsc();
 
         List<Map<String, Object>> result = volunteers.stream()
                 .map(this::volunteerToMap)
@@ -145,6 +148,16 @@ public class CoordinatorDashboardController {
         v.setPhone(trimToNull(request.get("phone")));
         v.setEmail(trimToNull(request.get("email")));
         v.setAddress(trimToNull(request.get("address")));
+
+        Integer partnerEntityId = parseInteger(request.get("partnerEntityId"));
+        if (partnerEntityId != null) {
+            PartnerEntity pe = partnerEntityRepository.findById(partnerEntityId).orElse(null);
+            if (pe == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Entidad colaboradora no encontrada con id=" + partnerEntityId));
+            }
+            v.setIdPartnerEntity(pe);
+        }
 
         Volunteer saved = volunteerRepository.save(v);
 
@@ -187,6 +200,21 @@ public class CoordinatorDashboardController {
         v.setPhone(trimToNull(request.get("phone")));
         v.setEmail(trimToNull(request.get("email")));
         v.setAddress(trimToNull(request.get("address")));
+
+        // partnerEntityId: null clears the entity, a valid id sets it, absent key keeps current
+        if (request.containsKey("partnerEntityId")) {
+            Integer partnerEntityId = parseInteger(request.get("partnerEntityId"));
+            if (partnerEntityId == null) {
+                v.setIdPartnerEntity(null);
+            } else {
+                PartnerEntity pe = partnerEntityRepository.findById(partnerEntityId).orElse(null);
+                if (pe == null) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("message", "Entidad colaboradora no encontrada con id=" + partnerEntityId));
+                }
+                v.setIdPartnerEntity(pe);
+            }
+        }
 
         Volunteer saved = volunteerRepository.save(v);
 
@@ -231,7 +259,6 @@ public class CoordinatorDashboardController {
             return ResponseEntity.badRequest().body(Map.of("message", "Voluntario no encontrado"));
         }
 
-        // Verificar que la tienda esté en la campaña
         if (!campaignStoreRepository.existsByIdCampaign_IdAndIdStore_Id(campaignId, storeId)) {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", "La tienda no está asociada a esta campaña"));
@@ -352,19 +379,16 @@ public class CoordinatorDashboardController {
 
         String normalizedEmail = email.toLowerCase();
 
-        // Rechazar si ya existe un usuario con ese email
         if (userRepository.existsByEmail(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Ya existe un usuario registrado con ese email"));
         }
 
-        // Rechazar si ya hay una solicitud PENDIENTE para ese email
         if (captainRequestRepository.existsByEmailAndStatus(normalizedEmail, "PENDIENTE")) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Ya existe una solicitud pendiente para ese email"));
         }
 
-        // Guardar solicitud (no crear usuario ni asignar rol todavía)
         UserEntity coordinator = new UserEntity();
         coordinator.setIdUser(coordinatorUserId);
 
@@ -388,6 +412,59 @@ public class CoordinatorDashboardController {
                 "message",   "Solicitud enviada. El administrador deberá aprobarla.",
                 "requestId", saved.getId()
         ));
+    }
+
+    // ── GET /api/coordinator/partner-entities ─────────────────────────────────
+
+    @GetMapping("/partner-entities")
+    public ResponseEntity<?> getPartnerEntities(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (!coordinatorGuard.isCoordinator(authHeader)) {
+            return forbidden();
+        }
+
+        List<Map<String, Object>> result = partnerEntityRepository.findAll().stream()
+                .map(pe -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id",    pe.getId());
+                    m.put("name",  pe.getName());
+                    m.put("phone", pe.getPhone());
+                    return m;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
+    }
+
+    // ── GET /api/coordinator/campaign-entities?campaignId=X ──────────────────
+
+    @GetMapping("/campaign-entities")
+    public ResponseEntity<?> getCampaignEntities(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestParam(value = "campaignId", required = false) Integer campaignId) {
+
+        if (!coordinatorGuard.isCoordinator(authHeader)) {
+            return forbidden();
+        }
+
+        if (campaignId == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "campaignId es obligatorio"));
+        }
+
+        List<PartnerEntity> entities = volunteerShiftRepository.findEntitiesWithVolunteersInCampaign(campaignId);
+
+        List<Map<String, Object>> result = entities.stream().map(pe -> {
+            Long count = volunteerShiftRepository.countVolunteersInCampaignByEntity(campaignId, pe.getId());
+            Map<String, Object> m = new HashMap<>();
+            m.put("id",             pe.getId());
+            m.put("name",           pe.getName());
+            m.put("phone",          pe.getPhone());
+            m.put("volunteerCount", count != null ? count : 0L);
+            return m;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -421,11 +498,13 @@ public class CoordinatorDashboardController {
 
     private Map<String, Object> volunteerToMap(Volunteer v) {
         Map<String, Object> m = new HashMap<>();
-        m.put("id",      v.getId());
-        m.put("name",    v.getName());
-        m.put("phone",   v.getPhone());
-        m.put("email",   v.getEmail());
-        m.put("address", v.getAddress());
+        m.put("id",                v.getId());
+        m.put("name",              v.getName());
+        m.put("phone",             v.getPhone());
+        m.put("email",             v.getEmail());
+        m.put("address",           v.getAddress());
+        m.put("partnerEntityId",   v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getId()   : null);
+        m.put("partnerEntityName", v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getName() : null);
         return m;
     }
 

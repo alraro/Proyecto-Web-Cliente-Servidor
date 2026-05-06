@@ -122,7 +122,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             (Array.isArray(volunteers) ? volunteers : []).forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = String(v.id);
-                opt.textContent = v.name + (v.phone ? ' · ' + v.phone : '');
+                const entityPart = v.partnerEntityName
+                    ? ' (' + v.partnerEntityName + ')'
+                    : ' (Independiente)';
+                opt.textContent = v.name + (v.phone ? ' · ' + v.phone : '') + entityPart;
                 volunteerSelect.appendChild(opt);
             });
         } catch (err) {
