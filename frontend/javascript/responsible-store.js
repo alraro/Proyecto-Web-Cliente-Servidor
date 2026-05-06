@@ -6,9 +6,23 @@ function getStoreId() { return localStorage.getItem('storeId'); }
 function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) { window.location.href = 'login.html'; }
-document.getElementById('user-name').textContent = getUser();
-document.getElementById('btn-logout').addEventListener('click', logout);
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            logout();
+        }
+    })
+});
 
 function showError(msg) {
     const el = document.getElementById('error-msg');
@@ -48,9 +62,9 @@ function renderShifts(shifts) {
 
     tbody.innerHTML = shifts.map(s => {
         let attendanceBadge;
-        if (s.attendance === true)      attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
+        if (s.attendance === true)       attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
         else if (s.attendance === false) attendanceBadge = '<span class="badge-attendance badge-no">✗ No</span>';
-        else                            attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
+        else                             attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
 
         return `
             <tr>

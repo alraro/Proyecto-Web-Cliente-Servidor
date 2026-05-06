@@ -1,17 +1,43 @@
 const BACKEND = 'http://localhost:8080';
 
 // ── Auth ──────────────────────────────────────────────────────────────
-function getToken() { return localStorage.getItem('token'); }
-function authHeaders() {
-    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
+function getToken() { 
+    return localStorage.getItem('token'); 
 }
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) { window.location.href = 'login.html'; }
+function authHeaders() {
+    return { 
+        'Content-Type': 'application/json', 
+        'Authorization': 'Bearer ' + getToken() 
+    };
+}
+
+function logout() { 
+    localStorage.clear(); 
+    window.location.href = 'login.html'; 
+}
+
 const role = (localStorage.getItem('role') || '').toUpperCase();
-if (role !== 'ADMINISTRADOR') { window.location.href = 'login.html'; }
-document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-document.getElementById('btn-logout').addEventListener('click', logout);
+if (role !== 'ADMINISTRADOR') { 
+    window.location.href = 'login.html'; 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'btn-edit') {
+            window.location.href = 'edit.html';
+
+        } else if (e.target.id === 'btn-logout') {
+            logout();
+        }
+    })
+});
+
 
 // ── Toast ─────────────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
@@ -47,7 +73,7 @@ function renderTable(partnerEntities) {
 }
 
 function escHtml(v) {
-    return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 function escAttr(v) {
     return String(v ?? '').replace(/'/g, "\\'");
@@ -208,10 +234,10 @@ document.getElementById('modal-backdrop').addEventListener('click', e => {
 
 // ── Guardar ───────────────────────────────────────────────────────────
 document.getElementById('btn-guardar').addEventListener('click', async () => {
-    const nombre    = document.getElementById('input-nombre').value.trim();
+    const nombre = document.getElementById('input-nombre').value.trim();
     const direccion = document.getElementById('input-direccion').value.trim();
-    const telefono  = document.getElementById('input-telefono').value.trim();
-    const errorEl   = document.getElementById('modal-error');
+    const telefono = document.getElementById('input-telefono').value.trim();
+    const errorEl = document.getElementById('modal-error');
 
     // Validación cliente
     if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
@@ -223,18 +249,18 @@ document.getElementById('btn-guardar').addEventListener('click', async () => {
         return;
     }
 
-    const body   = JSON.stringify({
+    const body = JSON.stringify({
         name: nombre,
         address: direccion || null,
         phone: telefono || null
     });
-    const url    = editandoId
+    const url = editandoId
         ? `${BACKEND}/api/partner-entities/${editandoId}`
         : `${BACKEND}/api/partner-entities`;
     const method = editandoId ? 'PUT' : 'POST';
 
     try {
-        const res  = await fetch(url, { method, headers: authHeaders(), body });
+        const res = await fetch(url, { method, headers: authHeaders(), body });
         const data = await res.json();
 
         if (!res.ok) {

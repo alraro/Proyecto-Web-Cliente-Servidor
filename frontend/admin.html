@@ -9,21 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <script src="javascript/admin.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
+
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="index.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Administrador</span>
-            </div>
-            <button class="btn-edit" id="btn-edit">Editar perfil</button>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="welcome-bar">
@@ -46,13 +38,14 @@
                 <p>Crear, editar y eliminar cadenas. Activar o desactivar su participación en campañas.</p>
                 <span class="menu-card-arrow">Ir a cadenas →</span>
             </a>
-            <a class="menu-card" href="http://localhost:8080/admin-campaigns">
+            <a class="menu-card" href="administrador-campanas.html">
                 <div class="menu-card-icon icon-orange">📢</div>
                 <h3>Campañas</h3>
                 <p>Crear y gestionar campañas de recogida de alimentos, asignar fechas y zonas.</p>
                 <span class="menu-card-arrow">Ir a campañas →</span>
             </a>
-            <a class="menu-card" href="http://localhost:8080/campaigns">
+            <!-- RF-13: public campaign listing with status and filters -->
+            <a class="menu-card" href="campanas.html">
                 <div class="menu-card-icon icon-blue">📋</div>
                 <h3>Ver campañas</h3>
                 <p>Consulta el estado de todas las campañas: activas, pasadas y futuras.</p>
@@ -110,13 +103,15 @@
                 <p>Consultar y gestionar los turnos y asistencia de voluntarios por tienda.</p>
                 <span class="menu-card-arrow">Ir a voluntarios →</span>
             </a>
-            <a class="menu-card" href="http://localhost:8080/admin-captains">
+            <!-- RF-14: Gestión dedicada de capitanes por campaña -->
+            <a class="menu-card" href="captain.html">
                 <div class="menu-card-icon icon-red">⚓</div>
                 <h3>Capitanes</h3>
                 <p>Asignar capitanes a tiendas y campañas, ver su estado y actividad.</p>
                 <span class="menu-card-arrow">Ir a capitanes →</span>
             </a>
-            <a class="menu-card" href="http://localhost:8080/admin-coordinators">
+            <!-- RF-14: Gestión dedicada de coordinadores por campaña -->
+            <a class="menu-card" href="coordinator.html">
                 <div class="menu-card-icon icon-blue">🗺️</div>
                 <h3>Coordinadores</h3>
                 <p>Ver y asignar coordinadores por zona geográfica y campaña.</p>

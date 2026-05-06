@@ -9,21 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/responsible-store.css">
+    <script src="javascript/responsible-store.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
 </head>
 <body>
 
-    <header class="topbar">
-        <a class="brand" href="index.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Responsable</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -58,7 +51,5 @@
 
         <div id="error-msg" class="error-panel hidden"></div>
     </main>
-
-    <script src="javascript/responsible-store.js"></script>
 </body>
 </html>
