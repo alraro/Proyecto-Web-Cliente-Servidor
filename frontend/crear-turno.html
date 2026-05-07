@@ -7,13 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/coordinator.css">
     <script src="javascript/crear-turno.js" defer></script>
 </head>
 <body>
 
     <header class="topbar">
-        <a class="brand" href="index.html">
+        <a class="brand" href="coordinator-dashboard.html">
             <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
         </a>
         <div class="topbar-right">
@@ -27,12 +28,14 @@
 
     <main class="page-wrapper">
 
-        <div class="welcome-bar">
-            <div>
-                <h2>Crear turno de recogida</h2>
-                <p>Define los turnos de voluntarios para una campaña y tienda.</p>
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Crear turno de recogida</h1>
+                    <p>Define turnos de voluntarios para una campaña y tienda, y asigna participantes.</p>
+                </div>
             </div>
-            <span class="role-pill">Coordinador</span>
         </div>
 
         <!-- Selección de campaña y tienda -->
@@ -113,7 +116,7 @@
 
     <!-- Modal de asignación de voluntarios y capitanes -->
     <div class="modal hidden" id="assignment-modal">
-        <div class="modal-content" style="max-width:680px;max-height:85vh;overflow-y:auto;">
+        <div class="modal-content">
             <span class="modal-close" id="modal-close" role="button" aria-label="Cerrar">×</span>
             <h3 id="modal-title">Asignaciones del turno</h3>
 

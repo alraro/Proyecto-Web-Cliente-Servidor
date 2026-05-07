@@ -597,11 +597,11 @@ public class ApiController {
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinator.html";
+			return "/coordinator-dashboard.html";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/captain.html";
+			return "/captain-dashboard.html";
 		}
 
 		if ("COLABORADOR".equals(role)) {

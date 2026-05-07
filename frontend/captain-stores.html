@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Mis Tiendas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/assignment.css">
+    <script src="javascript/captain-stores.js" defer></script>
+    <style>
+        .detail-panel { margin-top: 1.5rem; }
+        .shift-block {
+            background: var(--surface, #fff);
+            border: 1px solid var(--border, #e0e0e0);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .shift-block h4 { margin: 0 0 .5rem; font-size: .95rem; color: var(--text-primary, #1a1a2e); }
+        .shift-block p  { margin: 0; font-size: .85rem; color: var(--text-secondary, #6b7280); }
+        .volunteer-pill {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 14px;
+            padding: 2px 10px;
+            font-size: .8rem;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="captain-dashboard.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Capitán</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="captain-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Mis Tiendas</h1>
+                    <p>Vista de solo lectura: tiendas y voluntarios asignados.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="campaign-select">Campaña</label>
+                    <div class="selector-row">
+                        <select id="campaign-select">
+                            <option value="">Selecciona una campaña...</option>
+                        </select>
+                        <button type="button" id="btn-load" class="btn btn-secondary">Cargar tiendas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de tiendas -->
+        <div class="card">
+            <div class="card-head">
+                <h2>Tiendas asignadas</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Cadena</th>
+                            <th>Dirección</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stores-tbody">
+                        <tr><td colspan="4" class="table-empty">Selecciona una campaña para ver las tiendas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel de detalle de tienda seleccionada -->
+        <div id="detail-panel" class="detail-panel" hidden>
+            <p class="section-title" id="detail-title">Turnos y voluntarios</p>
+            <div id="shifts-container"></div>
+        </div>
+    </main>
+</body>
+</html>

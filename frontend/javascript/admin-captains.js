@@ -9,32 +9,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
-    const campaignSelect     = document.getElementById('campaign-select');
-    const btnLoad            = document.getElementById('btn-load');
-    const globalMessage      = document.getElementById('global-message');
-    const coordinatorsTbody  = document.getElementById('coordinators-tbody');
-    const coordinatorSelect  = document.getElementById('coordinator-select');
-    const btnAssign          = document.getElementById('btn-assign');
+    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
 
+    const campaignSelect  = document.getElementById('campaign-select');
+    const btnLoad         = document.getElementById('btn-load');
+    const globalMessage   = document.getElementById('global-message');
+    const captainsTbody   = document.getElementById('captains-tbody');
+    const captainSelect   = document.getElementById('captain-select');
+    const btnAssign       = document.getElementById('btn-assign');
 
-    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'COORDINADOR') {
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        localStorage.clear();
         window.location.href = 'login.html';
-        return;
-    }
+    });
 
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-    
-
-    coordinatorSelect.disabled = true;
+    captainSelect.disabled = true;
     btnAssign.disabled = true;
 
     if (!token) {
@@ -58,48 +47,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
         try {
             await loadCampaignData(campaignId);
-            coordinatorSelect.disabled = false;
+            captainSelect.disabled = false;
             btnAssign.disabled = false;
         } catch (error) {
-            coordinatorSelect.disabled = true;
+            captainSelect.disabled = true;
             btnAssign.disabled = true;
-            showMessage(error.message || 'No se pudieron cargar los coordinadores', true);
+            showMessage(error.message || 'No se pudieron cargar los capitanes', true);
         }
     });
 
     btnAssign.addEventListener('click', async () => {
         const campaignId = campaignSelect.value;
-        const userId     = coordinatorSelect.value;
+        const userId     = captainSelect.value;
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
-        if (!userId)     { showMessage('Selecciona un coordinador', true); return; }
+        if (!userId)     { showMessage('Selecciona un capitán', true); return; }
         try {
-            await fetchJson(API_BASE + `/api/campaigns/${campaignId}/coordinators`, {
+            await fetchJson(API_BASE + `/api/campaigns/${campaignId}/captains`, {
                 method: 'POST',
                 headers: authHeaders(token),
                 body: JSON.stringify({ userId: Number(userId) })
             });
-            showMessage('Coordinador asignado correctamente', false);
+            showMessage('Capitán asignado correctamente', false);
             await loadCampaignData(campaignId);
         } catch (error) {
-            showMessage(error.message || 'No se pudo asignar el coordinador', true);
+            showMessage(error.message || 'No se pudo asignar el capitán', true);
         }
     });
 
-    coordinatorsTbody.addEventListener('click', async (event) => {
-        const button = event.target.closest("button[data-role='COORDINATOR']");
+    captainsTbody.addEventListener('click', async (event) => {
+        const button = event.target.closest("button[data-role='CAPTAIN']");
         if (!button) return;
         const campaignId = campaignSelect.value;
         const userId     = button.dataset.userid;
         if (!campaignId || !userId) { showMessage('Selección inválida', true); return; }
         try {
-            await fetchJson(API_BASE + `/api/campaigns/${campaignId}/coordinators/${userId}`, {
+            await fetchJson(API_BASE + `/api/campaigns/${campaignId}/captains/${userId}`, {
                 method: 'DELETE',
                 headers: authHeaders(token)
             });
-            showMessage('Coordinador desasignado correctamente', false);
+            showMessage('Capitán desasignado correctamente', false);
             await loadCampaignData(campaignId);
         } catch (error) {
-            showMessage(error.message || 'No se pudo desasignar el coordinador', true);
+            showMessage(error.message || 'No se pudo desasignar el capitán', true);
         }
     });
 
@@ -112,11 +101,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadCampaignData(campaignId) {
         const [assignments, availableData] = await Promise.all([
             fetchJson(API_BASE + `/api/campaigns/${campaignId}/assignments`, { headers: authHeaders(token) }),
-            fetchJson(API_BASE + `/api/campaigns/${campaignId}/available-users?role=COORDINATOR`, { headers: authHeaders(token) })
+            fetchJson(API_BASE + `/api/campaigns/${campaignId}/available-users?role=CAPTAIN`, { headers: authHeaders(token) })
         ]);
         const available = Array.isArray(availableData) ? availableData : (availableData.content || []);
-        renderCoordinatorsTable(assignments?.coordinators || []);
-        populateSelect(coordinatorSelect, available, 'Selecciona un coordinador...');
+        renderCaptainsTable(assignments?.captains || []);
+        populateSelect(captainSelect, available, 'Selecciona un capitán...');
     }
 
     async function fetchJson(url, options) {
@@ -139,20 +128,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function renderCoordinatorsTable(coordinators) {
-        coordinatorsTbody.innerHTML = '';
-        if (!coordinators.length) {
-            coordinatorsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin coordinadores asignados.</td></tr>";
+    function renderCaptainsTable(captains) {
+        captainsTbody.innerHTML = '';
+        if (!captains.length) {
+            captainsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin capitanes asignados.</td></tr>";
             return;
         }
-        coordinators.forEach(coordinator => {
+        captains.forEach(captain => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${escapeHtml(coordinator.name || '')}</td>
-                <td>${escapeHtml(coordinator.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button></td>
+                <td>${escapeHtml(captain.name || '')}</td>
+                <td>${escapeHtml(captain.email || '')}</td>
+                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${captain.userId}" data-role="CAPTAIN">Eliminar</button></td>
             `;
-            coordinatorsTbody.appendChild(row);
+            captainsTbody.appendChild(row);
         });
     }
 
