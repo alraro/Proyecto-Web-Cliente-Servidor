@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Validar registros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/admin-validate-users.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+</head>
+<body>
+
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Administrador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <h1>Validar registros</h1>
+            <p>Revisa y aprueba o rechaza las solicitudes de nuevos usuarios.</p>
+        </div>
+
+        <!-- Usuarios pendientes -->
+        <div class="card" style="margin-bottom:1.5rem;">
+            <div class="card-header">
+                <h2>Pendientes de aprobación <span id="badge-pending" class="badge badge-no" style="display:none;"></span></h2>
+                <div class="card-actions">
+                    <button class="btn btn-edit btn-sm" onclick="loadPending()">↻ Actualizar</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Asignar rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-tbody">
+                        <tr><td colspan="6" class="table-empty">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="toast-container" id="toast-container"></div>
+
+</body>
+</html>

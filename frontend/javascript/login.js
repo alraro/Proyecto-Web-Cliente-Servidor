@@ -59,7 +59,13 @@ form.addEventListener('submit', async (event) => {
             body: JSON.stringify({ email, password })
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 403) {
+            message.textContent = 'Tu cuenta está pendiente de verificación por un administrador.';
+            message.classList.add('is-error');
+            return;
+        }
 
         if (!res.ok) {
             message.textContent = data.message || 'Credenciales incorrectas.';
