@@ -1,6 +1,11 @@
 const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+        window.location.href = 'login.html';
+        return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
     const nameFromQuery  = params.get('nombre');

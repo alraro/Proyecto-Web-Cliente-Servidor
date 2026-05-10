@@ -70,29 +70,26 @@ form.addEventListener('submit', async (event) => {
         return;
     }
 
-    message.textContent = 'Se enviará el formulario y, si todo es correcto, volverás a la página de login.';
-    message.classList.add('is-success');
-
-    const formData = new FormData(form);
-    const data = new URLSearchParams(formData);
-
-    try{
-        const response = await fetch(form.action, {
-            method: form.method,
-            body: data,
+    try {
+        const res = await fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, email, password, telefono, domicilio, cp })
         });
 
-        if (response.ok){
-            window.location.href = 'login.html';
-        } else{
-            message.textContent = 'Error al registrar el usuario. Intenta nuevamente.';
-            message.classList.remove('is-success');
-            message.classList.add('is-error');
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 201) {
+            message.textContent = 'Tu solicitud ha sido registrada. Un administrador revisará tu cuenta y te asignará un rol. Recibirás acceso una vez aprobado.';
+            message.classList.add('is-success');
+            return;
         }
-    } catch(error) {
-        message.textContent = 'Error de conexión. Intenta nuevamente más tarde.';
-        message.classList.remove('is-success');
+
+        message.textContent = data.message || 'No se pudo completar el registro.';
         message.classList.add('is-error');
-        console.error('Error:', error);
+    } catch (error) {
+        console.log(error);
+        message.textContent = 'Error al conectar con el servidor.';
+        message.classList.add('is-error');
     }
 });
