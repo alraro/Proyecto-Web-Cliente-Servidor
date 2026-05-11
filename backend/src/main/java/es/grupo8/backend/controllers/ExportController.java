@@ -85,7 +85,6 @@ public class ExportController {
                 case "stores"    -> exportStores();
                 case "chains"    -> exportChains();
                 case "campaigns" -> exportCampaigns();
-                case "dashboard" -> exportDashboard(campaignId);
                 case "partners"  -> exportPartners();
                 case "users"     -> exportUsers();
                 default          -> null;
@@ -193,63 +192,6 @@ public class ExportController {
             autoSizeColumns(sheet, 5);
             return toBytes(wb);
         }
-    }
-
-    // Dashboard 
-    private byte[] exportDashboard(Integer campaignId) throws IOException {
-        try (XSSFWorkbook wb = new XSSFWorkbook()) {
-
-            CellStyle hs = createHeaderStyle(wb);
-
-            Sheet sheetAll = wb.createSheet("Por Campaña");
-
-            createHeaderRow(sheetAll, new String[]{
-                "ID", "Nombre", "Inicio", "Fin", "Tiendas en campaña"
-            }, hs);
-
-            List<Object[]> allCampaigns = campaignStoreRepository.coverageAllCampaigns();
-            int r = 1;
-
-            for (Object[] data : allCampaigns) {
-                Row excelRow = sheetAll.createRow(r++);
-                excelRow.createCell(0).setCellValue(((Number) data[0]).doubleValue()); // ID
-                excelRow.createCell(1).setCellValue((String) data[1]); // Nombre
-                excelRow.createCell(2).setCellValue(data[2].toString()); // Inicio
-                excelRow.createCell(3).setCellValue(data[3].toString()); // Fin
-                excelRow.createCell(4).setCellValue(((Number) data[4]).doubleValue()); // Tiendas en campaña
-            }
-
-            autoSizeColumns(sheetAll, 5);
-
-            if (campaignId != null) {
-                coverageSheet(wb, hs, "Por cadena",    campaignStoreRepository.coverageByChain(campaignId));
-                coverageSheet(wb, hs, "Por localidad", campaignStoreRepository.coverageByLocality(campaignId));
-                coverageSheet(wb, hs, "Por zona",      campaignStoreRepository.coverageByZone(campaignId));
-            }
-            return toBytes(wb);
-        }
-    }
-
-    private void coverageSheet(XSSFWorkbook wb, CellStyle hs, String name, List<Object[]> data) {
-        Sheet sheet = wb.createSheet(name);
-
-        createHeaderRow(sheet, new String[]{
-            "Nombre", "Total tiendas", "Tiendas en campaña", "Cobertura (%)"
-        }, hs);
-
-        int r = 1;
-        for (Object[] item : data) {
-            Row excelRow = sheet.createRow(r++);
-            long total = ((Number) item[1]).longValue();
-            long inCampaign = ((Number) item[2]).longValue();
-            double pct = total > 0 ? Math.round(inCampaign * 100.0 / total * 10) / 10.0 : 0.0;
-            excelRow.createCell(0).setCellValue((String) item[0]); // Nombre
-            excelRow.createCell(1).setCellValue((double) total); // Total tiendas
-            excelRow.createCell(2).setCellValue((double) inCampaign); // Tiendas en campaña
-            excelRow.createCell(3).setCellValue(pct); // Cobertura (%)
-        }
-
-        autoSizeColumns(sheet, 4);
     }
 
     // Entidades colaboradoras 
