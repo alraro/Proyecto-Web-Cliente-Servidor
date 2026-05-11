@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +64,9 @@ public class CoordinatorController {
 
     @Autowired
     private CoordinatorGuard coordinatorGuard;
+
+    @Autowired
+    private es.grupo8.backend.dao.VolunteerShiftRepository volunteerShiftRepository;
 
     /**
      * Create a new pickup shift for a campaign and store.
@@ -279,6 +284,101 @@ public class CoordinatorController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(stores);
+    }
+
+    // ── GET /api/shifts/calendar?campaignId=X ────────────────────────────────
+    // Optimizado para RNF-06: sólo 2 consultas a base de datos.
+
+    @Operation(summary = "Calendario de turnos por tienda, día y franja horaria",
+               description = "Devuelve los turnos agrupados por tienda → día → franja para el panel visual.")
+    @GetMapping("/calendar")
+    public ResponseEntity<?> getCalendar(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestParam(value = "campaignId", required = false) Integer campaignId) {
+
+        if (!coordinatorGuard.isCoordinator(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden ver el calendario."));
+        }
+
+        if (campaignId == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "campaignId es obligatorio"));
+        }
+
+        // Consulta 1: todos los turnos de la campaña
+        List<Shift> shifts = shiftRepository.findByIdCampaign(campaignId);
+
+        // Consulta 2: conteo de voluntarios agrupado (storeId, day, startTime, count)
+        Map<String, Long> countMap = new HashMap<>();
+        for (Object[] row : volunteerShiftRepository.countVolunteersPerShiftInCampaign(campaignId)) {
+            Integer sid  = (Integer)   row[0];
+            LocalDate d  = (LocalDate) row[1];
+            LocalTime st = (LocalTime) row[2];
+            Long count   = (Long)      row[3];
+            countMap.put(sid + "|" + d + "|" + st, count);
+        }
+
+        // Agrupar en memoria: storeId → storeName + (day → shifts)
+        Map<Integer, Map<String, Object>> storeMap = new LinkedHashMap<>();
+
+        for (Shift s : shifts) {
+            Integer sid    = s.getIdStore().getId();
+            String  sName  = s.getIdStore().getName();
+            String  dayKey = s.getShiftDay().toString();
+            String  cntKey = sid + "|" + dayKey + "|" + s.getStartTime().toString();
+            long    assigned = countMap.getOrDefault(cntKey, 0L);
+
+            storeMap.computeIfAbsent(sid, k -> {
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("storeId",   sid);
+                m.put("storeName", sName);
+                m.put("days",      new LinkedHashMap<String, List<Map<String, Object>>>());
+                return m;
+            });
+
+            @SuppressWarnings("unchecked")
+            Map<String, List<Map<String, Object>>> days =
+                    (Map<String, List<Map<String, Object>>>) storeMap.get(sid).get("days");
+
+            days.computeIfAbsent(dayKey, k -> new ArrayList<>()).add(Map.of(
+                    "shiftId",            s.getId(),
+                    "startTime",          s.getStartTime().toString(),
+                    "endTime",            s.getEndTime().toString(),
+                    "volunteersNeeded",   s.getVolunteersNeeded(),
+                    "volunteersAssigned", (int) assigned,
+                    "observations",       s.getObservations() != null ? s.getObservations() : ""
+            ));
+        }
+
+        // Convertir a lista ordenada cronológicamente por tienda y día
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> storeEntry : storeMap.values()) {
+            @SuppressWarnings("unchecked")
+            Map<String, List<Map<String, Object>>> days =
+                    (Map<String, List<Map<String, Object>>>) storeEntry.get("days");
+
+            List<Map<String, Object>> dayList = days.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(e -> {
+                        List<Map<String, Object>> dayShifts = e.getValue().stream()
+                                .sorted(Comparator.comparing(m -> (String) m.get("startTime")))
+                                .collect(Collectors.toList());
+                        Map<String, Object> dm = new HashMap<>();
+                        dm.put("date",   e.getKey());
+                        dm.put("shifts", dayShifts);
+                        return dm;
+                    })
+                    .collect(Collectors.toList());
+
+            Map<String, Object> storeFinal = new HashMap<>();
+            storeFinal.put("storeId",   storeEntry.get("storeId"));
+            storeFinal.put("storeName", storeEntry.get("storeName"));
+            storeFinal.put("days",      dayList);
+            result.add(storeFinal);
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     private Map<String, Object> shiftToMap(Shift shift) {
