@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/admin-partner-entities.css">
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
 
 </head>
 <body>
@@ -28,6 +29,7 @@
             <div class="card-header">
                 <h2>Listado de entidades socias</h2>
                 <div class="card-actions">
+                    <button onclick="exportarExcel('partner-entities')" class="btn-export">Exportar archivo</button>
                     <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad socia</button>
                 </div>
             </div>

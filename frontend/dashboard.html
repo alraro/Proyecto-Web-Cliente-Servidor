@@ -8,10 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="javascript/dashboard.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
 
 </head>
 <body>
@@ -25,8 +27,11 @@
         <h1>Dashboard de Cobertura</h1>
         <p>Visualiza métricas de cobertura por cadena, localidad y zona geográfica.</p>
     </div>
+    <span>
+        <button onclick="exportarExcel('dashboard', document.getElementById('campaignSelect').value)" class="btn-export">Exportar datos</button>
+    </span>
 
-    <!-- Selector de campaña + auto-refresh -->
+    <!-- Selector de campaña -->
     <section class="controls">
         <label for="campaignSelect">Campaña:</label>
         <select id="campaignSelect">
