@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import es.grupo8.backend.entity.Shift;
 import es.grupo8.backend.entity.ShiftCaptain;
 import es.grupo8.backend.entity.ShiftCaptainId;
 
@@ -16,6 +17,11 @@ import es.grupo8.backend.entity.ShiftCaptainId;
 public interface ShiftCaptainRepository extends JpaRepository<ShiftCaptain, ShiftCaptainId> {
 
     List<ShiftCaptain> findByShift_Id(Integer shiftId);
+
+    @Query("SELECT sc.shift FROM ShiftCaptain sc WHERE sc.user.idUser = :userId AND sc.shift.idCampaign.id = :campaignId")
+    List<Shift> findShiftsByUserIdAndCampaignId(
+            @Param("userId") Integer userId,
+            @Param("campaignId") Integer campaignId);
 
     @Query("SELECT sc FROM ShiftCaptain sc " +
            "WHERE sc.user.idUser = :userId " +
