@@ -11,7 +11,9 @@ COPY src ./src
 RUN mvn -B -DskipTests package
 
 # Etapa 2: Ejecución (Contenedor final ligero)
-FROM eclipse-temurin:17-jre-alpine
+# Use a standard Temurin JRE tag which is more widely available
+## Use the same Maven/Temurin image from the build stage to avoid additional remote pulls
+FROM maven:3.9.6-eclipse-temurin-17-alpine
 WORKDIR /app
 
 # Extraer el .war de la etapa anterior

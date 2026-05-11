@@ -64,4 +64,10 @@ public interface VolunteerShiftRepository extends JpaRepository<VolunteerShift, 
     Long countVolunteersInCampaignByEntity(
             @Param("campaignId") Integer campaignId,
             @Param("entityId") Integer entityId);
+
+    @Query("SELECT vs.id.idStore, vs.id.shiftDay, vs.id.startTime, COUNT(vs) " +
+           "FROM VolunteerShift vs " +
+           "WHERE vs.id.idCampaign = :campaignId " +
+           "GROUP BY vs.id.idStore, vs.id.shiftDay, vs.id.startTime")
+    List<Object[]> countVolunteersPerShiftInCampaign(@Param("campaignId") Integer campaignId);
 }
