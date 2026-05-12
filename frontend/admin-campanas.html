@@ -11,6 +11,8 @@
     <script src="javascript/administrador-campanas.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
+
 
 </head>
 <body>
@@ -25,6 +27,7 @@
                 <h1>Gestión de Campañas</h1>
                 <p>Crea, edita y elimina campañas de recogida de alimentos.</p>
             </div>
+            <button onclick="exportarExcel('campaigns')" class="btn-export">Exportar archivo</button>
             <button type="button" class="btn btn-primary" id="btn-new">+ Nueva campaña</button>
         </div>
     </div>

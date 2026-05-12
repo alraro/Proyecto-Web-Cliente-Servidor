@@ -12,6 +12,7 @@
     <script src="javascript/admin-stores.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
 
 </head>
 <body>
@@ -29,6 +30,7 @@
             <div class="card-header">
                 <h2>Listado de tiendas</h2>
                 <div class="card-actions">
+                    <button onclick="exportarExcel('stores')" class="btn-export">Exportar archivo</button>
                     <button class="btn btn-primary" id="btn-nueva-tienda">+ Nueva tienda</button>
                 </div>
             </div>

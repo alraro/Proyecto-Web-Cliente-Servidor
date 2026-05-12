@@ -465,26 +465,6 @@ public class ApiController {
 		));
 	}
 
-/*
-	// Implementación para futuro
-	// Endpoint para añadir usuario
-	@PostMapping("/anadir")
-	public String doAnadir(Model model) {
-		return this.doRegister(model);
-	}
-	// Endpoint para editar usuario
-	@GetMapping("/editar")
-	public String doEditar(@RequestParam(value = "id", required = false) Integer id, Model model) {
-		model.addAttribute("selectedId", id);
-		return this.doRegister(model);
-	}
-	// Endpoint para guardar usuario
-	@PostMapping("/guardar")
-	public String doGuardar() {
-		return "redirect:/";
-	}
-*/
-
 	// Métodos auxiliares
 	// Limpiador de textos, se asegura de no guardar textos vacíos o llenos de espacios
 	private static String trimToNull(String value) {
