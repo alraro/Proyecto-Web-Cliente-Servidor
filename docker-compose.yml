@@ -1,6 +1,6 @@
 services:
-  frontend:
-    container_name: nginx-frontend
+  frontend-classic:
+    container_name: nginx-frontend-classic
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -8,7 +8,17 @@ services:
       - ${FRONTEND_PORT:-80}:80
     depends_on:
       - backend
-  
+
+  frontend-react:
+    container_name: nginx-frontend-react
+    build:
+      context: ./frontend/React
+      dockerfile: Dockerfile
+    ports:
+      - ${FRONTEND_REACT_PORT:-3000}:80
+    depends_on:
+      - backend
+
   database:
     image: postgres:15-alpine
     container_name: postgres-database
@@ -36,7 +46,7 @@ services:
       - ${ADMINER_PORT:-8081}:8080
     depends_on:
       - database
-  
+
   backend:
     build:
       context: ./backend

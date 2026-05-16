@@ -1,122 +1,104 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import GestionVoluntarios from './pages/responsable/GestionVoluntarios';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState('home');
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'volunteers':
+        return <GestionVoluntarios />;
+      default:
+        return <HomePage onNavigate={setCurrentPage} />;
+    }
+  };
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+  return renderPage();
 }
 
-export default App
+function HomePage({ onNavigate }) {
+  return (
+    <div className="home-page">
+      <header className="topbar">
+        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
+          <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" className="logo" />
+        </a>
+        <nav className="main-nav">
+          <a href="#" className="active">Inicio</a>
+        </nav>
+      </header>
+
+      <main>
+        <section className="hero">
+          <div className="hero-copy">
+            <span className="eyebrow">Banco de alimentos de Málaga</span>
+            <h1>Bancosol transforma excedentes en ayuda real para miles de familias.</h1>
+            <p>
+              Somos una red solidaria que recupera alimentos, coordina voluntariado y distribuye recursos a
+              entidades sociales para que nadie se quede atrás.
+            </p>
+            <div className="hero-actions">
+              <a className="primary-action" href="#" onClick={(e) => { e.preventDefault(); onNavigate('volunteers'); }}>
+                Gestión de Voluntarios
+              </a>
+            </div>
+          </div>
+
+          <aside className="hero-panel">
+            <div className="panel-card panel-card-dark">
+              <p>Misión principal</p>
+              <h2>Recuperar y repartir</h2>
+              <span>Con dignidad y transparencia</span>
+            </div>
+            <div className="panel-card">
+              <p>Zona de responsables</p>
+              <ul>
+                <li><span>Gestionar voluntarios de mi entidad</span></li>
+                <li><span>Ver campañas asignadas</span></li>
+                <li><span>Administrar turnos</span></li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+
+        <section className="section-block">
+          <div className="section-heading">
+            <span className="eyebrow">Acceso rápido</span>
+            <h2>¿Qué necesitas hacer?</h2>
+          </div>
+          <div className="service-grid">
+            <article>
+              <h3>Mis Voluntarios</h3>
+              <p>Gestiona los voluntarios vinculados a tu entidad colaboradora.</p>
+              <button className="action-btn" onClick={() => onNavigate('volunteers')}>
+                Acceder
+              </button>
+            </article>
+            <article>
+              <h3>Mis Campañas</h3>
+              <p>Consulta las campañas activas de tu entidad.</p>
+              <button className="action-btn" disabled>
+                Próximamente
+              </button>
+            </article>
+            <article>
+              <h3>Mis Turnos</h3>
+              <p>Administra los turnos de voluntariado.</p>
+              <button className="action-btn" disabled>
+                Próximamente
+              </button>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" className="logo" />
+        <p>Bancosol · Banco de alimentos</p>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
