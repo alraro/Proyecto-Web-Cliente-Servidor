@@ -70,8 +70,26 @@ form.addEventListener('submit', async (event) => {
         return;
     }
 
-    message.textContent = 'Se enviará el formulario y, si todo es correcto, volverás a la página de login.';
-    message.classList.add('is-success');
+    try {
+        const res = await fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, email, password, telefono, domicilio, cp })
+        });
 
-    form.submit();
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 201) {
+            message.textContent = 'Tu solicitud ha sido registrada. Un administrador revisará tu cuenta y te asignará un rol. Recibirás acceso una vez aprobado.';
+            message.classList.add('is-success');
+            return;
+        }
+
+        message.textContent = data.message || 'No se pudo completar el registro.';
+        message.classList.add('is-error');
+    } catch (error) {
+        console.log(error);
+        message.textContent = 'Error al conectar con el servidor.';
+        message.classList.add('is-error');
+    }
 });

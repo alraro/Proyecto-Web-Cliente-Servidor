@@ -11,6 +11,7 @@
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/admin-chains.js" defer></script>
     <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
 
 </head>
 <body>
@@ -28,6 +29,7 @@
             <div class="card-header">
                 <h2>Listado de cadenas</h2>
                 <div class="card-actions">
+                    <button onclick="exportarExcel('chains')" class="btn-export">Exportar archivo</button>
                     <button class="btn btn-primary" id="btn-nueva">+ Nueva cadena</button>
                 </div>
             </div>

@@ -7,7 +7,7 @@ function authHeaders() {
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken()) {
+    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }

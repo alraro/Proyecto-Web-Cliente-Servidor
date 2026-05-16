@@ -306,7 +306,7 @@ async function loadCampaignTypes() {
 // ── Boot ────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!getToken()) { window.location.href = 'login.html'; return; }
+    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
 
 
     document.addEventListener('click', (e) => {

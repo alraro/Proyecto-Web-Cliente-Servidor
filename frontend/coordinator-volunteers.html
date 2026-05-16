@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Asignación de Voluntarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/assignment.css">
+    <script src="javascript/coordinator-volunteers.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="coordinator-dashboard.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Coordinador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Asignación de Voluntarios</h1>
+                    <p>Asigna voluntarios a los turnos de tus tiendas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <!-- Filtros campaña + tienda -->
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="campaign-select">Campaña</label>
+                    <select id="campaign-select">
+                        <option value="">Selecciona una campaña...</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="store-select">Tienda</label>
+                    <div class="selector-row">
+                        <select id="store-select" disabled>
+                            <option value="">Selecciona primero una campaña...</option>
+                        </select>
+                        <button type="button" id="btn-load-shifts" class="btn btn-secondary" disabled>Cargar turnos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de turnos -->
+        <div class="card">
+            <div class="card-head">
+                <h2>Turnos</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Hora inicio</th>
+                            <th>Hora fin</th>
+                            <th>Voluntarios necesarios</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shifts-tbody">
+                        <tr><td colspan="5" class="table-empty">Selecciona campaña y tienda para ver los turnos.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal asignación de voluntario -->
+    <div id="modal-overlay" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Asignar voluntario al turno</h3>
+                <button type="button" id="modal-close" class="modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-shift-info" style="margin-bottom:1rem;color:var(--text-secondary);font-size:.9rem;"></p>
+                <div class="form-group">
+                    <label for="volunteer-select">Voluntario</label>
+                    <select id="volunteer-select">
+                        <option value="">Selecciona un voluntario...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shift-day-input">Día del turno</label>
+                    <input type="date" id="shift-day-input">
+                </div>
+                <div class="form-group">
+                    <label for="start-time-input">Hora de inicio</label>
+                    <input type="time" id="start-time-input">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="end-time-input">Hora de fin</label>
+                    <input type="time" id="end-time-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-cancel" class="btn btn-secondary">Cancelar</button>
+                <button type="button" id="modal-save" class="btn btn-primary">Guardar asignación</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

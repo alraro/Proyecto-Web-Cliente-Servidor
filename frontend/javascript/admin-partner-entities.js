@@ -23,7 +23,7 @@ if (role !== 'ADMINISTRADOR') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken()) {
+    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }

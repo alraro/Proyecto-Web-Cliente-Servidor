@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -330,6 +331,56 @@ public class ShiftAssignmentController {
         return ResponseEntity.ok(Map.of("message", "Capitán desasignado correctamente"));
     }
 
+    // ── Asistencia ────────────────────────────────────────────────────────────
+
+    @Operation(summary = "Registrar asistencia de un voluntario en un turno")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asistencia actualizada"),
+        @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
+        @ApiResponse(responseCode = "404", description = "Turno o asignación no encontrada")
+    })
+    @PutMapping("/attendance")
+    public ResponseEntity<?> updateAttendance(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer shiftId,
+            @RequestBody(required = false) Map<String, Object> request) {
+
+        Shift shift = shiftRepository.findById(shiftId).orElse(null);
+        if (shift == null) return shiftNotFound();
+
+        Integer volunteerId = parseInteger(request == null ? null : request.get("volunteerId"));
+        if (volunteerId == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "volunteerId es obligatorio"));
+        }
+
+        Object attendanceObj = request.get("attendance");
+        Boolean attendance;
+        if (attendanceObj instanceof Boolean) {
+            attendance = (Boolean) attendanceObj;
+        } else if (attendanceObj != null) {
+            attendance = Boolean.parseBoolean(attendanceObj.toString());
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "attendance es obligatorio"));
+        }
+
+        VolunteerShiftId vsId = buildVolunteerShiftId(volunteerId, shift);
+        VolunteerShift vs = volunteerShiftRepository.findById(vsId).orElse(null);
+        if (vs == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "El voluntario no está asignado a este turno"));
+        }
+
+        vs.setAttendance(attendance);
+        volunteerShiftRepository.save(vs);
+
+        return ResponseEntity.ok(Map.of(
+                "message",     "Asistencia actualizada correctamente",
+                "shiftId",     shiftId,
+                "volunteerId", volunteerId,
+                "attendance",  attendance
+        ));
+    }
+
     // ── Listas para desplegables ──────────────────────────────────────────────
 
     @Operation(summary = "Voluntarios disponibles para asignar al turno")
@@ -355,9 +406,12 @@ public class ShiftAssignmentController {
                 .filter(v -> !alreadyAssigned.contains(v.getId()))
                 .map(v -> {
                     Map<String, Object> m = new HashMap<>();
-                    m.put("volunteerId", v.getId());
-                    m.put("name",        v.getName());
-                    m.put("email",       v.getEmail());
+                    m.put("volunteerId",      v.getId());
+                    m.put("name",             v.getName());
+                    m.put("email",            v.getEmail());
+                    m.put("phone",            v.getPhone());
+                    m.put("partnerEntityName",
+                          v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getName() : null);
                     return m;
                 })
                 .collect(Collectors.toList());

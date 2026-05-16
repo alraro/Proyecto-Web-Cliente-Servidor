@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Asistencia del Equipo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/captain-attendance.css">
+    <script src="javascript/captain-attendance.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="captain-dashboard.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Capitán</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="captain-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Asistencia del Equipo</h1>
+                    <p>Marca la asistencia de los voluntarios en tus turnos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <!-- Selector de campaña -->
+        <div class="card">
+            <div class="card-head">
+                <h2>Selecciona una campaña</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="campaign-select">Campaña</label>
+                    <select id="campaign-select">
+                        <option value="">Cargando campañas...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de turnos con voluntarios -->
+        <div id="shifts-container">
+            <!-- Se rellena dinámicamente -->
+        </div>
+    </main>
+</body>
+</html>

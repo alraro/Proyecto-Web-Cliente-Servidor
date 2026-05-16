@@ -1,7 +1,7 @@
 const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('token')) {
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }

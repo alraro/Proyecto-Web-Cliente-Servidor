@@ -16,7 +16,7 @@ document.getElementById('btn-logout').addEventListener('click', logout);
 
 async function loadCampaigns() {
     try {
-        const res = await fetch(BACKEND + '/api/campaigns?size=200&sort=startDate,desc', { headers: authHeaders() });
+        const res = await fetch(BACKEND + '/api/coordinator/my-campaigns', { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) { showMessage('No se pudieron cargar las campañas.', 'error'); return; }
         const data = await res.json();
@@ -256,7 +256,9 @@ async function loadModalData(shiftId) {
 
         renderModalVolunteers(volData.volunteers || []);
         renderModalCaptains(capData.captains || []);
-        populateSelect('volunteer-select', availVol, 'volunteerId', 'name', 'Selecciona un voluntario...');
+        populateSelect('volunteer-select', availVol, 'volunteerId', 'name', 'Selecciona un voluntario...',
+            v => v.name + (v.phone ? ' · ' + v.phone : '') +
+                 (v.partnerEntityName ? ' (' + v.partnerEntityName + ')' : ' (Independiente)'));
         populateSelect('captain-select',   availCap, 'userId',     'name', 'Selecciona un capitán...');
     } catch (e) {
         document.getElementById('modal-shift-info').textContent = 'Error al cargar los datos del turno.';
@@ -291,13 +293,13 @@ function renderModalCaptains(captains) {
     `).join('');
 }
 
-function populateSelect(selectId, items, valueKey, labelKey, placeholder) {
+function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelFn) {
     const sel = document.getElementById(selectId);
     sel.innerHTML = `<option value="">${escHtml(placeholder)}</option>`;
     items.forEach(item => {
         const opt = document.createElement('option');
         opt.value       = item[valueKey];
-        opt.textContent = item[labelKey];
+        opt.textContent = labelFn ? labelFn(item) : item[labelKey];
         sel.appendChild(opt);
     });
 }

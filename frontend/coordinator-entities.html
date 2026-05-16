@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Entidades Colaboradoras</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/assignment.css">
+    <script src="javascript/coordinator-entities.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="coordinator-dashboard.html">
+            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
+        </a>
+        <div class="topbar-right">
+            <div class="user-badge">
+                <span class="dot"></span>
+                <span id="user-name">Coordinador</span>
+            </div>
+            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Entidades colaboradoras</h1>
+                    <p>Consulta qué entidades tienen voluntarios asignados en cada campaña.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <!-- Selector de campaña -->
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="campaign-select">Campaña</label>
+                    <div class="selector-row">
+                        <select id="campaign-select">
+                            <option value="">Selecciona una campaña...</option>
+                        </select>
+                        <button type="button" id="btn-load" class="btn btn-secondary">Ver entidades</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de entidades -->
+        <div class="card">
+            <div class="card-head">
+                <h2>Entidades con voluntarios asignados</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre de entidad</th>
+                            <th>Teléfono</th>
+                            <th>Nº voluntarios asignados</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entities-tbody">
+                        <tr><td colspan="4" class="table-empty">Selecciona una campaña para ver las entidades.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
