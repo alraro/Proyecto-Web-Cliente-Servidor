@@ -1,146 +1,334 @@
-const BACKEND = 'http://localhost:8080';
+// Cached DOM references
+let usersTbody = null;
+let modalBackdrop = null;
+let inputRole = null;
+let modalError = null;
+let btnGuardar = null;
+let btnCancelar = null;
+let btnRefresh = null;
+let btnExport = null;
+let currentUserId = null;
+let usersCache = [];
 
-if (localStorage.getItem('role') !== 'ADMINISTRADOR') {
+// Auth helpers
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+function authHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+    };
+}
+
+function logout() {
+    localStorage.clear();
     window.location.href = 'login.html';
 }
 
-function getToken() { return localStorage.getItem('token'); }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+// Toast notification
+function showToast(msg, type) {
+    console.log("El toast se muestra con el mensaje: " + msg + " y el tipo: " + type);
+    var container = document.getElementById('toast-container');
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(function () {
+        toast.remove();
+    }, 3500);
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btn-refresh').addEventListener('click', loadUsers);
-    loadUsers();
+// Escape HTML for safe attribute usage
+function escHtml(value) {
+    return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
+// Create a role badge element
+function createRoleBadge(role) {
+    var span = document.createElement('span');
+    var roleValue = role || 'PENDIENTE';
+    var cls = roleValue === 'PENDIENTE' ? 'badge badge-no' : 'badge badge-yes';
+    span.className = cls;
+    span.textContent = roleValue;
+    return span;
+}
+
+// Render a single user table row using DOM API
+function renderUserRow(user) {
+    var tr = document.createElement('tr');
+
+    // ID
+    var tdId = document.createElement('td');
+    tdId.textContent = user.id;
+    tr.appendChild(tdId);
+
+    // Name
+    var tdName = document.createElement('td');
+    var strong = document.createElement('strong');
+    strong.textContent = user.name;
+    tdName.appendChild(strong);
+    tr.appendChild(tdName);
+
+    // Email
+    var tdEmail = document.createElement('td');
+    tdEmail.textContent = user.email;
+    tr.appendChild(tdEmail);
+
+    // Phone
+    var tdPhone = document.createElement('td');
+    tdPhone.textContent = user.phone || '—';
+    tr.appendChild(tdPhone);
+
+    // Role badge
+    var tdRole = document.createElement('td');
+    tdRole.appendChild(createRoleBadge(user.role));
+    tr.appendChild(tdRole);
+
+    // Actions
+    var tdActions = document.createElement('td');
+    tdActions.className = 'td-actions';
+
+    // Edit button
+    var btnEdit = document.createElement('button');
+    btnEdit.className = 'btn btn-primary btn-sm';
+    btnEdit.textContent = 'Editar';
+    btnEdit.setAttribute('data-userid', user.id);
+    tdActions.appendChild(btnEdit);
+
+    // Delete button
+    var btnDelete = document.createElement('button');
+    btnDelete.className = 'btn btn-danger btn-sm';
+    btnDelete.textContent = 'Eliminar';
+    btnDelete.setAttribute('data-userid', user.id);
+    tdActions.appendChild(btnDelete);
+
+    tr.appendChild(tdActions);
+
+    return tr;
+}
+
+// Load all users from API
+async function loadUsers() {
+    if (!usersTbody) return;
+
+    // Clear existing rows
+    usersTbody.innerHTML = '';
+
+    try {
+        var response = await fetch(API_BASE + '/api/users', {
+            headers: authHeaders()
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            logout();
+            return;
+        }
+
+        if (!response.ok) {
+            var errorData = await response.json().catch(function () { return {}; });
+            showToast(errorData.message || 'Error al cargar usuarios.', 'error');
+            return;
+        }
+
+        var data = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+            var emptyRow = document.createElement('tr');
+            var emptyCell = document.createElement('td');
+            emptyCell.colSpan = 6;
+            emptyCell.className = 'table-empty';
+            emptyCell.textContent = 'No hay usuarios.';
+            emptyRow.appendChild(emptyCell);
+            usersTbody.appendChild(emptyRow);
+            return;
+        }
+
+        usersCache = data;
+
+        for (var i = 0; i < data.length; i++) {
+            usersTbody.appendChild(renderUserRow(data[i]));
+        }
+    } catch (error) {
+        usersTbody.innerHTML = '';
+        var errorRow = document.createElement('tr');
+        var errorCell = document.createElement('td');
+        errorCell.colSpan = 6;
+        errorCell.className = 'table-empty';
+        errorCell.textContent = 'Error al conectar con el servidor.';
+        errorRow.appendChild(errorCell);
+        usersTbody.appendChild(errorRow);
+    }
+}
+
+// Find user in cache by ID
+function findUserById(userId) {
+    for (var i = 0; i < usersCache.length; i++) {
+        if (String(usersCache[i].id) === String(userId)) {
+            return usersCache[i];
+        }
+    }
+    return null;
+}
+
+// Open edit modal for a user
+function openEditModal(userId) {
+    currentUserId = userId;
+    inputRole.value = '';
+    modalError.textContent = '';
+    modalBackdrop.classList.add('open');
+}
+
+// Close modal
+function closeModal() {
+    modalBackdrop.classList.remove('open');
+    currentUserId = null;
+    inputRole.value = '';
+    modalError.textContent = '';
+}
+
+// Save new role for user
+async function saveUserRole() {
+    if (!currentUserId) return;
+
+    var role = inputRole.value;
+
+    if (!role) {
+        modalError.textContent = 'Selecciona un rol valido.';
+        modalError.className = 'form-message is-error';
+        return;
+    }
+
+    btnGuardar.disabled = true;
+    modalError.textContent = '';
+
+    try {
+        var response = await fetch(API_BASE + '/api/users/' + currentUserId + '/role', {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ role: role })
+        });
+
+        var data = await response.json().catch(function () { return {}; });
+
+        if (!response.ok) {
+            modalError.textContent = data.message || 'Error al asignar rol.';
+            modalError.className = 'form-message is-error';
+            btnGuardar.disabled = false;
+            return;
+        }
+
+        showToast('Rol actualizado correctamente.', 'success');
+        closeModal();
+        await loadUsers();
+    } catch (error) {
+        modalError.textContent = 'Error de conexion.';
+        modalError.className = 'form-message is-error';
+    }
+
+    btnGuardar.disabled = false;
+}
+
+// Delete a user
+async function deleteUser(userId) {
+    var user = findUserById(userId);
+    if (!user) return;
+
+    var confirmDelete = confirm('¿Estas seguro de que quieres eliminar al usuario "' + user.name + '"?');
+    if (!confirmDelete) return;
+
+    try {
+        var response = await fetch(API_BASE + '/api/users/' + userId, {
+            method: 'DELETE',
+            headers: authHeaders()
+        });
+
+        var data = await response.json().catch(function () { return {}; });
+
+        if (!response.ok) {
+            showToast(data.message || 'Error al eliminar usuario.', 'error');
+            return;
+        }
+
+        showToast('Usuario eliminado correctamente.', 'success');
+        await loadUsers();
+    } catch (error) {
+        showToast('Error de conexion.', 'error');
+    }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function () {
+    // Cache DOM elements
+    usersTbody = document.getElementById('users-tbody');
+    modalBackdrop = document.getElementById('modal-backdrop');
+    inputRole = document.getElementById('input-role');
+    modalError = document.getElementById('modal-error');
+    btnGuardar = document.getElementById('btn-guardar');
+    btnCancelar = document.getElementById('btn-cancelar');
+    btnRefresh = document.getElementById('btn-refresh');
+    btnExport = document.getElementById('btn-export');
+
+    // Auth check
     if (!getToken()) {
         window.location.href = 'login.html';
         return;
     }
 
-    const userNameEl = document.getElementById('user-name');
-	
+    if (localStorage.getItem('role') !== 'ADMINISTRADOR') {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Set welcome name
+    var userNameEl = document.getElementById('user-name');
     if (userNameEl) {
         userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
     }
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            logout();
-        }
-    })
+    // Event listeners
+    btnRefresh.addEventListener('click', loadUsers);
 
-});
+    btnExport.addEventListener('click', function () {
+        exportarExcel('users');
+    });
 
-function showToast(msg, type = 'success') {
-    const c = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = 'toast toast-' + type;
-    t.textContent = msg;
-    c.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
-}
+    btnCancelar.addEventListener('click', closeModal);
 
-function escHtml(v) {
-    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+    btnGuardar.addEventListener('click', saveUserRole);
 
-function roleBadge(role) {
-    const cls = role === 'PENDIENTE' ? 'badge-no' : 'badge-yes';
-    return `<span class="badge ${cls}">${escHtml(role)}</span>`;
-}
-
-function renderActions(userId) {
-    return `
-        <div class="td-actions" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" data-action="toggle-role" data-userid="${userId}">Cambiar rol</button>
-            <div class="role-inline" data-userid="${userId}" style="display:none;gap:.35rem;align-items:center;">
-                <select id="role-select-${userId}" style="padding:.35rem .6rem;border-radius:8px;border:1.5px solid #d1d5db;font-family:inherit;font-size:.85rem;">
-                    <option value="">Seleccionar rol...</option>
-                    <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                    <option value="COORDINADOR">COORDINADOR</option>
-                    <option value="CAPITAN">CAPITAN</option>
-                    <option value="COLABORADOR">COLABORADOR</option>
-                    <option value="RESPONSABLE_TIENDA">RESPONSABLE_TIENDA</option>
-                </select>
-                <button class="btn btn-primary btn-sm" data-action="confirm-role" data-userid="${userId}">Confirmar</button>
-            </div>
-        </div>
-    `;
-}
-
-function toggleRoleInline(userId) {
-    document.querySelectorAll('.role-inline').forEach((panel) => {
-        if (panel.dataset.userid === String(userId)) {
-            panel.style.display = panel.style.display === 'none' ? 'inline-flex' : 'none';
-        } else {
-            panel.style.display = 'none';
+    // Close modal when clicking on backdrop
+    modalBackdrop.addEventListener('click', function (e) {
+        if (e.target === modalBackdrop) {
+            closeModal();
         }
     });
-}
 
-async function loadUsers() {
-    const tbody = document.getElementById('users-tbody');
-    try {
-        const res = await fetch(BACKEND + '/api/users', { headers: authHeaders() });
-        if (res.status === 401 || res.status === 403) { logout(); return; }
-        const data = await res.json();
+    // Delegate table button clicks (edit / delete)
+    usersTbody.addEventListener('click', function (e) {
+        var button = e.target.closest('button');
+        if (!button) return;
 
-        if (!Array.isArray(data) || !data.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay usuarios.</td></tr>';
-            return;
+        var userId = button.getAttribute('data-userid');
+        var action = button.textContent;
+
+        if (action === 'Editar') {
+            openEditModal(userId);
+        } else if (action === 'Eliminar') {
+            deleteUser(userId);
         }
+    });
 
-        tbody.innerHTML = data.map(u => `
-            <tr>
-                <td>${u.id}</td>
-                <td><strong>${escHtml(u.name)}</strong></td>
-                <td>${escHtml(u.email)}</td>
-                <td>${escHtml(u.phone || '—')}</td>
-                <td>${roleBadge(u.role || 'PENDIENTE')}</td>
-                <td>${renderActions(u.id)}</td>
-            </tr>
-        `).join('');
-    } catch {
-        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
-    }
-}
-
-document.addEventListener('click', async (event) => {
-    const target = event.target.closest('button[data-action]');
-    if (!target) return;
-
-    const action = target.dataset.action;
-    const userId = target.dataset.userid;
-
-    if (action === 'toggle-role') {
-        toggleRoleInline(userId);
-        return;
-    }
-
-    if (action === 'confirm-role') {
-        const role = document.getElementById('role-select-' + userId)?.value;
-        if (!role) {
-            showToast('Selecciona un rol valido.', 'error');
-            return;
+    // Header button listeners
+    document.addEventListener('click', function (e) {
+        if (e.target.id === 'btn-edit') {
+            window.location.href = 'edit.html';
+        } else if (e.target.id === 'btn-logout') {
+            logout();
         }
-        try {
-            const res = await fetch(`${BACKEND}/api/users/${userId}/role`, {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify({ role })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) {
-                showToast(data.message || 'Error al asignar rol.', 'error');
-                return;
-            }
-            showToast('Rol actualizado correctamente.');
-            await loadUsers();
-        } catch {
-            showToast('Error de conexion.', 'error');
-        }
-    }
+    });
+
+    // Load initial data
+    loadUsers();
 });

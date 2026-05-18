@@ -13,7 +13,6 @@
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
     <script src="javascript/export.js" defer></script>
-
 </head>
 <body>
 
@@ -21,7 +20,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
             <h1>Usuarios</h1>
             <p>Gestiona los usuarios registrados en la plataforma.</p>
         </div>
@@ -30,7 +29,7 @@
             <div class="card-header">
                 <h2>Listado de usuarios</h2>
                 <div class="card-actions">
-                    <button onclick="exportarExcel('users')" class="btn btn-export">Exportar archivo</button>
+                    <button class="btn btn-export" id="btn-export">Exportar archivo</button>
                     <button class="btn btn-edit btn-sm" id="btn-refresh">↻ Actualizar</button>
                 </div>
             </div>
@@ -53,6 +52,32 @@
             </div>
         </div>
     </main>
+
+    <!-- MODAL: Cambiar rol -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Cambiar rol de usuario</h3>
+
+            <div class="form-group">
+                <label for="input-role">Nuevo rol <span class="required-asterisk">*</span></label>
+                <select id="input-role">
+                    <option value="">Seleccionar rol...</option>
+                    <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                    <option value="COORDINADOR">COORDINADOR</option>
+                    <option value="CAPITAN">CAPITAN</option>
+                    <option value="COLABORADOR">COLABORADOR</option>
+                    <option value="RESPONSABLE_TIENDA">RESPONSABLE_TIENDA</option>
+                </select>
+            </div>
+
+            <p class="form-message" id="modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
+            </div>
+        </div>
+    </div>
 
     <div class="toast-container" id="toast-container"></div>
 

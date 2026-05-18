@@ -180,7 +180,6 @@ public class UserController {
 
             if (!partnerEntityManagerRepository.existsById(id)) {
                 PartnerEntityManager manager = new PartnerEntityManager();
-                manager.setId(id);
                 manager.setUserAccounts(user);
                 manager.setIdPartnerEntity(partnerEntity.get());
                 partnerEntityManagerRepository.save(manager);
