@@ -66,7 +66,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnLoad.addEventListener('click', async () => {
         const campaignId = campaignSelect.value;
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
-        tbody.innerHTML = "<tr><td colspan='6' class='table-empty'>Cargando...</td></tr>";
+        tbody.innerHTML = '';
+        const loadingRow = document.createElement('tr');
+        const loadingCell = document.createElement('td');
+        loadingCell.setAttribute('colspan', '6');
+        loadingCell.className = 'table-empty';
+        loadingCell.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingCell);
+        tbody.appendChild(loadingRow);
         try {
             const volunteers = await fetchJson(
                 API_BASE + '/api/coordinator/volunteers?campaignId=' + campaignId,
@@ -75,30 +82,67 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(Array.isArray(volunteers) ? volunteers : []);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar los colaboradores', true);
-            tbody.innerHTML = "<tr><td colspan='6' class='table-empty'>Error al cargar.</td></tr>";
+            tbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.setAttribute('colspan', '6');
+            errorCell.className = 'table-empty';
+            errorCell.textContent = 'Error al cargar.';
+            errorRow.appendChild(errorCell);
+            tbody.appendChild(errorRow);
         }
     });
 
     function renderTable(volunteers) {
         tbody.innerHTML = '';
         if (!volunteers.length) {
-            tbody.innerHTML = "<tr><td colspan='6' class='table-empty'>No hay colaboradores registrados.</td></tr>";
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '6');
+            cell.className = 'table-empty';
+            cell.textContent = 'No hay colaboradores registrados.';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
         volunteers.forEach(v => {
             const isPending   = pendingIds.has(v.id);
             const entityLabel = v.partnerEntityName || 'Independiente';
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(v.name || '')}</td>
-                <td>${escapeHtml(v.phone || '-')}</td>
-                <td>${escapeHtml(v.email || '-')}</td>
-                <td>${escapeHtml(entityLabel)}</td>
-                <td>${isPending
-                    ? '<span class="badge-soon">Pendiente validación</span>'
-                    : '<span style="color:#2e7d32;font-weight:600">Activo</span>'}</td>
-                <td><button type="button" class="btn btn-sm btn-secondary" data-edit='${JSON.stringify(v)}'>Editar</button></td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(v.name || '');
+            tr.appendChild(tdName);
+            const tdPhone = document.createElement('td');
+            tdPhone.textContent = escapeHtml(v.phone || '-');
+            tr.appendChild(tdPhone);
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(v.email || '-');
+            tr.appendChild(tdEmail);
+            const tdEntity = document.createElement('td');
+            tdEntity.textContent = escapeHtml(entityLabel);
+            tr.appendChild(tdEntity);
+            const tdStatus = document.createElement('td');
+            if (isPending) {
+                const badge = document.createElement('span');
+                badge.className = 'badge-soon';
+                badge.textContent = 'Pendiente validación';
+                tdStatus.appendChild(badge);
+            } else {
+                const activeSpan = document.createElement('span');
+                activeSpan.style.color = '#2e7d32';
+                activeSpan.style.fontWeight = '600';
+                activeSpan.textContent = 'Activo';
+                tdStatus.appendChild(activeSpan);
+            }
+            tr.appendChild(tdStatus);
+            const tdAction = document.createElement('td');
+            const btnEdit = document.createElement('button');
+            btnEdit.type = 'button';
+            btnEdit.className = 'btn btn-sm btn-secondary';
+            btnEdit.setAttribute('data-edit', JSON.stringify(v));
+            btnEdit.textContent = 'Editar';
+            tdAction.appendChild(btnEdit);
+            tr.appendChild(tdAction);
             tbody.appendChild(tr);
         });
     }

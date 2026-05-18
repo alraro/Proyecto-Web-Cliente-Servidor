@@ -52,10 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Al cambiar campaña → cargar tiendas
     campaignSelect.addEventListener('change', async () => {
         const campaignId = campaignSelect.value;
-        storeSelect.innerHTML = '<option value="">Selecciona una tienda...</option>';
+        storeSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = 'Selecciona una tienda...';
+        storeSelect.appendChild(defaultOpt);
         storeSelect.disabled = true;
         btnLoadShifts.disabled = true;
-        shiftsTbody.innerHTML = "<tr><td colspan='5' class='table-empty'>Selecciona campaña y tienda para ver los turnos.</td></tr>";
+        shiftsTbody.innerHTML = '';
+        const initRow = document.createElement('tr');
+        const initTd = document.createElement('td');
+        initTd.colSpan = 5;
+        initTd.className = 'table-empty';
+        initTd.textContent = 'Selecciona campaña y tienda para ver los turnos.';
+        initRow.appendChild(initTd);
+        shiftsTbody.appendChild(initRow);
         if (!campaignId) return;
         try {
             const stores = await fetchJson(
@@ -80,7 +91,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = campaignSelect.value;
         const storeId    = storeSelect.value;
         if (!campaignId || !storeId) { showMessage('Selecciona campaña y tienda', true); return; }
-        shiftsTbody.innerHTML = "<tr><td colspan='5' class='table-empty'>Cargando...</td></tr>";
+        shiftsTbody.innerHTML = '';
+        const loadingRow = document.createElement('tr');
+        const loadingTd = document.createElement('td');
+        loadingTd.colSpan = 5;
+        loadingTd.className = 'table-empty';
+        loadingTd.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingTd);
+        shiftsTbody.appendChild(loadingRow);
         try {
             const shifts = await fetchJson(
                 API_BASE + '/api/shifts?campaignId=' + campaignId + '&storeId=' + storeId,
@@ -89,25 +107,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderShifts(Array.isArray(shifts) ? shifts : []);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar los turnos', true);
-            shiftsTbody.innerHTML = "<tr><td colspan='5' class='table-empty'>Error al cargar turnos.</td></tr>";
+            shiftsTbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorTd = document.createElement('td');
+            errorTd.colSpan = 5;
+            errorTd.className = 'table-empty';
+            errorTd.textContent = 'Error al cargar turnos.';
+            errorRow.appendChild(errorTd);
+            shiftsTbody.appendChild(errorRow);
         }
     });
 
     function renderShifts(shifts) {
         shiftsTbody.innerHTML = '';
         if (!shifts.length) {
-            shiftsTbody.innerHTML = "<tr><td colspan='5' class='table-empty'>No hay turnos para esta tienda y campaña.</td></tr>";
+            const emptyRow = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 5;
+            emptyTd.className = 'table-empty';
+            emptyTd.textContent = 'No hay turnos para esta tienda y campaña.';
+            emptyRow.appendChild(emptyTd);
+            shiftsTbody.appendChild(emptyRow);
             return;
         }
         shifts.forEach(s => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(s.day || '')}</td>
-                <td>${escapeHtml(s.startTime || '')}</td>
-                <td>${escapeHtml(s.endTime || '')}</td>
-                <td>${escapeHtml(String(s.volunteersNeeded || 0))}</td>
-                <td><button type="button" class="btn btn-sm btn-primary" data-shift='${JSON.stringify(s)}'>Asignar voluntario</button></td>
-            `;
+            const tdDay = document.createElement('td');
+            tdDay.textContent = escapeHtml(s.day || '');
+            const tdStart = document.createElement('td');
+            tdStart.textContent = escapeHtml(s.startTime || '');
+            const tdEnd = document.createElement('td');
+            tdEnd.textContent = escapeHtml(s.endTime || '');
+            const tdNeeded = document.createElement('td');
+            tdNeeded.textContent = escapeHtml(String(s.volunteersNeeded || 0));
+            const tdActions = document.createElement('td');
+            const assignBtn = document.createElement('button');
+            assignBtn.type = 'button';
+            assignBtn.className = 'btn btn-sm btn-primary';
+            assignBtn.dataset.shift = JSON.stringify(s);
+            assignBtn.textContent = 'Asignar voluntario';
+            tdActions.appendChild(assignBtn);
+            tr.appendChild(tdDay);
+            tr.appendChild(tdStart);
+            tr.appendChild(tdEnd);
+            tr.appendChild(tdNeeded);
+            tr.appendChild(tdActions);
             shiftsTbody.appendChild(tr);
         });
     }
@@ -123,13 +167,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         endTimeInput.value   = currentShift.endTime || '';
 
         // Cargar voluntarios disponibles
-        volunteerSelect.innerHTML = '<option value="">Cargando...</option>';
+        volunteerSelect.innerHTML = '';
+        const loadingOpt = document.createElement('option');
+        loadingOpt.value = '';
+        loadingOpt.textContent = 'Cargando...';
+        volunteerSelect.appendChild(loadingOpt);
         try {
             const volunteers = await fetchJson(
                 API_BASE + '/api/coordinator/volunteers?campaignId=' + (currentShift.campaignId || campaignSelect.value),
                 { headers: authHeaders(token) }
             );
-            volunteerSelect.innerHTML = '<option value="">Selecciona un voluntario...</option>';
+            volunteerSelect.innerHTML = '';
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = 'Selecciona un voluntario...';
+            volunteerSelect.appendChild(defaultOpt);
             (Array.isArray(volunteers) ? volunteers : []).forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = String(v.id);
@@ -140,7 +192,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 volunteerSelect.appendChild(opt);
             });
         } catch (err) {
-            volunteerSelect.innerHTML = '<option value="">Error al cargar voluntarios</option>';
+            volunteerSelect.innerHTML = '';
+            const errorOpt = document.createElement('option');
+            errorOpt.value = '';
+            errorOpt.textContent = 'Error al cargar voluntarios';
+            volunteerSelect.appendChild(errorOpt);
         }
 
         modalOverlay.hidden = false;

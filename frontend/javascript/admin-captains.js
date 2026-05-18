@@ -135,7 +135,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
-        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
+        campaignSelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecciona una campaña...';
+        campaignSelect.appendChild(defaultOption);
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -147,22 +151,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCaptainsTable(captains) {
         captainsTbody.innerHTML = '';
         if (!captains.length) {
-            captainsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin capitanes asignados.</td></tr>";
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '3');
+            cell.className = 'table-empty';
+            cell.textContent = 'Sin capitanes asignados.';
+            row.appendChild(cell);
+            captainsTbody.appendChild(row);
             return;
         }
         captains.forEach(captain => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(captain.name || '')}</td>
-                <td>${escapeHtml(captain.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${captain.userId}" data-role="CAPTAIN">Eliminar</button></td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(captain.name || '');
+            row.appendChild(tdName);
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(captain.email || '');
+            row.appendChild(tdEmail);
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-danger';
+            btn.setAttribute('data-userid', captain.userId);
+            btn.setAttribute('data-role', 'CAPTAIN');
+            btn.textContent = 'Eliminar';
+            tdAction.appendChild(btn);
+            row.appendChild(tdAction);
             captainsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
-        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
+        selectEl.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = placeholder;
+        selectEl.appendChild(defaultOption);
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);
