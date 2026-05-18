@@ -191,8 +191,8 @@ function renderTable(campaigns) {
             <td>${formatDate(c.startDate)}</td>
             <td>${formatDate(c.endDate)}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-secondary" onclick="openEditModal(${c.id})">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteCampaign(${c.id},'${escapeJs(c.name || '')}')">Eliminar</button>
+                <button class="btn btn-sm btn-secondary" data-action="edit" data-campaign-id="${c.id}">Editar</button>
+                <button class="btn btn-sm btn-danger" data-action="delete" data-campaign-id="${c.id}" data-campaign-name="${escapeJs(c.name || '')}">Eliminar</button>
             </td>
         </tr>`).join('');
 }
@@ -220,7 +220,7 @@ async function openEditModal(id) {
         currentCampaignId = id;
         document.getElementById('modal-title').textContent = 'Editar campaña';
         document.getElementById('campaign-name').value  = c.name  || '';
-        document.getElementById('campaign-type').value  = (c.type && c.type.id != null) ? String(c.type.id) : '';
+        document.getElementById('campaign-type').value  = (c.type && c.type.id !== null) ? String(c.type.id) : '';
         document.getElementById('campaign-start').value = c.startDate || '';
         document.getElementById('campaign-end').value   = c.endDate   || '';
         selectedStores = new Map();
@@ -356,9 +356,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === document.getElementById('campaign-modal')) hideModal();
     });
 
-    // Make functions available for inline onclick in table rows
-    window.openEditModal  = openEditModal;
-    window.deleteCampaign = deleteCampaign;
+    // Export button
+    document.getElementById('btn-export-campaigns').addEventListener('click', function () {
+        exportarExcel('campaigns');
+    });
+
+    // Event delegation for table action buttons (edit / delete)
+    document.getElementById('campaigns-table').addEventListener('click', function (e) {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        const campaignId = button.getAttribute('data-campaign-id');
+        if (action === 'edit') {
+            openEditModal(parseInt(campaignId));
+        } else if (action === 'delete') {
+            const campaignName = button.getAttribute('data-campaign-name');
+            deleteCampaign(parseInt(campaignId), campaignName);
+        }
+    });
 
     try {
         await loadCampaignTypes();

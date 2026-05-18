@@ -228,7 +228,7 @@
 
 /* ── Responsive móvil (RNF-09) ────────────────────────────────────────────── */
 
-@media (max-width: 600px) {
+@media screen and (width <= 600px) {
     .days-grid {
         /* En móvil sigue siendo scroll horizontal, pero las columnas son más estrechas */
     }
@@ -236,7 +236,7 @@
     .cal-filter-bar { padding: 1rem; }
 }
 
-@media (max-width: 420px) {
+@media screen and (width <= 420px) {
     .day-col { min-width: 130px; }
     .shift-card { margin: .4rem; padding: .55rem .65rem; }
 }

@@ -238,7 +238,7 @@ body {
     color: rgba(53, 51, 53, 0.78);
 }
 
-@media (max-width: 960px) {
+@media screen and (width <= 960px) {
     .topbar-login {
         flex-wrap: wrap;
         gap: 1rem;
@@ -254,7 +254,7 @@ body {
     }
 }
 
-@media (max-width: 640px) {
+@media screen and (width <= 640px) {
     .topbar-login {
         padding: 1rem 1rem 0;
     }

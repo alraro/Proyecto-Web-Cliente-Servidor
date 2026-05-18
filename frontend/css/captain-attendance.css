@@ -243,7 +243,7 @@
 
 /* ── Responsive móvil (RNF-09) ────────────────────────────────────────────── */
 
-@media (max-width: 480px) {
+@media screen and (width <= 480px) {
     .shift-card-header { flex-direction: column; gap: .6rem; }
     .attendance-counter { align-self: flex-end; }
 

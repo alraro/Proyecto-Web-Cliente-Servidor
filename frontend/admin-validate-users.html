@@ -18,17 +18,17 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
             <h1>Validar registros</h1>
             <p>Revisa y aprueba o rechaza las solicitudes de nuevos usuarios.</p>
         </div>
 
         <!-- Usuarios pendientes -->
-        <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card mb-lg">
             <div class="card-header">
-                <h2>Pendientes de aprobación <span id="badge-pending" class="badge badge-no" style="display:none;"></span></h2>
+                <h2>Pendientes de aprobación <span id="badge-pending" class="badge badge-no hidden"></span></h2>
                 <div class="card-actions">
-                    <button class="btn btn-edit btn-sm" onclick="loadPending()">↻ Actualizar</button>
+                    <button id="btn-refresh-pending" class="btn btn-edit btn-sm">↻ Actualizar</button>
                 </div>
             </div>
             <div class="table-wrap">

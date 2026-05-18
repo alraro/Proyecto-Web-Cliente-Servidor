@@ -1,0 +1,50 @@
+/* Crear turno — page-specific styles */
+
+.shift-info-box {
+    background: #f5f5f5;
+    border-radius: 6px;
+    padding: .75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: .9rem;
+    color: var(--text-light);
+}
+
+.modal-section-title {
+    margin-bottom: .5rem;
+}
+
+.modal-section-title-spaced {
+    margin-bottom: .5rem;
+    margin-top: 1.5rem;
+}
+
+.capacity-indicator {
+    margin-bottom: .75rem;
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+.modal-assignments-list {
+    margin-bottom: 1rem;
+}
+
+.modal-assign-row {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.modal-select {
+    flex: 1;
+    min-width: 180px;
+    padding: .6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.feedback-hidden {
+    display: none;
+    margin-top: .5rem;
+}

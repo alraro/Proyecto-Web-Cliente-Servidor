@@ -60,8 +60,8 @@ document.getElementById('campaign-select').addEventListener('change', async func
 
     storeSel.innerHTML  = '<option value="">Cargando tiendas...</option>';
     storeSel.disabled   = true;
-    document.getElementById('shift-form-card').style.display = 'none';
-    document.getElementById('shifts-card').style.display     = 'none';
+    document.getElementById('shift-form-card').classList.add('hidden');
+    document.getElementById('shifts-card').classList.add('hidden');
     selectedCampaign = null;
 
     if (!campaignId) {
@@ -97,9 +97,9 @@ document.getElementById('campaign-select').addEventListener('change', async func
         });
         storeSel.disabled = false;
 
-        document.getElementById('shift-form-card').style.display = 'block';
+        document.getElementById('shift-form-card').classList.remove('hidden');
         await loadShifts(campaignId);
-        document.getElementById('shifts-card').style.display = 'block';
+        document.getElementById('shifts-card').classList.remove('hidden');
     } catch {
         storeSel.innerHTML = '<option value="">Error al cargar tiendas</option>';
     }
@@ -383,7 +383,7 @@ async function unassignCaptain(userId) {
 function showFeedback(type, text, level) {
     const el = document.getElementById(`${type}-feedback`);
     el.textContent = text;
-    el.style.display = 'block';
+    el.classList.remove('feedback-hidden');
     el.className = 'form-message ' + (level === 'warning' ? 'error' : level);
     // 'warning' usa estilo error (naranja/rojo) para que sea visualmente llamativo (RF-28)
 }
@@ -391,7 +391,7 @@ function showFeedback(type, text, level) {
 function clearModalFeedback() {
     ['volunteer-feedback', 'captain-feedback'].forEach(id => {
         const el = document.getElementById(id);
-        el.style.display = 'none';
+        el.classList.add('feedback-hidden');
         el.textContent = '';
     });
 }

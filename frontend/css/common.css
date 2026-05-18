@@ -102,6 +102,20 @@ body {
 
 /* Utility */
 .hidden { display: none !important; }
+.mb-0 { margin-bottom: 0; }
+.mb-lg { margin-bottom: 1.5rem; }
+.m-0 { margin: 0; }
+.pt-0 { padding-top: 0; }
+.text-nowrap { white-space: nowrap; }
+.textarea-field {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border, #e0e0e0);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+}
 
 .page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 

@@ -30,7 +30,7 @@
             <div class="card-header">
                 <h2>Listado de entidades colaboradoras</h2>
                 <div class="card-actions">
-                    <button onclick="exportarExcel('partner-entities')" class="btn btn-export">Exportar archivo</button>
+                    <button id="btn-export-pe" class="btn btn-export">Exportar archivo</button>
                     <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad colaboradora</button>
                 </div>
             </div>
@@ -66,12 +66,12 @@
                 </table>
             </div>
             <div class="pagination">
-                <button id="btn-prev-page" onclick="previousPage()">← Anterior</button>
+                <button id="btn-prev-page">← Anterior</button>
                 <span class="pagination-info">
                     Página <span id="current-page">1</span> de <span id="total-pages">1</span>
                 </span>
-                <button id="btn-next-page" onclick="nextPage()">Siguiente →</button>
-                <select class="pagination-select" id="page-size-select" onchange="changePageSize()">
+                <button id="btn-next-page">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select">
                     <option value="20">20 por página</option>
                     <option value="50">50 por página</option>
                     <option value="100">100 por página</option>

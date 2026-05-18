@@ -30,8 +30,8 @@ function logout() {
 // Toast notification
 function showToast(msg, type) {
     console.log("El toast se muestra con el mensaje: " + msg + " y el tipo: " + type);
-    var container = document.getElementById('toast-container');
-    var toast = document.createElement('div');
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
     toast.className = 'toast toast-' + type;
     toast.textContent = msg;
     container.appendChild(toast);
@@ -47,9 +47,9 @@ function escHtml(value) {
 
 // Create a role badge element
 function createRoleBadge(role) {
-    var span = document.createElement('span');
-    var roleValue = role || 'PENDIENTE';
-    var cls = roleValue === 'PENDIENTE' ? 'badge badge-no' : 'badge badge-yes';
+    const span = document.createElement('span');
+    const roleValue = role || 'PENDIENTE';
+    const cls = roleValue === 'PENDIENTE' ? 'badge badge-no' : 'badge badge-yes';
     span.className = cls;
     span.textContent = roleValue;
     return span;
@@ -57,48 +57,48 @@ function createRoleBadge(role) {
 
 // Render a single user table row using DOM API
 function renderUserRow(user) {
-    var tr = document.createElement('tr');
+    const tr = document.createElement('tr');
 
     // ID
-    var tdId = document.createElement('td');
+    const tdId = document.createElement('td');
     tdId.textContent = user.id;
     tr.appendChild(tdId);
 
     // Name
-    var tdName = document.createElement('td');
-    var strong = document.createElement('strong');
+    const tdName = document.createElement('td');
+    const strong = document.createElement('strong');
     strong.textContent = user.name;
     tdName.appendChild(strong);
     tr.appendChild(tdName);
 
     // Email
-    var tdEmail = document.createElement('td');
+    const tdEmail = document.createElement('td');
     tdEmail.textContent = user.email;
     tr.appendChild(tdEmail);
 
     // Phone
-    var tdPhone = document.createElement('td');
+    const tdPhone = document.createElement('td');
     tdPhone.textContent = user.phone || '—';
     tr.appendChild(tdPhone);
 
     // Role badge
-    var tdRole = document.createElement('td');
+    const tdRole = document.createElement('td');
     tdRole.appendChild(createRoleBadge(user.role));
     tr.appendChild(tdRole);
 
     // Actions
-    var tdActions = document.createElement('td');
+    const tdActions = document.createElement('td');
     tdActions.className = 'td-actions';
 
     // Edit button
-    var btnEdit = document.createElement('button');
+    const btnEdit = document.createElement('button');
     btnEdit.className = 'btn btn-primary btn-sm';
     btnEdit.textContent = 'Editar';
     btnEdit.setAttribute('data-userid', user.id);
     tdActions.appendChild(btnEdit);
 
     // Delete button
-    var btnDelete = document.createElement('button');
+    const btnDelete = document.createElement('button');
     btnDelete.className = 'btn btn-danger btn-sm';
     btnDelete.textContent = 'Eliminar';
     btnDelete.setAttribute('data-userid', user.id);
@@ -117,7 +117,7 @@ async function loadUsers() {
     usersTbody.innerHTML = '';
 
     try {
-        var response = await fetch(API_BASE + '/api/users', {
+        const response = await fetch(API_BASE + '/api/users', {
             headers: authHeaders()
         });
 
@@ -127,16 +127,16 @@ async function loadUsers() {
         }
 
         if (!response.ok) {
-            var errorData = await response.json().catch(function () { return {}; });
+            const errorData = await response.json().catch(function () { return {}; });
             showToast(errorData.message || 'Error al cargar usuarios.', 'error');
             return;
         }
 
-        var data = await response.json();
+        const data = await response.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-            var emptyRow = document.createElement('tr');
-            var emptyCell = document.createElement('td');
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
             emptyCell.colSpan = 6;
             emptyCell.className = 'table-empty';
             emptyCell.textContent = 'No hay usuarios.';
@@ -147,13 +147,13 @@ async function loadUsers() {
 
         usersCache = data;
 
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             usersTbody.appendChild(renderUserRow(data[i]));
         }
     } catch (error) {
         usersTbody.innerHTML = '';
-        var errorRow = document.createElement('tr');
-        var errorCell = document.createElement('td');
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
         errorCell.colSpan = 6;
         errorCell.className = 'table-empty';
         errorCell.textContent = 'Error al conectar con el servidor.';
@@ -164,7 +164,7 @@ async function loadUsers() {
 
 // Find user in cache by ID
 function findUserById(userId) {
-    for (var i = 0; i < usersCache.length; i++) {
+    for (let i = 0; i < usersCache.length; i++) {
         if (String(usersCache[i].id) === String(userId)) {
             return usersCache[i];
         }
@@ -192,7 +192,7 @@ function closeModal() {
 async function saveUserRole() {
     if (!currentUserId) return;
 
-    var role = inputRole.value;
+    const role = inputRole.value;
 
     if (!role) {
         modalError.textContent = 'Selecciona un rol valido.';
@@ -204,13 +204,13 @@ async function saveUserRole() {
     modalError.textContent = '';
 
     try {
-        var response = await fetch(API_BASE + '/api/users/' + currentUserId + '/role', {
+        const response = await fetch(API_BASE + '/api/users/' + currentUserId + '/role', {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({ role: role })
         });
 
-        var data = await response.json().catch(function () { return {}; });
+        const data = await response.json().catch(function () { return {}; });
 
         if (!response.ok) {
             modalError.textContent = data.message || 'Error al asignar rol.';
@@ -232,19 +232,19 @@ async function saveUserRole() {
 
 // Delete a user
 async function deleteUser(userId) {
-    var user = findUserById(userId);
+    const user = findUserById(userId);
     if (!user) return;
 
-    var confirmDelete = confirm('¿Estas seguro de que quieres eliminar al usuario "' + user.name + '"?');
+    const confirmDelete = confirm('¿Estas seguro de que quieres eliminar al usuario "' + user.name + '"?');
     if (!confirmDelete) return;
 
     try {
-        var response = await fetch(API_BASE + '/api/users/' + userId, {
+        const response = await fetch(API_BASE + '/api/users/' + userId, {
             method: 'DELETE',
             headers: authHeaders()
         });
 
-        var data = await response.json().catch(function () { return {}; });
+        const data = await response.json().catch(function () { return {}; });
 
         if (!response.ok) {
             showToast(data.message || 'Error al eliminar usuario.', 'error');
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Set welcome name
-    var userNameEl = document.getElementById('user-name');
+    const userNameEl = document.getElementById('user-name');
     if (userNameEl) {
         userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
     }
@@ -307,11 +307,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Delegate table button clicks (edit / delete)
     usersTbody.addEventListener('click', function (e) {
-        var button = e.target.closest('button');
+        const button = e.target.closest('button');
         if (!button) return;
 
-        var userId = button.getAttribute('data-userid');
-        var action = button.textContent;
+        const userId = button.getAttribute('data-userid');
+        const action = button.textContent;
 
         if (action === 'Editar') {
             openEditModal(userId);

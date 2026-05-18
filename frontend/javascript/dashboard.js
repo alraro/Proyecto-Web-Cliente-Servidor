@@ -119,9 +119,9 @@ async function loadMetrics(campaignId) {
         renderChart('zoneChart',     zoneData,     'horizontalBar', 'Zonas');
 
         // Se muestran contenedores de datos
-        document.getElementById('kpiRow').style.display    = 'flex';
-        document.getElementById('chartsGrid').style.display = 'grid';
-        document.getElementById('noSelection').style.display = 'none';
+        document.getElementById('kpiRow').classList.remove('hidden');
+        document.getElementById('chartsGrid').classList.remove('hidden');
+        document.getElementById('noSelection').classList.add('hidden');
         document.getElementById('lastUpdated').textContent =
             `Actualizado: ${new Date().toLocaleTimeString('es-ES')}`;
 
@@ -211,19 +211,20 @@ function resetTimer() {
 
 
 function showLoading(on) {
-    document.getElementById('loadingSpinner').style.display = on ? 'block' : 'none';
+    const el = document.getElementById('loadingSpinner');
+    if (on) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
 }
 // Mostramos vista inicial
 function showNoSelection() {
-    document.getElementById('kpiRow').style.display     = 'none';
-    document.getElementById('chartsGrid').style.display = 'none';
-    document.getElementById('noSelection').style.display = 'block';
+    document.getElementById('kpiRow').classList.add('hidden');
+    document.getElementById('chartsGrid').classList.add('hidden');
+    document.getElementById('noSelection').classList.remove('hidden');
 }
 function showError(msg) {
     const el = document.getElementById('errorMsg');
     el.textContent = `Error: ${msg}`;
-    el.style.display = 'block';
+    el.classList.remove('hidden');
 }
 function hideError() {
-    document.getElementById('errorMsg').style.display = 'none';
+    document.getElementById('errorMsg').classList.add('hidden');
 }

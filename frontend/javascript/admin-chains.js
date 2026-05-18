@@ -56,8 +56,8 @@ function renderTable(chains) {
             </td>
             <td>
                 <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" onclick="openEdit(${c.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteChain(${c.id}, '${escAttr(c.name)}')">Eliminar</button>
+                    <button class="btn btn-edit btn-sm" data-action="edit" data-chain-id="${c.id}">Editar</button>
+                    <button class="btn btn-danger btn-sm" data-action="delete" data-chain-id="${c.id}" data-chain-name="${escAttr(c.name)}">Eliminar</button>
                 </div>
             </td>
         </tr>
@@ -131,6 +131,25 @@ document.getElementById('btn-nueva').addEventListener('click', openCreate);
 document.getElementById('btn-cancelar').addEventListener('click', closeModal);
 document.getElementById('modal-backdrop').addEventListener('click', e => {
     if (e.target === document.getElementById('modal-backdrop')) closeModal();
+});
+
+// Export button
+document.getElementById('btn-export-chains').addEventListener('click', function () {
+    exportarExcel('chains');
+});
+
+// Event delegation for table action buttons (edit / delete)
+document.getElementById('chains-tbody').addEventListener('click', function (e) {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const action = button.getAttribute('data-action');
+    const chainId = button.getAttribute('data-chain-id');
+    if (action === 'edit') {
+        openEdit(parseInt(chainId));
+    } else if (action === 'delete') {
+        const chainName = button.getAttribute('data-chain-name');
+        deleteChain(parseInt(chainId), chainName);
+    }
 });
 
 document.getElementById('btn-guardar').addEventListener('click', async () => {

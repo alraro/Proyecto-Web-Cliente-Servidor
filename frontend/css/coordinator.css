@@ -304,7 +304,7 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media screen and (width <= 768px) {
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -318,4 +318,50 @@ body {
     .shift-details {
         flex-wrap: wrap;
     }
+}
+
+/* Coordinator utility classes extracted from inline styles */
+.card-body-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.card-subtitle {
+    font-size: .9rem;
+    color: var(--ink-light);
+    margin-top: .25rem;
+}
+
+.card-head-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-actions-row {
+    padding-top: 0;
+    display: flex;
+    gap: .5rem;
+}
+
+.info-note {
+    padding: 1rem 1.25rem;
+    color: var(--text-secondary, #6b7280);
+    font-size: .88rem;
+    border-top: 1px solid var(--border, #e0e0e0);
+}
+
+.form-description {
+    color: var(--text-secondary);
+    font-size: .9rem;
+    margin-bottom: 1rem;
+}
+
+.modal-shift-info {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-size: .9rem;
 }

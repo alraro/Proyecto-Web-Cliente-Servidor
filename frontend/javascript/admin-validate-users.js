@@ -25,6 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
+    // Refresh button
+    document.getElementById('btn-refresh-pending').addEventListener('click', loadPending);
+
+    // Event delegation for table action buttons (approve / reject)
+    document.getElementById('pending-tbody').addEventListener('click', function (e) {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        const userId = button.getAttribute('data-user-id');
+        if (action === 'approve') {
+            approveUser(parseInt(userId));
+        } else if (action === 'reject') {
+            const userName = button.getAttribute('data-user-name');
+            rejectUser(parseInt(userId), userName);
+        }
+    });
+
     loadPending();
 });
 
@@ -53,9 +70,9 @@ async function loadPending() {
         const badge = document.getElementById('badge-pending');
         if (data.length > 0) {
             badge.textContent = data.length;
-            badge.style.display = '';
+            badge.classList.remove('hidden');
         } else {
-            badge.style.display = 'none';
+            badge.classList.add('hidden');
         }
 
         if (!data.length) {
@@ -81,8 +98,8 @@ async function loadPending() {
                 </td>
                 <td>
                     <div class="td-actions">
-                        <button class="btn btn-primary btn-sm" onclick="approveUser(${u.id})">✓ Aprobar</button>
-                        <button class="btn btn-danger btn-sm" onclick="rejectUser(${u.id}, '${escHtml(u.name)}')">✗ Rechazar</button>
+                        <button class="btn btn-primary btn-sm" data-action="approve" data-user-id="${u.id}">✓ Aprobar</button>
+                        <button class="btn btn-danger btn-sm" data-action="reject" data-user-id="${u.id}" data-user-name="${escHtml(u.name)}">✗ Rechazar</button>
                     </div>
                 </td>
             </tr>

@@ -48,7 +48,7 @@
 	box-shadow: 0 10px 20px rgba(26, 38, 62, 0.15);
 }
 
-@media (max-width: 640px) {
+@media screen and (width <= 640px) {
 	.edit-actions {
 		grid-template-columns: 1fr;
 	}

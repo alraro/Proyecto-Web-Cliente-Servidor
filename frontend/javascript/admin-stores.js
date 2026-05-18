@@ -123,8 +123,8 @@ function renderTable(stores) {
             <td>${escHtml(s.chainName || '—')}</td>
             <td>
                 <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" onclick="openEdit(${s.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteStore(${s.id}, '${escAttr(s.name)}')">Eliminar</button>
+                    <button class="btn btn-edit btn-sm" data-action="edit" data-store-id="${s.id}">Editar</button>
+                    <button class="btn btn-danger btn-sm" data-action="delete" data-store-id="${s.id}" data-store-name="${escAttr(s.name)}">Eliminar</button>
                 </div>
             </td>
         </tr>
@@ -182,6 +182,28 @@ document.getElementById('btn-clear-filters').addEventListener('click', () => {
     document.getElementById('filter-chain').value = '';
     populateLocalities('');
     loadStores(0);
+});
+
+// Pagination and export buttons
+document.getElementById('btn-prev-page').addEventListener('click', previousPage);
+document.getElementById('btn-next-page').addEventListener('click', nextPage);
+document.getElementById('page-size-select').addEventListener('change', changePageSize);
+document.getElementById('btn-export-stores').addEventListener('click', function () {
+    exportarExcel('stores');
+});
+
+// Event delegation for table action buttons (edit / delete)
+document.getElementById('stores-tbody').addEventListener('click', function (e) {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const action = button.getAttribute('data-action');
+    const storeId = button.getAttribute('data-store-id');
+    if (action === 'edit') {
+        openEdit(parseInt(storeId));
+    } else if (action === 'delete') {
+        const storeName = button.getAttribute('data-store-name');
+        deleteStore(parseInt(storeId), storeName);
+    }
 });
 
 let editingId = null;

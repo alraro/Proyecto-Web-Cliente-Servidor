@@ -99,7 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            currentStatus = chip.dataset.status;
+            if (chip.classList.contains('chip-status-all')) {
+                currentStatus = '';
+            } else if (chip.classList.contains('chip-status-active')) {
+                currentStatus = 'ACTIVE';
+            } else if (chip.classList.contains('chip-status-future')) {
+                currentStatus = 'FUTURE';
+            } else if (chip.classList.contains('chip-status-past')) {
+                currentStatus = 'PAST';
+            }
             currentPage   = 0;
             updateChips();
             loadCampaigns();

@@ -70,8 +70,8 @@ function renderTable(partnerEntities) {
             <td>${escHtml(pe.phone || '—')}</td>
             <td>
                 <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" onclick="abrirEditar(${pe.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarEntidad(${pe.id}, '${escAttr(pe.name)}')">Eliminar</button>
+                    <button class="btn btn-edit btn-sm" data-action="edit" data-pe-id="${pe.id}">Editar</button>
+                    <button class="btn btn-danger btn-sm" data-action="delete" data-pe-id="${pe.id}" data-pe-name="${escAttr(pe.name)}">Eliminar</button>
                 </div>
             </td>
         </tr>
@@ -184,6 +184,28 @@ function clearFilters() {
 
 document.getElementById('btn-apply-filters').addEventListener('click', applyFilters);
 document.getElementById('btn-clear-filters').addEventListener('click', clearFilters);
+
+// Pagination and export buttons
+document.getElementById('btn-prev-page').addEventListener('click', previousPage);
+document.getElementById('btn-next-page').addEventListener('click', nextPage);
+document.getElementById('page-size-select').addEventListener('change', changePageSize);
+document.getElementById('btn-export-pe').addEventListener('click', function () {
+    exportarExcel('partner-entities');
+});
+
+// Event delegation for table action buttons (edit / delete)
+document.getElementById('partner-entities-tbody').addEventListener('click', function (e) {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const action = button.getAttribute('data-action');
+    const peId = button.getAttribute('data-pe-id');
+    if (action === 'edit') {
+        abrirEditar(parseInt(peId));
+    } else if (action === 'delete') {
+        const peName = button.getAttribute('data-pe-name');
+        eliminarEntidad(parseInt(peId), peName);
+    }
+});
 
 // Permitir buscar presionando Enter en el campo de búsqueda
 document.getElementById('filter-search').addEventListener('keypress', e => {
