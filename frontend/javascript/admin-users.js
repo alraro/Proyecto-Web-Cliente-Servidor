@@ -9,10 +9,29 @@ function authHeaders() { return { 'Content-Type': 'application/json', 'Authoriza
 function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-    document.getElementById('btn-logout').addEventListener('click', logout);
     document.getElementById('btn-refresh').addEventListener('click', loadUsers);
     loadUsers();
+
+    if (!getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const userNameEl = document.getElementById('user-name');
+	
+    if (userNameEl) {
+        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            logout();
+        }
+    })
+
 });
 
 function showToast(msg, type = 'success') {
