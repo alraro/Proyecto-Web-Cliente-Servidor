@@ -6,6 +6,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    const userNameEl = document.getElementById('user-name');
+	
+    if (userNameEl) {
+        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    })
+
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
     const nameFromQuery  = params.get('nombre');
@@ -14,8 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-
     const campaignSelect  = document.getElementById('campaign-select');
     const btnLoad         = document.getElementById('btn-load');
     const globalMessage   = document.getElementById('global-message');
@@ -23,10 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const captainSelect   = document.getElementById('captain-select');
     const btnAssign       = document.getElementById('btn-assign');
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
+    
 
     captainSelect.disabled = true;
     btnAssign.disabled = true;

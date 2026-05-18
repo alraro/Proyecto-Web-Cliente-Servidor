@@ -2,7 +2,6 @@ async function exportarExcel(resource, campaignId = null) {
     const btn = document.querySelector('.btn-export');
     const textoOriginal = btn.textContent;
 
-    // Feedback visual mientras genera
     btn.textContent = 'Generando...';
     btn.disabled = true;
 
@@ -17,7 +16,7 @@ async function exportarExcel(resource, campaignId = null) {
         const response = await fetch(url, { headers });
 
         if (response.status === 403) {
-            alert('No tienes permisos para exportar este listado.');
+            alert('No tienes permisos.');
             return;
         }
         if (!response.ok) {
