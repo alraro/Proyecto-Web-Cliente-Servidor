@@ -63,13 +63,6 @@
     color: var(--ink);
     background: var(--surface);
     outline: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23193a6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right .85rem center;
-    padding-right: 2.2rem;
     transition: border-color .2s, box-shadow .2s;
 }
 .form-group select:focus {
@@ -148,29 +141,19 @@
 /* ── Grid de días (scroll horizontal en móvil) ────────────────────────────── */
 
 .days-grid {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     gap: 0;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     padding: 0;
-    /* Sin scroll snapping para compatibilidad máxima */
 }
 
 /* ── Columna de día ───────────────────────────────────────────────────────── */
 
 .day-col {
     min-width: 160px;
-    -ms-flex-negative: 0;
     flex-shrink: 0;
     border-right: 1px solid var(--border);
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
     flex-direction: column;
 }
 .day-col:last-child { border-right: none; }
@@ -228,7 +211,6 @@
     height: 100%;
     border-radius: 999px;
     background: var(--blue-700);
-    -webkit-transition: width .3s ease;
     transition: width .3s ease;
 }
 .shift-full    .vol-bar-fill { background: #16a34a; }
@@ -241,9 +223,7 @@
     color: var(--ink-light);
     font-style: italic;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    max-height: 2.4em;
 }
 
 /* ── Responsive móvil (RNF-09) ────────────────────────────────────────────── */

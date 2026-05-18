@@ -1,19 +1,8 @@
-:root {
-    --blue-900: #193a6b;
-    --blue-700: #2d65a0;
-    --orange-500: #eb7b31;
-    --orange-300: #f7b075;
-    --ink: #1f2937;
-    --card: #ffffff;
-    --shadow: 0 20px 50px rgba(22, 46, 82, 0.18);
-}
-
 * {
     box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
 }
 
 body {
@@ -43,7 +32,7 @@ a {
 
 .brand .logo {
     display: block;
-    width: clamp(155px, 23vw, 220px);
+    width: 180px;
     height: auto;
 }
 
@@ -81,7 +70,7 @@ a {
 
 .main-nav a:hover {
     background: rgba(25, 58, 107, 0.08);
-    color: rgba(31, 41, 55, 0.9) !important;
+    color: var(--ink);
     transform: translateY(-1px);
 }
 
@@ -92,7 +81,7 @@ a {
 .nav-cta,
 .primary-action {
     background: linear-gradient(140deg, var(--blue-900), var(--blue-700));
-    color: #ffffff !important;
+    color: var(--white);
     font-weight: 700;
     box-shadow: var(--shadow);
 }
@@ -123,7 +112,6 @@ a {
     border: 1px solid rgba(25, 58, 107, 0.1);
     background: rgba(255, 255, 255, 0.86);
     box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
 }
 
 .hero-copy {
@@ -166,7 +154,7 @@ a {
 }
 
 .hero-copy h1 {
-    font-size: clamp(2.15rem, 4.9vw, 4rem);
+    font-size: 2.15rem;
     max-width: 15ch;
     line-height: 1.02;
 }
@@ -296,7 +284,7 @@ a {
 .section-heading h2,
 .section-highlight h2,
 .contact-strip h2 {
-    font-size: clamp(1.65rem, 3vw, 2.6rem);
+    font-size: 1.65rem;
 }
 
 .service-grid,
@@ -331,7 +319,6 @@ a {
 .case-gallery img {
     width: 100%;
     height: 132px;
-    object-fit: contain;
     border-radius: 16px;
     margin-bottom: 0.6rem;
     background: linear-gradient(145deg, rgba(45, 101, 160, 0.1), rgba(247, 176, 117, 0.24));
@@ -370,7 +357,7 @@ a {
 }
 
 .site-footer .logo {
-    width: clamp(130px, 20vw, 188px);
+    width: 160px;
     height: auto;
 }
 

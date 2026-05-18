@@ -1,10 +1,11 @@
+/* Layout — topbar, navigation, footer, brand elements */
+
 .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
@@ -12,7 +13,6 @@
 }
 
 .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-
 .brand .logo { width: 140px; height: auto; }
 
 .topbar-right { display: flex; align-items: center; gap: 1rem; }
@@ -32,7 +32,7 @@
 .user-badge .dot {
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: #22c55e;
+    background: var(--color-green-dot);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
 }
 
@@ -51,7 +51,7 @@
 
 .btn-edit:hover { background: rgba(235, 123, 49, 0.12); color: var(--orange-500); border-color: var(--orange-500); }
 
-.btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.btn-logout:hover { background: var(--color-error-light); color: var(--color-error-text); border-color: var(--color-error-border); }
 
 .topbar-login {
     max-width: 1200px;
@@ -132,29 +132,4 @@
     font-weight: 700;
     font-family: var(--font-heading);
     white-space: nowrap;
-    backdrop-filter: blur(4px);
-}
-
-.card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    padding: 1.5rem;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.card-header h2 {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--blue-900);
 }

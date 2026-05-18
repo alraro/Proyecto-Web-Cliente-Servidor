@@ -137,7 +137,6 @@
     font-size: .82rem;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    backdrop-filter: blur(4px);
     flex-shrink: 0;
 }
 .attendance-counter.all-present {

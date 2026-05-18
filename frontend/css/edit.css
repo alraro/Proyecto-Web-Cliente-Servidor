@@ -1,4 +1,4 @@
-@import url('register.css');
+/* Edit — page-specific styles only */
 
 .edit-card {
 	max-width: 620px;
@@ -46,11 +46,6 @@
 .secondary-button:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 10px 20px rgba(26, 38, 62, 0.15);
-}
-
-.secondary-button:focus-visible {
-	outline: 3px solid rgba(63, 106, 203, 0.4);
-	outline-offset: 2px;
 }
 
 @media (max-width: 640px) {

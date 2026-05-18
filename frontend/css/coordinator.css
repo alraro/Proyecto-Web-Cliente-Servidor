@@ -1,17 +1,4 @@
 /* Coordinator Panel Styles */
-:root {
-    --primary-color: #2E7D32;
-    --primary-light: #4CAF50;
-    --primary-dark: #1B5E20;
-    --secondary-color: #FF9800;
-    --bg-color: #F5F5F5;
-    --card-bg: #FFFFFF;
-    --text-color: #333333;
-    --text-light: #666666;
-    --border-color: #E0E0E0;
-    --error-color: #D32F2F;
-    --success-color: #388E3C;
-}
 
 * {
     margin: 0;
@@ -20,29 +7,29 @@
 }
 
 body {
-    font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: var(--font-primary);
+    background-color: var(--coord-bg);
+    color: var(--coord-text);
     min-height: 100vh;
 }
 
 /* Form Card */
 .form-card {
-    background: var(--card-bg);
+    background: var(--coord-card);
     padding: 1.5rem;
     border-radius: 0;
     margin-bottom: 1.5rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--coord-border);
 }
 
 .form-card h3 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1rem;
     font-weight: 700;
     margin-bottom: 1.25rem;
-    color: var(--text-color);
+    color: var(--coord-text);
     padding-bottom: .6rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--coord-border);
 }
 
 .form-row {
@@ -61,7 +48,7 @@ body {
     margin-bottom: .4rem;
     font-weight: 600;
     font-size: .9rem;
-    color: var(--text-color);
+    color: var(--coord-text);
 }
 
 .form-group input,
@@ -69,24 +56,24 @@ body {
 .form-group textarea {
     width: 100%;
     padding: .6rem .75rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--coord-border);
     border-radius: 0;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-primary);
     font-size: .93rem;
-    background: #fff;
+    background: var(--white);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--coord-primary);
     box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.12);
 }
 
 .form-group input:disabled,
 .form-group select:disabled {
-    background: #f5f5f5;
+    background: var(--coord-bg);
     cursor: not-allowed;
 }
 
@@ -98,53 +85,53 @@ body {
 
 .btn-primary {
     padding: .6rem 1.5rem;
-    background: var(--primary-color);
-    color: white;
+    background: var(--coord-primary);
+    color: var(--white);
     border: none;
     border-radius: 0;
     font-weight: 700;
     font-size: .9rem;
     cursor: pointer;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-primary);
     transition: background .2s;
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    background: var(--coord-primary-dark);
 }
 
 .btn-secondary {
     padding: .6rem 1.5rem;
-    background: #f5f5f5;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+    background: var(--coord-bg);
+    color: var(--coord-text);
+    border: 1px solid var(--coord-border);
     border-radius: 0;
     font-weight: 700;
     font-size: .9rem;
     cursor: pointer;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-primary);
     transition: background .2s;
 }
 
 .btn-secondary:hover {
-    background: #e0e0e0;
+    background: var(--coord-border);
 }
 
 .btn-refresh {
     padding: .4rem .9rem;
-    background: var(--primary-color);
-    color: white;
+    background: var(--coord-primary);
+    color: var(--white);
     border: none;
     border-radius: 0;
     cursor: pointer;
     font-weight: 600;
     font-size: .88rem;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-primary);
     transition: background .2s;
 }
 
 .btn-refresh:hover {
-    background: var(--primary-dark);
+    background: var(--coord-primary-dark);
 }
 
 .form-message {
@@ -158,21 +145,21 @@ body {
 .form-message.success {
     display: block;
     background: #E8F5E9;
-    color: var(--success-color);
-    border: 1px solid var(--success-color);
+    color: var(--coord-success);
+    border: 1px solid var(--coord-success);
 }
 
 .form-message.error {
     display: block;
     background: #FFEBEE;
-    color: var(--error-color);
-    border: 1px solid var(--error-color);
+    color: var(--coord-error);
+    border: 1px solid var(--coord-error);
 }
 
 /* Shifts List */
 .shifts-list-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
+    background: var(--coord-card);
+    border: 1px solid var(--coord-border);
     border-radius: 0;
 }
 
@@ -181,14 +168,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--coord-border);
 }
 
 .shifts-list-header h3 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-color);
+    color: var(--coord-text);
 }
 
 #shifts-container {
@@ -198,7 +185,7 @@ body {
 
 .empty-message {
     text-align: center;
-    color: var(--text-light);
+    color: var(--coord-text-light);
     padding: 2rem;
     font-size: .9rem;
 }
@@ -208,7 +195,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: .85rem 1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--coord-border);
     border-radius: 0;
     margin-bottom: .6rem;
     background: #fafafa;
@@ -224,12 +211,12 @@ body {
 
 .shift-info h4 {
     font-size: .95rem;
-    color: var(--text-color);
+    color: var(--coord-text);
     margin-bottom: .3rem;
 }
 
 .shift-info p {
-    color: var(--text-light);
+    color: var(--coord-text-light);
     font-size: .88rem;
     margin-bottom: .2rem;
 }
@@ -243,41 +230,36 @@ body {
 
 .shift-detail {
     font-size: .85rem;
-    color: var(--text-light);
+    color: var(--coord-text-light);
 }
 
-/* ── Modal ───────────────────────────────────────────────────────────────── */
-/*
- * admin.css defines .modal as a content card (max-width:460px, padding:2rem,
- * no position). We must explicitly override every conflicting property so the
- * overlay spans the full viewport.
- * admin.css also has .hidden { display:none !important }, so we match that
- * specificity with !important on .modal.hidden.
- */
-.modal {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    max-width: none !important;
-    height: 100vh !important;
-    padding: 1.5rem !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    animation: none !important;
-    background: rgba(0, 0, 0, 0.55) !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    z-index: 9999 !important;
-    overflow-y: auto !important;
+/* Modal overlay */
+.coordinator-modal-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    padding: 1.5rem;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 9999;
+    overflow-y: auto;
 }
 
-.modal.hidden {
-    display: none !important;
+.coordinator-modal-overlay.hidden {
+    display: none;
 }
 
-.modal-content {
-    background: var(--card-bg);
+.coordinator-modal-content {
+    background: var(--coord-card);
     padding: 1.75rem;
     border-radius: 0;
     width: 100%;
@@ -285,40 +267,40 @@ body {
     max-height: calc(100vh - 3rem);
     overflow-y: auto;
     position: relative;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--coord-border);
     align-self: flex-start;
     flex-shrink: 0;
 }
 
-.modal-close {
+.coordinator-modal-close {
     position: absolute;
     top: .9rem;
     right: 1rem;
     font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
-    color: var(--text-light);
+    color: var(--coord-text-light);
     background: none;
     border: none;
 }
 
-.modal-close:hover {
-    color: var(--text-color);
+.coordinator-modal-close:hover {
+    color: var(--coord-text);
 }
 
-.modal-content h3 {
-    font-family: 'Montserrat', sans-serif;
+.coordinator-modal-content h3 {
+    font-family: var(--font-heading);
     font-size: 1.05rem;
     font-weight: 700;
     margin-bottom: 1.25rem;
     padding-right: 2rem;
 }
 
-.modal-content h4 {
-    font-family: 'Montserrat', sans-serif;
+.coordinator-modal-content h4 {
+    font-family: var(--font-heading);
     font-size: .9rem;
     font-weight: 700;
-    color: var(--text-color);
+    color: var(--coord-text);
 }
 
 /* Responsive */

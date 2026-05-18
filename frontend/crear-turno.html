@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Crear Turno</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/coordinator.css">
     <script src="javascript/crear-turno.js" defer></script>
@@ -103,9 +105,9 @@
     </main>
 
     <!-- Modal de asignación de voluntarios y capitanes -->
-    <div class="modal hidden" id="assignment-modal">
-        <div class="modal-content">
-            <span class="modal-close" id="modal-close" role="button" aria-label="Cerrar">×</span>
+    <div class="coordinator-modal-overlay hidden" id="assignment-modal">
+        <div class="coordinator-modal-content">
+            <span class="coordinator-modal-close" id="modal-close" role="button" aria-label="Cerrar">×</span>
             <h3 id="modal-title">Asignaciones del turno</h3>
 
             <div id="modal-shift-info" style="background:#f5f5f5;border-radius:6px;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:.9rem;color:var(--text-light);"></div>
