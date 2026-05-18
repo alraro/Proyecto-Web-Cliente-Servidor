@@ -95,16 +95,43 @@ async function loadStoreFilters() {
     ]);
 
     const chainSel = document.getElementById('store-filter-chain');
-    chainSel.innerHTML = '<option value="">Todas las cadenas</option>';
-    chains.forEach(c => { chainSel.insertAdjacentHTML('beforeend', `<option value="${c.id}">${escapeHtml(c.name)}</option>`); });
+    chainSel.innerHTML = '';
+    const chainDefault = document.createElement('option');
+    chainDefault.value = '';
+    chainDefault.textContent = 'Todas las cadenas';
+    chainSel.appendChild(chainDefault);
+    chains.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = escapeHtml(c.name);
+        chainSel.appendChild(opt);
+    });
 
     const zoneSel = document.getElementById('store-filter-zone');
-    zoneSel.innerHTML = '<option value="">Todas las zonas</option>';
-    zones.forEach(z => { zoneSel.insertAdjacentHTML('beforeend', `<option value="${z.id}">${escapeHtml(z.name)}</option>`); });
+    zoneSel.innerHTML = '';
+    const zoneDefault = document.createElement('option');
+    zoneDefault.value = '';
+    zoneDefault.textContent = 'Todas las zonas';
+    zoneSel.appendChild(zoneDefault);
+    zones.forEach(z => {
+        const opt = document.createElement('option');
+        opt.value = z.id;
+        opt.textContent = escapeHtml(z.name);
+        zoneSel.appendChild(opt);
+    });
 
     const localSel = document.getElementById('store-filter-locality');
-    localSel.innerHTML = '<option value="">Todas las localidades</option>';
-    localities.forEach(l => { localSel.insertAdjacentHTML('beforeend', `<option value="${l.id}">${escapeHtml(l.name)}</option>`); });
+    localSel.innerHTML = '';
+    const localDefault = document.createElement('option');
+    localDefault.value = '';
+    localDefault.textContent = 'Todas las localidades';
+    localSel.appendChild(localDefault);
+    localities.forEach(l => {
+        const opt = document.createElement('option');
+        opt.value = l.id;
+        opt.textContent = escapeHtml(l.name);
+        localSel.appendChild(opt);
+    });
 }
 
 async function loadAvailableStores() {
@@ -128,7 +155,11 @@ function renderAvailableList() {
     const available = allFilteredStores.filter(s => !selectedStores.has(Number(s.id)));
 
     if (!available.length) {
-        ul.innerHTML = '<li class="store-list-empty">Sin tiendas disponibles con estos filtros.</li>';
+        ul.innerHTML = '';
+        const li = document.createElement('li');
+        li.className = 'store-list-empty';
+        li.textContent = 'Sin tiendas disponibles con estos filtros.';
+        ul.appendChild(li);
         document.getElementById('available-count').textContent = '0';
         return;
     }
@@ -139,8 +170,14 @@ function renderAvailableList() {
         const localityName = s.locality  ? escapeHtml(s.locality)  : '-';
         const li = document.createElement('li');
         li.dataset.storeid = String(s.id);
-        li.innerHTML = `<span>${escapeHtml(s.name)} — ${chainName} — ${localityName}</span>
-            <button type="button" class="btn-add-store btn btn-sm">+</button>`;
+        const span = document.createElement('span');
+        span.textContent = escapeHtml(s.name) + ' — ' + chainName + ' — ' + localityName;
+        li.appendChild(span);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-add-store btn btn-sm';
+        btn.textContent = '+';
+        li.appendChild(btn);
         ul.appendChild(li);
     });
     document.getElementById('available-count').textContent = String(available.length);
@@ -151,7 +188,11 @@ function renderSelectedList() {
     const items = [...selectedStores.values()];
 
     if (!items.length) {
-        ul.innerHTML = '<li class="store-list-empty">Sin tiendas seleccionadas.</li>';
+        ul.innerHTML = '';
+        const li = document.createElement('li');
+        li.className = 'store-list-empty';
+        li.textContent = 'Sin tiendas seleccionadas.';
+        ul.appendChild(li);
         document.getElementById('selected-count').textContent = '0';
         return;
     }
@@ -161,8 +202,14 @@ function renderSelectedList() {
         const chainName = s.chainName ? escapeHtml(s.chainName) : '-';
         const li = document.createElement('li');
         li.dataset.storeid = String(s.id);
-        li.innerHTML = `<span>${escapeHtml(s.name)} — ${chainName}</span>
-            <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>`;
+        const span = document.createElement('span');
+        span.textContent = escapeHtml(s.name) + ' — ' + chainName;
+        li.appendChild(span);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-remove-store btn btn-sm btn-danger';
+        btn.textContent = '×';
+        li.appendChild(btn);
         ul.appendChild(li);
     });
     document.getElementById('selected-count').textContent = String(items.length);
@@ -180,21 +227,59 @@ async function loadCampaigns() {
 
 function renderTable(campaigns) {
     const tbody = document.getElementById('campaigns-tbody');
+    tbody.innerHTML = '';
     if (!campaigns.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay campañas registradas.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'table-empty';
+        td.textContent = 'No hay campañas registradas.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = campaigns.map(c => `
-        <tr>
-            <td><strong>${escapeHtml(c.name || '')}</strong></td>
-            <td>${escapeHtml((c.type && c.type.name) ? c.type.name : '-')}</td>
-            <td>${formatDate(c.startDate)}</td>
-            <td>${formatDate(c.endDate)}</td>
-            <td class="actions-cell">
-                <button class="btn btn-sm btn-secondary" data-action="edit" data-campaign-id="${c.id}">Editar</button>
-                <button class="btn btn-sm btn-danger" data-action="delete" data-campaign-id="${c.id}" data-campaign-name="${escapeJs(c.name || '')}">Eliminar</button>
-            </td>
-        </tr>`).join('');
+    campaigns.forEach(c => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = escapeHtml(c.name || '');
+        td1.appendChild(strong);
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        td2.textContent = escapeHtml((c.type && c.type.name) ? c.type.name : '-');
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        td3.textContent = formatDate(c.startDate);
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        td4.textContent = formatDate(c.endDate);
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        td5.className = 'actions-cell';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-sm btn-secondary';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-campaign-id', c.id);
+        btnEdit.textContent = 'Editar';
+        td5.appendChild(btnEdit);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-sm btn-danger';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-campaign-id', c.id);
+        btnDelete.setAttribute('data-campaign-name', escapeJs(c.name || ''));
+        btnDelete.textContent = 'Eliminar';
+        td5.appendChild(btnDelete);
+
+        tr.appendChild(td5);
+        tbody.appendChild(tr);
+    });
 }
 
 // ── Modal open/save ─────────────────────────────────────────────────────────
@@ -297,9 +382,16 @@ async function deleteCampaign(id, name) {
 async function loadCampaignTypes() {
     cachedTypes = await fetchJson(API_BASE + '/api/campaign-types', { headers: authHeaders() });
     const sel = document.getElementById('campaign-type');
-    sel.innerHTML = '<option value="">Selecciona un tipo...</option>';
+    sel.innerHTML = '';
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Selecciona un tipo...';
+    sel.appendChild(defaultOpt);
     (cachedTypes || []).forEach(t => {
-        sel.insertAdjacentHTML('beforeend', `<option value="${t.id}">${escapeHtml(t.name)}</option>`);
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = escapeHtml(t.name);
+        sel.appendChild(opt);
     });
 }
 

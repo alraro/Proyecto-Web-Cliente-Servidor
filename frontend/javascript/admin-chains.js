@@ -40,28 +40,73 @@ function showToast(msg, type = 'success') {
 
 function renderTable(chains) {
     const tbody = document.getElementById('chains-tbody');
+    tbody.innerHTML = '';
     if (!chains.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay cadenas registradas.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'table-empty';
+        td.textContent = 'No hay cadenas registradas.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = chains.map(c => `
-        <tr>
-            <td>${c.id}</td>
-            <td><strong>${escHtml(c.name)}</strong></td>
-            <td><code class="inline-code">${escHtml(c.code)}</code></td>
-            <td>
-                ${c.participation
-            ? '<span class="badge badge-yes">✓ Sí</span>'
-            : '<span class="badge badge-no">— No</span>'}
-            </td>
-            <td>
-                <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" data-action="edit" data-chain-id="${c.id}">Editar</button>
-                    <button class="btn btn-danger btn-sm" data-action="delete" data-chain-id="${c.id}" data-chain-name="${escAttr(c.name)}">Eliminar</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    chains.forEach(c => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.textContent = c.id;
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = escHtml(c.name);
+        td2.appendChild(strong);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        const code = document.createElement('code');
+        code.className = 'inline-code';
+        code.textContent = escHtml(c.code);
+        td3.appendChild(code);
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        const badge = document.createElement('span');
+        if (c.participation) {
+            badge.className = 'badge badge-yes';
+            badge.textContent = '✓ Sí';
+        } else {
+            badge.className = 'badge badge-no';
+            badge.textContent = '— No';
+        }
+        td4.appendChild(badge);
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        const div = document.createElement('div');
+        div.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-edit btn-sm';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-chain-id', c.id);
+        btnEdit.textContent = 'Editar';
+        div.appendChild(btnEdit);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-danger btn-sm';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-chain-id', c.id);
+        btnDelete.setAttribute('data-chain-name', escAttr(c.name));
+        btnDelete.textContent = 'Eliminar';
+        div.appendChild(btnDelete);
+
+        td5.appendChild(div);
+        tr.appendChild(td5);
+
+        tbody.appendChild(tr);
+    });
 }
 
 function escHtml(v) {
@@ -76,15 +121,29 @@ async function loadChains() {
         const res = await fetch(BACKEND + '/api/chains', { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
-            document.getElementById('chains-tbody').innerHTML =
-                '<tr><td colspan="5" class="table-empty">Error al cargar las cadenas.</td></tr>';
+            const tbodyErr = document.getElementById('chains-tbody');
+            tbodyErr.innerHTML = '';
+            const trErr = document.createElement('tr');
+            const tdErr = document.createElement('td');
+            tdErr.colSpan = 5;
+            tdErr.className = 'table-empty';
+            tdErr.textContent = 'Error al cargar las cadenas.';
+            trErr.appendChild(tdErr);
+            tbodyErr.appendChild(trErr);
             return;
         }
         const data = await res.json();
         renderTable(data);
     } catch {
-        document.getElementById('chains-tbody').innerHTML =
-            '<tr><td colspan="5" class="table-empty">No se puede conectar con el servidor. ¿Está el backend en marcha?</td></tr>';
+        const tbodyErr = document.getElementById('chains-tbody');
+        tbodyErr.innerHTML = '';
+        const trErr = document.createElement('tr');
+        const tdErr = document.createElement('td');
+        tdErr.colSpan = 5;
+        tdErr.className = 'table-empty';
+        tdErr.textContent = 'No se puede conectar con el servidor. ¿Está el backend en marcha?';
+        trErr.appendChild(tdErr);
+        tbodyErr.appendChild(trErr);
     }
 }
 

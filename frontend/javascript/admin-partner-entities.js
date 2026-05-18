@@ -58,24 +58,62 @@ function showToast(msg, type = 'success') {
 // ── Tabla ─────────────────────────────────────────────────────────────
 function renderTable(partnerEntities) {
     const tbody = document.getElementById('partner-entities-tbody');
+    tbody.innerHTML = '';
     if (!partnerEntities.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay entidades socias registradas.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'table-empty';
+        td.textContent = 'No hay entidades socias registradas.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = partnerEntities.map(pe => `
-        <tr>
-            <td>${pe.id}</td>
-            <td><strong>${escHtml(pe.name)}</strong></td>
-            <td>${escHtml(pe.address || '—')}</td>
-            <td>${escHtml(pe.phone || '—')}</td>
-            <td>
-                <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" data-action="edit" data-pe-id="${pe.id}">Editar</button>
-                    <button class="btn btn-danger btn-sm" data-action="delete" data-pe-id="${pe.id}" data-pe-name="${escAttr(pe.name)}">Eliminar</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    partnerEntities.forEach(pe => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.textContent = pe.id;
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = escHtml(pe.name);
+        td2.appendChild(strong);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        td3.textContent = escHtml(pe.address || '—');
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        td4.textContent = escHtml(pe.phone || '—');
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        const div = document.createElement('div');
+        div.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-edit btn-sm';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-pe-id', pe.id);
+        btnEdit.textContent = 'Editar';
+        div.appendChild(btnEdit);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-danger btn-sm';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-pe-id', pe.id);
+        btnDelete.setAttribute('data-pe-name', escAttr(pe.name));
+        btnDelete.textContent = 'Eliminar';
+        div.appendChild(btnDelete);
+
+        td5.appendChild(div);
+        tr.appendChild(td5);
+
+        tbody.appendChild(tr);
+    });
 }
 
 function escHtml(v) {
@@ -122,8 +160,15 @@ async function cargarEntidades(page = 0) {
         const res = await fetch(BACKEND + '/api/partner-entities?' + params, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
-            document.getElementById('partner-entities-tbody').innerHTML =
-                '<tr><td colspan="5" class="table-empty">Error al cargar las entidades socias.</td></tr>';
+            const tbodyErr = document.getElementById('partner-entities-tbody');
+            tbodyErr.innerHTML = '';
+            const trErr = document.createElement('tr');
+            const tdErr = document.createElement('td');
+            tdErr.colSpan = 5;
+            tdErr.className = 'table-empty';
+            tdErr.textContent = 'Error al cargar las entidades socias.';
+            trErr.appendChild(tdErr);
+            tbodyErr.appendChild(trErr);
             return;
         }
         const data = await res.json();
@@ -139,8 +184,15 @@ async function cargarEntidades(page = 0) {
         const items = data.content || [];
         renderTable(Array.isArray(items) ? items : []);
     } catch {
-        document.getElementById('partner-entities-tbody').innerHTML =
-            '<tr><td colspan="5" class="table-empty">No se puede conectar con el servidor. ¿Está el backend en marcha?</td></tr>';
+        const tbodyErr = document.getElementById('partner-entities-tbody');
+        tbodyErr.innerHTML = '';
+        const trErr = document.createElement('tr');
+        const tdErr = document.createElement('td');
+        tdErr.colSpan = 5;
+        tdErr.className = 'table-empty';
+        tdErr.textContent = 'No se puede conectar con el servidor. ¿Está el backend en marcha?';
+        trErr.appendChild(tdErr);
+        tbodyErr.appendChild(trErr);
     }
 }
 
