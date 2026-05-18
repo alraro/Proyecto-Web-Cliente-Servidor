@@ -6,14 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const nombre = localStorage.getItem('nombre') || 'Coordinador';
-    const userNameEl   = document.getElementById('user-name');
     const welcomeNameEl = document.getElementById('welcome-name');
 
-    if (userNameEl)    userNameEl.textContent   = nombre;
     if (welcomeNameEl) welcomeNameEl.textContent = nombre;
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
+
+    const userNameEl = document.getElementById('user-name');
+	
+    if (userNameEl) {
+        userNameEl.textContent = localStorage.getItem('nombre') || 'Coordinador';
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'btn-edit'){
+            window.location.href = 'edit.html';
+            
+        } else if(e.target.id === 'btn-logout'){
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    })
 });
