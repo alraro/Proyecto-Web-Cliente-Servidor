@@ -130,11 +130,6 @@ body {
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.input-shell input:focus {
-    border-color: rgba(45, 101, 160, 0.9);
-    box-shadow: 0 0 0 4px rgba(45, 101, 160, 0.14);
-}
-
 .input-shell input {
     width: 100%;
     border: 0;
