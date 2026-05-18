@@ -1,0 +1,160 @@
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+
+.brand .logo { width: 140px; height: auto; }
+
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: rgba(25, 58, 107, 0.07);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--blue-900);
+}
+
+.user-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.btn-edit, .btn-logout {
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-edit:hover { background: rgba(235, 123, 49, 0.12); color: var(--orange-500); border-color: var(--orange-500); }
+
+.btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+
+.topbar-login {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.main-nav-login {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.45rem;
+}
+
+.main-nav-login a {
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.brand-lockup .logo { width: 70px; height: auto; }
+
+.brand-lockup .text h2 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--blue-900);
+}
+
+.brand-lockup .text p {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    margin-top: 0.15rem;
+}
+
+.site-footer {
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.site-footer .logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 0.5rem;
+}
+
+.site-footer p {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+}
+
+.role-pill {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+}
+
+.card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--blue-900);
+}

@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bancosol | Entidades Socias</title>
+    <title>Bancosol | Entidades Colaboradoras</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/admin-partner-entities.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/pagination.css">
+    <link rel="stylesheet" href="css/filters.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/admin-partner-entities.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
     <script src="javascript/export.js" defer></script>
@@ -18,16 +24,16 @@
     <main class="page-wrapper">
         <div class="page-header">
             <a href="admin.html">← Volver al panel</a>
-            <h1>Entidades Socias</h1>
-            <p>Gestiona las entidades socias participantes en las campañas de Bancosol.</p>
+            <h1>Entidades Colaboradoras</h1>
+            <p>Gestiona las entidades colaboradoras participantes en las campañas de Bancosol.</p>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <h2>Listado de entidades socias</h2>
+                <h2>Listado de entidades colaboradoras</h2>
                 <div class="card-actions">
                     <button onclick="exportarExcel('partner-entities')" class="btn-export">Exportar archivo</button>
-                    <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad socia</button>
+                    <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad colaboradora</button>
                 </div>
             </div>
             <!-- FILTROS -->
@@ -57,7 +63,7 @@
                         </tr>
                     </thead>
                     <tbody id="partner-entities-tbody">
-                        <tr><td colspan="5" class="table-empty">Cargando entidades socias...</td></tr>
+                        <tr><td colspan="5" class="table-empty">Cargando entidades colaboradoras...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -76,10 +82,9 @@
         </div>
     </main>
 
-    <!-- MODAL -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <h3 id="modal-title">Nueva entidad socia</h3>
+            <h3 id="modal-title">Nueva entidad colaboradora</h3>
 
             <div class="form-group">
                 <label for="input-nombre">Nombre <span>*</span></label>
@@ -103,7 +108,6 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
     <script src="javascript/admin-partner-entities.js"></script>
