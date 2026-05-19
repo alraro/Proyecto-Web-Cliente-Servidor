@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/coordinator.css">
-    <link rel="stylesheet" href="css/crear-turno.css">
-    <script src="javascript/crear-turno.js" defer></script>
+    <link rel="stylesheet" href="css/create-shift.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/create-shift.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
 </head>
@@ -29,7 +30,7 @@
             </div>
         </div>
 
-        <!-- Selección de campaña y tienda -->
+
         <div class="form-card">
             <h3>Selecciona campaña y tienda</h3>
             <div class="form-row">
@@ -48,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Formulario de creación de turno -->
+ 
         <div class="form-card hidden" id="shift-form-card">
             <h3>Datos del turno</h3>
 
@@ -92,7 +93,7 @@
             </div>
         </div>
 
-        <!-- Listado de turnos de la campaña -->
+
         <div class="shifts-list-card hidden" id="shifts-card">
             <div class="shifts-list-header">
                 <h3>Turnos creados para esta campaña</h3>
@@ -105,7 +106,7 @@
 
     </main>
 
-    <!-- Modal de asignación de voluntarios y capitanes -->
+
     <div class="coordinator-modal-overlay hidden" id="assignment-modal">
         <div class="coordinator-modal-content">
             <span class="coordinator-modal-close" id="modal-close" role="button" aria-label="Cerrar">×</span>
@@ -113,7 +114,6 @@
 
             <div id="modal-shift-info" class="shift-info-box"></div>
 
-            <!-- Voluntarios -->
             <h4 class="modal-section-title">Voluntarios</h4>
             <div id="capacity-indicator" class="capacity-indicator"></div>
             <div id="modal-volunteers" class="modal-assignments-list"></div>
@@ -128,7 +128,7 @@
                 <p id="volunteer-feedback" class="form-message feedback-hidden"></p>
             </div>
 
-            <!-- Capitanes -->
+    
             <h4 class="modal-section-title modal-section-title-spaced">Capitanes</h4>
             <div id="modal-captains" class="modal-assignments-list"></div>
             <div class="form-group">
