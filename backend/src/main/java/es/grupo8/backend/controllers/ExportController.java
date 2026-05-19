@@ -85,7 +85,7 @@ public class ExportController {
                 case "stores"    -> exportStores();
                 case "chains"    -> exportChains();
                 case "campaigns" -> exportCampaigns();
-                case "partners"  -> exportPartners();
+                case "partner-entities", "partners" -> exportPartners();
                 case "users"     -> exportUsers();
                 default          -> null;
             };
