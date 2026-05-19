@@ -2,9 +2,6 @@
     box-sizing: border-box;
 }
 
-html {
-}
-
 body {
     margin: 0;
     font-family: 'Nunito', sans-serif;
@@ -214,14 +211,13 @@ a {
 }
 
 .panel-card-dark {
-    color: #ffffff;
     background: linear-gradient(150deg, var(--blue-900), var(--blue-700));
 }
 
 .panel-card-dark p,
 .panel-card-dark h2,
 .panel-card-dark span {
-    color: #ffffff;
+    color: #000000;
 }
 
 .panel-card p {
