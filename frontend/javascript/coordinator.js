@@ -130,7 +130,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
-        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
+        campaignSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = 'Selecciona una campaña...';
+        campaignSelect.appendChild(defaultOpt);
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -142,22 +146,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCoordinatorsTable(coordinators) {
         coordinatorsTbody.innerHTML = '';
         if (!coordinators.length) {
-            coordinatorsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin coordinadores asignados.</td></tr>";
+            const emptyRow = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 3;
+            emptyTd.className = 'table-empty';
+            emptyTd.textContent = 'Sin coordinadores asignados.';
+            emptyRow.appendChild(emptyTd);
+            coordinatorsTbody.appendChild(emptyRow);
             return;
         }
         coordinators.forEach(coordinator => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(coordinator.name || '')}</td>
-                <td>${escapeHtml(coordinator.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button></td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(coordinator.name || '');
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(coordinator.email || '');
+            const tdActions = document.createElement('td');
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-sm btn-danger';
+            deleteBtn.dataset.userid = coordinator.userId;
+            deleteBtn.dataset.role = 'COORDINATOR';
+            deleteBtn.textContent = 'Eliminar';
+            tdActions.appendChild(deleteBtn);
+            row.appendChild(tdName);
+            row.appendChild(tdEmail);
+            row.appendChild(tdActions);
             coordinatorsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
-        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
+        selectEl.innerHTML = '';
+        const placeholderOpt = document.createElement('option');
+        placeholderOpt.value = '';
+        placeholderOpt.textContent = placeholder;
+        selectEl.appendChild(placeholderOpt);
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);

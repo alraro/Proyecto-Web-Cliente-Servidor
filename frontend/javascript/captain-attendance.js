@@ -32,7 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaigns = await fetchJson(API_BASE + '/api/captain/my-campaigns', {
             headers: authHeaders(token)
         });
-        campaignSelect.innerHTML = '<option value="">Selecciona una campaña...</option>';
+        campaignSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = 'Selecciona una campaña...';
+        campaignSelect.appendChild(defaultOpt);
         (Array.isArray(campaigns) ? campaigns : []).forEach(c => {
             const opt = document.createElement('option');
             opt.value = String(c.id);
@@ -41,7 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     } catch (err) {
         showMessage(err.message || 'No se pudieron cargar las campañas', true);
-        campaignSelect.innerHTML = '<option value="">Error al cargar campañas</option>';
+        campaignSelect.innerHTML = '';
+        const errorOpt = document.createElement('option');
+        errorOpt.value = '';
+        errorOpt.textContent = 'Error al cargar campañas';
+        campaignSelect.appendChild(errorOpt);
     }
 
     // ── Al cambiar campaña → cargar turnos del capitán ────────────────────────
@@ -51,7 +59,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         shiftsContainer.innerHTML = '';
         if (!campaignId) return;
 
-        shiftsContainer.innerHTML = '<p class="loading-msg">Cargando turnos...</p>';
+        const loadingP = document.createElement('p');
+        loadingP.className = 'loading-msg';
+        loadingP.textContent = 'Cargando turnos...';
+        shiftsContainer.appendChild(loadingP);
 
         try {
             const shifts = await fetchJson(
@@ -60,7 +71,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
             renderShifts(Array.isArray(shifts) ? shifts : []);
         } catch (err) {
-            shiftsContainer.innerHTML = '<p class="loading-msg error-msg">Error al cargar los turnos.</p>';
+            const errorP = document.createElement('p');
+            errorP.className = 'loading-msg error-msg';
+            errorP.textContent = 'Error al cargar los turnos.';
+            shiftsContainer.innerHTML = '';
+            shiftsContainer.appendChild(errorP);
             showMessage(err.message || 'No se pudieron cargar los turnos', true);
         }
     });
@@ -70,7 +85,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderShifts(shifts) {
         shiftsContainer.innerHTML = '';
         if (!shifts.length) {
-            shiftsContainer.innerHTML = '<p class="loading-msg">No tienes turnos asignados en esta campaña.</p>';
+            const emptyP = document.createElement('p');
+            emptyP.className = 'loading-msg';
+            emptyP.textContent = 'No tienes turnos asignados en esta campaña.';
+            shiftsContainer.appendChild(emptyP);
             return;
         }
 
@@ -82,23 +100,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             const presentCount = (shift.volunteers || []).filter(v => v.attendance).length;
             const totalCount   = (shift.volunteers || []).length;
 
-            card.innerHTML = `
-                <div class="shift-card-header">
-                    <div class="shift-meta">
-                        <span class="shift-store">${escapeHtml(shift.storeName || '')}</span>
-                        <span class="shift-date">${formatDate(shift.day)}</span>
-                        <span class="shift-time">${shift.startTime || ''} – ${shift.endTime || ''}</span>
-                    </div>
-                    <div class="attendance-counter" id="counter-${shift.shiftId}">
-                        ${presentCount}/${totalCount} presentes
-                    </div>
-                </div>
-                ${shift.observations ? `<p class="shift-obs">${escapeHtml(shift.observations)}</p>` : ''}
-                <div class="volunteer-list" id="volunteers-${shift.shiftId}">
-                    ${renderVolunteerRows(shift.volunteers || [], shift.shiftId)}
-                </div>
-                ${!totalCount ? '<p class="no-volunteers">No hay voluntarios asignados a este turno.</p>' : ''}
-            `;
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'shift-card-header';
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'shift-meta';
+            const storeSpan = document.createElement('span');
+            storeSpan.className = 'shift-store';
+            storeSpan.textContent = escapeHtml(shift.storeName || '');
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'shift-date';
+            dateSpan.textContent = formatDate(shift.day);
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'shift-time';
+            timeSpan.textContent = (shift.startTime || '') + ' – ' + (shift.endTime || '');
+            metaDiv.appendChild(storeSpan);
+            metaDiv.appendChild(dateSpan);
+            metaDiv.appendChild(timeSpan);
+            const counterDiv = document.createElement('div');
+            counterDiv.className = 'attendance-counter';
+            counterDiv.id = 'counter-' + shift.shiftId;
+            counterDiv.textContent = presentCount + '/' + totalCount + ' presentes';
+            headerDiv.appendChild(metaDiv);
+            headerDiv.appendChild(counterDiv);
+            card.appendChild(headerDiv);
+
+            if (shift.observations) {
+                const obsP = document.createElement('p');
+                obsP.className = 'shift-obs';
+                obsP.textContent = escapeHtml(shift.observations);
+                card.appendChild(obsP);
+            }
+
+            const volunteerListDiv = document.createElement('div');
+            volunteerListDiv.className = 'volunteer-list';
+            volunteerListDiv.id = 'volunteers-' + shift.shiftId;
+            const volunteerRows = renderVolunteerRows(shift.volunteers || [], shift.shiftId);
+            volunteerRows.forEach(row => volunteerListDiv.appendChild(row));
+            card.appendChild(volunteerListDiv);
+
+            if (!totalCount) {
+                const noVolP = document.createElement('p');
+                noVolP.className = 'no-volunteers';
+                noVolP.textContent = 'No hay voluntarios asignados a este turno.';
+                card.appendChild(noVolP);
+            }
 
             shiftsContainer.appendChild(card);
         });
@@ -108,32 +153,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderVolunteerRows(volunteers, shiftId) {
-        return volunteers.map(v => `
-            <div class="volunteer-row" id="row-${shiftId}-${v.volunteerId}">
-                <div class="volunteer-info">
-                    <span class="volunteer-name">${escapeHtml(v.volunteerName || '')}</span>
-                    ${v.phone ? `<span class="volunteer-phone">${escapeHtml(v.phone)}</span>` : ''}
-                </div>
-                <div class="attendance-controls">
-                    <button
-                        class="btn-attendance ${v.attendance ? 'btn-present active' : 'btn-present'}"
-                        data-shift-id="${shiftId}"
-                        data-volunteer-id="${v.volunteerId}"
-                        data-attendance="true"
-                        aria-label="Marcar presente"
-                        ${v.attendance ? 'disabled' : ''}
-                    >Presente</button>
-                    <button
-                        class="btn-attendance ${!v.attendance ? 'btn-absent active' : 'btn-absent'}"
-                        data-shift-id="${shiftId}"
-                        data-volunteer-id="${v.volunteerId}"
-                        data-attendance="false"
-                        aria-label="Marcar ausente"
-                        ${!v.attendance ? 'disabled' : ''}
-                    >Ausente</button>
-                </div>
-            </div>
-        `).join('');
+        return volunteers.map(v => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'volunteer-row';
+            rowDiv.id = 'row-' + shiftId + '-' + v.volunteerId;
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'volunteer-info';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'volunteer-name';
+            nameSpan.textContent = escapeHtml(v.volunteerName || '');
+            infoDiv.appendChild(nameSpan);
+            if (v.phone) {
+                const phoneSpan = document.createElement('span');
+                phoneSpan.className = 'volunteer-phone';
+                phoneSpan.textContent = escapeHtml(v.phone);
+                infoDiv.appendChild(phoneSpan);
+            }
+            rowDiv.appendChild(infoDiv);
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'attendance-controls';
+            const btnPresent = document.createElement('button');
+            btnPresent.className = 'btn-attendance ' + (v.attendance ? 'btn-present active' : 'btn-present');
+            btnPresent.dataset.shiftId = shiftId;
+            btnPresent.dataset.volunteerId = v.volunteerId;
+            btnPresent.dataset.attendance = 'true';
+            btnPresent.setAttribute('aria-label', 'Marcar presente');
+            btnPresent.textContent = 'Presente';
+            if (v.attendance) {
+                btnPresent.disabled = true;
+            }
+            const btnAbsent = document.createElement('button');
+            btnAbsent.className = 'btn-attendance ' + (!v.attendance ? 'btn-absent active' : 'btn-absent');
+            btnAbsent.dataset.shiftId = shiftId;
+            btnAbsent.dataset.volunteerId = v.volunteerId;
+            btnAbsent.dataset.attendance = 'false';
+            btnAbsent.setAttribute('aria-label', 'Marcar ausente');
+            btnAbsent.textContent = 'Ausente';
+            if (!v.attendance) {
+                btnAbsent.disabled = true;
+            }
+            controlsDiv.appendChild(btnPresent);
+            controlsDiv.appendChild(btnAbsent);
+            rowDiv.appendChild(controlsDiv);
+            return rowDiv;
+        });
     }
 
     // ── Manejar click en botones de asistencia ────────────────────────────────

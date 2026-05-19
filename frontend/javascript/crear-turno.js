@@ -58,14 +58,22 @@ document.getElementById('campaign-select').addEventListener('change', async func
     const selOpt     = this.options[this.selectedIndex];
     const storeSel   = document.getElementById('store-select');
 
-    storeSel.innerHTML  = '<option value="">Cargando tiendas...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Cargando tiendas...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
     storeSel.disabled   = true;
-    document.getElementById('shift-form-card').style.display = 'none';
-    document.getElementById('shifts-card').style.display     = 'none';
+    document.getElementById('shift-form-card').classList.add('hidden');
+    document.getElementById('shifts-card').classList.add('hidden');
     selectedCampaign = null;
 
     if (!campaignId) {
-        storeSel.innerHTML = '<option value="">Selecciona primero una campaña...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Selecciona primero una campaña...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
         return;
     }
 
@@ -80,13 +88,25 @@ document.getElementById('campaign-select').addEventListener('change', async func
         const res = await fetch(`${BACKEND}/api/shifts/campaign/${campaignId}/stores`, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
-            storeSel.innerHTML = '<option value="">Error al cargar tiendas</option>';
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = 'Error al cargar tiendas';
+            storeSel.innerHTML = '';
+            storeSel.appendChild(opt0);
             return;
         }
         const stores = await res.json();
-        storeSel.innerHTML = '<option value="">Selecciona una tienda...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Selecciona una tienda...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
         if (!stores.length) {
-            storeSel.innerHTML = '<option value="">Sin tiendas asignadas a esta campaña</option>';
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = 'Sin tiendas asignadas a esta campaña';
+            storeSel.innerHTML = '';
+            storeSel.appendChild(opt0);
             return;
         }
         stores.forEach(s => {
@@ -97,11 +117,15 @@ document.getElementById('campaign-select').addEventListener('change', async func
         });
         storeSel.disabled = false;
 
-        document.getElementById('shift-form-card').style.display = 'block';
+        document.getElementById('shift-form-card').classList.remove('hidden');
         await loadShifts(campaignId);
-        document.getElementById('shifts-card').style.display = 'block';
+        document.getElementById('shifts-card').classList.remove('hidden');
     } catch {
-        storeSel.innerHTML = '<option value="">Error al cargar tiendas</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Error al cargar tiendas';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
     }
 });
 
@@ -109,36 +133,91 @@ document.getElementById('campaign-select').addEventListener('change', async func
 
 async function loadShifts(campaignId) {
     const container = document.getElementById('shifts-container');
-    container.innerHTML = '<p class="empty-message">Cargando...</p>';
+    container.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = 'empty-message';
+    p.textContent = 'Cargando...';
+    container.appendChild(p);
     try {
         const res = await fetch(`${BACKEND}/api/shifts?campaignId=${campaignId}`, { headers: authHeaders() });
-        if (!res.ok) { container.innerHTML = '<p class="empty-message">Error al cargar los turnos.</p>'; return; }
+        if (!res.ok) {
+            container.innerHTML = '';
+            const pErr = document.createElement('p');
+            pErr.className = 'empty-message';
+            pErr.textContent = 'Error al cargar los turnos.';
+            container.appendChild(pErr);
+            return;
+        }
         renderShifts(await res.json());
     } catch {
-        container.innerHTML = '<p class="empty-message">Error al conectar con el servidor.</p>';
+        container.innerHTML = '';
+        const pErr = document.createElement('p');
+        pErr.className = 'empty-message';
+        pErr.textContent = 'Error al conectar con el servidor.';
+        container.appendChild(pErr);
     }
 }
 
 function renderShifts(shifts) {
     const container = document.getElementById('shifts-container');
     if (!shifts.length) {
-        container.innerHTML = '<p class="empty-message">No hay turnos creados para esta campaña.</p>';
+        container.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = 'empty-message';
+        p.textContent = 'No hay turnos creados para esta campaña.';
+        container.appendChild(p);
         return;
     }
-    container.innerHTML = shifts.map(s => `
-        <div class="shift-item">
-            <div class="shift-info">
-                <h4>${escHtml(s.storeName)}</h4>
-                <p>${escHtml(s.day)} &nbsp;·&nbsp; ${escHtml(s.startTime)} – ${escHtml(s.endTime)}</p>
-                <div class="shift-details">
-                    <span class="shift-detail">👤 ${s.volunteersNeeded} voluntarios</span>
-                    ${s.location     ? `<span class="shift-detail">📍 ${escHtml(s.location)}</span>`     : ''}
-                    ${s.observations ? `<span class="shift-detail">📝 ${escHtml(s.observations)}</span>` : ''}
-                </div>
-            </div>
-            <button class="btn-edit" onclick="openAssignModal(${s.shiftId})" style="white-space:nowrap;">Asignar →</button>
-        </div>
-    `).join('');
+    container.innerHTML = '';
+    shifts.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'shift-item';
+
+        const shiftInfo = document.createElement('div');
+        shiftInfo.className = 'shift-info';
+
+        const h4 = document.createElement('h4');
+        h4.textContent = escHtml(s.storeName);
+        shiftInfo.appendChild(h4);
+
+        const p = document.createElement('p');
+        p.textContent = s.day + ' \u00a0\u00b7\u00a0 ' + s.startTime + ' \u2013 ' + s.endTime;
+        shiftInfo.appendChild(p);
+
+        const shiftDetails = document.createElement('div');
+        shiftDetails.className = 'shift-details';
+
+        const spanVol = document.createElement('span');
+        spanVol.className = 'shift-detail';
+        spanVol.textContent = '\ud83d\udc64 ' + s.volunteersNeeded + ' voluntarios';
+        shiftDetails.appendChild(spanVol);
+
+        if (s.location) {
+            const spanLoc = document.createElement('span');
+            spanLoc.className = 'shift-detail';
+            spanLoc.textContent = '\ud83d\udccd ' + escHtml(s.location);
+            shiftDetails.appendChild(spanLoc);
+        }
+
+        if (s.observations) {
+            const spanObs = document.createElement('span');
+            spanObs.className = 'shift-detail';
+            spanObs.textContent = '\ud83d\udcdd ' + escHtml(s.observations);
+            shiftDetails.appendChild(spanObs);
+        }
+
+        shiftInfo.appendChild(shiftDetails);
+        div.appendChild(shiftInfo);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-edit';
+        btn.style.whiteSpace = 'nowrap';
+        btn.textContent = 'Asignar \u2192';
+        btn.setAttribute('onclick', 'openAssignModal(' + s.shiftId + ')');
+        div.appendChild(btn);
+
+        container.appendChild(div);
+    });
 }
 
 document.getElementById('btn-refresh').addEventListener('click', () => {
@@ -286,34 +365,84 @@ async function loadModalData(shiftId) {
 function renderModalVolunteers(volunteers) {
     const el = document.getElementById('modal-volunteers');
     if (!volunteers.length) {
-        el.innerHTML = '<p style="font-size:.88rem;color:var(--text-light);">Sin voluntarios asignados.</p>';
+        el.innerHTML = '';
+        const p = document.createElement('p');
+        p.style.fontSize = '.88rem';
+        p.style.color = 'var(--text-light)';
+        p.textContent = 'Sin voluntarios asignados.';
+        el.appendChild(p);
         return;
     }
-    el.innerHTML = volunteers.map(v => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border-color);">
-            <span style="font-size:.9rem;">${escHtml(v.name)} <span style="color:var(--text-light)">(${escHtml(v.email || '')})</span></span>
-            <button class="btn-secondary" style="padding:.25rem .75rem;font-size:.8rem;" onclick="unassignVolunteer(${v.volunteerId})">Quitar</button>
-        </div>
-    `).join('');
+    el.innerHTML = '';
+    volunteers.forEach(v => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.padding = '.4rem 0';
+        div.style.borderBottom = '1px solid var(--border-color)';
+
+        const span = document.createElement('span');
+        span.style.fontSize = '.9rem';
+        span.textContent = escHtml(v.name) + ' (' + escHtml(v.email || '') + ')';
+        div.appendChild(span);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.padding = '.25rem .75rem';
+        btn.style.fontSize = '.8rem';
+        btn.textContent = 'Quitar';
+        btn.setAttribute('onclick', 'unassignVolunteer(' + v.volunteerId + ')');
+        div.appendChild(btn);
+
+        el.appendChild(div);
+    });
 }
 
 function renderModalCaptains(captains) {
     const el = document.getElementById('modal-captains');
     if (!captains.length) {
-        el.innerHTML = '<p style="font-size:.88rem;color:var(--text-light);">Sin capitanes asignados.</p>';
+        el.innerHTML = '';
+        const p = document.createElement('p');
+        p.style.fontSize = '.88rem';
+        p.style.color = 'var(--text-light)';
+        p.textContent = 'Sin capitanes asignados.';
+        el.appendChild(p);
         return;
     }
-    el.innerHTML = captains.map(c => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border-color);">
-            <span style="font-size:.9rem;">${escHtml(c.name)} <span style="color:var(--text-light)">(${escHtml(c.email || '')})</span></span>
-            <button class="btn-secondary" style="padding:.25rem .75rem;font-size:.8rem;" onclick="unassignCaptain(${c.userId})">Quitar</button>
-        </div>
-    `).join('');
+    el.innerHTML = '';
+    captains.forEach(c => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.padding = '.4rem 0';
+        div.style.borderBottom = '1px solid var(--border-color)';
+
+        const span = document.createElement('span');
+        span.style.fontSize = '.9rem';
+        span.textContent = escHtml(c.name) + ' (' + escHtml(c.email || '') + ')';
+        div.appendChild(span);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.padding = '.25rem .75rem';
+        btn.style.fontSize = '.8rem';
+        btn.textContent = 'Quitar';
+        btn.setAttribute('onclick', 'unassignCaptain(' + c.userId + ')');
+        div.appendChild(btn);
+
+        el.appendChild(div);
+    });
 }
 
 function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelFn) {
     const sel = document.getElementById(selectId);
-    sel.innerHTML = `<option value="">${escHtml(placeholder)}</option>`;
+    sel.innerHTML = '';
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = escHtml(placeholder);
+    sel.appendChild(defaultOpt);
     items.forEach(item => {
         const opt = document.createElement('option');
         opt.value       = item[valueKey];
@@ -383,7 +512,7 @@ async function unassignCaptain(userId) {
 function showFeedback(type, text, level) {
     const el = document.getElementById(`${type}-feedback`);
     el.textContent = text;
-    el.style.display = 'block';
+    el.classList.remove('feedback-hidden');
     el.className = 'form-message ' + (level === 'warning' ? 'error' : level);
     // 'warning' usa estilo error (naranja/rojo) para que sea visualmente llamativo (RF-28)
 }
@@ -391,7 +520,7 @@ function showFeedback(type, text, level) {
 function clearModalFeedback() {
     ['volunteer-feedback', 'captain-feedback'].forEach(id => {
         const el = document.getElementById(id);
-        el.style.display = 'none';
+        el.classList.add('feedback-hidden');
         el.textContent = '';
     });
 }

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Campañas</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <script src="javascript/administrador-campanas.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
@@ -24,7 +26,7 @@
                 <h1>Gestión de Campañas</h1>
                 <p>Crea, edita y elimina campañas de recogida de alimentos.</p>
             </div>
-            <button onclick="exportarExcel('campaigns')" class="btn-export">Exportar archivo</button>
+            <button id="btn-export-campaigns" class="btn btn-export">Exportar archivo</button>
             <button type="button" class="btn btn-primary" id="btn-new">+ Nueva campaña</button>
         </div>
     </div>

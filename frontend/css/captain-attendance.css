@@ -137,7 +137,6 @@
     font-size: .82rem;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    backdrop-filter: blur(4px);
     flex-shrink: 0;
 }
 .attendance-counter.all-present {
@@ -244,7 +243,7 @@
 
 /* ── Responsive móvil (RNF-09) ────────────────────────────────────────────── */
 
-@media (max-width: 480px) {
+@media screen and (width <= 480px) {
     .shift-card-header { flex-direction: column; gap: .6rem; }
     .attendance-counter { align-self: flex-end; }
 

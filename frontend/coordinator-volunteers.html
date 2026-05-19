@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Asignación de Voluntarios</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator-volunteers.js" defer></script>
@@ -36,7 +38,7 @@
                         <option value="">Selecciona una campaña...</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="store-select">Tienda</label>
                     <div class="selector-row">
                         <select id="store-select" disabled>
@@ -80,7 +82,7 @@
                 <button type="button" id="modal-close" class="modal-close">✕</button>
             </div>
             <div class="modal-body">
-                <p id="modal-shift-info" style="margin-bottom:1rem;color:var(--text-secondary);font-size:.9rem;"></p>
+                <p id="modal-shift-info" class="modal-shift-info"></p>
                 <div class="form-group">
                     <label for="volunteer-select">Voluntario</label>
                     <select id="volunteer-select">
@@ -95,7 +97,7 @@
                     <label for="start-time-input">Hora de inicio</label>
                     <input type="time" id="start-time-input">
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="end-time-input">Hora de fin</label>
                     <input type="time" id="end-time-input">
                 </div>

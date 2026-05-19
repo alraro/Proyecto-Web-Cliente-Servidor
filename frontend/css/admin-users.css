@@ -1,0 +1,31 @@
+/* Admin users — page-specific styles only */
+
+.role-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin: 0.1rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: var(--color-error);
+    color: var(--white);
+}
+
+.role-badge.coordinator {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+.role-badge.captain {
+    background: var(--color-success);
+    color: var(--white);
+}
+
+.role-badge.partner_entity_manager {
+    background: #ca8a04;
+    color: var(--white);
+}

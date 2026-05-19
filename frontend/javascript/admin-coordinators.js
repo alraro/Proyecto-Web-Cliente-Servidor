@@ -134,7 +134,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
-        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
+        campaignSelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecciona una campaña...';
+        campaignSelect.appendChild(defaultOption);
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -146,22 +150,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCoordinatorsTable(coordinators) {
         coordinatorsTbody.innerHTML = '';
         if (!coordinators.length) {
-            coordinatorsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin coordinadores asignados.</td></tr>";
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '3');
+            cell.className = 'table-empty';
+            cell.textContent = 'Sin coordinadores asignados.';
+            row.appendChild(cell);
+            coordinatorsTbody.appendChild(row);
             return;
         }
         coordinators.forEach(coordinator => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(coordinator.name || '')}</td>
-                <td>${escapeHtml(coordinator.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button></td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(coordinator.name || '');
+            row.appendChild(tdName);
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(coordinator.email || '');
+            row.appendChild(tdEmail);
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-danger';
+            btn.setAttribute('data-userid', coordinator.userId);
+            btn.setAttribute('data-role', 'COORDINATOR');
+            btn.textContent = 'Eliminar';
+            tdAction.appendChild(btn);
+            row.appendChild(tdAction);
             coordinatorsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
-        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
+        selectEl.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = placeholder;
+        selectEl.appendChild(defaultOption);
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);

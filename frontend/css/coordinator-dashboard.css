@@ -1,15 +1,4 @@
-.role-pill {
-    background: rgba(255,255,255,0.18);
-    color: #ffffff;
-    border: 1.5px solid rgba(255,255,255,0.45);
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    font-family: 'Montserrat', sans-serif;
-    white-space: nowrap;
-    backdrop-filter: blur(4px);
-}
+/* Coordinator dashboard — page-specific overrides */
 
-.icon-teal  { background: #e0f2f1; color: #00796b; }
-.icon-green { background: #e8f5e9; color: #2e7d32; }
+.icon-teal { background: var(--color-teal-bg); color: var(--color-teal); }
+.icon-green { background: var(--color-green-icon-bg); color: var(--color-green-icon); }

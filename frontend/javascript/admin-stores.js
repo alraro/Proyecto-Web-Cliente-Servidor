@@ -87,14 +87,18 @@ document.getElementById('filter-zone').addEventListener('change', function () {
 function populateLocalities(zoneId) {
     const sel = document.getElementById('filter-locality');
     const valorActual = sel.value;
-    sel.innerHTML = '<option value="">Todas las localidades</option>';
+    sel.innerHTML = '';
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = 'Todas las localidades';
+    sel.appendChild(o);
     const lista = zoneId
         ? allLocalities.filter(l => String(l.zoneId) === String(zoneId))
         : allLocalities;
     lista.forEach(l => {
-        const o = document.createElement('option');
-        o.value = l.id; o.textContent = l.name;
-        sel.appendChild(o);
+        const opt = document.createElement('option');
+        opt.value = l.id; opt.textContent = l.name;
+        sel.appendChild(opt);
     });
     if (valorActual && lista.some(l => String(l.id) === String(valorActual))) {
         sel.value = valorActual;
@@ -108,27 +112,74 @@ let totalPages = 1;
 
 function renderTable(stores) {
     const tbody = document.getElementById('stores-tbody');
+    tbody.innerHTML = '';
     if (!stores.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 8;
+        td.className = 'table-empty';
+        td.textContent = 'No hay tiendas que coincidan con los filtros.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = stores.map(s => `
-        <tr>
-            <td>${s.id}</td>
-            <td><strong>${escHtml(s.name)}</strong></td>
-            <td>${escHtml(s.address || '—')}</td>
-            <td>${escHtml(s.locality || '—')}</td>
-            <td>${escHtml(s.postalCode || '—')}</td>
-            <td>${escHtml(s.zone || '—')}</td>
-            <td>${escHtml(s.chainName || '—')}</td>
-            <td>
-                <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" onclick="openEdit(${s.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteStore(${s.id}, '${escAttr(s.name)}')">Eliminar</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    stores.forEach(s => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.textContent = s.id;
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = escHtml(s.name);
+        td2.appendChild(strong);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        td3.textContent = escHtml(s.address || '—');
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        td4.textContent = escHtml(s.locality || '—');
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        td5.textContent = escHtml(s.postalCode || '—');
+        tr.appendChild(td5);
+
+        const td6 = document.createElement('td');
+        td6.textContent = escHtml(s.zone || '—');
+        tr.appendChild(td6);
+
+        const td7 = document.createElement('td');
+        td7.textContent = escHtml(s.chainName || '—');
+        tr.appendChild(td7);
+
+        const td8 = document.createElement('td');
+        const div = document.createElement('div');
+        div.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-edit btn-sm';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-store-id', s.id);
+        btnEdit.textContent = 'Editar';
+        div.appendChild(btnEdit);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-danger btn-sm';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-store-id', s.id);
+        btnDelete.setAttribute('data-store-name', escAttr(s.name));
+        btnDelete.textContent = 'Eliminar';
+        div.appendChild(btnDelete);
+
+        td8.appendChild(div);
+        tr.appendChild(td8);
+
+        tbody.appendChild(tr);
+    });
 }
 
 async function loadStores(page = 0) {
@@ -158,8 +209,15 @@ async function loadStores(page = 0) {
 
         renderTable(data.content || []);
     } catch {
-        document.getElementById('stores-tbody').innerHTML =
-            '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
+        const tbodyErr = document.getElementById('stores-tbody');
+        tbodyErr.innerHTML = '';
+        const trErr = document.createElement('tr');
+        const tdErr = document.createElement('td');
+        tdErr.colSpan = 8;
+        tdErr.className = 'table-empty';
+        tdErr.textContent = 'No se puede conectar con el servidor.';
+        trErr.appendChild(tdErr);
+        tbodyErr.appendChild(trErr);
     }
 }
 
@@ -182,6 +240,28 @@ document.getElementById('btn-clear-filters').addEventListener('click', () => {
     document.getElementById('filter-chain').value = '';
     populateLocalities('');
     loadStores(0);
+});
+
+// Pagination and export buttons
+document.getElementById('btn-prev-page').addEventListener('click', previousPage);
+document.getElementById('btn-next-page').addEventListener('click', nextPage);
+document.getElementById('page-size-select').addEventListener('change', changePageSize);
+document.getElementById('btn-export-stores').addEventListener('click', function () {
+    exportarExcel('stores');
+});
+
+// Event delegation for table action buttons (edit / delete)
+document.getElementById('stores-tbody').addEventListener('click', function (e) {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const action = button.getAttribute('data-action');
+    const storeId = button.getAttribute('data-store-id');
+    if (action === 'edit') {
+        openEdit(parseInt(storeId));
+    } else if (action === 'delete') {
+        const storeName = button.getAttribute('data-store-name');
+        deleteStore(parseInt(storeId), storeName);
+    }
 });
 
 let editingId = null;

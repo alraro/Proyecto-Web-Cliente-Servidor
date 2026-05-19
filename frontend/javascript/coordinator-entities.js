@@ -47,7 +47,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = campaignSelect.value;
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
 
-        entitiesTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Cargando...</td></tr>";
+        const loadingRow = document.createElement('tr');
+        const loadingTd = document.createElement('td');
+        loadingTd.colSpan = 4;
+        loadingTd.className = 'table-empty';
+        loadingTd.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingTd);
+        entitiesTbody.innerHTML = '';
+        entitiesTbody.appendChild(loadingRow);
         volunteersCache = [];
 
         try {
@@ -66,7 +73,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderEntities(Array.isArray(entities) ? entities : [], campaignId);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar las entidades', true);
-            entitiesTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Error al cargar.</td></tr>";
+            entitiesTbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorTd = document.createElement('td');
+            errorTd.colSpan = 4;
+            errorTd.className = 'table-empty';
+            errorTd.textContent = 'Error al cargar.';
+            errorRow.appendChild(errorTd);
+            entitiesTbody.appendChild(errorRow);
         }
     });
 
@@ -74,12 +88,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         entitiesTbody.innerHTML = '';
 
         if (!entities.length) {
-            entitiesTbody.innerHTML = `
-                <tr><td colspan="4" class="table-empty">
-                    No hay entidades colaboradoras con voluntarios asignados en esta campaña.<br>
-                    <span style="font-size:.85rem;">Puedes asignar voluntarios desde la sección
-                    <a href="coordinator-volunteers.html" style="color:var(--blue-700)">Asignación de Voluntarios</a>.</span>
-                </td></tr>`;
+            const emptyRow = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 4;
+            emptyTd.className = 'table-empty';
+            const emptyText = document.createTextNode('No hay entidades colaboradoras con voluntarios asignados en esta campaña.');
+            const emptyBr = document.createElement('br');
+            const emptySpan = document.createElement('span');
+            emptySpan.style.fontSize = '.85rem';
+            const emptySpanText = document.createTextNode('Puedes asignar voluntarios desde la sección ');
+            const emptyLink = document.createElement('a');
+            emptyLink.href = 'coordinator-volunteers.html';
+            emptyLink.style.color = 'var(--blue-700)';
+            emptyLink.textContent = 'Asignación de Voluntarios';
+            const emptySpanEnd = document.createTextNode('.');
+            emptySpan.appendChild(emptySpanText);
+            emptySpan.appendChild(emptyLink);
+            emptySpan.appendChild(emptySpanEnd);
+            emptyTd.appendChild(emptyText);
+            emptyTd.appendChild(emptyBr);
+            emptyTd.appendChild(emptySpan);
+            emptyRow.appendChild(emptyTd);
+            entitiesTbody.appendChild(emptyRow);
             return;
         }
 
@@ -88,27 +118,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             const entityVolunteers = volunteersCache.filter(v => v.partnerEntityId === entity.id);
 
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(entity.name || '')}</td>
-                <td>${escapeHtml(entity.phone || '-')}</td>
-                <td>${entity.volunteerCount}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-secondary" data-target="${rowId}">
-                        Ver voluntarios
-                    </button>
-                </td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(entity.name || '');
+            const tdPhone = document.createElement('td');
+            tdPhone.textContent = escapeHtml(entity.phone || '-');
+            const tdCount = document.createElement('td');
+            tdCount.textContent = entity.volunteerCount;
+            const tdActions = document.createElement('td');
+            const viewBtn = document.createElement('button');
+            viewBtn.type = 'button';
+            viewBtn.className = 'btn btn-sm btn-secondary';
+            viewBtn.dataset.target = rowId;
+            viewBtn.textContent = 'Ver voluntarios';
+            tdActions.appendChild(viewBtn);
+            tr.appendChild(tdName);
+            tr.appendChild(tdPhone);
+            tr.appendChild(tdCount);
+            tr.appendChild(tdActions);
             entitiesTbody.appendChild(tr);
 
             // Fila expandible con voluntarios
             const detailRow = document.createElement('tr');
             detailRow.id = rowId;
             detailRow.hidden = true;
-            detailRow.innerHTML = `
-                <td colspan="4" style="background:#f8fafc;padding:.75rem 1.25rem;">
-                    ${buildVolunteerDetail(entityVolunteers)}
-                </td>
-            `;
+            const detailTd = document.createElement('td');
+            detailTd.colSpan = 4;
+            detailTd.style.background = '#f8fafc';
+            detailTd.style.padding = '.75rem 1.25rem';
+            detailTd.appendChild(buildVolunteerDetail(entityVolunteers));
+            detailRow.appendChild(detailTd);
             entitiesTbody.appendChild(detailRow);
         });
 
@@ -125,26 +163,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function buildVolunteerDetail(volunteers) {
         if (!volunteers.length) {
-            return '<p style="margin:0;font-size:.88rem;color:var(--text-secondary,#6b7280)">No se encontraron voluntarios de esta entidad en el registro local.</p>';
+            const p = document.createElement('p');
+            p.style.margin = '0';
+            p.style.fontSize = '.88rem';
+            p.style.color = 'var(--text-secondary,#6b7280)';
+            p.textContent = 'No se encontraron voluntarios de esta entidad en el registro local.';
+            return p;
         }
-        const rows = volunteers.map(v =>
-            `<tr>
-                <td style="padding:.35rem .75rem">${escapeHtml(v.name || '')}</td>
-                <td style="padding:.35rem .75rem">${escapeHtml(v.phone || '-')}</td>
-                <td style="padding:.35rem .75rem">${escapeHtml(v.email || '-')}</td>
-            </tr>`
-        ).join('');
-        return `
-            <table style="width:100%;font-size:.88rem;border-collapse:collapse">
-                <thead>
-                    <tr style="color:var(--text-secondary,#6b7280)">
-                        <th style="padding:.35rem .75rem;text-align:left;font-weight:600">Nombre</th>
-                        <th style="padding:.35rem .75rem;text-align:left;font-weight:600">Teléfono</th>
-                        <th style="padding:.35rem .75rem;text-align:left;font-weight:600">Email</th>
-                    </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-            </table>`;
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.fontSize = '.88rem';
+        table.style.borderCollapse = 'collapse';
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.style.color = 'var(--text-secondary,#6b7280)';
+        const thName = document.createElement('th');
+        thName.style.padding = '.35rem .75rem';
+        thName.style.textAlign = 'left';
+        thName.style.fontWeight = '600';
+        thName.textContent = 'Nombre';
+        const thPhone = document.createElement('th');
+        thPhone.style.padding = '.35rem .75rem';
+        thPhone.style.textAlign = 'left';
+        thPhone.style.fontWeight = '600';
+        thPhone.textContent = 'Teléfono';
+        const thEmail = document.createElement('th');
+        thEmail.style.padding = '.35rem .75rem';
+        thEmail.style.textAlign = 'left';
+        thEmail.style.fontWeight = '600';
+        thEmail.textContent = 'Email';
+        headerRow.appendChild(thName);
+        headerRow.appendChild(thPhone);
+        headerRow.appendChild(thEmail);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        volunteers.forEach(v => {
+            const row = document.createElement('tr');
+            const tdName = document.createElement('td');
+            tdName.style.padding = '.35rem .75rem';
+            tdName.textContent = escapeHtml(v.name || '');
+            const tdPhone = document.createElement('td');
+            tdPhone.style.padding = '.35rem .75rem';
+            tdPhone.textContent = escapeHtml(v.phone || '-');
+            const tdEmail = document.createElement('td');
+            tdEmail.style.padding = '.35rem .75rem';
+            tdEmail.textContent = escapeHtml(v.email || '-');
+            row.appendChild(tdName);
+            row.appendChild(tdPhone);
+            row.appendChild(tdEmail);
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        return table;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

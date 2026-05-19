@@ -42,10 +42,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Al cambiar campaña → cargar tiendas
     campaignSelect.addEventListener('change', async () => {
         const campaignId = campaignSelect.value;
-        storeSelect.innerHTML = '<option value="">Selecciona una tienda...</option>';
+        storeSelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecciona una tienda...';
+        storeSelect.appendChild(defaultOption);
         storeSelect.disabled = true;
         btnLoad.disabled = true;
-        captainsTbody.innerHTML = "<tr><td colspan='2' class='table-empty'>Selecciona campaña y tienda.</td></tr>";
+        captainsTbody.innerHTML = '';
+        const infoRow = document.createElement('tr');
+        const infoCell = document.createElement('td');
+        infoCell.setAttribute('colspan', '2');
+        infoCell.className = 'table-empty';
+        infoCell.textContent = 'Selecciona campaña y tienda.';
+        infoRow.appendChild(infoCell);
+        captainsTbody.appendChild(infoRow);
         if (!campaignId) return;
         try {
             const stores = await fetchJson(
@@ -70,7 +81,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = campaignSelect.value;
         const storeId    = storeSelect.value;
         if (!campaignId || !storeId) { showMessage('Selecciona campaña y tienda', true); return; }
-        captainsTbody.innerHTML = "<tr><td colspan='2' class='table-empty'>Cargando...</td></tr>";
+        captainsTbody.innerHTML = '';
+        const loadingRow = document.createElement('tr');
+        const loadingCell = document.createElement('td');
+        loadingCell.setAttribute('colspan', '2');
+        loadingCell.className = 'table-empty';
+        loadingCell.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingCell);
+        captainsTbody.appendChild(loadingRow);
         try {
             const captains = await fetchJson(
                 API_BASE + '/api/coordinator/captains?campaignId=' + campaignId + '&storeId=' + storeId,
@@ -79,15 +97,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(Array.isArray(captains) ? captains : []);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar los capitanes', true);
-            captainsTbody.innerHTML = "<tr><td colspan='2' class='table-empty'>Error al cargar.</td></tr>";
+            captainsTbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.setAttribute('colspan', '2');
+            errorCell.className = 'table-empty';
+            errorCell.textContent = 'Error al cargar.';
+            errorRow.appendChild(errorCell);
+            captainsTbody.appendChild(errorRow);
         }
     });
 
     function renderTable(captains) {
         captainsTbody.innerHTML = '';
         if (!captains.length) {
-            captainsTbody.innerHTML = "<tr><td colspan='2' class='table-empty'>No hay capitanes asignados a esta campaña.</td></tr>";
-            // Párrafo informativo bajo la tabla cuando no hay capitanes
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '2');
+            cell.className = 'table-empty';
+            cell.textContent = 'No hay capitanes asignados a esta campaña.';
+            row.appendChild(cell);
+            captainsTbody.appendChild(row);
             const info = document.getElementById('captains-info');
             if (info) info.hidden = false;
             return;
@@ -96,10 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (info) info.hidden = true;
         captains.forEach(c => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(c.name || '')}</td>
-                <td>${escapeHtml(c.email || '')}</td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(c.name || '');
+            tr.appendChild(tdName);
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(c.email || '');
+            tr.appendChild(tdEmail);
             captainsTbody.appendChild(tr);
         });
     }

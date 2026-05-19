@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Colaboradores</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator-collaborators.js" defer></script>
@@ -30,7 +32,7 @@
         <!-- Filtro campaña -->
         <div class="card">
             <div class="card-body">
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="campaign-select">Campaña</label>
                     <div class="selector-row">
                         <select id="campaign-select">
@@ -44,9 +46,9 @@
 
         <!-- Tabla de colaboradores -->
         <div class="card">
-            <div class="card-head" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="card-head card-head-flex">
                 <h2>Colaboradores y voluntarios</h2>
-                <button type="button" id="btn-new" class="btn btn-primary" style="margin:0">+ Nuevo colaborador</button>
+                <button type="button" id="btn-new" class="btn btn-primary m-0">+ Nuevo colaborador</button>
             </div>
             <div class="table-wrap">
                 <table>
@@ -90,14 +92,14 @@
                     <label for="edit-address">Dirección</label>
                     <input type="text" id="edit-address" placeholder="Dirección (opcional)">
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="edit-partner-entity">Entidad colaboradora (opcional)</label>
                     <select id="edit-partner-entity">
                         <option value="">Sin entidad (voluntario independiente)</option>
                     </select>
                 </div>
             </div>
-            <div class="card-body" style="padding-top:0;display:flex;gap:.5rem">
+            <div class="card-body card-actions-row">
                 <button type="button" id="btn-save" class="btn btn-primary">Guardar</button>
                 <button type="button" id="btn-cancel-form" class="btn btn-secondary">Cancelar</button>
             </div>

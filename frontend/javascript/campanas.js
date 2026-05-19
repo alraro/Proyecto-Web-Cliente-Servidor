@@ -34,26 +34,62 @@ async function loadCampaigns() {
         renderPagination(data.pagination || { page:0, totalPages:0, totalElements:0, isFirst:true, isLast:true });
         renderSummary(data.summary   || { totalActive:0, totalFuture:0, totalPast:0 });
     } catch {
-        tbody.innerHTML = "<tr><td colspan='5' class='table-empty'>Error al cargar campañas. Inténtalo de nuevo.</td></tr>";
+        tbody.replaceChildren();
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('colspan', '5');
+        td.className = 'table-empty';
+        td.textContent = 'Error al cargar campañas. Inténtalo de nuevo.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
     }
 }
 
 function renderTable(campaigns) {
     const tbody = document.getElementById('campaigns-tbody');
     if (!campaigns.length) {
-        tbody.innerHTML = "<tr><td colspan='5' class='table-empty'>No hay campañas con los filtros seleccionados.</td></tr>";
+        tbody.replaceChildren();
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('colspan', '5');
+        td.className = 'table-empty';
+        td.textContent = 'No hay campañas con los filtros seleccionados.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = campaigns.map(c => {
+    tbody.replaceChildren();
+    campaigns.forEach(c => {
         const s = STATUS[c.status] || STATUS.ACTIVE;
-        return `<tr>
-            <td><strong>${c.name || '—'}</strong></td>
-            <td>${(c.type && c.type.name) ? c.type.name : '—'}</td>
-            <td>${formatDate(c.startDate)}</td>
-            <td>${formatDate(c.endDate)}</td>
-            <td><span class="${s.css}">${s.label}</span></td>
-        </tr>`;
-    }).join('');
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = c.name || '—';
+        tdName.appendChild(strong);
+        tr.appendChild(tdName);
+
+        const tdType = document.createElement('td');
+        tdType.textContent = (c.type && c.type.name) ? c.type.name : '—';
+        tr.appendChild(tdType);
+
+        const tdStart = document.createElement('td');
+        tdStart.textContent = formatDate(c.startDate);
+        tr.appendChild(tdStart);
+
+        const tdEnd = document.createElement('td');
+        tdEnd.textContent = formatDate(c.endDate);
+        tr.appendChild(tdEnd);
+
+        const tdStatus = document.createElement('td');
+        const span = document.createElement('span');
+        span.className = s.css;
+        span.textContent = s.label;
+        tdStatus.appendChild(span);
+        tr.appendChild(tdStatus);
+
+        tbody.appendChild(tr);
+    });
 }
 
 function renderPagination(p) {
@@ -99,7 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            currentStatus = chip.dataset.status;
+            if (chip.classList.contains('chip-status-all')) {
+                currentStatus = '';
+            } else if (chip.classList.contains('chip-status-active')) {
+                currentStatus = 'ACTIVE';
+            } else if (chip.classList.contains('chip-status-future')) {
+                currentStatus = 'FUTURE';
+            } else if (chip.classList.contains('chip-status-past')) {
+                currentStatus = 'PAST';
+            }
             currentPage   = 0;
             updateChips();
             loadCampaigns();

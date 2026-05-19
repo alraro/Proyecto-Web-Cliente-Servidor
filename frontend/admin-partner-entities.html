@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bancosol | Entidades Socias</title>
+    <title>Bancosol | Entidades Colaboradoras</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/admin-partner-entities.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/admin-partner-entities.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
     <script src="javascript/export.js" defer></script>
@@ -17,17 +21,17 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="admin.html" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:var(--blue-700);text-decoration:none;margin-bottom:1rem;">← Volver al panel</a>
-            <h1>Entidades Socias</h1>
-            <p>Gestiona las entidades socias participantes en las campañas de Bancosol.</p>
+            <a href="admin.html">← Volver al panel</a>
+            <h1>Entidades Colaboradoras</h1>
+            <p>Gestiona las entidades colaboradoras participantes en las campañas de Bancosol.</p>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <h2>Listado de entidades socias</h2>
+                <h2>Listado de entidades colaboradoras</h2>
                 <div class="card-actions">
-                    <button onclick="exportarExcel('partner-entities')" class="btn-export">Exportar archivo</button>
-                    <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad socia</button>
+                    <button id="btn-export-pe" class="btn btn-export">Exportar archivo</button>
+                    <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad colaboradora</button>
                 </div>
             </div>
             <!-- FILTROS -->
@@ -57,17 +61,17 @@
                         </tr>
                     </thead>
                     <tbody id="partner-entities-tbody">
-                        <tr><td colspan="5" class="table-empty">Cargando entidades socias...</td></tr>
+                        <tr><td colspan="5" class="table-empty">Cargando entidades colaboradoras...</td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="pagination">
-                <button id="btn-prev-page" onclick="previousPage()">← Anterior</button>
+                <button id="btn-prev-page">← Anterior</button>
                 <span class="pagination-info">
                     Página <span id="current-page">1</span> de <span id="total-pages">1</span>
                 </span>
-                <button id="btn-next-page" onclick="nextPage()">Siguiente →</button>
-                <select class="pagination-select" id="page-size-select" onchange="changePageSize()">
+                <button id="btn-next-page">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select">
                     <option value="20">20 por página</option>
                     <option value="50">50 por página</option>
                     <option value="100">100 por página</option>
@@ -76,13 +80,12 @@
         </div>
     </main>
 
-    <!-- MODAL -->
     <div class="modal-backdrop" id="modal-backdrop">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <h3 id="modal-title">Nueva entidad socia</h3>
+            <h3 id="modal-title">Nueva entidad colaboradora</h3>
 
             <div class="form-group">
-                <label for="input-nombre">Nombre <span style="color:#dc2626">*</span></label>
+                <label for="input-nombre">Nombre <span>*</span></label>
                 <input type="text" id="input-nombre" placeholder="Ej: BanCorp" maxlength="255">
             </div>
             <div class="form-group">
@@ -103,7 +106,6 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
     <script src="javascript/admin-partner-entities.js"></script>
