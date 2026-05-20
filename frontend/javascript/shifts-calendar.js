@@ -1,8 +1,6 @@
-const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
+    if (!getToken()) { window.location.href = 'login.html'; return; }
 
     const userNameEl = document.getElementById('user-name');
 	
@@ -24,14 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const calendarContainer  = document.getElementById('calendar-container');
     const calLegend          = document.getElementById('cal-legend');
 
-    // ── Carga campañas ────────────────────────────────────────────────────────
 
     try {
-        const res = await fetch(API_BASE + '/api/coordinator/my-campaigns', {
-            headers: authHeaders(token)
-        });
-        if (res.status === 401 || res.status === 403) { expiredSession(); return; }
-        const campaigns = res.ok ? await res.json() : [];
+        const campaigns = await apiFetch('/api/coordinator/my-campaigns');
         campaignSelect.replaceChildren();
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
@@ -52,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         campaignSelect.appendChild(errOpt);
     }
 
-    // ── Al cambiar campaña → cargar calendario ────────────────────────────────
 
     campaignSelect.addEventListener('change', async () => {
         const campaignId = campaignSelect.value;
@@ -71,10 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         calendarContainer.appendChild(loading);
 
         try {
-            const data = await fetchJson(
-                API_BASE + '/api/shifts/calendar?campaignId=' + campaignId,
-                { headers: authHeaders(token) }
-            );
+            const data = await apiFetch('/api/shifts/calendar?campaignId=' + campaignId);
             const stores = Array.isArray(data) ? data : [];
             renderCalendar(stores);
             calLegend.hidden = stores.length === 0;
@@ -88,7 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ── Renderizar panel de turnos ─────────────────────────────────────────────
 
     function renderCalendar(stores) {
         calendarContainer.replaceChildren();
@@ -111,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             icon.textContent = '🏬';
             header.appendChild(icon);
             const h2 = document.createElement('h2');
-            h2.textContent = escapeHtml(store.storeName);
+            h2.textContent = store.storeName;
             header.appendChild(h2);
             section.appendChild(header);
 
@@ -153,11 +141,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const card = document.createElement('div');
         card.className = 'shift-card ' + statusClass;
 
-        const barWidth = Math.min(Math.round(pct * 100), 100);
+        const pct100   = parseInt(pct * 100 + 0.5);
+        const barWidth = pct100 > 100 ? 100 : pct100;
 
         const timeDiv = document.createElement('div');
         timeDiv.className = 'shift-time';
-        timeDiv.textContent = escapeHtml(shift.startTime || '') + ' – ' + escapeHtml(shift.endTime || '');
+        timeDiv.textContent = (shift.startTime || '') + ' – ' + (shift.endTime || '');
         card.appendChild(timeDiv);
 
         const volDiv = document.createElement('div');
@@ -183,51 +172,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (shift.observations) {
             const obsDiv = document.createElement('div');
             obsDiv.className = 'shift-obs';
-            obsDiv.textContent = escapeHtml(shift.observations);
+            obsDiv.textContent = shift.observations;
             card.appendChild(obsDiv);
         }
 
         return card;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    function authHeaders(t) {
-        return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t };
-    }
-
-    async function fetchJson(url, options) {
-        const res  = await fetch(url, options);
-        const data = await res.json().catch(() => ({}));
-        if (res.status === 401 || res.status === 403) { expiredSession(); throw new Error('Sesión expirada'); }
-        if (!res.ok) throw new Error(data.message || 'Error ' + res.status);
-        return data;
-    }
-
-    function expiredSession() {
-        localStorage.clear(); window.location.href = 'login.html';
-    }
-
-    function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
-        el.hidden = false;
-        el.textContent = text;
-        el.className = isError ? 'error' : 'success';
-        clearTimeout(showMessage._t);
-        showMessage._t = setTimeout(() => { el.hidden = true; }, 4000);
-    }
-
-    function escapeHtml(v) {
-        return String(v)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        const [y, m, d] = dateStr.split('-');
+        const parts = dateStr.split('-');
+        const y = Number(parts[0]);
+        const m = Number(parts[1]);
+        const d = Number(parts[2]);
         const names = ['dom','lun','mar','mié','jue','vie','sáb'];
-        const dow   = new Date(Number(y), Number(m) - 1, Number(d)).getDay();
-        return names[dow] + ' ' + d + '/' + m;
+        const t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
+        const yr  = m < 3 ? y - 1 : y;
+        const dow = (yr + parseInt(yr / 4) - parseInt(yr / 100) + parseInt(yr / 400) + t[m - 1] + d) % 7;
+        return names[dow] + ' ' + parts[2] + '/' + parts[1];
     }
 });

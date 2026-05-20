@@ -71,6 +71,16 @@ function escapeAttr(value) {
     return String(value ?? '').replace(/'/g, "\\'");
 }
 
+function showMessage(text, isError) {
+    const el = document.getElementById('global-message');
+    if (!el) return;
+    el.hidden = false;
+    el.textContent = text;
+    el.className = isError ? 'error' : 'success';
+    clearTimeout(showMessage._t);
+    showMessage._t = setTimeout(function() { el.hidden = true; }, 4000);
+}
+
 function showToast(msg, type = 'success', containerId = 'toast-container') {
     const container = document.getElementById(containerId);
     if (!container) return;

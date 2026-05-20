@@ -1,27 +1,16 @@
-const BACKEND = 'http://localhost:8080';
-
 let selectedCampaign = null;
-
-function getToken() { return localStorage.getItem('token'); }
-function authHeaders() {
-    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
-}
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken()) window.location.href = 'login.html';
 
-
-    
-
 });
 
-// ── Campañas ──────────────────────────────────────────────────────────────────
+
 
 async function loadCampaigns() {
     try {
-        const res = await fetch(BACKEND + '/api/coordinator/my-campaigns', { headers: authHeaders() });
+        const res = await fetch(API_BASE + '/api/coordinator/my-campaigns', { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) { showMessage('No se pudieron cargar las campañas.', 'error'); return; }
         const data = await res.json();
@@ -31,8 +20,8 @@ async function loadCampaigns() {
             const opt = document.createElement('option');
             opt.value = c.id;
             opt.textContent = `${c.name} (${c.startDate} – ${c.endDate})`;
-            opt.dataset.start = c.startDate;
-            opt.dataset.end   = c.endDate;
+            opt.setAttribute('data-start', c.startDate);
+            opt.setAttribute('data-end', c.endDate);
             sel.appendChild(opt);
         });
     } catch {
@@ -51,8 +40,8 @@ document.getElementById('campaign-select').addEventListener('change', async func
         storeSel.innerHTML = '';
         storeSel.appendChild(opt0);
     storeSel.disabled   = true;
-    document.getElementById('shift-form-card').classList.add('hidden');
-    document.getElementById('shifts-card').classList.add('hidden');
+    document.getElementById('shift-form-card').className = 'form-card hidden';
+    document.getElementById('shifts-card').className = 'shifts-list-card hidden';
     selectedCampaign = null;
 
     if (!campaignId) {
@@ -64,15 +53,14 @@ document.getElementById('campaign-select').addEventListener('change', async func
         return;
     }
 
-    selectedCampaign = { id: campaignId, start: selOpt.dataset.start, end: selOpt.dataset.end };
+    selectedCampaign = { id: campaignId, start: selOpt.getAttribute('data-start'), end: selOpt.getAttribute('data-end') };
 
-    // Restringir el selector de fecha al rango de la campaña
     const dayInput = document.getElementById('shift-day');
     dayInput.min = selectedCampaign.start;
     dayInput.max = selectedCampaign.end;
 
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/campaign/${campaignId}/stores`, { headers: authHeaders() });
+        const res = await fetch(`${API_BASE}/api/shifts/campaign/${campaignId}/stores`, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
             const opt0 = document.createElement('option');
@@ -104,9 +92,9 @@ document.getElementById('campaign-select').addEventListener('change', async func
         });
         storeSel.disabled = false;
 
-        document.getElementById('shift-form-card').classList.remove('hidden');
+        document.getElementById('shift-form-card').className = 'form-card';
         await loadShifts(campaignId);
-        document.getElementById('shifts-card').classList.remove('hidden');
+        document.getElementById('shifts-card').className = 'shifts-list-card';
     } catch {
         const opt0 = document.createElement('option');
         opt0.value = '';
@@ -116,7 +104,6 @@ document.getElementById('campaign-select').addEventListener('change', async func
     }
 });
 
-// ── Turnos ────────────────────────────────────────────────────────────────────
 
 async function loadShifts(campaignId) {
     const container = document.getElementById('shifts-container');
@@ -126,7 +113,7 @@ async function loadShifts(campaignId) {
     p.textContent = 'Cargando...';
     container.appendChild(p);
     try {
-        const res = await fetch(`${BACKEND}/api/shifts?campaignId=${campaignId}`, { headers: authHeaders() });
+        const res = await fetch(`${API_BASE}/api/shifts?campaignId=${campaignId}`, { headers: authHeaders() });
         if (!res.ok) {
             container.innerHTML = '';
             const pErr = document.createElement('p');
@@ -164,11 +151,11 @@ function renderShifts(shifts) {
         shiftInfo.className = 'shift-info';
 
         const h4 = document.createElement('h4');
-        h4.textContent = escHtml(s.storeName);
+        h4.textContent = s.storeName;
         shiftInfo.appendChild(h4);
 
         const p = document.createElement('p');
-        p.textContent = s.day + ' \u00a0\u00b7\u00a0 ' + s.startTime + ' \u2013 ' + s.endTime;
+        p.textContent = s.day + '  ·  ' + s.startTime + ' – ' + s.endTime;
         shiftInfo.appendChild(p);
 
         const shiftDetails = document.createElement('div');
@@ -176,20 +163,20 @@ function renderShifts(shifts) {
 
         const spanVol = document.createElement('span');
         spanVol.className = 'shift-detail';
-        spanVol.textContent = '\ud83d\udc64 ' + s.volunteersNeeded + ' voluntarios';
+        spanVol.textContent = '👤 ' + s.volunteersNeeded + ' voluntarios';
         shiftDetails.appendChild(spanVol);
 
         if (s.location) {
             const spanLoc = document.createElement('span');
             spanLoc.className = 'shift-detail';
-            spanLoc.textContent = '\ud83d\udccd ' + escHtml(s.location);
+            spanLoc.textContent = '📍 ' + s.location;
             shiftDetails.appendChild(spanLoc);
         }
 
         if (s.observations) {
             const spanObs = document.createElement('span');
             spanObs.className = 'shift-detail';
-            spanObs.textContent = '\ud83d\udcdd ' + escHtml(s.observations);
+            spanObs.textContent = '📝 ' + s.observations;
             shiftDetails.appendChild(spanObs);
         }
 
@@ -199,8 +186,8 @@ function renderShifts(shifts) {
         const btn = document.createElement('button');
         btn.className = 'btn-edit';
         btn.style.whiteSpace = 'nowrap';
-        btn.textContent = 'Asignar \u2192';
-        btn.setAttribute('onclick', 'openAssignModal(' + s.shiftId + ')');
+        btn.textContent = 'Asignar →';
+        btn.addEventListener('click', function() { openAssignModal(s.shiftId); });
         div.appendChild(btn);
 
         container.appendChild(div);
@@ -211,7 +198,6 @@ document.getElementById('btn-refresh').addEventListener('click', () => {
     if (selectedCampaign) loadShifts(selectedCampaign.id);
 });
 
-// ── Envío del formulario ──────────────────────────────────────────────────────
 
 document.getElementById('btn-submit').addEventListener('click', async () => {
     const campaignId       = document.getElementById('campaign-select').value;
@@ -223,7 +209,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     const location         = document.getElementById('location').value.trim();
     const observations     = document.getElementById('observations').value.trim();
 
-    // Validación cliente
+    
     if (!campaignId)    { showMessage('Selecciona una campaña.',  'error'); return; }
     if (!storeId)       { showMessage('Selecciona una tienda.',   'error'); return; }
     if (!day)           { showMessage('El día es obligatorio.',   'error'); return; }
@@ -246,7 +232,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     }
 
     try {
-        const res = await fetch(`${BACKEND}/api/shifts`, {
+        const res = await fetch(`${API_BASE}/api/shifts`, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({
@@ -291,11 +277,6 @@ function showMessage(text, type) {
     el.className   = 'form-message ' + type;
 }
 
-function escHtml(v) {
-    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// ── Modal de asignación ───────────────────────────────────────────────────────
 
 let currentShiftId = null;
 
@@ -305,25 +286,29 @@ document.getElementById('assignment-modal').addEventListener('click', e => {
 });
 
 function closeAssignModal() {
-    document.getElementById('assignment-modal').classList.add('hidden');
+    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay hidden';
     currentShiftId = null;
 }
 
 async function openAssignModal(shiftId) {
     currentShiftId = shiftId;
-    document.getElementById('assignment-modal').classList.remove('hidden');
+    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay';
     clearModalFeedback();
     await loadModalData(shiftId);
 }
 
 async function loadModalData(shiftId) {
     try {
-        const [volData, capData, availVol, availCap] = await Promise.all([
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/volunteers`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/captains`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/available-volunteers`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/available-captains`)
+        const results = await Promise.all([
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/volunteers`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/captains`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/available-volunteers`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/available-captains`)
         ]);
+        const volData  = results[0];
+        const capData  = results[1];
+        const availVol = results[2];
+        const availCap = results[3];
 
         // Info del turno
         document.getElementById('modal-title').textContent = `Asignaciones — Turno #${shiftId}`;
@@ -371,7 +356,7 @@ function renderModalVolunteers(volunteers) {
 
         const span = document.createElement('span');
         span.style.fontSize = '.9rem';
-        span.textContent = escHtml(v.name) + ' (' + escHtml(v.email || '') + ')';
+        span.textContent = v.name + ' (' + (v.email || '') + ')';
         div.appendChild(span);
 
         const btn = document.createElement('button');
@@ -379,7 +364,7 @@ function renderModalVolunteers(volunteers) {
         btn.style.padding = '.25rem .75rem';
         btn.style.fontSize = '.8rem';
         btn.textContent = 'Quitar';
-        btn.setAttribute('onclick', 'unassignVolunteer(' + v.volunteerId + ')');
+        btn.addEventListener('click', function() { unassignVolunteer(v.volunteerId); });
         div.appendChild(btn);
 
         el.appendChild(div);
@@ -408,7 +393,7 @@ function renderModalCaptains(captains) {
 
         const span = document.createElement('span');
         span.style.fontSize = '.9rem';
-        span.textContent = escHtml(c.name) + ' (' + escHtml(c.email || '') + ')';
+        span.textContent = c.name + ' (' + (c.email || '') + ')';
         div.appendChild(span);
 
         const btn = document.createElement('button');
@@ -416,7 +401,7 @@ function renderModalCaptains(captains) {
         btn.style.padding = '.25rem .75rem';
         btn.style.fontSize = '.8rem';
         btn.textContent = 'Quitar';
-        btn.setAttribute('onclick', 'unassignCaptain(' + c.userId + ')');
+        btn.addEventListener('click', function() { unassignCaptain(c.userId); });
         div.appendChild(btn);
 
         el.appendChild(div);
@@ -428,7 +413,7 @@ function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelF
     sel.innerHTML = '';
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '';
-    defaultOpt.textContent = escHtml(placeholder);
+    defaultOpt.textContent = placeholder;
     sel.appendChild(defaultOpt);
     items.forEach(item => {
         const opt = document.createElement('option');
@@ -442,7 +427,7 @@ document.getElementById('btn-assign-volunteer').addEventListener('click', async 
     const volunteerId = document.getElementById('volunteer-select').value;
     if (!volunteerId) { showFeedback('volunteer', 'Selecciona un voluntario.', 'error'); return; }
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/volunteers`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/volunteers`, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ volunteerId: parseInt(volunteerId, 10) })
         });
@@ -461,7 +446,7 @@ document.getElementById('btn-assign-captain').addEventListener('click', async ()
     const userId = document.getElementById('captain-select').value;
     if (!userId) { showFeedback('captain', 'Selecciona un capitán.', 'error'); return; }
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/captains`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/captains`, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ userId: parseInt(userId, 10) })
         });
@@ -478,7 +463,7 @@ document.getElementById('btn-assign-captain').addEventListener('click', async ()
 
 async function unassignVolunteer(volunteerId) {
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/volunteers/${volunteerId}`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/volunteers/${volunteerId}`, {
             method: 'DELETE', headers: authHeaders()
         });
         if (!res.ok) { const d = await res.json(); showFeedback('volunteer', d.message, 'error'); return; }
@@ -488,7 +473,7 @@ async function unassignVolunteer(volunteerId) {
 
 async function unassignCaptain(userId) {
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/captains/${userId}`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/captains/${userId}`, {
             method: 'DELETE', headers: authHeaders()
         });
         if (!res.ok) { const d = await res.json(); showFeedback('captain', d.message, 'error'); return; }
@@ -499,15 +484,13 @@ async function unassignCaptain(userId) {
 function showFeedback(type, text, level) {
     const el = document.getElementById(`${type}-feedback`);
     el.textContent = text;
-    el.classList.remove('feedback-hidden');
     el.className = 'form-message ' + (level === 'warning' ? 'error' : level);
-    // 'warning' usa estilo error (naranja/rojo) para que sea visualmente llamativo (RF-28)
 }
 
 function clearModalFeedback() {
     ['volunteer-feedback', 'captain-feedback'].forEach(id => {
         const el = document.getElementById(id);
-        el.classList.add('feedback-hidden');
+        el.className = 'form-message feedback-hidden';
         el.textContent = '';
     });
 }

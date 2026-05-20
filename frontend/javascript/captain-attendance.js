@@ -1,8 +1,6 @@
-const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
+    if (!getToken()) { window.location.href = 'login.html'; return; }
 
     document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Capitán';
 
@@ -10,12 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const campaignSelect   = document.getElementById('campaign-select');
     const shiftsContainer  = document.getElementById('shifts-container');
 
-    // ── Carga campañas del capitán ────────────────────────────────────────────
 
     try {
-        const campaigns = await fetchJson(API_BASE + '/api/captain/my-campaigns', {
-            headers: authHeaders(token)
-        });
+        const campaigns = await apiFetch('/api/captain/my-campaigns');
         campaignSelect.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
@@ -36,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         campaignSelect.appendChild(errorOpt);
     }
 
-    // ── Al cambiar campaña → cargar turnos del capitán ────────────────────────
 
     campaignSelect.addEventListener('change', async () => {
         const campaignId = campaignSelect.value;
@@ -49,10 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         shiftsContainer.appendChild(loadingP);
 
         try {
-            const shifts = await fetchJson(
-                API_BASE + '/api/shifts/my-team?campaignId=' + campaignId,
-                { headers: authHeaders(token) }
-            );
+            const shifts = await apiFetch('/api/shifts/my-team?campaignId=' + campaignId);
             renderShifts(Array.isArray(shifts) ? shifts : []);
         } catch (err) {
             const errorP = document.createElement('p');
@@ -64,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ── Renderizar tarjetas de turnos ─────────────────────────────────────────
 
     function renderShifts(shifts) {
         shiftsContainer.innerHTML = '';
@@ -79,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         shifts.forEach(shift => {
             const card = document.createElement('div');
             card.className = 'shift-card';
-            card.dataset.shiftId = shift.shiftId;
+            card.setAttribute('data-shift-id', shift.shiftId);
 
             const presentCount = (shift.volunteers || []).filter(v => v.attendance).length;
             const totalCount   = (shift.volunteers || []).length;
@@ -90,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             metaDiv.className = 'shift-meta';
             const storeSpan = document.createElement('span');
             storeSpan.className = 'shift-store';
-            storeSpan.textContent = escapeHtml(shift.storeName || '');
+            storeSpan.textContent = shift.storeName || '';
             const dateSpan = document.createElement('span');
             dateSpan.className = 'shift-date';
             dateSpan.textContent = formatDate(shift.day);
@@ -111,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (shift.observations) {
                 const obsP = document.createElement('p');
                 obsP.className = 'shift-obs';
-                obsP.textContent = escapeHtml(shift.observations);
+                obsP.textContent = shift.observations;
                 card.appendChild(obsP);
             }
 
@@ -132,7 +122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             shiftsContainer.appendChild(card);
         });
 
-        // Delegación de eventos para botones de asistencia
         shiftsContainer.addEventListener('click', handleAttendanceClick);
     }
 
@@ -145,12 +134,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             infoDiv.className = 'volunteer-info';
             const nameSpan = document.createElement('span');
             nameSpan.className = 'volunteer-name';
-            nameSpan.textContent = escapeHtml(v.volunteerName || '');
+            nameSpan.textContent = v.volunteerName || '';
             infoDiv.appendChild(nameSpan);
             if (v.phone) {
                 const phoneSpan = document.createElement('span');
                 phoneSpan.className = 'volunteer-phone';
-                phoneSpan.textContent = escapeHtml(v.phone);
+                phoneSpan.textContent = v.phone;
                 infoDiv.appendChild(phoneSpan);
             }
             rowDiv.appendChild(infoDiv);
@@ -158,9 +147,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             controlsDiv.className = 'attendance-controls';
             const btnPresent = document.createElement('button');
             btnPresent.className = 'btn-attendance ' + (v.attendance ? 'btn-present active' : 'btn-present');
-            btnPresent.dataset.shiftId = shiftId;
-            btnPresent.dataset.volunteerId = v.volunteerId;
-            btnPresent.dataset.attendance = 'true';
+            btnPresent.setAttribute('data-shift-id', shiftId);
+            btnPresent.setAttribute('data-volunteer-id', v.volunteerId);
+            btnPresent.setAttribute('data-attendance', 'true');
             btnPresent.setAttribute('aria-label', 'Marcar presente');
             btnPresent.textContent = 'Presente';
             if (v.attendance) {
@@ -168,9 +157,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const btnAbsent = document.createElement('button');
             btnAbsent.className = 'btn-attendance ' + (!v.attendance ? 'btn-absent active' : 'btn-absent');
-            btnAbsent.dataset.shiftId = shiftId;
-            btnAbsent.dataset.volunteerId = v.volunteerId;
-            btnAbsent.dataset.attendance = 'false';
+            btnAbsent.setAttribute('data-shift-id', shiftId);
+            btnAbsent.setAttribute('data-volunteer-id', v.volunteerId);
+            btnAbsent.setAttribute('data-attendance', 'false');
             btnAbsent.setAttribute('aria-label', 'Marcar ausente');
             btnAbsent.textContent = 'Ausente';
             if (!v.attendance) {
@@ -183,23 +172,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── Manejar click en botones de asistencia ────────────────────────────────
 
     async function handleAttendanceClick(e) {
-        const btn = e.target.closest('.btn-attendance');
-        if (!btn || btn.disabled) return;
+        let btn = e.target;
+        while (btn && btn !== e.currentTarget && btn.className.indexOf('btn-attendance') === -1) {
+            btn = btn.parentNode;
+        }
+        if (!btn || btn === e.currentTarget || btn.disabled) return;
 
-        const shiftId     = Number(btn.dataset.shiftId);
-        const volunteerId = Number(btn.dataset.volunteerId);
-        const attendance  = btn.dataset.attendance === 'true';
+        const shiftId     = Number(btn.getAttribute('data-shift-id'));
+        const volunteerId = Number(btn.getAttribute('data-volunteer-id'));
+        const attendance  = btn.getAttribute('data-attendance') === 'true';
 
         btn.disabled = true;
-        btn.classList.add('loading');
+        btn.className = btn.className + ' loading';
 
         try {
-            await fetchJson(API_BASE + '/api/shifts/' + shiftId + '/attendance', {
+            await apiFetch('/api/shifts/' + shiftId + '/attendance', {
                 method: 'PUT',
-                headers: authHeaders(token),
                 body: JSON.stringify({ volunteerId, attendance })
             });
 
@@ -210,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
         } catch (err) {
             btn.disabled = false;
-            btn.classList.remove('loading');
+            btn.className = btn.className.replace(' loading', '');
             showMessage(err.message || 'Error al actualizar la asistencia', true);
         }
     }
@@ -223,16 +213,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btnAbsent  = row.querySelector('[data-attendance="false"]');
 
         if (btnPresent) {
-            btnPresent.classList.toggle('active', attendance);
+            btnPresent.className = 'btn-attendance btn-present' + (attendance ? ' active' : '');
             btnPresent.disabled = attendance;
         }
         if (btnAbsent) {
-            btnAbsent.classList.toggle('active', !attendance);
+            btnAbsent.className = 'btn-attendance btn-absent' + (!attendance ? ' active' : '');
             btnAbsent.disabled = !attendance;
         }
 
-        // Actualizar contador del turno
-        const card    = row.closest('.shift-card');
+        let card = row.parentNode;
+        while (card && card.className.indexOf('shift-card') === -1) { card = card.parentNode; }
         const counter = document.getElementById('counter-' + shiftId);
         if (card && counter) {
             const rows   = card.querySelectorAll('.volunteer-row');
@@ -242,41 +232,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    function authHeaders(t) {
-        return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t };
-    }
-
-    async function fetchJson(url, options) {
-        const res  = await fetch(url, options);
-        const data = await res.json().catch(() => ({}));
-        if (res.status === 401 || res.status === 403) {
-            localStorage.clear(); window.location.href = 'login.html';
-            throw new Error('Sesión expirada');
-        }
-        if (!res.ok) throw new Error(data.message || 'Error ' + res.status);
-        return data;
-    }
-
-    function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
-        el.hidden = false;
-        el.textContent = text;
-        el.className = isError ? 'error' : 'success';
-        clearTimeout(showMessage._t);
-        showMessage._t = setTimeout(() => { el.hidden = true; }, 4000);
-    }
-
-    function escapeHtml(v) {
-        return String(v)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        const [y, m, d] = dateStr.split('-');
-        return d + '/' + m + '/' + y;
+        const parts = dateStr.split('-');
+        return parts[2] + '/' + parts[1] + '/' + parts[0];
     }
 });
