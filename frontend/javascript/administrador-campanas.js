@@ -400,22 +400,6 @@ async function loadCampaignTypes() {
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-
 
     document.getElementById('btn-new').addEventListener('click', openCreateModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', hideModal);

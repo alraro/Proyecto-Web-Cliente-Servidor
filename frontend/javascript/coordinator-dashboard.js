@@ -10,20 +10,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (welcomeNameEl) welcomeNameEl.textContent = nombre;
 
-
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Coordinador';
-    }
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
 });

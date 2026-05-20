@@ -281,12 +281,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Set welcome name
-    const userNameEl = document.getElementById('user-name');
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-
     // Event listeners
     btnRefresh.addEventListener('click', loadUsers);
 
@@ -317,15 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
             openEditModal(userId);
         } else if (action === 'Eliminar') {
             deleteUser(userId);
-        }
-    });
-
-    // Header button listeners
-    document.addEventListener('click', function (e) {
-        if (e.target.id === 'btn-edit') {
-            window.location.href = 'edit.html';
-        } else if (e.target.id === 'btn-logout') {
-            logout();
         }
     });
 
