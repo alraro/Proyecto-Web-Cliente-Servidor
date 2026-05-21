@@ -1,9 +1,3 @@
-const BACKEND = 'http://localhost:8080';
-
-function getToken()    { return localStorage.getItem('token'); }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-function logout()      { localStorage.clear(); window.location.href = 'login.html'; }
-
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
@@ -12,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Refresh button
-    document.getElementById('btn-refresh-pending').addEventListener('click', loadPending);
+    document.querySelector('#btn-refresh-pending').addEventListener('click', loadPending);
 
     // Event delegation for table action buttons (approve / reject)
-    document.getElementById('pending-tbody').addEventListener('click', function (e) {
+    document.querySelector('#pending-tbody').addEventListener('click', function (e) {
         const button = e.target.closest('button');
         if (!button) return;
         const action = button.getAttribute('data-action');
@@ -31,15 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPending();
 });
 
-function showToast(msg, type = 'success') {
-    const c = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = 'toast toast-' + type;
-    t.textContent = msg;
-    c.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
-}
-
 function escHtml(v) {
     return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -47,13 +32,13 @@ function escHtml(v) {
 
 // ── Usuarios pendientes ────────────────────────────────────────────────────
 async function loadPending() {
-    const tbody = document.getElementById('pending-tbody');
+    const tbody = document.querySelector('#pending-tbody');
     try {
-        const res = await fetch(BACKEND + '/api/users/pending', { headers: authHeaders() });
+        const res = await fetch(API_BASE + '/api/users/pending', { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         const data = await res.json();
 
-        const badge = document.getElementById('badge-pending');
+        const badge = document.querySelector('#badge-pending');
         if (data.length > 0) {
             badge.textContent = data.length;
             badge.classList.remove('hidden');
@@ -159,14 +144,14 @@ async function loadPending() {
 }
 
 async function approveUser(id) {
-    const role = document.getElementById('role-' + id)?.value;
+    const role = document.querySelector('#role-' + id)?.value;
     if (!role) {
         showToast('Selecciona un rol antes de aprobar.', 'error');
         return;
     }
 
     try {
-        const res = await fetch(`${BACKEND}/api/users/${id}/role`, {
+        const res = await fetch(`${API_BASE}/api/users/${id}/role`, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({ role })
@@ -183,7 +168,7 @@ async function approveUser(id) {
 async function rejectUser(id, name) {
     if (!confirm(`¿Rechazar y eliminar la cuenta de "${name}"? Esta acción no se puede deshacer.`)) return;
     try {
-        const res = await fetch(`${BACKEND}/api/users/${id}`, {
+        const res = await fetch(`${API_BASE}/api/users/${id}`, {
             method: 'DELETE',
             headers: authHeaders()
         });

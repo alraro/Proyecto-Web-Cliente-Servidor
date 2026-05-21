@@ -67,7 +67,7 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/register', {
+        const res = await fetch(API_BASE + '/api/auth/register', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json' 
@@ -86,7 +86,6 @@ form.addEventListener('submit', async (event) => {
         message.textContent = data.message || 'No se pudo completar el registro.';
         message.classList.add('is-error');
     } catch (error) {
-        console.log(error);
         message.textContent = 'Error al conectar con el servidor.';
         message.classList.add('is-error');
     }
