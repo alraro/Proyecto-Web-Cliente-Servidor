@@ -4,10 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Capitán';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
+    
 
     const campaignSelect  = document.getElementById('campaign-select');
     const btnLoad         = document.getElementById('btn-load');

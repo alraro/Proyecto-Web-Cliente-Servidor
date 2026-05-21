@@ -1,11 +1,16 @@
+/*
+*   Participación en el proyecto:
+*  - Hugo Herrero González: 80%
+*  - IA Generativa: 20%
+*/
+
+
+
 package es.grupo8.backend.controllers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -36,7 +41,6 @@ import es.grupo8.backend.dao.CoordinatorRepository;
 import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.entity.AdminEntity;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.ChainEntity;
 import es.grupo8.backend.entity.PartnerEntity;
