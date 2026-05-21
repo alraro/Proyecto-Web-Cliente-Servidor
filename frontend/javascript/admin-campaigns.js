@@ -260,171 +260,202 @@ function renderTable(campaigns) {
         tr.appendChild(td4);
 
         const td5 = document.createElement('td');
-        const div = document.createElement('div');
-        div.className = 'td-actions';
+        td5.className = 'actions-cell';
 
-        const editButton = document.createElement('button');
-        editButton.className = 'btn btn-edit btn-sm';
-        editButton.textContent = 'Editar';
-        editButton.setAttribute('data-action', 'edit');
-        editButton.setAttribute('data-id', c.id);
-        div.appendChild(editButton);
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-sm btn-secondary';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-campaign-id', c.id);
+        btnEdit.textContent = 'Editar';
+        td5.appendChild(btnEdit);
 
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'btn btn-danger btn-sm';
-        deleteButton.textContent = 'Eliminar';
-        deleteButton.setAttribute('data-action', 'delete');
-        deleteButton.setAttribute('data-id', c.id);
-        div.appendChild(deleteButton);
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-sm btn-danger';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-campaign-id', c.id);
+        btnDelete.setAttribute('data-campaign-name', escapeJs(c.name || ''));
+        btnDelete.textContent = 'Eliminar';
+        td5.appendChild(btnDelete);
 
-        td5.appendChild(div);
         tr.appendChild(td5);
-
         tbody.appendChild(tr);
     });
 }
 
-function resetModal() {
+// ── Modal open/save ─────────────────────────────────────────────────────────
+
+async function openCreateModal() {
     currentCampaignId = null;
-    document.querySelector('#campaign-name').value = '';
-    document.querySelector('#campaign-type').value = '';
+    document.querySelector('#modal-title').textContent = 'Nueva campaña';
+    document.querySelector('#campaign-name').value  = '';
+    document.querySelector('#campaign-type').value  = '';
     document.querySelector('#campaign-start').value = '';
-    document.querySelector('#campaign-end').value = '';
-    selectedStores.clear();
-    renderSelectedList();
-    renderAvailableList();
+    document.querySelector('#campaign-end').value   = '';
+    selectedStores = new Map();
     clearModalError();
+    showModal();
+    await loadAvailableStores();
+    renderSelectedList();
 }
 
-function mapCampaignPayload() {
-    const name = document.querySelector('#campaign-name').value.trim();
-    const type = document.querySelector('#campaign-type').value;
-    const startDate = document.querySelector('#campaign-start').value;
-    const endDate = document.querySelector('#campaign-end').value;
-    const storeIds = [...selectedStores.keys()];
-
-    if (!name) throw new Error('El nombre es obligatorio.');
-    if (!type) throw new Error('El tipo es obligatorio.');
-    if (!startDate) throw new Error('La fecha de inicio es obligatoria.');
-    if (!endDate) throw new Error('La fecha de fin es obligatoria.');
-    if (new Date(startDate) > new Date(endDate)) throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
-    if (!storeIds.length) throw new Error('Debes seleccionar al menos una tienda.');
-
-    return { name, typeId: Number(type), startDate, endDate, storeIds };
+async function openEditModal(id) {
+    clearModalError();
+    try {
+        const c = await fetchJson(API_BASE + '/api/campaigns/' + id, { headers: authHeaders() });
+        currentCampaignId = id;
+        document.querySelector('#modal-title').textContent = 'Editar campaña';
+        document.querySelector('#campaign-name').value  = c.name  || '';
+        document.querySelector('#campaign-type').value  = (c.type && c.type.id !== null) ? String(c.type.id) : '';
+        document.querySelector('#campaign-start').value = c.startDate || '';
+        document.querySelector('#campaign-end').value   = c.endDate   || '';
+        selectedStores = new Map();
+        try {
+            const sd = await fetchJson(API_BASE + '/api/campaigns/' + id + '/stores',
+                { headers: { Authorization: 'Bearer ' + getToken() } });
+            (sd.stores || []).forEach(s => selectedStores.set(Number(s.id), s));
+        } catch (e) { console.error('Error cargando tiendas', e); }
+        showModal();
+        await loadAvailableStores();
+        renderSelectedList();
+    } catch (e) {
+        showMessage(e.message || 'No se pudo cargar la campaña.', true);
+    }
 }
 
 async function saveCampaign() {
+    const name      = (document.querySelector('#campaign-name').value  || '').trim();
+    const typeIdRaw = (document.querySelector('#campaign-type').value  || '').trim();
+    const startDate = (document.querySelector('#campaign-start').value || '').trim();
+    const endDate   = (document.querySelector('#campaign-end').value   || '').trim();
+    clearModalError();
+
+    if (!name)      return showModalError('El nombre de la campaña es obligatorio.');
+    if (!typeIdRaw) return showModalError('El tipo de campaña es obligatorio.');
+    if (!startDate) return showModalError('La fecha de inicio es obligatoria.');
+    if (!endDate)   return showModalError('La fecha de fin es obligatoria.');
+    if (endDate <= startDate) return showModalError('La fecha de fin debe ser posterior a la de inicio.');
+
+    const body = { name, typeId: parseInt(typeIdRaw, 10), startDate, endDate };
+    const isEditing = currentCampaignId != null;
+
     try {
-        const payload = mapCampaignPayload();
-        const method = currentCampaignId ? 'PUT' : 'POST';
-        const url = currentCampaignId
-            ? API_BASE + '/api/campaigns/' + currentCampaignId
-            : API_BASE + '/api/campaigns';
-
-        const data = await fetchJson(url, {
-            method,
-            headers: authHeaders(),
-            body: JSON.stringify(payload)
-        });
-
-        showMessage(data.message || 'Campaña guardada correctamente.');
+        const resp = await fetchJson(
+            API_BASE + '/api/campaigns' + (isEditing ? '/' + currentCampaignId : ''),
+            { method: isEditing ? 'PUT' : 'POST', headers: authHeaders(), body: JSON.stringify(body) }
+        );
+        const campaignId = resp.campaign ? Number(resp.campaign.id) : currentCampaignId;
+        let syncFailed = false;
+        if (campaignId) {
+            try {
+                await fetchJson(API_BASE + '/api/campaigns/' + campaignId + '/stores', {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ storeIds: [...selectedStores.keys()] })
+                });
+            } catch { syncFailed = true; }
+        }
         hideModal();
-        resetModal();
-        loadCampaigns();
-    } catch (err) {
-        showModalError(err.message || 'No se pudo guardar la campaña.');
+        showMessage(
+            syncFailed ? 'Campaña guardada, pero error al sincronizar tiendas.' :
+            isEditing   ? 'Campaña actualizada correctamente.' : 'Campaña creada correctamente.',
+            syncFailed
+        );
+        await loadCampaigns();
+    } catch (e) {
+        if (e.message && e.message.includes('already exists'))
+            return showModalError('Ya existe una campaña con ese nombre.');
+        showModalError(e.message || 'No se pudo guardar la campaña.');
     }
 }
 
-async function editCampaign(id) {
+async function deleteCampaign(id, name) {
+    if (!confirm(`¿Seguro que quieres eliminar «${name}»?\nSe eliminarán también todas sus asignaciones.`)) return;
     try {
-        const data = await fetchJson(API_BASE + '/api/campaigns/' + id, { headers: authHeaders() });
-        currentCampaignId = data.id;
-        document.querySelector('#campaign-name').value = data.name || '';
-        document.querySelector('#campaign-type').value = data.type?.id || '';
-        document.querySelector('#campaign-start').value = data.startDate || '';
-        document.querySelector('#campaign-end').value = data.endDate || '';
-        selectedStores.clear();
-        (data.stores || []).forEach(s => selectedStores.set(Number(s.id), s));
-        renderSelectedList();
-        renderAvailableList();
-        showModal();
-    } catch (err) {
-        showMessage(err.message || 'No se pudo cargar la campaña.', true);
+        await fetchJson(API_BASE + '/api/campaigns/' + id, { method: 'DELETE', headers: authHeaders() });
+        showMessage('Campaña eliminada correctamente.', false);
+        await loadCampaigns();
+    } catch (e) {
+        showMessage(e.message || 'No se pudo eliminar la campaña.', true);
     }
 }
 
-async function deleteCampaign(id) {
-    if (!confirm('¿Eliminar esta campaña? Esta acción no se puede deshacer.')) return;
-    try {
-        await fetchJson(API_BASE + '/api/campaigns/' + id, {
-            method: 'DELETE',
-            headers: authHeaders()
-        });
-        showMessage('Campaña eliminada correctamente.');
-        loadCampaigns();
-    } catch (err) {
-        showMessage(err.message || 'No se pudo eliminar la campaña.', true);
-    }
+async function loadCampaignTypes() {
+    cachedTypes = await fetchJson(API_BASE + '/api/campaign-types', { headers: authHeaders() });
+    const sel = document.querySelector('#campaign-type');
+    sel.innerHTML = '';
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Selecciona un tipo...';
+    sel.appendChild(defaultOpt);
+    (cachedTypes || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = escapeHtml(t.name);
+        sel.appendChild(opt);
+    });
 }
 
-function attachModalEvents() {
-    document.querySelector('#btn-new').addEventListener('click', () => {
-        resetModal();
-        showModal();
-    });
-    document.querySelector('#btn-cancel-modal').addEventListener('click', () => {
-        hideModal();
-        resetModal();
-    });
+// ── Boot ────────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
+
+
+    document.querySelector('#btn-new').addEventListener('click', openCreateModal);
+    document.querySelector('#btn-cancel-modal').addEventListener('click', hideModal);
     document.querySelector('#btn-save').addEventListener('click', saveCampaign);
 
     document.querySelector('#btn-store-filter').addEventListener('click', loadAvailableStores);
     document.querySelector('#btn-store-clear').addEventListener('click', () => {
-        document.querySelector('#store-filter-chain').value = '';
-        document.querySelector('#store-filter-zone').value = '';
-        document.querySelector('#store-filter-locality').value = '';
+        ['store-filter-chain','store-filter-zone','store-filter-locality']
+            .forEach(id => document.querySelector(`#${id}`).value = '');
         loadAvailableStores();
     });
-}
 
-function attachTableEvents() {
-    document.querySelector('#campaigns-tbody').addEventListener('click', event => {
-        const btn = event.target.closest('button');
+    document.querySelector('#available-stores').addEventListener('click', e => {
+        const btn = e.target.closest('.btn-add-store');
         if (!btn) return;
-        const action = btn.getAttribute('data-action');
-        const id = btn.getAttribute('data-id');
-        if (action === 'edit') editCampaign(id);
-        if (action === 'delete') deleteCampaign(id);
+        const storeId = Number(btn.closest('li').dataset.storeid);
+        const store = allFilteredStores.find(s => Number(s.id) === storeId);
+        if (store) selectedStores.set(storeId, store);
+        renderAvailableList(); renderSelectedList();
     });
-}
 
-async function loadTypes() {
-    cachedTypes = await fetchArray(API_BASE + '/api/campaign-types', { headers: authHeaders() });
-    const select = document.querySelector('#campaign-type');
-    select.innerHTML = '<option value="">Selecciona un tipo...</option>';
-    cachedTypes.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = escapeHtml(t.name);
-        select.appendChild(opt);
+    document.querySelector('#selected-stores').addEventListener('click', e => {
+        const btn = e.target.closest('.btn-remove-store');
+        if (!btn) return;
+        selectedStores.delete(Number(btn.closest('li').dataset.storeid));
+        renderAvailableList(); renderSelectedList();
     });
-}
 
-document.addEventListener('DOMContentLoaded', async () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
-        window.location.href = 'login.html';
-        return;
-    }
+    document.querySelector('#campaign-modal').addEventListener('click', e => {
+        if (e.target === document.querySelector('#campaign-modal')) hideModal();
+    });
+
+    // Export button
+    document.querySelector('#btn-export-campaigns').addEventListener('click', function () {
+        exportarExcel('campaigns');
+    });
+
+    // Event delegation for table action buttons (edit / delete)
+    document.querySelector('#campaigns-table').addEventListener('click', function (e) {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        const campaignId = button.getAttribute('data-campaign-id');
+        if (action === 'edit') {
+            openEditModal(parseInt(campaignId));
+        } else if (action === 'delete') {
+            const campaignName = button.getAttribute('data-campaign-name');
+            deleteCampaign(parseInt(campaignId), campaignName);
+        }
+    });
 
     try {
-        await loadTypes();
+        await loadCampaignTypes();
+        await loadCampaigns();
         await loadStoreFilters();
-        await loadAvailableStores();
-        attachModalEvents();
-        attachTableEvents();
-        loadCampaigns();
-    } catch (err) {
-        showMessage(err.message || 'No se pudo cargar la pantalla.', true);
+    } catch (e) {
+        showMessage(e.message || 'No se pudieron cargar los datos.', true);
     }
 });
