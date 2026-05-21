@@ -1,12 +1,12 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    const statusSelect  = document.getElementById('status-select');
-    const btnLoad       = document.getElementById('btn-load');
-    const requestsTbody = document.getElementById('requests-tbody');
+    const statusSelect  = document.querySelector('#status-select');
+    const btnLoad       = document.querySelector('#btn-load');
+    const requestsTbody = document.querySelector('#requests-tbody');
 
     async function loadRequests() {
         const status = statusSelect.value;
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

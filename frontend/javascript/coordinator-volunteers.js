@@ -1,23 +1,23 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
 
-    const campaignSelect   = document.getElementById('campaign-select');
-    const storeSelect      = document.getElementById('store-select');
-    const btnLoadShifts    = document.getElementById('btn-load-shifts');
-    const shiftsTbody      = document.getElementById('shifts-tbody');
-    const modalOverlay     = document.getElementById('modal-overlay');
-    const modalClose       = document.getElementById('modal-close');
-    const modalCancel      = document.getElementById('modal-cancel');
-    const modalSave        = document.getElementById('modal-save');
-    const volunteerSelect  = document.getElementById('volunteer-select');
-    const modalShiftInfo   = document.getElementById('modal-shift-info');
-    const shiftDayInput    = document.getElementById('shift-day-input');
-    const startTimeInput   = document.getElementById('start-time-input');
-    const endTimeInput     = document.getElementById('end-time-input');
+    const campaignSelect   = document.querySelector('#campaign-select');
+    const storeSelect      = document.querySelector('#store-select');
+    const btnLoadShifts    = document.querySelector('#btn-load-shifts');
+    const shiftsTbody      = document.querySelector('#shifts-tbody');
+    const modalOverlay     = document.querySelector('#modal-overlay');
+    const modalClose       = document.querySelector('#modal-close');
+    const modalCancel      = document.querySelector('#modal-cancel');
+    const modalSave        = document.querySelector('#modal-save');
+    const volunteerSelect  = document.querySelector('#volunteer-select');
+    const modalShiftInfo   = document.querySelector('#modal-shift-info');
+    const shiftDayInput    = document.querySelector('#shift-day-input');
+    const startTimeInput   = document.querySelector('#start-time-input');
+    const endTimeInput     = document.querySelector('#end-time-input');
 
     let currentShift = null;
 
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

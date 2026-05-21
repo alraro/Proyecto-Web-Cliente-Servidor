@@ -1,24 +1,24 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
 
-    const campaignSelect    = document.getElementById('campaign-select');
-    const btnLoad           = document.getElementById('btn-load');
-    const tbody             = document.getElementById('collaborators-tbody');
-    const formCard          = document.getElementById('form-card');
-    const formTitle         = document.getElementById('form-title');
-    const editId            = document.getElementById('edit-id');
-    const editName          = document.getElementById('edit-name');
-    const editPhone         = document.getElementById('edit-phone');
-    const editEmail         = document.getElementById('edit-email');
-    const editAddress       = document.getElementById('edit-address');
-    const editPartnerEntity = document.getElementById('edit-partner-entity');
-    const btnNew            = document.getElementById('btn-new');
-    const btnSave           = document.getElementById('btn-save');
-    const btnCancelForm     = document.getElementById('btn-cancel-form');
+    const campaignSelect    = document.querySelector('#campaign-select');
+    const btnLoad           = document.querySelector('#btn-load');
+    const tbody             = document.querySelector('#collaborators-tbody');
+    const formCard          = document.querySelector('#form-card');
+    const formTitle         = document.querySelector('#form-title');
+    const editId            = document.querySelector('#edit-id');
+    const editName          = document.querySelector('#edit-name');
+    const editPhone         = document.querySelector('#edit-phone');
+    const editEmail         = document.querySelector('#edit-email');
+    const editAddress       = document.querySelector('#edit-address');
+    const editPartnerEntity = document.querySelector('#edit-partner-entity');
+    const btnNew            = document.querySelector('#btn-new');
+    const btnSave           = document.querySelector('#btn-save');
+    const btnCancelForm     = document.querySelector('#btn-cancel-form');
 
     const pendingIds = new Set();
     let partnerEntities = [];
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

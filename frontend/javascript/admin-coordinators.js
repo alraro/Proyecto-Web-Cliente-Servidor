@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
@@ -16,12 +16,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
-    const campaignSelect     = document.getElementById('campaign-select');
-    const btnLoad            = document.getElementById('btn-load');
-    const globalMessage      = document.getElementById('global-message');
-    const coordinatorsTbody  = document.getElementById('coordinators-tbody');
-    const coordinatorSelect  = document.getElementById('coordinator-select');
-    const btnAssign          = document.getElementById('btn-assign');
+    const campaignSelect     = document.querySelector('#campaign-select');
+    const btnLoad            = document.querySelector('#btn-load');
+    const globalMessage      = document.querySelector('#global-message');
+    const coordinatorsTbody  = document.querySelector('#coordinators-tbody');
+    const coordinatorSelect  = document.querySelector('#coordinator-select');
+    const btnAssign          = document.querySelector('#btn-assign');
 
 
     coordinatorSelect.disabled = true;

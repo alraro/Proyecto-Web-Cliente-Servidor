@@ -1,11 +1,11 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
 
-    const tbody = document.getElementById('campaigns-tbody');
+    const tbody = document.querySelector('#campaigns-tbody');
 
     try {
         const campaigns = await fetchJson(API_BASE + '/api/coordinator/my-campaigns', {
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

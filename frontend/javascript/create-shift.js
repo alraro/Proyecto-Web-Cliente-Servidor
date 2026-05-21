@@ -1,4 +1,4 @@
-let selectedCampaign = null;
+﻿let selectedCampaign = null;
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,7 +15,7 @@ async function loadCampaigns() {
         if (!res.ok) { showMessage('No se pudieron cargar las campañas.', 'error'); return; }
         const data = await res.json();
         const campaigns = Array.isArray(data) ? data : (data.content || []);
-        const sel = document.getElementById('campaign-select');
+        const sel = document.querySelector('#campaign-select');
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
@@ -29,10 +29,10 @@ async function loadCampaigns() {
     }
 }
 
-document.getElementById('campaign-select').addEventListener('change', async function () {
+document.querySelector('#campaign-select').addEventListener('change', async function () {
     const campaignId = this.value;
     const selOpt     = this.options[this.selectedIndex];
-    const storeSel   = document.getElementById('store-select');
+    const storeSel   = document.querySelector('#store-select');
 
         const opt0 = document.createElement('option');
         opt0.value = '';
@@ -40,8 +40,8 @@ document.getElementById('campaign-select').addEventListener('change', async func
         storeSel.innerHTML = '';
         storeSel.appendChild(opt0);
     storeSel.disabled   = true;
-    document.getElementById('shift-form-card').className = 'form-card hidden';
-    document.getElementById('shifts-card').className = 'shifts-list-card hidden';
+    document.querySelector('#shift-form-card').className = 'form-card hidden';
+    document.querySelector('#shifts-card').className = 'shifts-list-card hidden';
     selectedCampaign = null;
 
     if (!campaignId) {
@@ -55,7 +55,7 @@ document.getElementById('campaign-select').addEventListener('change', async func
 
     selectedCampaign = { id: campaignId, start: selOpt.getAttribute('data-start'), end: selOpt.getAttribute('data-end') };
 
-    const dayInput = document.getElementById('shift-day');
+    const dayInput = document.querySelector('#shift-day');
     dayInput.min = selectedCampaign.start;
     dayInput.max = selectedCampaign.end;
 
@@ -92,9 +92,9 @@ document.getElementById('campaign-select').addEventListener('change', async func
         });
         storeSel.disabled = false;
 
-        document.getElementById('shift-form-card').className = 'form-card';
+        document.querySelector('#shift-form-card').className = 'form-card';
         await loadShifts(campaignId);
-        document.getElementById('shifts-card').className = 'shifts-list-card';
+        document.querySelector('#shifts-card').className = 'shifts-list-card';
     } catch {
         const opt0 = document.createElement('option');
         opt0.value = '';
@@ -106,7 +106,7 @@ document.getElementById('campaign-select').addEventListener('change', async func
 
 
 async function loadShifts(campaignId) {
-    const container = document.getElementById('shifts-container');
+    const container = document.querySelector('#shifts-container');
     container.innerHTML = '';
     const p = document.createElement('p');
     p.className = 'empty-message';
@@ -133,7 +133,7 @@ async function loadShifts(campaignId) {
 }
 
 function renderShifts(shifts) {
-    const container = document.getElementById('shifts-container');
+    const container = document.querySelector('#shifts-container');
     if (!shifts.length) {
         container.innerHTML = '';
         const p = document.createElement('p');
@@ -194,20 +194,20 @@ function renderShifts(shifts) {
     });
 }
 
-document.getElementById('btn-refresh').addEventListener('click', () => {
+document.querySelector('#btn-refresh').addEventListener('click', () => {
     if (selectedCampaign) loadShifts(selectedCampaign.id);
 });
 
 
-document.getElementById('btn-submit').addEventListener('click', async () => {
-    const campaignId       = document.getElementById('campaign-select').value;
-    const storeId          = document.getElementById('store-select').value;
-    const day              = document.getElementById('shift-day').value;
-    const startTime        = document.getElementById('start-time').value;
-    const endTime          = document.getElementById('end-time').value;
-    const volunteersRaw    = document.getElementById('volunteers-needed').value;
-    const location         = document.getElementById('location').value.trim();
-    const observations     = document.getElementById('observations').value.trim();
+document.querySelector('#btn-submit').addEventListener('click', async () => {
+    const campaignId       = document.querySelector('#campaign-select').value;
+    const storeId          = document.querySelector('#store-select').value;
+    const day              = document.querySelector('#shift-day').value;
+    const startTime        = document.querySelector('#start-time').value;
+    const endTime          = document.querySelector('#end-time').value;
+    const volunteersRaw    = document.querySelector('#volunteers-needed').value;
+    const location         = document.querySelector('#location').value.trim();
+    const observations     = document.querySelector('#observations').value.trim();
 
     
     if (!campaignId)    { showMessage('Selecciona una campaña.',  'error'); return; }
@@ -257,22 +257,22 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     }
 });
 
-document.getElementById('btn-reset').addEventListener('click', resetForm);
+document.querySelector('#btn-reset').addEventListener('click', resetForm);
 
 function resetForm() {
-    document.getElementById('shift-day').value         = '';
-    document.getElementById('start-time').value        = '';
-    document.getElementById('end-time').value          = '';
-    document.getElementById('volunteers-needed').value = '';
-    document.getElementById('location').value          = '';
-    document.getElementById('observations').value      = '';
-    const msg = document.getElementById('form-message');
+    document.querySelector('#shift-day').value         = '';
+    document.querySelector('#start-time').value        = '';
+    document.querySelector('#end-time').value          = '';
+    document.querySelector('#volunteers-needed').value = '';
+    document.querySelector('#location').value          = '';
+    document.querySelector('#observations').value      = '';
+    const msg = document.querySelector('#form-message');
     msg.className   = 'form-message';
     msg.textContent = '';
 }
 
 function showMessage(text, type) {
-    const el = document.getElementById('form-message');
+    const el = document.querySelector('#form-message');
     el.textContent = text;
     el.className   = 'form-message ' + type;
 }
@@ -280,19 +280,19 @@ function showMessage(text, type) {
 
 let currentShiftId = null;
 
-document.getElementById('modal-close').addEventListener('click', closeAssignModal);
-document.getElementById('assignment-modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('assignment-modal')) closeAssignModal();
+document.querySelector('#modal-close').addEventListener('click', closeAssignModal);
+document.querySelector('#assignment-modal').addEventListener('click', e => {
+    if (e.target === document.querySelector('#assignment-modal')) closeAssignModal();
 });
 
 function closeAssignModal() {
-    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay hidden';
+    document.querySelector('#assignment-modal').className = 'coordinator-modal-overlay hidden';
     currentShiftId = null;
 }
 
 async function openAssignModal(shiftId) {
     currentShiftId = shiftId;
-    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay';
+    document.querySelector('#assignment-modal').className = 'coordinator-modal-overlay';
     clearModalFeedback();
     await loadModalData(shiftId);
 }
@@ -311,12 +311,12 @@ async function loadModalData(shiftId) {
         const availCap = results[3];
 
         // Info del turno
-        document.getElementById('modal-title').textContent = `Asignaciones — Turno #${shiftId}`;
-        document.getElementById('modal-shift-info').textContent =
+        document.querySelector('#modal-title').textContent = `Asignaciones — Turno #${shiftId}`;
+        document.querySelector('#modal-shift-info').textContent =
             `Voluntarios: ${volData.volunteersAssigned} / ${volData.volunteersNeeded} asignados`;
 
         // Indicador de aforo
-        const capEl = document.getElementById('capacity-indicator');
+        const capEl = document.querySelector('#capacity-indicator');
         const full = volData.volunteersAssigned >= volData.volunteersNeeded;
         capEl.textContent = full
             ? '⚠️ Aforo completo'
@@ -330,12 +330,12 @@ async function loadModalData(shiftId) {
                  (v.partnerEntityName ? ' (' + v.partnerEntityName + ')' : ' (Independiente)'));
         populateSelect('captain-select',   availCap, 'userId',     'name', 'Selecciona un capitán...');
     } catch (e) {
-        document.getElementById('modal-shift-info').textContent = 'Error al cargar los datos del turno.';
+        document.querySelector('#modal-shift-info').textContent = 'Error al cargar los datos del turno.';
     }
 }
 
 function renderModalVolunteers(volunteers) {
-    const el = document.getElementById('modal-volunteers');
+    const el = document.querySelector('#modal-volunteers');
     if (!volunteers.length) {
         el.innerHTML = '';
         const p = document.createElement('p');
@@ -372,7 +372,7 @@ function renderModalVolunteers(volunteers) {
 }
 
 function renderModalCaptains(captains) {
-    const el = document.getElementById('modal-captains');
+    const el = document.querySelector('#modal-captains');
     if (!captains.length) {
         el.innerHTML = '';
         const p = document.createElement('p');
@@ -409,7 +409,7 @@ function renderModalCaptains(captains) {
 }
 
 function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelFn) {
-    const sel = document.getElementById(selectId);
+    const sel = document.querySelector(`#${selectId}`);
     sel.innerHTML = '';
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '';
@@ -423,8 +423,8 @@ function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelF
     });
 }
 
-document.getElementById('btn-assign-volunteer').addEventListener('click', async () => {
-    const volunteerId = document.getElementById('volunteer-select').value;
+document.querySelector('#btn-assign-volunteer').addEventListener('click', async () => {
+    const volunteerId = document.querySelector('#volunteer-select').value;
     if (!volunteerId) { showFeedback('volunteer', 'Selecciona un voluntario.', 'error'); return; }
     try {
         const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/volunteers`, {
@@ -442,8 +442,8 @@ document.getElementById('btn-assign-volunteer').addEventListener('click', async 
     } catch { showFeedback('volunteer', 'Error de conexión.', 'error'); }
 });
 
-document.getElementById('btn-assign-captain').addEventListener('click', async () => {
-    const userId = document.getElementById('captain-select').value;
+document.querySelector('#btn-assign-captain').addEventListener('click', async () => {
+    const userId = document.querySelector('#captain-select').value;
     if (!userId) { showFeedback('captain', 'Selecciona un capitán.', 'error'); return; }
     try {
         const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/captains`, {
@@ -482,14 +482,14 @@ async function unassignCaptain(userId) {
 }
 
 function showFeedback(type, text, level) {
-    const el = document.getElementById(`${type}-feedback`);
+    const el = document.querySelector(`#${type}-feedback`);
     el.textContent = text;
     el.className = 'form-message ' + (level === 'warning' ? 'error' : level);
 }
 
 function clearModalFeedback() {
     ['volunteer-feedback', 'captain-feedback'].forEach(id => {
-        const el = document.getElementById(id);
+        const el = document.querySelector(`#${id}`);
         el.className = 'form-message feedback-hidden';
         el.textContent = '';
     });

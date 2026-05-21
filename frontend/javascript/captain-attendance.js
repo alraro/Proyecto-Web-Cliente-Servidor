@@ -1,12 +1,9 @@
-
+﻿
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Capitán';
-
-
-    const campaignSelect   = document.getElementById('campaign-select');
-    const shiftsContainer  = document.getElementById('shifts-container');
+    const campaignSelect   = document.querySelector('#campaign-select');
+    const shiftsContainer  = document.querySelector('#shifts-container');
 
 
     try {
@@ -206,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateVolunteerRow(shiftId, volunteerId, attendance) {
-        const row = document.getElementById('row-' + shiftId + '-' + volunteerId);
+        const row = document.querySelector(`#row-${shiftId}-${volunteerId}`);
         if (!row) return;
 
         const btnPresent = row.querySelector('[data-attendance="true"]');
@@ -223,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let card = row.parentNode;
         while (card && card.className.indexOf('shift-card') === -1) { card = card.parentNode; }
-        const counter = document.getElementById('counter-' + shiftId);
+        const counter = document.querySelector(`#counter-${shiftId}`);
         if (card && counter) {
             const rows   = card.querySelectorAll('.volunteer-row');
             const present = card.querySelectorAll('.btn-present.active').length;

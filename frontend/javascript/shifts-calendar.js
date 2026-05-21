@@ -1,11 +1,11 @@
-
+﻿
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
 
-    const campaignSelect     = document.getElementById('campaign-select');
-    const calendarContainer  = document.getElementById('calendar-container');
-    const calLegend          = document.getElementById('cal-legend');
+    const campaignSelect     = document.querySelector('#campaign-select');
+    const calendarContainer  = document.querySelector('#calendar-container');
+    const calLegend          = document.querySelector('#cal-legend');
 
 
     try {

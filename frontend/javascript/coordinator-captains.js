@@ -1,15 +1,15 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
 
-    const campaignSelect = document.getElementById('campaign-select');
-    const storeSelect    = document.getElementById('store-select');
-    const btnLoad        = document.getElementById('btn-load');
-    const captainsTbody  = document.getElementById('captains-tbody');
-    const btnRegister    = document.getElementById('btn-register');
+    const campaignSelect = document.querySelector('#campaign-select');
+    const storeSelect    = document.querySelector('#store-select');
+    const btnLoad        = document.querySelector('#btn-load');
+    const captainsTbody  = document.querySelector('#captains-tbody');
+    const btnRegister    = document.querySelector('#btn-register');
 
     // Carga campañas
     try {
@@ -103,11 +103,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             cell.textContent = 'No hay capitanes asignados a esta campaña.';
             row.appendChild(cell);
             captainsTbody.appendChild(row);
-            const info = document.getElementById('captains-info');
+            const info = document.querySelector('#captains-info');
             if (info) info.hidden = false;
             return;
         }
-        const info = document.getElementById('captains-info');
+        const info = document.querySelector('#captains-info');
         if (info) info.hidden = true;
         captains.forEach(c => {
             const tr = document.createElement('tr');
@@ -124,9 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Registrar nuevo capitán
     btnRegister.addEventListener('click', async () => {
         const campaignId = campaignSelect.value;
-        const name       = document.getElementById('new-name').value.trim();
-        const email      = document.getElementById('new-email').value.trim();
-        const password   = document.getElementById('new-password').value;
+        const name       = document.querySelector('#new-name').value.trim();
+        const email      = document.querySelector('#new-email').value.trim();
+        const password   = document.querySelector('#new-password').value;
 
         if (!campaignId) { showMessage('Selecciona una campaña antes de registrar', true); return; }
         if (!name || !email || !password) { showMessage('Nombre, email y contraseña son obligatorios', true); return; }
@@ -139,9 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({ name, email, password, campaignId: Number(campaignId) })
             });
             showMessage('Solicitud enviada correctamente. El administrador recibirá tu petición y deberá aprobarla.', false);
-            document.getElementById('new-name').value = '';
-            document.getElementById('new-email').value = '';
-            document.getElementById('new-password').value = '';
+            document.querySelector('#new-name').value = '';
+            document.querySelector('#new-email').value = '';
+            document.querySelector('#new-password').value = '';
         } catch (err) {
             showMessage(err.message || 'No se pudo registrar el capitán', true);
         }
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';
