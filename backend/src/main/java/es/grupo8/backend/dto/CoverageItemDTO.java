@@ -1,9 +1,9 @@
 package es.grupo8.backend.dto;
 
 public class CoverageItemDTO {
-    private String label;          // nombre de cadena / localidad / zona
-    private long totalStores;      // total tiendas en esa agrupación
-    private long storesInCampaign; // tiendas que participan en la campaña
+    private String label;           // nombre de cadena / localidad / zona
+    private long totalStores;       // total tiendas en esa agrupación
+    private long storesInCampaign;  // tiendas que participan en la campaña
     private double coveragePercent; // porcentaje calculado
 
     public CoverageItemDTO(String label, long totalStores, long storesInCampaign) {

@@ -1,10 +1,12 @@
+const API_BASE = 'http://localhost:8080';
+
 const form = document.querySelector('#login-form');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const message = document.querySelector('#form-message');
 
-function mostrarErrorDesdeUrl() {
+function showErrorFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
     if (!error) return;
@@ -13,7 +15,7 @@ function mostrarErrorDesdeUrl() {
     message.classList.add('is-error');
 }
 
-mostrarErrorDesdeUrl();
+showErrorFromUrl();
 
 togglePasswordButton.addEventListener('click', () => {
     const nextType = passwordInput.type === 'password' ? 'text' : 'password';
@@ -51,13 +53,22 @@ form.addEventListener('submit', async (event) => {
     }
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/login', {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify({ email, password })
         });
 
         const data = await res.json();
+
+        // Solo cuando es correcto pero no tiene rol asignado
+        if (res.status === 403) {
+            message.textContent = 'Tu cuenta está pendiente de verificación por un administrador.';
+            message.classList.add('is-error');
+            return;
+        }
 
         if (!res.ok) {
             message.textContent = data.message || 'Credenciales incorrectas.';
@@ -71,10 +82,20 @@ form.addEventListener('submit', async (event) => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('role', data.role);
 
+
+        // Guardar storeId si el rol es Responsable de Tienda
+        if (data.storeId != null) {
+            localStorage.setItem('storeId', data.storeId);
+        } else {
+            localStorage.removeItem('storeId');
+        }
+
+
         // Redirigir según rol
         window.location.href = data.redirectUrl;
 
-    } catch {
+    } catch(e) {
+        console.log(e)
         message.textContent = 'Error al conectar con el servidor.';
         message.classList.add('is-error');
     }

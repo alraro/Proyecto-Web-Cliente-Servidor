@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.entity.UserEntity;
 import io.jsonwebtoken.Jwts;
@@ -39,6 +42,12 @@ public class ApiController {
 
 	@Autowired
 	protected UserRepository userRepository;
+
+	@Autowired
+	protected CampaignRepository campaignRepository;
+
+	@Autowired
+	protected StoreRepository storeRepository;
 
 	// Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
 	// Hace que el usuario mantenga la sesión activa tras loguearse, incluso después de cerrar el navegador, hasta que el token expire o se revoque.
@@ -134,6 +143,7 @@ public class ApiController {
 			@RequestParam(value = "error", required = false) String error,
 			@RequestParam(value = "success", required = false) String success,
 			Model model) {
+
 		model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
 		if (error != null && !error.isBlank()) {
 			model.addAttribute("registerError", error);
@@ -202,7 +212,7 @@ public class ApiController {
 		try {
 			userRepository.save(user);
 		} catch (DataIntegrityViolationException ex) {
-			return "redirect:/register?error=" + urlEncode("No se pudo crear la cuenta. Revisa email y codigo postal");
+			return "redirect:/register?error=" + urlEncode("No se pudo crear la cuenta.");
 		}
 
 		return "redirect:/login?success=" + urlEncode("Registro correcto. Ya puedes iniciar sesion");
@@ -212,7 +222,9 @@ public class ApiController {
 	// Endpoint para login
 	@PostMapping("/api/auth/login")
 	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+	// El tipo del cuerpo no está fijado, los endpoints pueden devolver respuestas distintas según el caso
+	public ResponseEntity<?> login(@RequestBody Map<String, 
+									String> request) {
 
 		// Sacamos email y contraseña
 		String email = normalizeEmail(request == null ? null : request.get("email"));
@@ -228,16 +240,14 @@ public class ApiController {
 		
 		// Si no existe el usuario, fuera
 		if (user == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "No existen los datos"));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No existen los datos"));
 		}
 
 
 		String storedPassword = user.getPassword();
 		// Verificamos la contraseña proporcionada con la almacenada
 		if (!matchesPassword(password, storedPassword)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Credenciales invalidas"));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Credenciales invalidas"));
 		}
 
 		// Si no está en hash la cambiamos
@@ -251,21 +261,27 @@ public class ApiController {
 		String role = resolveRole(user.getIdUser());
 
 		if ("PENDIENTE".equals(role)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "No tiene rol asignado."));
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "No tiene rol asignado."));
 		}
 
-		return ResponseEntity.ok(Map.of(
-				"userId", user.getIdUser(),
-				"nombre", user.getName(),
-				"email", user.getEmail(),
-				"role", role,
-				"redirectUrl", buildFrontendUrl(roleToPath(role)),
-				"message", "Login correcto",
-				"token", token,
-				"tokenType", "Bearer",
-				"expiresInSeconds", Math.max(1, jwtExpirationMs / 1000)
-		));
+		// HashMap porque Map.of() no acepta null (storeId puede ser null)
+		Map<String, Object> loginResponse = new HashMap<>();
+		loginResponse.put("userId",           user.getIdUser());
+		loginResponse.put("nombre",           user.getName());
+		loginResponse.put("email",            user.getEmail());
+		loginResponse.put("role",             role);
+		loginResponse.put("redirectUrl",      buildFrontendUrl(roleToPath(role)));
+		loginResponse.put("message",          "Login correcto");
+		loginResponse.put("token",            token);
+		loginResponse.put("tokenType",        "Bearer");
+		loginResponse.put("expiresInSeconds", Math.max(1, jwtExpirationMs / 1000));
+
+		// Si es Responsable de Tienda, incluir storeId para que el frontend sepa a qué tienda ir
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			storeRepository.findByIdResponsible_IdUser(user.getIdUser()).ifPresent(s -> loginResponse.put("storeId", s.getId()));
+		}
+
+		return ResponseEntity.ok(loginResponse);
 	}
 
 
@@ -283,8 +299,8 @@ public class ApiController {
 		String cp = trimToNull(request == null ? null : request.get("cp"));
 
 		// Comprobamos datos obligatorios
-		if (nombre == null || email == null || password == null || telefono == null || domicilio == null || cp == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email, telefono, contrasena, domicilio y CP son obligatorios"));
+		if (nombre == null || email == null || password == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email y contrasena son obligatorios"));
 		}
 
 		// Validamos formato de email
@@ -293,12 +309,12 @@ public class ApiController {
 		}
 
 		// Validamos formato telefono
-		if (!isValidPhone(telefono)) {
+		if (telefono != null && !isValidPhone(telefono)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "El telefono no tiene un formato valido"));
 		}
 
 		// Validamos formato código postal
-		if (!isValidPostalCode(cp)) {
+		if (cp != null && !isValidPostalCode(cp)) {
 			return ResponseEntity.badRequest().body(Map.of("message", "El codigo postal no es valido"));
 		}
 
@@ -345,21 +361,18 @@ public class ApiController {
 	// Endpoint para obtener el perfil del usuario
 	@GetMapping("/api/auth/profile")
 	@ResponseBody
-	public ResponseEntity<?> getOwnProfile(
-			@RequestHeader(value = "Authorization", required = false) String authHeader) {
+	public ResponseEntity<?> getOwnProfile(@RequestHeader(value = "Authorization", required = false) String authHeader) {
 
 		// Obtenemos el ID del usuario
 		Integer userId = extractUserIdFromAuthHeader(authHeader);
 		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Token invalido o ausente"));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido o ausente"));
 		}
 
 		// Obtenemos el usuario de la base de datos
 		UserEntity user = userRepository.findById(userId).orElse(null);
 		if (user == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Usuario no encontrado"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
 		}
 
 		String role = resolveRole(userId);
@@ -385,14 +398,12 @@ public class ApiController {
 
 		Integer userId = extractUserIdFromAuthHeader(authHeader);
 		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("message", "Token invalido o ausente"));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido o ausente"));
 		}
 
 		UserEntity user = userRepository.findById(userId).orElse(null);
 		if (user == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Usuario no encontrado"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
 		}
 
 		String email = normalizeEmail(request == null ? null : request.get("email"));
@@ -417,8 +428,7 @@ public class ApiController {
 		}
 
 		if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmail(email)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(Map.of("message", "Ya existe un usuario con ese email"));
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Ya existe un usuario con ese email"));
 		}
 
 		user.setEmail(email);
@@ -448,26 +458,6 @@ public class ApiController {
 		));
 	}
 
-/*
-	// Implementación para futuro
-	// Endpoint para añadir usuario
-	@PostMapping("/anadir")
-	public String doAnadir(Model model) {
-		return this.doRegister(model);
-	}
-	// Endpoint para editar usuario
-	@GetMapping("/editar")
-	public String doEditar(@RequestParam(value = "id", required = false) Integer id, Model model) {
-		model.addAttribute("selectedId", id);
-		return this.doRegister(model);
-	}
-	// Endpoint para guardar usuario
-	@PostMapping("/guardar")
-	public String doGuardar() {
-		return "redirect:/";
-	}
-*/
-
 	// Métodos auxiliares
 	// Limpiador de textos, se asegura de no guardar textos vacíos o llenos de espacios
 	private static String trimToNull(String value) {
@@ -495,7 +485,7 @@ public class ApiController {
 		return telefono != null && telefono.matches("^[0-9+\\-\\s]{7,20}$");
 	}
 	
-	// Valida que el código postal tenga exactamente 5 dígitos, lo que es común en muchos países.
+	// Valida que el código postal tenga exactamente 5 dígitos.
 	private static boolean isValidPostalCode(String cp) {
 		return cp != null && cp.matches("^[0-9]{5}$");
 	}
@@ -552,6 +542,7 @@ public class ApiController {
 		}
 	}
 
+	// Coge el id Usuario dependiendo de si está autorizado o no, devolviendo null si el token es inválido o no se proporcionó.
 	private Integer extractUserIdFromAuthHeader(String authHeader) {
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			return null;
@@ -570,6 +561,7 @@ public class ApiController {
 		}
 	}
 
+	// Devuelve el rol del usuario
 	private String resolveRole(Integer userId) {
 		if (userRepository.isAdmin(userId)) {
 			return "ADMINISTRADOR";
@@ -587,29 +579,39 @@ public class ApiController {
 			return "COLABORADOR";
 		}
 
+		if (storeRepository.existsByIdResponsible_IdUser(userId)) {
+			return "RESPONSABLE_TIENDA";
+		}
+
 		return "PENDIENTE";
 	}
 
+	// Devuelve el path que debe seguir según el rol que tiene
 	private static String roleToPath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
 			return "/admin.html";
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinator.html";
+			return "/coordinator-dashboard.html";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/captain.html";
+			return "/captain-dashboard.html";
 		}
 
 		if ("COLABORADOR".equals(role)) {
 			return "/collaborator.html";
 		}
 
+		if ("RESPONSABLE_TIENDA".equals(role)) {
+			return "/responsible-store.html";
+		}
+
 		return "/login.html";
 	}
 
+	// Creamos URL del frontend
 	private String buildFrontendUrl(String path) {
 		String base = frontendBaseUrl == null ? "http://localhost:80" : frontendBaseUrl.trim();
 		if (base.endsWith("/")) {
@@ -623,6 +625,7 @@ public class ApiController {
 		return base + "/" + path;
 	}
 
+	// Codifica un valor para poder usarlo en URLs, como en los mensajes de error al redirigir a la página de login o registro.
 	private static String urlEncode(String value) {
 		return URLEncoder.encode(value, StandardCharsets.UTF_8);
 	}

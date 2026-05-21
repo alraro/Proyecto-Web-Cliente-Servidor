@@ -11,22 +11,18 @@ const togglePasswordButton = document.querySelector('#toggle-password');
 const toggleConfirmPasswordButton = document.querySelector('#toggle-confirm-password');
 const message = document.querySelector('#form-message');
 
-function togglePasswordVisibility(input, button) {
-    const nextType = input.type === 'password' ? 'text' : 'password';
-    input.type = nextType;
-    button.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
-    button.setAttribute(
-        'aria-label',
-        nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña'
-    );
-}
-
 togglePasswordButton.addEventListener('click', () => {
-    togglePasswordVisibility(passwordInput, togglePasswordButton);
+    const nextType = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = nextType;
+    togglePasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
+    togglePasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
 });
 
 toggleConfirmPasswordButton.addEventListener('click', () => {
-    togglePasswordVisibility(confirmPasswordInput, toggleConfirmPasswordButton);
+    const nextType = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+    confirmPasswordInput.type = nextType;
+    toggleConfirmPasswordButton.textContent = nextType === 'password' ? 'Mostrar' : 'Ocultar';
+    toggleConfirmPasswordButton.setAttribute('aria-label', nextType === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
 });
 
 form.addEventListener('submit', async (event) => {
@@ -70,8 +66,27 @@ form.addEventListener('submit', async (event) => {
         return;
     }
 
-    message.textContent = 'Se enviará el formulario y, si todo es correcto, volverás a la página de login.';
-    message.classList.add('is-success');
+    try {
+        const res = await fetch(API_BASE + '/api/auth/register', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ nombre, email, password, telefono, domicilio, cp })
+        });
 
-    form.submit();
+        const data = await res.json();
+
+        if (res.status === 201) {
+            message.textContent = 'Tu solicitud ha sido registrada. Un administrador revisará tu cuenta y te asignará un rol. Recibirás acceso una vez aprobado.';
+            message.classList.add('is-success');
+            return;
+        }
+
+        message.textContent = data.message || 'No se pudo completar el registro.';
+        message.classList.add('is-error');
+    } catch (error) {
+        message.textContent = 'Error al conectar con el servidor.';
+        message.classList.add('is-error');
+    }
 });

@@ -36,7 +36,7 @@ public class Store {
     @JoinColumn(name = "id_responsible")
     private UserEntity idResponsible;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "stores")
     private Set<Campaign> campaigns = new LinkedHashSet<>();
 
     public Integer getId() {

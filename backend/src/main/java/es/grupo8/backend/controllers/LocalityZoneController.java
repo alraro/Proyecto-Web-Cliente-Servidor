@@ -1,5 +1,6 @@
 package es.grupo8.backend.controllers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,9 +19,9 @@ import es.grupo8.backend.security.AdminGuard;
 @RestController
 public class LocalityZoneController {
 
-    @Autowired private LocalityRepository      localityRepository;
+    @Autowired private LocalityRepository       localityRepository;
     @Autowired private GeographicZoneRepository zoneRepository;
-    @Autowired private AdminGuard              adminGuard;
+    @Autowired private AdminGuard               adminGuard;
 
     @GetMapping("/api/localities")
     public ResponseEntity<?> getLocalities(
@@ -31,13 +32,17 @@ public class LocalityZoneController {
                     .body(Map.of("message", "Access restricted to administrators"));
         }
 
+        // IMPORTANTE: Map.of() lanza NullPointerException si algún valor es null.
+        // Usamos HashMap porque zoneId puede ser null cuando la localidad no tiene zona.
         List<Map<String, Object>> result = localityRepository.findAll()
                 .stream()
-                .map(l -> Map.<String, Object>of(
-                        "id",     l.getId(),
-                        "name",   l.getName(),
-                        "zoneId", l.getIdZone() != null ? l.getIdZone().getId() : null
-                ))
+                .map(l -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id",     l.getId());
+                    m.put("name",   l.getName());
+                    m.put("zoneId", l.getIdZone() != null ? l.getIdZone().getId() : null);
+                    return m;
+                })
                 .sorted((a, b) -> String.valueOf(a.get("name")).compareTo(String.valueOf(b.get("name"))))
                 .collect(Collectors.toList());
 

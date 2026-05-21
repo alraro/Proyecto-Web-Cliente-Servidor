@@ -2,9 +2,10 @@ const API_BASE = 'http://localhost:8080';
 
 const ROLE_ROUTES = {
 	ADMINISTRADOR: 'admin.html',
-	COORDINADOR: 'coordinator.html',
-	CAPITAN: 'captain.html',
-	COLABORADOR: 'collaborator.html'
+	COORDINADOR: 'coordinator-dashboard.html',
+	CAPITAN: 'captain-dashboard.html',
+	COLABORADOR: 'collaborator.html',
+	RESPONSABLE_TIENDA: 'responsible-store.html'
 };
 
 const form = document.querySelector('#edit-form');
@@ -163,7 +164,7 @@ async function handleSubmit(event) {
 		localStorage.setItem('email', data.email || payload.email);
 		localStorage.setItem('localidadPerfil', payload.localidad);
 
-		showMessage('Perfil actualizado correctamente. Volviendo a tu panel...');
+		showMessage('Guardando cambios');
 		setTimeout(() => {
 			redirectToRolePage();
 		}, 900);

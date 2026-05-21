@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Entidades Colaboradoras</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-partner-entities.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/admin-partner-entities.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
+
+</head>
+<body>
+
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+            <h1>Entidades Colaboradoras</h1>
+            <p>Gestiona las entidades colaboradoras participantes en las campañas de Bancosol.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Listado de entidades colaboradoras</h2>
+                <div class="card-actions">
+                    <button id="btn-export-pe" class="btn btn-export">Exportar archivo</button>
+                    <button class="btn btn-primary" id="btn-nueva">+ Nueva entidad colaboradora</button>
+                </div>
+            </div>
+            <!-- FILTROS -->
+            <div class="filters-bar">
+                <input type="text" id="filter-search" placeholder="Buscar por nombre..." class="filter-search">
+                <select id="filter-sort-by">
+                    <option value="id">Ordenar por ID</option>
+                    <option value="name">Ordenar por Nombre</option>
+                </select>
+                <select id="filter-sort-order">
+                    <option value="asc">Ascendente</option>
+                    <option value="desc">Descendente</option>
+                </select>
+                <button id="btn-apply-filters">Filtrar</button>
+                <button class="btn-clear" id="btn-clear-filters">Limpiar</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partner-entities-tbody">
+                        <tr><td colspan="5" class="table-empty">Cargando entidades colaboradoras...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="btn-prev-page">← Anterior</button>
+                <span class="pagination-info">
+                    Página <span id="current-page">1</span> de <span id="total-pages">1</span>
+                </span>
+                <button id="btn-next-page">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select">
+                    <option value="20">20 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Nueva entidad colaboradora</h3>
+
+            <div class="form-group">
+                <label for="input-nombre">Nombre <span>*</span></label>
+                <input type="text" id="input-nombre" placeholder="Ej: BanCorp" maxlength="255">
+            </div>
+            <div class="form-group">
+                <label for="input-direccion">Dirección</label>
+                <input type="text" id="input-direccion" placeholder="Calle, número..." maxlength="500">
+            </div>
+            <div class="form-group">
+                <label for="input-telefono">Teléfono</label>
+                <input type="text" id="input-telefono" placeholder="Ej: +34 912345678" maxlength="20">
+            </div>
+
+            <p class="form-message" id="modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="javascript/admin-partner-entities.js"></script>
+</body>
+</html>

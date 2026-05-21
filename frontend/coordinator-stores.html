@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Mis Tiendas</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/assignment.css">
+    <script src="javascript/coordinator-stores.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
+</head>
+<body>
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Mis Tiendas</h1>
+                    <p>Tiendas asignadas a tu campaña.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group mb-0">
+                    <label for="campaign-select">Selecciona una campaña</label>
+                    <div class="selector-row">
+                        <select id="campaign-select">
+                            <option value="">Selecciona una campaña...</option>
+                        </select>
+                        <button type="button" id="btn-load" class="btn btn-secondary">Cargar tiendas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h2>Tiendas de la campaña</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Cadena</th>
+                            <th>Localidad</th>
+                            <th>Dirección</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stores-tbody">
+                        <tr><td colspan="4" class="table-empty">Selecciona una campaña para ver las tiendas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

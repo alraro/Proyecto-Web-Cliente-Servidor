@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Calendario de Turnos</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/shifts-calendar.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/shifts-calendar.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+</head>
+<body>
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Calendario de Turnos</h1>
+                    <p>Vista de turnos por tienda, día y franja horaria.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+
+        <div class="cal-filter-bar">
+            <div class="form-group">
+                <label for="campaign-select">Campaña</label>
+                <select id="campaign-select">
+                    <option value="">Cargando campañas...</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="cal-legend" id="cal-legend" hidden>
+            <span class="legend-item legend-full">Completo</span>
+            <span class="legend-item legend-partial">Parcial</span>
+            <span class="legend-item legend-empty">Sin voluntarios</span>
+        </div>
+
+
+        <div id="calendar-container">
+            <p class="cal-placeholder">Selecciona una campaña para ver el calendario de turnos.</p>
+        </div>
+    </main>
+</body>
+</html>

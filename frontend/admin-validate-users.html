@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Validar registros</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/admin-validate-users.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
+</head>
+<body>
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+            <h1>Validar registros</h1>
+            <p>Revisa y aprueba o rechaza las solicitudes de nuevos usuarios.</p>
+        </div>
+
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h2>Pendientes de aprobación <span id="badge-pending" class="badge badge-no hidden"></span></h2>
+                <div class="card-actions">
+                    <button id="btn-refresh-pending" class="btn btn-edit btn-sm">↻ Actualizar</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Asignar rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-tbody">
+                        <tr><td colspan="6" class="table-empty">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="toast-container" id="toast-container"></div>
+</body>
+</html>

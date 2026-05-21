@@ -31,6 +31,11 @@ public class Campaign {
     private LocalDate endDate;
 
     @ManyToMany
+    @JoinTable(
+        name = "campaign_stores",
+        joinColumns = @JoinColumn(name = "id_campaign"),
+        inverseJoinColumns = @JoinColumn(name = "id_store")
+    )
     private Set<Store> stores = new LinkedHashSet<>();
 
     @ManyToMany

@@ -1,0 +1,24 @@
+/* Captain stores — page-specific styles */
+
+.detail-panel { margin-top: 1.5rem; }
+
+.shift-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.shift-block h4 { margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--blue-900); }
+.shift-block p { margin: 0; font-size: 0.85rem; color: var(--ink-light); }
+
+.volunteer-pill {
+    display: inline-block;
+    background: var(--color-green-icon-bg);
+    color: var(--color-green-icon);
+    border-radius: 14px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    margin: 2px;
+}

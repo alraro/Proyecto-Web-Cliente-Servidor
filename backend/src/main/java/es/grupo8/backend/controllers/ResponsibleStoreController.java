@@ -88,7 +88,7 @@ public class ResponsibleStoreController {
         return ResponseEntity.ok(response);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // Helpers 
     private Map<String, Object> buildDetailResponse(Store store) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("id",      store.getId());

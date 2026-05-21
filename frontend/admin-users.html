@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Usuarios</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="javascript/common.js" defer></script>
+    <script src="javascript/admin-users.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+    <script src="javascript/export.js" defer></script>
+</head>
+<body>
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+            <h1>Usuarios</h1>
+            <p>Gestiona los usuarios registrados en la plataforma.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Listado de usuarios</h2>
+                <div class="card-actions">
+                    <button class="btn btn-export" id="btn-export">Exportar archivo</button>
+                    <button class="btn btn-edit btn-sm" id="btn-refresh">↻ Actualizar</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Rol actual</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="6" class="table-empty">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Cambiar rol de usuario</h3>
+
+            <div class="form-group">
+                <label for="input-role">Nuevo rol <span class="required-asterisk">*</span></label>
+                <select id="input-role">
+                    <option value="">Seleccionar rol...</option>
+                    <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                    <option value="COORDINADOR">COORDINADOR</option>
+                    <option value="CAPITAN">CAPITAN</option>
+                    <option value="COLABORADOR">COLABORADOR</option>
+                    <option value="RESPONSABLE_TIENDA">RESPONSABLE_TIENDA</option>
+                </select>
+            </div>
+
+            <p class="form-message" id="modal-error"></p>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+</body>
+</html>
