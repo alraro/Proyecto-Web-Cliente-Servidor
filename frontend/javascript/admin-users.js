@@ -27,19 +27,6 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Toast notification
-function showToast(msg, type) {
-    console.log("El toast se muestra con el mensaje: " + msg + " y el tipo: " + type);
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(function () {
-        toast.remove();
-    }, 3500);
-}
-
 // Escape HTML for safe attribute usage
 function escHtml(value) {
     return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -94,6 +81,7 @@ function renderUserRow(user) {
     const btnEdit = document.createElement('button');
     btnEdit.className = 'btn btn-primary btn-sm';
     btnEdit.textContent = 'Editar';
+    btnEdit.setAttribute('data-action', 'edit');
     btnEdit.setAttribute('data-userid', user.id);
     tdActions.appendChild(btnEdit);
 
@@ -101,6 +89,7 @@ function renderUserRow(user) {
     const btnDelete = document.createElement('button');
     btnDelete.className = 'btn btn-danger btn-sm';
     btnDelete.textContent = 'Eliminar';
+    btnDelete.setAttribute('data-action', 'delete');
     btnDelete.setAttribute('data-userid', user.id);
     tdActions.appendChild(btnDelete);
 
@@ -147,9 +136,9 @@ async function loadUsers() {
 
         usersCache = data;
 
-        for (let i = 0; i < data.length; i++) {
-            usersTbody.appendChild(renderUserRow(data[i]));
-        }
+        data.forEach(function (user) {
+            usersTbody.appendChild(renderUserRow(user));
+        });
     } catch (error) {
         usersTbody.innerHTML = '';
         const errorRow = document.createElement('tr');
@@ -261,14 +250,14 @@ async function deleteUser(userId) {
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function () {
     // Cache DOM elements
-    usersTbody = document.getElementById('users-tbody');
-    modalBackdrop = document.getElementById('modal-backdrop');
-    inputRole = document.getElementById('input-role');
-    modalError = document.getElementById('modal-error');
-    btnGuardar = document.getElementById('btn-guardar');
-    btnCancelar = document.getElementById('btn-cancelar');
-    btnRefresh = document.getElementById('btn-refresh');
-    btnExport = document.getElementById('btn-export');
+    usersTbody = document.querySelector('#users-tbody');
+    modalBackdrop = document.querySelector('#modal-backdrop');
+    inputRole = document.querySelector('#input-role');
+    modalError = document.querySelector('#modal-error');
+    btnGuardar = document.querySelector('#btn-guardar');
+    btnCancelar = document.querySelector('#btn-cancelar');
+    btnRefresh = document.querySelector('#btn-refresh');
+    btnExport = document.querySelector('#btn-export');
 
     // Auth check
     if (!getToken()) {
@@ -305,11 +294,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!button) return;
 
         const userId = button.getAttribute('data-userid');
-        const action = button.textContent;
+        const action = button.getAttribute('data-action');
 
-        if (action === 'Editar') {
+        if (action === 'edit') {
             openEditModal(userId);
-        } else if (action === 'Eliminar') {
+        } else if (action === 'delete') {
             deleteUser(userId);
         }
     });
