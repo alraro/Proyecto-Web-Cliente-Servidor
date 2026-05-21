@@ -4,26 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Entidades Colaboradoras</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator-entities.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="coordinator-dashboard.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Coordinador</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -41,7 +32,7 @@
         <!-- Selector de campaña -->
         <div class="card">
             <div class="card-body">
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="campaign-select">Campaña</label>
                     <div class="selector-row">
                         <select id="campaign-select">

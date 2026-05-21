@@ -402,7 +402,4 @@ public class CoordinatorController {
                 .body(Map.of("message", "Acceso denegado"));
     }
 
-    private static String trimToNull(String s) {
-        return s == null ? null : s.trim().isEmpty() ? null : s.trim();
-    }
 }

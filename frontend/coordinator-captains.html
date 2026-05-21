@@ -4,26 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Capitanes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator-captains.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="coordinator-dashboard.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Coordinador</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -47,7 +38,7 @@
                         <option value="">Selecciona una campaña...</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="store-select">Tienda</label>
                     <div class="selector-row">
                         <select id="store-select" disabled>
@@ -77,7 +68,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="captains-info" hidden style="padding:1rem 1.25rem;color:var(--text-secondary,#6b7280);font-size:.88rem;border-top:1px solid var(--border,#e0e0e0);">
+            <div id="captains-info" hidden class="info-note">
                 Para añadir un capitán, rellena el formulario de abajo. Tu solicitud quedará pendiente de aprobación por el administrador.
             </div>
         </div>
@@ -88,7 +79,7 @@
                 <h2>Registrar nuevo capitán</h2>
             </div>
             <div class="card-body">
-                <p style="color:var(--text-secondary);font-size:.9rem;margin-bottom:1rem;">
+                <p class="form-description">
                     El nuevo capitán quedará pendiente de validación por el administrador.
                 </p>
                 <div class="form-group">

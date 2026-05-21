@@ -1,24 +1,3 @@
-/* ── Mensajes globales ─────────────────────────────────────────────────────── */
-
-#global-message {
-    margin: 0 0 1rem 0;
-    padding: .85rem 1.2rem;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    font-size: .93rem;
-}
-#global-message.success {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-}
-#global-message.error {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
-}
-
-/* ── Cabecera de página ────────────────────────────────────────────────────── */
 
 .page-header { margin-bottom: 1.5rem; }
 .back-link-inline {
@@ -40,7 +19,6 @@
 }
 .page-header-row p { color: var(--ink-light); font-size: .93rem; margin: 0; }
 
-/* ── Tarjetas base ─────────────────────────────────────────────────────────── */
 
 .card {
     background: var(--white);
@@ -62,7 +40,6 @@
 }
 .card-body { padding: 1.25rem 1.5rem; }
 
-/* ── Selector de campaña ──────────────────────────────────────────────────── */
 
 .form-group { display: flex; flex-direction: column; gap: .4rem; }
 .form-group label {
@@ -88,7 +65,6 @@
     box-shadow: 0 0 0 3px rgba(45, 101, 160, .14);
 }
 
-/* ── Mensajes de estado ────────────────────────────────────────────────────── */
 
 .loading-msg {
     text-align: center;
@@ -98,7 +74,6 @@
 }
 .error-msg { color: #b91c1c; }
 
-/* ── Tarjeta de turno ─────────────────────────────────────────────────────── */
 
 .shift-card {
     background: var(--white);
@@ -137,7 +112,6 @@
     font-size: .82rem;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    backdrop-filter: blur(4px);
     flex-shrink: 0;
 }
 .attendance-counter.all-present {
@@ -161,7 +135,6 @@
     margin: 0;
 }
 
-/* ── Filas de voluntarios ─────────────────────────────────────────────────── */
 
 .volunteer-list { padding: .5rem 0; }
 
@@ -188,7 +161,6 @@
 }
 .volunteer-phone { font-size: .8rem; color: var(--ink-light); }
 
-/* ── Controles de asistencia ──────────────────────────────────────────────── */
 
 .attendance-controls {
     display: flex;
@@ -242,9 +214,8 @@
 .btn-attendance:disabled { opacity: .75; }
 .btn-attendance.loading { opacity: .5; cursor: wait; }
 
-/* ── Responsive móvil (RNF-09) ────────────────────────────────────────────── */
 
-@media (max-width: 480px) {
+@media screen and (width <= 480px) {
     .shift-card-header { flex-direction: column; gap: .6rem; }
     .attendance-counter { align-self: flex-end; }
 

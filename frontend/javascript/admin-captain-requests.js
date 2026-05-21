@@ -4,18 +4,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
-
     const statusSelect  = document.getElementById('status-select');
     const btnLoad       = document.getElementById('btn-load');
     const requestsTbody = document.getElementById('requests-tbody');
 
     async function loadRequests() {
         const status = statusSelect.value;
-        requestsTbody.innerHTML = "<tr><td colspan='7' class='table-empty'>Cargando...</td></tr>";
+        const loadingRow = document.createElement('tr');
+        const loadingCell = document.createElement('td');
+        loadingCell.setAttribute('colspan', '7');
+        loadingCell.className = 'table-empty';
+        loadingCell.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingCell);
+        requestsTbody.replaceChildren();
         try {
             const requests = await fetchJson(
                 API_BASE + '/api/admin/captain-requests?status=' + encodeURIComponent(status),
@@ -24,36 +25,70 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(Array.isArray(requests) ? requests : []);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar las solicitudes', true);
-            requestsTbody.innerHTML = "<tr><td colspan='7' class='table-empty'>Error al cargar.</td></tr>";
+            requestsTbody.replaceChildren();
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.setAttribute('colspan', '7');
+            errorCell.className = 'table-empty';
+            errorCell.textContent = 'Error al cargar.';
+            errorRow.appendChild(errorCell);
+            requestsTbody.appendChild(errorRow);
         }
     }
 
     btnLoad.addEventListener('click', loadRequests);
 
     function renderTable(requests) {
-        requestsTbody.innerHTML = '';
+        requestsTbody.replaceChildren();
         if (!requests.length) {
-            requestsTbody.innerHTML = "<tr><td colspan='7' class='table-empty'>No hay solicitudes con este estado.</td></tr>";
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '7');
+            cell.className = 'table-empty';
+            cell.textContent = 'No hay solicitudes con este estado.';
+            row.appendChild(cell);
+            requestsTbody.appendChild(row);
             return;
         }
         requests.forEach(r => {
             const tr = document.createElement('tr');
             const isPending = r.status === 'PENDIENTE';
-            const fecha = r.createdAt ? new Date(r.createdAt).toLocaleDateString('es-ES') : '—';
-            tr.innerHTML = `
-                <td>${escapeHtml(r.name || '')}</td>
-                <td>${escapeHtml(r.email || '')}</td>
-                <td>${escapeHtml(r.campaignName || '')}</td>
-                <td>${escapeHtml(r.coordinatorName || '')}</td>
-                <td>${fecha}</td>
-                <td>${statusBadge(r.status)}</td>
-                <td class="action-cell">
-                    ${isPending ? `
-                    <button class="btn btn-sm btn-approve" data-id="${r.id}">Aprobar</button>
-                    <button class="btn btn-sm btn-reject"  data-id="${r.id}">Rechazar</button>
-                    ` : '—'}
-                </td>
-            `;
+            const fecha = r.createdAt ? new Date(r.createdAt).toLocaleDateString('es-ES') : '\u2014';
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(r.name || '');
+            tr.appendChild(tdName);
+            const tdEmail = document.createElement('td');
+            tdEmail.textContent = escapeHtml(r.email || '');
+            tr.appendChild(tdEmail);
+            const tdCampaign = document.createElement('td');
+            tdCampaign.textContent = escapeHtml(r.campaignName || '');
+            tr.appendChild(tdCampaign);
+            const tdCoordinator = document.createElement('td');
+            tdCoordinator.textContent = escapeHtml(r.coordinatorName || '');
+            tr.appendChild(tdCoordinator);
+            const tdDate = document.createElement('td');
+            tdDate.textContent = fecha;
+            tr.appendChild(tdDate);
+            const tdStatus = document.createElement('td');
+            tdStatus.appendChild(statusBadge(r.status));
+            tr.appendChild(tdStatus);
+            const tdAction = document.createElement('td');
+            tdAction.className = 'action-cell';
+            if (isPending) {
+                const btnApprove = document.createElement('button');
+                btnApprove.className = 'btn btn-sm btn-approve';
+                btnApprove.setAttribute('data-id', r.id);
+                btnApprove.textContent = 'Aprobar';
+                tdAction.appendChild(btnApprove);
+                const btnReject = document.createElement('button');
+                btnReject.className = 'btn btn-sm btn-reject';
+                btnReject.setAttribute('data-id', r.id);
+                btnReject.textContent = 'Rechazar';
+                tdAction.appendChild(btnReject);
+            } else {
+                tdAction.textContent = '\u2014';
+            }
+            tr.appendChild(tdAction);
             requestsTbody.appendChild(tr);
         });
 
@@ -82,11 +117,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function statusBadge(status) {
         const map = {
-            'PENDIENTE':  '<span class="status-badge status-pending">Pendiente</span>',
-            'APROBADA':   '<span class="status-badge status-approved">Aprobada</span>',
-            'RECHAZADA':  '<span class="status-badge status-rejected">Rechazada</span>',
+            'PENDIENTE':  { text: 'Pendiente',  css: 'status-badge status-pending' },
+            'APROBADA':   { text: 'Aprobada',   css: 'status-badge status-approved' },
+            'RECHAZADA':  { text: 'Rechazada',  css: 'status-badge status-rejected' },
         };
-        return map[status] || escapeHtml(status);
+        const entry = map[status];
+        if (entry) {
+            const span = document.createElement('span');
+            span.className = entry.css;
+            span.textContent = entry.text;
+            return span;
+        }
+        const span = document.createElement('span');
+        span.textContent = status;
+        return span;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

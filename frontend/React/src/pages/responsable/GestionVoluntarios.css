@@ -1,0 +1,332 @@
+:root {
+  --blue-900: #193a6b;
+  --blue-700: #2d65a0;
+  --orange-500: #eb7b31;
+  --orange-300: #f7b075;
+  --ink: #1f2937;
+  --card: #ffffff;
+  --shadow: 0 20px 50px rgba(22, 46, 82, 0.18);
+}
+
+.gestion-voluntarios {
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(247, 176, 117, 0.34), transparent 30%),
+    radial-gradient(circle at 90% 0%, rgba(45, 101, 160, 0.22), transparent 32%),
+    linear-gradient(180deg, #fffdfa 0%, #f4f8ff 58%, #eef5ff 100%);
+}
+
+.header {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 1.2rem 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header h1 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--blue-900);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1220px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-title {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--blue-900);
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.65rem, 3vw, 2.6rem);
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #fcc;
+}
+
+.btn-add {
+  background: linear-gradient(140deg, var(--blue-900), var(--blue-700));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+}
+
+.volunteers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+  border-radius: 32px;
+  overflow: hidden;
+  border: 1px solid rgba(25, 58, 107, 0.1);
+}
+
+.volunteers-table thead {
+  background: linear-gradient(150deg, var(--blue-900), var(--blue-700));
+  color: white;
+}
+
+.volunteers-table th,
+.volunteers-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(25, 58, 107, 0.1);
+}
+
+.volunteers-table th {
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.volunteers-table tbody tr:hover {
+  background: rgba(244, 248, 255, 0.92);
+}
+
+.volunteers-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 2rem !important;
+}
+
+.campaigns-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.campaign-badge {
+  background: rgba(235, 123, 49, 0.13);
+  color: #a14f19;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.no-campaigns {
+  color: #999;
+  font-size: 0.875rem;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-edit {
+  background: var(--blue-700);
+  color: white;
+}
+
+.btn-edit:hover {
+  background: var(--blue-900);
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  background: var(--orange-500);
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c96525;
+  transform: translateY(-1px);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(25, 58, 107, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 32px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(25, 58, 107, 0.1);
+}
+
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--blue-900);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(25, 58, 107, 0.16);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--blue-700);
+  box-shadow: 0 0 0 3px rgba(45, 101, 160, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: transform 0.2s ease;
+}
+
+.btn-save {
+  background: linear-gradient(140deg, var(--blue-900), var(--blue-700));
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: rgba(25, 58, 107, 0.16);
+  color: var(--blue-900);
+}
+
+.btn-cancel:hover {
+  background: rgba(25, 58, 107, 0.24);
+  transform: translateY(-2px);
+}
+
+.footer {
+  max-width: 1220px;
+  margin: 1.5rem auto 0;
+  padding: 1rem 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(25, 58, 107, 0.12);
+}
+
+.footer p {
+  margin: 0;
+  color: rgba(31, 41, 55, 0.76);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.25rem;
+  color: #666;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--blue-700);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: var(--blue-900);
+}
+
+@media (max-width: 768px) {
+  .volunteers-table {
+    font-size: 0.875rem;
+  }
+
+  .volunteers-table th,
+  .volunteers-table td {
+    padding: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    margin-right: 0;
+  }
+}

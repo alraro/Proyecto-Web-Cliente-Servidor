@@ -4,47 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Mis Tiendas</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/captain-stores.js" defer></script>
-    <style>
-        .detail-panel { margin-top: 1.5rem; }
-        .shift-block {
-            background: var(--surface, #fff);
-            border: 1px solid var(--border, #e0e0e0);
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1rem;
-        }
-        .shift-block h4 { margin: 0 0 .5rem; font-size: .95rem; color: var(--text-primary, #1a1a2e); }
-        .shift-block p  { margin: 0; font-size: .85rem; color: var(--text-secondary, #6b7280); }
-        .volunteer-pill {
-            display: inline-block;
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-radius: 14px;
-            padding: 2px 10px;
-            font-size: .8rem;
-            margin: 2px;
-        }
-    </style>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="captain-dashboard.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Capitán</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
+
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -61,7 +32,7 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="campaign-select">Campaña</label>
                     <div class="selector-row">
                         <select id="campaign-select">

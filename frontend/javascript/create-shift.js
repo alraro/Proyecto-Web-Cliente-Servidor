@@ -1,22 +1,16 @@
-const BACKEND = 'http://localhost:8080';
-
 let selectedCampaign = null;
 
-function getToken() { return localStorage.getItem('token'); }
-function authHeaders() {
-    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
-}
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-if (!getToken()) window.location.href = 'login.html';
-document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Coordinador';
-document.getElementById('btn-logout').addEventListener('click', logout);
+document.addEventListener('DOMContentLoaded', () => {
+    if (!getToken()) window.location.href = 'login.html';
 
-// ── Campañas ──────────────────────────────────────────────────────────────────
+});
+
+
 
 async function loadCampaigns() {
     try {
-        const res = await fetch(BACKEND + '/api/coordinator/my-campaigns', { headers: authHeaders() });
+        const res = await fetch(API_BASE + '/api/coordinator/my-campaigns', { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) { showMessage('No se pudieron cargar las campañas.', 'error'); return; }
         const data = await res.json();
@@ -26,8 +20,8 @@ async function loadCampaigns() {
             const opt = document.createElement('option');
             opt.value = c.id;
             opt.textContent = `${c.name} (${c.startDate} – ${c.endDate})`;
-            opt.dataset.start = c.startDate;
-            opt.dataset.end   = c.endDate;
+            opt.setAttribute('data-start', c.startDate);
+            opt.setAttribute('data-end', c.endDate);
             sel.appendChild(opt);
         });
     } catch {
@@ -40,35 +34,54 @@ document.getElementById('campaign-select').addEventListener('change', async func
     const selOpt     = this.options[this.selectedIndex];
     const storeSel   = document.getElementById('store-select');
 
-    storeSel.innerHTML  = '<option value="">Cargando tiendas...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Cargando tiendas...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
     storeSel.disabled   = true;
-    document.getElementById('shift-form-card').style.display = 'none';
-    document.getElementById('shifts-card').style.display     = 'none';
+    document.getElementById('shift-form-card').className = 'form-card hidden';
+    document.getElementById('shifts-card').className = 'shifts-list-card hidden';
     selectedCampaign = null;
 
     if (!campaignId) {
-        storeSel.innerHTML = '<option value="">Selecciona primero una campaña...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Selecciona primero una campaña...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
         return;
     }
 
-    selectedCampaign = { id: campaignId, start: selOpt.dataset.start, end: selOpt.dataset.end };
+    selectedCampaign = { id: campaignId, start: selOpt.getAttribute('data-start'), end: selOpt.getAttribute('data-end') };
 
-    // Restringir el selector de fecha al rango de la campaña
     const dayInput = document.getElementById('shift-day');
     dayInput.min = selectedCampaign.start;
     dayInput.max = selectedCampaign.end;
 
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/campaign/${campaignId}/stores`, { headers: authHeaders() });
+        const res = await fetch(`${API_BASE}/api/shifts/campaign/${campaignId}/stores`, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
-            storeSel.innerHTML = '<option value="">Error al cargar tiendas</option>';
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = 'Error al cargar tiendas';
+            storeSel.innerHTML = '';
+            storeSel.appendChild(opt0);
             return;
         }
         const stores = await res.json();
-        storeSel.innerHTML = '<option value="">Selecciona una tienda...</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Selecciona una tienda...';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
         if (!stores.length) {
-            storeSel.innerHTML = '<option value="">Sin tiendas asignadas a esta campaña</option>';
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = 'Sin tiendas asignadas a esta campaña';
+            storeSel.innerHTML = '';
+            storeSel.appendChild(opt0);
             return;
         }
         stores.forEach(s => {
@@ -79,55 +92,112 @@ document.getElementById('campaign-select').addEventListener('change', async func
         });
         storeSel.disabled = false;
 
-        document.getElementById('shift-form-card').style.display = 'block';
+        document.getElementById('shift-form-card').className = 'form-card';
         await loadShifts(campaignId);
-        document.getElementById('shifts-card').style.display = 'block';
+        document.getElementById('shifts-card').className = 'shifts-list-card';
     } catch {
-        storeSel.innerHTML = '<option value="">Error al cargar tiendas</option>';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Error al cargar tiendas';
+        storeSel.innerHTML = '';
+        storeSel.appendChild(opt0);
     }
 });
 
-// ── Turnos ────────────────────────────────────────────────────────────────────
 
 async function loadShifts(campaignId) {
     const container = document.getElementById('shifts-container');
-    container.innerHTML = '<p class="empty-message">Cargando...</p>';
+    container.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = 'empty-message';
+    p.textContent = 'Cargando...';
+    container.appendChild(p);
     try {
-        const res = await fetch(`${BACKEND}/api/shifts?campaignId=${campaignId}`, { headers: authHeaders() });
-        if (!res.ok) { container.innerHTML = '<p class="empty-message">Error al cargar los turnos.</p>'; return; }
+        const res = await fetch(`${API_BASE}/api/shifts?campaignId=${campaignId}`, { headers: authHeaders() });
+        if (!res.ok) {
+            container.innerHTML = '';
+            const pErr = document.createElement('p');
+            pErr.className = 'empty-message';
+            pErr.textContent = 'Error al cargar los turnos.';
+            container.appendChild(pErr);
+            return;
+        }
         renderShifts(await res.json());
     } catch {
-        container.innerHTML = '<p class="empty-message">Error al conectar con el servidor.</p>';
+        container.innerHTML = '';
+        const pErr = document.createElement('p');
+        pErr.className = 'empty-message';
+        pErr.textContent = 'Error al conectar con el servidor.';
+        container.appendChild(pErr);
     }
 }
 
 function renderShifts(shifts) {
     const container = document.getElementById('shifts-container');
     if (!shifts.length) {
-        container.innerHTML = '<p class="empty-message">No hay turnos creados para esta campaña.</p>';
+        container.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = 'empty-message';
+        p.textContent = 'No hay turnos creados para esta campaña.';
+        container.appendChild(p);
         return;
     }
-    container.innerHTML = shifts.map(s => `
-        <div class="shift-item">
-            <div class="shift-info">
-                <h4>${escHtml(s.storeName)}</h4>
-                <p>${escHtml(s.day)} &nbsp;·&nbsp; ${escHtml(s.startTime)} – ${escHtml(s.endTime)}</p>
-                <div class="shift-details">
-                    <span class="shift-detail">👤 ${s.volunteersNeeded} voluntarios</span>
-                    ${s.location     ? `<span class="shift-detail">📍 ${escHtml(s.location)}</span>`     : ''}
-                    ${s.observations ? `<span class="shift-detail">📝 ${escHtml(s.observations)}</span>` : ''}
-                </div>
-            </div>
-            <button class="btn-edit" onclick="openAssignModal(${s.shiftId})" style="white-space:nowrap;">Asignar →</button>
-        </div>
-    `).join('');
+    container.innerHTML = '';
+    shifts.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'shift-item';
+
+        const shiftInfo = document.createElement('div');
+        shiftInfo.className = 'shift-info';
+
+        const h4 = document.createElement('h4');
+        h4.textContent = s.storeName;
+        shiftInfo.appendChild(h4);
+
+        const p = document.createElement('p');
+        p.textContent = s.day + '  ·  ' + s.startTime + ' – ' + s.endTime;
+        shiftInfo.appendChild(p);
+
+        const shiftDetails = document.createElement('div');
+        shiftDetails.className = 'shift-details';
+
+        const spanVol = document.createElement('span');
+        spanVol.className = 'shift-detail';
+        spanVol.textContent = '👤 ' + s.volunteersNeeded + ' voluntarios';
+        shiftDetails.appendChild(spanVol);
+
+        if (s.location) {
+            const spanLoc = document.createElement('span');
+            spanLoc.className = 'shift-detail';
+            spanLoc.textContent = '📍 ' + s.location;
+            shiftDetails.appendChild(spanLoc);
+        }
+
+        if (s.observations) {
+            const spanObs = document.createElement('span');
+            spanObs.className = 'shift-detail';
+            spanObs.textContent = '📝 ' + s.observations;
+            shiftDetails.appendChild(spanObs);
+        }
+
+        shiftInfo.appendChild(shiftDetails);
+        div.appendChild(shiftInfo);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-edit';
+        btn.style.whiteSpace = 'nowrap';
+        btn.textContent = 'Asignar →';
+        btn.addEventListener('click', function() { openAssignModal(s.shiftId); });
+        div.appendChild(btn);
+
+        container.appendChild(div);
+    });
 }
 
 document.getElementById('btn-refresh').addEventListener('click', () => {
     if (selectedCampaign) loadShifts(selectedCampaign.id);
 });
 
-// ── Envío del formulario ──────────────────────────────────────────────────────
 
 document.getElementById('btn-submit').addEventListener('click', async () => {
     const campaignId       = document.getElementById('campaign-select').value;
@@ -139,7 +209,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     const location         = document.getElementById('location').value.trim();
     const observations     = document.getElementById('observations').value.trim();
 
-    // Validación cliente
+    
     if (!campaignId)    { showMessage('Selecciona una campaña.',  'error'); return; }
     if (!storeId)       { showMessage('Selecciona una tienda.',   'error'); return; }
     if (!day)           { showMessage('El día es obligatorio.',   'error'); return; }
@@ -162,7 +232,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     }
 
     try {
-        const res = await fetch(`${BACKEND}/api/shifts`, {
+        const res = await fetch(`${API_BASE}/api/shifts`, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({
@@ -207,11 +277,6 @@ function showMessage(text, type) {
     el.className   = 'form-message ' + type;
 }
 
-function escHtml(v) {
-    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// ── Modal de asignación ───────────────────────────────────────────────────────
 
 let currentShiftId = null;
 
@@ -221,25 +286,29 @@ document.getElementById('assignment-modal').addEventListener('click', e => {
 });
 
 function closeAssignModal() {
-    document.getElementById('assignment-modal').classList.add('hidden');
+    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay hidden';
     currentShiftId = null;
 }
 
 async function openAssignModal(shiftId) {
     currentShiftId = shiftId;
-    document.getElementById('assignment-modal').classList.remove('hidden');
+    document.getElementById('assignment-modal').className = 'coordinator-modal-overlay';
     clearModalFeedback();
     await loadModalData(shiftId);
 }
 
 async function loadModalData(shiftId) {
     try {
-        const [volData, capData, availVol, availCap] = await Promise.all([
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/volunteers`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/captains`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/available-volunteers`),
-            apiFetch(`${BACKEND}/api/shifts/${shiftId}/available-captains`)
+        const results = await Promise.all([
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/volunteers`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/captains`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/available-volunteers`),
+            apiFetch(`${API_BASE}/api/shifts/${shiftId}/available-captains`)
         ]);
+        const volData  = results[0];
+        const capData  = results[1];
+        const availVol = results[2];
+        const availCap = results[3];
 
         // Info del turno
         document.getElementById('modal-title').textContent = `Asignaciones — Turno #${shiftId}`;
@@ -268,34 +337,84 @@ async function loadModalData(shiftId) {
 function renderModalVolunteers(volunteers) {
     const el = document.getElementById('modal-volunteers');
     if (!volunteers.length) {
-        el.innerHTML = '<p style="font-size:.88rem;color:var(--text-light);">Sin voluntarios asignados.</p>';
+        el.innerHTML = '';
+        const p = document.createElement('p');
+        p.style.fontSize = '.88rem';
+        p.style.color = 'var(--text-light)';
+        p.textContent = 'Sin voluntarios asignados.';
+        el.appendChild(p);
         return;
     }
-    el.innerHTML = volunteers.map(v => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border-color);">
-            <span style="font-size:.9rem;">${escHtml(v.name)} <span style="color:var(--text-light)">(${escHtml(v.email || '')})</span></span>
-            <button class="btn-secondary" style="padding:.25rem .75rem;font-size:.8rem;" onclick="unassignVolunteer(${v.volunteerId})">Quitar</button>
-        </div>
-    `).join('');
+    el.innerHTML = '';
+    volunteers.forEach(v => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.padding = '.4rem 0';
+        div.style.borderBottom = '1px solid var(--border-color)';
+
+        const span = document.createElement('span');
+        span.style.fontSize = '.9rem';
+        span.textContent = v.name + ' (' + (v.email || '') + ')';
+        div.appendChild(span);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.padding = '.25rem .75rem';
+        btn.style.fontSize = '.8rem';
+        btn.textContent = 'Quitar';
+        btn.addEventListener('click', function() { unassignVolunteer(v.volunteerId); });
+        div.appendChild(btn);
+
+        el.appendChild(div);
+    });
 }
 
 function renderModalCaptains(captains) {
     const el = document.getElementById('modal-captains');
     if (!captains.length) {
-        el.innerHTML = '<p style="font-size:.88rem;color:var(--text-light);">Sin capitanes asignados.</p>';
+        el.innerHTML = '';
+        const p = document.createElement('p');
+        p.style.fontSize = '.88rem';
+        p.style.color = 'var(--text-light)';
+        p.textContent = 'Sin capitanes asignados.';
+        el.appendChild(p);
         return;
     }
-    el.innerHTML = captains.map(c => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border-color);">
-            <span style="font-size:.9rem;">${escHtml(c.name)} <span style="color:var(--text-light)">(${escHtml(c.email || '')})</span></span>
-            <button class="btn-secondary" style="padding:.25rem .75rem;font-size:.8rem;" onclick="unassignCaptain(${c.userId})">Quitar</button>
-        </div>
-    `).join('');
+    el.innerHTML = '';
+    captains.forEach(c => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.padding = '.4rem 0';
+        div.style.borderBottom = '1px solid var(--border-color)';
+
+        const span = document.createElement('span');
+        span.style.fontSize = '.9rem';
+        span.textContent = c.name + ' (' + (c.email || '') + ')';
+        div.appendChild(span);
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary';
+        btn.style.padding = '.25rem .75rem';
+        btn.style.fontSize = '.8rem';
+        btn.textContent = 'Quitar';
+        btn.addEventListener('click', function() { unassignCaptain(c.userId); });
+        div.appendChild(btn);
+
+        el.appendChild(div);
+    });
 }
 
 function populateSelect(selectId, items, valueKey, labelKey, placeholder, labelFn) {
     const sel = document.getElementById(selectId);
-    sel.innerHTML = `<option value="">${escHtml(placeholder)}</option>`;
+    sel.innerHTML = '';
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = placeholder;
+    sel.appendChild(defaultOpt);
     items.forEach(item => {
         const opt = document.createElement('option');
         opt.value       = item[valueKey];
@@ -308,7 +427,7 @@ document.getElementById('btn-assign-volunteer').addEventListener('click', async 
     const volunteerId = document.getElementById('volunteer-select').value;
     if (!volunteerId) { showFeedback('volunteer', 'Selecciona un voluntario.', 'error'); return; }
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/volunteers`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/volunteers`, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ volunteerId: parseInt(volunteerId, 10) })
         });
@@ -327,7 +446,7 @@ document.getElementById('btn-assign-captain').addEventListener('click', async ()
     const userId = document.getElementById('captain-select').value;
     if (!userId) { showFeedback('captain', 'Selecciona un capitán.', 'error'); return; }
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/captains`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/captains`, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ userId: parseInt(userId, 10) })
         });
@@ -344,7 +463,7 @@ document.getElementById('btn-assign-captain').addEventListener('click', async ()
 
 async function unassignVolunteer(volunteerId) {
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/volunteers/${volunteerId}`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/volunteers/${volunteerId}`, {
             method: 'DELETE', headers: authHeaders()
         });
         if (!res.ok) { const d = await res.json(); showFeedback('volunteer', d.message, 'error'); return; }
@@ -354,7 +473,7 @@ async function unassignVolunteer(volunteerId) {
 
 async function unassignCaptain(userId) {
     try {
-        const res = await fetch(`${BACKEND}/api/shifts/${currentShiftId}/captains/${userId}`, {
+        const res = await fetch(`${API_BASE}/api/shifts/${currentShiftId}/captains/${userId}`, {
             method: 'DELETE', headers: authHeaders()
         });
         if (!res.ok) { const d = await res.json(); showFeedback('captain', d.message, 'error'); return; }
@@ -365,15 +484,13 @@ async function unassignCaptain(userId) {
 function showFeedback(type, text, level) {
     const el = document.getElementById(`${type}-feedback`);
     el.textContent = text;
-    el.style.display = 'block';
     el.className = 'form-message ' + (level === 'warning' ? 'error' : level);
-    // 'warning' usa estilo error (naranja/rojo) para que sea visualmente llamativo (RF-28)
 }
 
 function clearModalFeedback() {
     ['volunteer-feedback', 'captain-feedback'].forEach(id => {
         const el = document.getElementById(id);
-        el.style.display = 'none';
+        el.className = 'form-message feedback-hidden';
         el.textContent = '';
     });
 }

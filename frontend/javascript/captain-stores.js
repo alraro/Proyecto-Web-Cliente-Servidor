@@ -4,10 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Capitán';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
+    
 
     const campaignSelect  = document.getElementById('campaign-select');
     const btnLoad         = document.getElementById('btn-load');
@@ -33,7 +30,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = campaignSelect.value;
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
         detailPanel.hidden = true;
-        storesTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Cargando...</td></tr>";
+        storesTbody.innerHTML = '';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 4;
+        td.className = 'table-empty';
+        td.textContent = 'Cargando...';
+        tr.appendChild(td);
+        storesTbody.appendChild(tr);
         try {
             const stores = await fetchJson(
                 API_BASE + '/api/captain/my-stores?campaignId=' + campaignId,
@@ -42,26 +46,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderStores(Array.isArray(stores) ? stores : [], campaignId);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar las tiendas', true);
-            storesTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Error al cargar.</td></tr>";
+            storesTbody.innerHTML = '';
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 4;
+            td.className = 'table-empty';
+            td.textContent = 'Error al cargar.';
+            tr.appendChild(td);
+            storesTbody.appendChild(tr);
         }
     });
 
     function renderStores(stores, campaignId) {
         storesTbody.innerHTML = '';
         if (!stores.length) {
-            storesTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>No hay tiendas en esta campaña.</td></tr>";
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 4;
+            td.className = 'table-empty';
+            td.textContent = 'No hay tiendas en esta campaña.';
+            tr.appendChild(td);
+            storesTbody.appendChild(tr);
             return;
         }
         stores.forEach(s => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(s.name || '')}</td>
-                <td>${escapeHtml(s.chainName || '-')}</td>
-                <td>${escapeHtml(s.address || '-')}</td>
-                <td><button type="button" class="btn btn-sm btn-secondary"
-                    data-store-id="${s.id}" data-store-name="${escapeHtml(s.name || '')}"
-                    data-campaign-id="${campaignId}">Ver detalle</button></td>
-            `;
+            const td0 = document.createElement('td');
+            td0.textContent = escapeHtml(s.name || '');
+            tr.appendChild(td0);
+            const td1 = document.createElement('td');
+            td1.textContent = escapeHtml(s.chainName || '-');
+            tr.appendChild(td1);
+            const td2 = document.createElement('td');
+            td2.textContent = escapeHtml(s.address || '-');
+            tr.appendChild(td2);
+            const td3 = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-secondary';
+            btn.dataset.storeId = s.id;
+            btn.dataset.storeName = escapeHtml(s.name || '');
+            btn.dataset.campaignId = campaignId;
+            btn.textContent = 'Ver detalle';
+            td3.appendChild(btn);
+            tr.appendChild(td3);
             storesTbody.appendChild(tr);
         });
     }
@@ -75,7 +103,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = btn.dataset.campaignId;
 
         detailTitle.textContent = 'Turnos y voluntarios — ' + storeName;
-        shiftsContainer.innerHTML = '<p style="color:var(--text-secondary)">Cargando...</p>';
+        shiftsContainer.innerHTML = '';
+        const p = document.createElement('p');
+        p.style.color = 'var(--text-secondary)';
+        p.textContent = 'Cargando...';
+        shiftsContainer.appendChild(p);
         detailPanel.hidden = false;
         detailPanel.scrollIntoView({ behavior: 'smooth' });
 
@@ -89,14 +121,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 Array.isArray(volunteerShifts) ? volunteerShifts : []
             );
         } catch (err) {
-            shiftsContainer.innerHTML = '<p style="color:#c62828">Error al cargar el detalle.</p>';
+            shiftsContainer.innerHTML = '';
+            const p = document.createElement('p');
+            p.style.color = '#c62828';
+            p.textContent = 'Error al cargar el detalle.';
+            shiftsContainer.appendChild(p);
             showMessage(err.message || 'Error al cargar el detalle', true);
         }
     });
 
     function renderShifts(shifts, volunteerShifts) {
         if (!shifts.length) {
-            shiftsContainer.innerHTML = '<p style="color:var(--text-secondary)">No hay turnos registrados para esta tienda.</p>';
+            shiftsContainer.innerHTML = '';
+            const p = document.createElement('p');
+            p.style.color = 'var(--text-secondary)';
+            p.textContent = 'No hay turnos registrados para esta tienda.';
+            shiftsContainer.appendChild(p);
             return;
         }
 
@@ -115,16 +155,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             const div  = document.createElement('div');
             div.className = 'shift-block';
 
-            const volHtml = vols.length
-                ? vols.map(v => `<span class="volunteer-pill">${escapeHtml(v.volunteerName || v.name || 'Voluntario')}${v.phone ? ' · ' + escapeHtml(v.phone) : ''}</span>`).join('')
-                : '<em style="color:var(--text-secondary);font-size:.85rem">Sin voluntarios asignados</em>';
+            const h4 = document.createElement('h4');
+            h4.textContent = escapeHtml(s.day || s.shiftDay || '') + ' · ' + escapeHtml(s.startTime || '') + ' - ' + escapeHtml(s.endTime || '');
+            div.appendChild(h4);
 
-            div.innerHTML = `
-                <h4>${escapeHtml(s.day || s.shiftDay || '')} · ${escapeHtml(s.startTime || '')} - ${escapeHtml(s.endTime || '')}</h4>
-                <p>Voluntarios necesarios: <strong>${escapeHtml(String(s.volunteersNeeded || 0))}</strong></p>
-                ${s.observations ? '<p>Observaciones: ' + escapeHtml(s.observations) + '</p>' : ''}
-                <div style="margin-top:.5rem">${volHtml}</div>
-            `;
+            const p1 = document.createElement('p');
+            p1.textContent = 'Voluntarios necesarios: ';
+            const strong = document.createElement('strong');
+            strong.textContent = escapeHtml(String(s.volunteersNeeded || 0));
+            p1.appendChild(strong);
+            div.appendChild(p1);
+
+            if (s.observations) {
+                const p2 = document.createElement('p');
+                p2.textContent = 'Observaciones: ' + escapeHtml(s.observations);
+                div.appendChild(p2);
+            }
+
+            const volDiv = document.createElement('div');
+            volDiv.style.marginTop = '.5rem';
+            if (vols.length) {
+                vols.forEach(v => {
+                    const span = document.createElement('span');
+                    span.className = 'volunteer-pill';
+                    span.textContent = escapeHtml(v.volunteerName || v.name || 'Voluntario') + (v.phone ? ' · ' + escapeHtml(v.phone) : '');
+                    volDiv.appendChild(span);
+                });
+            } else {
+                const em = document.createElement('em');
+                em.style.color = 'var(--text-secondary)';
+                em.style.fontSize = '.85rem';
+                em.textContent = 'Sin voluntarios asignados';
+                volDiv.appendChild(em);
+            }
+            div.appendChild(volDiv);
+
             shiftsContainer.appendChild(div);
         });
     }

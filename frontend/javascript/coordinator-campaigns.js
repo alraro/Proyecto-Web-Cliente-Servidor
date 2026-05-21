@@ -4,11 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Coordinador';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
 
     const tbody = document.getElementById('campaigns-tbody');
 
@@ -19,23 +14,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTable(Array.isArray(campaigns) ? campaigns : []);
     } catch (err) {
         showMessage(err.message || 'No se pudieron cargar las campañas', true);
-        tbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Error al cargar.</td></tr>";
+        tbody.innerHTML = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.setAttribute('colspan', '4');
+        errorCell.className = 'table-empty';
+        errorCell.textContent = 'Error al cargar.';
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
     }
 
     function renderTable(campaigns) {
         tbody.innerHTML = '';
         if (!campaigns.length) {
-            tbody.innerHTML = "<tr><td colspan='4' class='table-empty'>No tienes campañas asignadas.</td></tr>";
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '4');
+            cell.className = 'table-empty';
+            cell.textContent = 'No tienes campañas asignadas.';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
         campaigns.forEach(c => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(c.name || '')}</td>
-                <td>${escapeHtml(c.typeName || '-')}</td>
-                <td>${escapeHtml(c.startDate || '')}</td>
-                <td>${escapeHtml(c.endDate || '')}</td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(c.name || '');
+            tr.appendChild(tdName);
+            const tdType = document.createElement('td');
+            tdType.textContent = escapeHtml(c.typeName || '-');
+            tr.appendChild(tdType);
+            const tdStart = document.createElement('td');
+            tdStart.textContent = escapeHtml(c.startDate || '');
+            tr.appendChild(tdStart);
+            const tdEnd = document.createElement('td');
+            tdEnd.textContent = escapeHtml(c.endDate || '');
+            tr.appendChild(tdEnd);
             tbody.appendChild(tr);
         });
     }

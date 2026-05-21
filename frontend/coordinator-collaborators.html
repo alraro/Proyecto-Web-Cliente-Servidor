@@ -4,26 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Colaboradores</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator-collaborators.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
+
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="coordinator-dashboard.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Coordinador</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -41,7 +32,7 @@
         <!-- Filtro campaña -->
         <div class="card">
             <div class="card-body">
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="campaign-select">Campaña</label>
                     <div class="selector-row">
                         <select id="campaign-select">
@@ -55,9 +46,9 @@
 
         <!-- Tabla de colaboradores -->
         <div class="card">
-            <div class="card-head" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="card-head card-head-flex">
                 <h2>Colaboradores y voluntarios</h2>
-                <button type="button" id="btn-new" class="btn btn-primary" style="margin:0">+ Nuevo colaborador</button>
+                <button type="button" id="btn-new" class="btn btn-primary m-0">+ Nuevo colaborador</button>
             </div>
             <div class="table-wrap">
                 <table>
@@ -101,14 +92,14 @@
                     <label for="edit-address">Dirección</label>
                     <input type="text" id="edit-address" placeholder="Dirección (opcional)">
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="edit-partner-entity">Entidad colaboradora (opcional)</label>
                     <select id="edit-partner-entity">
                         <option value="">Sin entidad (voluntario independiente)</option>
                     </select>
                 </div>
             </div>
-            <div class="card-body" style="padding-top:0;display:flex;gap:.5rem">
+            <div class="card-body card-actions-row">
                 <button type="button" id="btn-save" class="btn btn-primary">Guardar</button>
                 <button type="button" id="btn-cancel-form" class="btn btn-secondary">Cancelar</button>
             </div>

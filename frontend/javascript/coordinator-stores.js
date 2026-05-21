@@ -4,11 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Coordinador';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
 
     const campaignSelect = document.getElementById('campaign-select');
     const btnLoad        = document.getElementById('btn-load');
@@ -31,7 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnLoad.addEventListener('click', async () => {
         const campaignId = campaignSelect.value;
         if (!campaignId) { showMessage('Selecciona una campaña', true); return; }
-        tbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Cargando...</td></tr>";
+        tbody.innerHTML = '';
+        const loadingRow = document.createElement('tr');
+        const loadingTd = document.createElement('td');
+        loadingTd.colSpan = 4;
+        loadingTd.className = 'table-empty';
+        loadingTd.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingTd);
+        tbody.appendChild(loadingRow);
         try {
             const stores = await fetchJson(
                 API_BASE + '/api/coordinator/my-stores?campaignId=' + campaignId,
@@ -40,24 +42,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(Array.isArray(stores) ? stores : []);
         } catch (err) {
             showMessage(err.message || 'No se pudieron cargar las tiendas', true);
-            tbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Error al cargar.</td></tr>";
+            tbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorTd = document.createElement('td');
+            errorTd.colSpan = 4;
+            errorTd.className = 'table-empty';
+            errorTd.textContent = 'Error al cargar.';
+            errorRow.appendChild(errorTd);
+            tbody.appendChild(errorRow);
         }
     });
 
     function renderTable(stores) {
         tbody.innerHTML = '';
         if (!stores.length) {
-            tbody.innerHTML = "<tr><td colspan='4' class='table-empty'>No hay tiendas en esta campaña.</td></tr>";
+            const emptyRow = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 4;
+            emptyTd.className = 'table-empty';
+            emptyTd.textContent = 'No hay tiendas en esta campaña.';
+            emptyRow.appendChild(emptyTd);
+            tbody.appendChild(emptyRow);
             return;
         }
         stores.forEach(s => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(s.name || '')}</td>
-                <td>${escapeHtml(s.chainName || '-')}</td>
-                <td>${escapeHtml(s.locality || '-')}</td>
-                <td>${escapeHtml(s.address || '-')}</td>
-            `;
+            const tdName = document.createElement('td');
+            tdName.textContent = escapeHtml(s.name || '');
+            const tdChain = document.createElement('td');
+            tdChain.textContent = escapeHtml(s.chainName || '-');
+            const tdLocality = document.createElement('td');
+            tdLocality.textContent = escapeHtml(s.locality || '-');
+            const tdAddress = document.createElement('td');
+            tdAddress.textContent = escapeHtml(s.address || '-');
+            tr.appendChild(tdName);
+            tr.appendChild(tdChain);
+            tr.appendChild(tdLocality);
+            tr.appendChild(tdAddress);
             tbody.appendChild(tr);
         });
     }

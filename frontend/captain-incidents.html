@@ -4,26 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Registrar Incidencia</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/captain-incidents.js" defer></script>
+    <script src="javascript/includeHTML.js" defer></script>
+    <script src="javascript/header.js" defer></script>
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="captain-dashboard.html">
-            <img src="assets/LOGO_BANCOSOL.png" alt="Bancosol" class="logo">
-        </a>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <span class="dot"></span>
-                <span id="user-name">Capitán</span>
-            </div>
-            <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">
@@ -56,13 +46,13 @@
                         <option value="">Selecciona primero una campaña...</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom:0">
+                <div class="form-group mb-0">
                     <label for="description">Descripción de la incidencia</label>
                     <textarea id="description" rows="5" placeholder="Describe con detalle la incidencia ocurrida..."
-                        style="width:100%;padding:.6rem .8rem;border:1px solid var(--border,#e0e0e0);border-radius:8px;font-family:inherit;font-size:.9rem;resize:vertical;"></textarea>
+                        class="textarea-field"></textarea>
                 </div>
             </div>
-            <div class="card-body" style="padding-top:0">
+            <div class="card-body pt-0">
                 <button type="button" id="btn-submit" class="btn btn-primary">Enviar incidencia</button>
             </div>
         </div>

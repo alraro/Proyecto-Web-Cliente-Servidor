@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Tiendas</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/admin-stores.css">
+    <script src="javascript/common.js" defer></script>
     <script src="javascript/admin-stores.js" defer></script>
     <script src="javascript/includeHTML.js" defer></script>
     <script src="javascript/header.js" defer></script>
@@ -30,7 +30,7 @@
             <div class="card-header">
                 <h2>Listado de tiendas</h2>
                 <div class="card-actions">
-                    <button onclick="exportarExcel('stores')" class="btn-export">Exportar archivo</button>
+                    <button id="btn-export-stores" class="btn btn-export">Exportar archivo</button>
                     <button class="btn btn-primary" id="btn-nueva-tienda">+ Nueva tienda</button>
                 </div>
             </div>
@@ -69,12 +69,12 @@
                 </table>
             </div>
             <div class="pagination">
-                <button id="btn-prev-page" onclick="previousPage()">← Anterior</button>
+                <button id="btn-prev-page">← Anterior</button>
                 <span class="pagination-info">
                     Página <span id="current-page">1</span> de <span id="total-pages">1</span>
                 </span>
-                <button id="btn-next-page" onclick="nextPage()">Siguiente →</button>
-                <select class="pagination-select" id="page-size-select" onchange="changePageSize()">
+                <button id="btn-next-page">Siguiente →</button>
+                <select class="pagination-select" id="page-size-select">
                     <option value="20">20 por página</option>
                     <option value="50">50 por página</option>
                     <option value="100">100 por página</option>

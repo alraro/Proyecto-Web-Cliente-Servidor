@@ -21,16 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
     
 
     captainSelect.disabled = true;
@@ -129,7 +119,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
-        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
+        campaignSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = 'Selecciona una campaña...';
+        campaignSelect.appendChild(defaultOpt);
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -141,22 +135,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCaptainsTable(captains) {
         captainsTbody.innerHTML = '';
         if (!captains.length) {
-            captainsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin capitanes asignados.</td></tr>";
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 3;
+            td.className = 'table-empty';
+            td.textContent = 'Sin capitanes asignados.';
+            tr.appendChild(td);
+            captainsTbody.appendChild(tr);
             return;
         }
         captains.forEach(captain => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(captain.name || '')}</td>
-                <td>${escapeHtml(captain.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${captain.userId}" data-role="CAPTAIN">Eliminar</button></td>
-            `;
+            const td0 = document.createElement('td');
+            td0.textContent = escapeHtml(captain.name || '');
+            row.appendChild(td0);
+            const td1 = document.createElement('td');
+            td1.textContent = escapeHtml(captain.email || '');
+            row.appendChild(td1);
+            const td2 = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-danger';
+            btn.dataset.userid = captain.userId;
+            btn.dataset.role = 'CAPTAIN';
+            btn.textContent = 'Eliminar';
+            td2.appendChild(btn);
+            row.appendChild(td2);
             captainsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
-        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
+        selectEl.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = placeholder;
+        selectEl.appendChild(defaultOpt);
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);

@@ -4,10 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Capitán';
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear(); window.location.href = 'login.html';
-    });
+    
 
     const campaignSelect = document.getElementById('campaign-select');
     const storeSelect    = document.getElementById('store-select');
@@ -31,9 +28,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Al cambiar campaña → cargar tiendas
     campaignSelect.addEventListener('change', async () => {
         const campaignId = campaignSelect.value;
-        storeSelect.innerHTML = '<option value="">Selecciona una tienda...</option>';
+        storeSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = 'Selecciona una tienda...';
+        storeSelect.appendChild(defaultOpt);
         storeSelect.disabled = true;
-        incidentsTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Selecciona campaña y tienda para ver el historial.</td></tr>";
+        incidentsTbody.innerHTML = '';
+        const initRow = document.createElement('tr');
+        const initTd = document.createElement('td');
+        initTd.colSpan = 4;
+        initTd.className = 'table-empty';
+        initTd.textContent = 'Selecciona campaña y tienda para ver el historial.';
+        initRow.appendChild(initTd);
+        incidentsTbody.appendChild(initRow);
         if (!campaignId) return;
         try {
             const stores = await fetchJson(
@@ -57,7 +65,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const campaignId = campaignSelect.value;
         const storeId    = storeSelect.value;
         if (!campaignId || !storeId) return;
-        incidentsTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Cargando...</td></tr>";
+        incidentsTbody.innerHTML = '';
+        const loadingRow = document.createElement('tr');
+        const loadingTd = document.createElement('td');
+        loadingTd.colSpan = 4;
+        loadingTd.className = 'table-empty';
+        loadingTd.textContent = 'Cargando...';
+        loadingRow.appendChild(loadingTd);
+        incidentsTbody.appendChild(loadingRow);
         try {
             const incidents = await fetchJson(
                 API_BASE + '/api/captain/incidents?campaignId=' + campaignId + '&storeId=' + storeId,
@@ -65,24 +80,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
             renderIncidents(Array.isArray(incidents) ? incidents : []);
         } catch (err) {
-            incidentsTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>Error al cargar el historial.</td></tr>";
+            incidentsTbody.innerHTML = '';
+            const errorRow = document.createElement('tr');
+            const errorTd = document.createElement('td');
+            errorTd.colSpan = 4;
+            errorTd.className = 'table-empty';
+            errorTd.textContent = 'Error al cargar el historial.';
+            errorRow.appendChild(errorTd);
+            incidentsTbody.appendChild(errorRow);
         }
     });
 
     function renderIncidents(incidents) {
         incidentsTbody.innerHTML = '';
         if (!incidents.length) {
-            incidentsTbody.innerHTML = "<tr><td colspan='4' class='table-empty'>No hay incidencias registradas.</td></tr>";
+            const emptyRow = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 4;
+            emptyTd.className = 'table-empty';
+            emptyTd.textContent = 'No hay incidencias registradas.';
+            emptyRow.appendChild(emptyTd);
+            incidentsTbody.appendChild(emptyRow);
             return;
         }
         incidents.forEach(i => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(i.createdAt || i.date || '-')}</td>
-                <td>${escapeHtml(i.campaignName || '-')}</td>
-                <td>${escapeHtml(i.storeName || '-')}</td>
-                <td>${escapeHtml(i.description || '')}</td>
-            `;
+            const tdDate = document.createElement('td');
+            tdDate.textContent = escapeHtml(i.createdAt || i.date || '-');
+            const tdCampaign = document.createElement('td');
+            tdCampaign.textContent = escapeHtml(i.campaignName || '-');
+            const tdStore = document.createElement('td');
+            tdStore.textContent = escapeHtml(i.storeName || '-');
+            const tdDesc = document.createElement('td');
+            tdDesc.textContent = escapeHtml(i.description || '');
+            tr.appendChild(tdDate);
+            tr.appendChild(tdCampaign);
+            tr.appendChild(tdStore);
+            tr.appendChild(tdDesc);
             incidentsTbody.appendChild(tr);
         });
     }

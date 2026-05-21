@@ -2,14 +2,15 @@ async function exportarExcel(resource, campaignId = null) {
     const btn = document.querySelector('.btn-export');
     const textoOriginal = btn.textContent;
 
-    // Feedback visual mientras genera
     btn.textContent = 'Generando...';
     btn.disabled = true;
 
     try {
         let url = `http://localhost:8080/api/export/${resource}`;
+        
+        /* Lo usamos solo si necesitamos exportar tambien el dashboard (en proceso)
         if (campaignId) url += `?campaignId=${campaignId}`;
-
+        */
         const token = localStorage.getItem('token');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -17,9 +18,10 @@ async function exportarExcel(resource, campaignId = null) {
         const response = await fetch(url, { headers });
 
         if (response.status === 403) {
-            alert('No tienes permisos para exportar este listado.');
+            alert('No tienes permisos.');
             return;
         }
+
         if (!response.ok) {
             alert('Error al generar el archivo.');
             return;

@@ -15,11 +15,6 @@ function formatDate(dateString){
     })
 }
 
-function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
-}
-
 function authHeaders() {
     return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
 }
@@ -45,28 +40,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-
     await loadCampaigns();
 
-    document.getElementById('campaignSelect').addEventListener('change', onCampaignChange);
-    document.getElementById('refreshInterval').addEventListener('change', resetTimer);
-    document.getElementById('refreshBtn').addEventListener('click', () => loadMetrics(currentCampaignId));
+    document.querySelector('#campaignSelect').addEventListener('change', onCampaignChange);
+    document.querySelector('#refreshInterval').addEventListener('change', resetTimer);
+    document.querySelector('#refreshBtn').addEventListener('click', () => loadMetrics(currentCampaignId));
 });
 
 // Función para cargar campañas y llenar el select
 async function loadCampaigns() {
     try {
         const campaigns = await apiFetch('/api/dashboard/campaigns');
-        const sel = document.getElementById('campaignSelect');
+        const sel = document.querySelector('#campaignSelect');
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
@@ -80,14 +65,12 @@ async function loadCampaigns() {
 
         // KPI global de campañas activas
         const actives = campaigns.filter(c => c.active);
-        document.getElementById('kpiStatus') && (
-            document.getElementById('kpiChains').textContent = campaigns.length
-        );
+        document.querySelector('#kpiStatus') && (document.querySelector('#kpiChains').textContent = campaigns.length);
     } catch(e) {
         showError(e.message);
     }
 }
-
+// Se ejecuta cuando se cambia la campaña seleccionada
 function onCampaignChange(e) {
     currentCampaignId = e.target.value ? parseInt(e.target.value) : null;
     if (currentCampaignId) {
@@ -114,16 +97,15 @@ async function loadMetrics(campaignId) {
 
         // Mostramos el gráfico de cada una de las coberturas
         updateKPIs(chainData, zoneData);
-        renderChart('chainChart',    chainData,    'bar',        'Cadenas');
-        renderChart('localityChart', localityData, 'bar',        'Localidades');
-        renderChart('zoneChart',     zoneData,     'horizontalBar', 'Zonas');
+        renderChart('chainChart', chainData, 'bar', 'Cadenas');
+        renderChart('localityChart', localityData, 'bar', 'Localidades');
+        renderChart('zoneChart', zoneData, 'horizontalBar', 'Zonas');
 
         // Se muestran contenedores de datos
-        document.getElementById('kpiRow').style.display    = 'flex';
-        document.getElementById('chartsGrid').style.display = 'grid';
-        document.getElementById('noSelection').style.display = 'none';
-        document.getElementById('lastUpdated').textContent =
-            `Actualizado: ${new Date().toLocaleTimeString('es-ES')}`;
+        document.querySelector('#kpiRow').classList.remove('hidden');
+        document.querySelector('#chartsGrid').classList.remove('hidden');
+        document.querySelector('#noSelection').classList.add('hidden');
+        document.querySelector('#lastUpdated').textContent = `Actualizado: ${new Date().toLocaleTimeString('es-ES')}`;
 
     } catch(e) {
         showError(e.message);
@@ -137,21 +119,23 @@ function updateKPIs(chainData, zoneData) {
     const chainsActive = chainData.filter(c => c.storesInCampaign > 0).length;
     const zonesActive  = zoneData.filter(z => z.storesInCampaign > 0).length;
 
-    document.getElementById('kpiStores').textContent = totalStores;
-    document.getElementById('kpiChains').textContent = chainsActive;
-    document.getElementById('kpiZones').textContent  = zonesActive;
+    document.querySelector('#kpiStores').textContent = totalStores;
+    document.querySelector('#kpiChains').textContent = chainsActive;
+    document.querySelector('#kpiZones').textContent  = zonesActive;
 }
 
 // Configuramos y dibujamos el gráfico usando Chart.js
 function renderChart(canvasId, data, type, dimensionLabel) {
-    const canvas = document.getElementById(canvasId);
+    const canvas = document.querySelector(`#${canvasId}`);
     const labels  = data.map(d => d.label);
     const covered = data.map(d => d.storesInCampaign);
     const total   = data.map(d => d.totalStores);
     const pct     = data.map(d => d.coveragePercent);
 
     // Destruir instancia previa si existe
-    if (charts[canvasId]) { charts[canvasId].destroy(); }
+    if (charts[canvasId]) { 
+        charts[canvasId].destroy(); 
+    }
 
     const isHorizontal = (type === 'horizontalBar');
     charts[canvasId] = new Chart(canvas, {
@@ -203,7 +187,7 @@ function renderChart(canvasId, data, type, dimensionLabel) {
 // Actualizamos por el intervalo seleccionado
 function resetTimer() {
     if (refreshTimer) clearInterval(refreshTimer);
-    const ms = parseInt(document.getElementById('refreshInterval').value);
+    const ms = parseInt(document.querySelector('#refreshInterval').value);
     if (ms > 0 && currentCampaignId) {
         refreshTimer = setInterval(() => loadMetrics(currentCampaignId), ms);
     }
@@ -211,19 +195,23 @@ function resetTimer() {
 
 
 function showLoading(on) {
-    document.getElementById('loadingSpinner').style.display = on ? 'block' : 'none';
+    const el = document.querySelector('#loadingSpinner');
+    if (on) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
 }
+
 // Mostramos vista inicial
 function showNoSelection() {
-    document.getElementById('kpiRow').style.display     = 'none';
-    document.getElementById('chartsGrid').style.display = 'none';
-    document.getElementById('noSelection').style.display = 'block';
+    document.querySelector('#kpiRow').classList.add('hidden');
+    document.querySelector('#chartsGrid').classList.add('hidden');
+    document.querySelector('#noSelection').classList.remove('hidden');
 }
+
 function showError(msg) {
-    const el = document.getElementById('errorMsg');
+    const el = document.querySelector('#errorMsg');
     el.textContent = `Error: ${msg}`;
-    el.style.display = 'block';
+    el.classList.remove('hidden');
 }
+
 function hideError() {
-    document.getElementById('errorMsg').style.display = 'none';
+    document.querySelector('#errorMsg').classList.add('hidden');
 }

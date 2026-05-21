@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Gestión de Coordinadores</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/assignment.css">
     <script src="javascript/coordinator.js" defer></script>
@@ -32,20 +31,20 @@
     <div id="global-message" hidden></div>
 
     <!-- Acceso a gestión de turnos -->
-    <div class="card" style="margin-bottom:1.5rem;">
-        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <div class="card mb-lg">
+        <div class="card-body card-body-flex">
             <div>
                 <strong>Turnos de recogida</strong>
-                <p style="font-size:.9rem;color:var(--ink-light);margin-top:.25rem;">Crea y gestiona los turnos de voluntarios para tus campañas.</p>
+                <p class="card-subtitle">Crea y gestiona los turnos de voluntarios para tus campañas.</p>
             </div>
-            <a href="crear-turno.html" class="btn btn-primary" style="white-space:nowrap;">Ir a turnos →</a>
+            <a href="create-shift.html" class="btn btn-primary text-nowrap">Ir a turnos →</a>
         </div>
     </div>
 
     <!-- Selector de campaña -->
     <div class="card">
         <div class="card-body">
-            <div class="form-group" style="margin-bottom:0">
+            <div class="form-group mb-0">
                 <label for="campaign-select">Campaña</label>
                 <div class="selector-row">
                     <select id="campaign-select">
@@ -81,7 +80,7 @@
     <!-- Añadir coordinador -->
     <div class="card">
         <div class="card-body">
-            <div class="form-group" style="margin-bottom:0">
+            <div class="form-group mb-0">
                 <label for="coordinator-select">Añadir coordinador</label>
                 <div class="selector-row">
                     <select id="coordinator-select">

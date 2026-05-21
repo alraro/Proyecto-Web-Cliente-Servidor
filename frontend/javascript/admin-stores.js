@@ -1,42 +1,17 @@
-const BACKEND = 'http://localhost:8080';
-
-function getToken() { return localStorage.getItem('token'); }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
-
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
 
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            logout();
-        }
-    })
+    
 });
 
 
 
-function showToast(msg, type = 'success') {
-    const c = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = 'toast toast-' + type;
-    t.textContent = msg;
-    c.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
-}
-
 function escHtml(v) {
     return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-function escAttr(v) { return String(v ?? '').replace(/'/g, "\\'"); }
-
 // Datos auxiliares
 let allChains = [];
 let allLocalities = [];
@@ -45,16 +20,16 @@ let allZones = [];
 async function loadAuxData() {
     try {
         const [resChains, resLoc, resZones] = await Promise.all([
-            fetch(BACKEND + '/api/chains', { headers: authHeaders() }),
-            fetch(BACKEND + '/api/localities', { headers: authHeaders() }),
-            fetch(BACKEND + '/api/zones', { headers: authHeaders() })
+            fetch(API_BASE + '/api/chains', { headers: authHeaders() }),
+            fetch(API_BASE + '/api/localities', { headers: authHeaders() }),
+            fetch(API_BASE + '/api/zones', { headers: authHeaders() })
         ]);
         if (resChains.ok) allChains = await resChains.json();
         if (resLoc.ok) allLocalities = await resLoc.json();
         if (resZones.ok) allZones = await resZones.json();
     } catch { /* los selects quedan vacíos pero no rompe nada */ }
 
-    const fz = document.getElementById('filter-zone');
+    const fz = document.querySelector('#filter-zone');
     allZones.forEach(z => {
         const o = document.createElement('option');
         o.value = z.id; o.textContent = z.name;
@@ -63,8 +38,8 @@ async function loadAuxData() {
 
     populateLocalities('');
 
-    const fc = document.getElementById('filter-chain');
-    const fch = document.getElementById('input-chain');
+    const fc = document.querySelector('#filter-chain');
+    const fch = document.querySelector('#input-chain');
     allChains.forEach(c => {
         [fc, fch].forEach(sel => {
             const o = document.createElement('option');
@@ -74,22 +49,26 @@ async function loadAuxData() {
     });
 }
 
-document.getElementById('filter-zone').addEventListener('change', function () {
-    document.getElementById('filter-locality').value = '';
+document.querySelector('#filter-zone').addEventListener('change', function () {
+    document.querySelector('#filter-locality').value = '';
     populateLocalities(this.value);
 });
 
 function populateLocalities(zoneId) {
-    const sel = document.getElementById('filter-locality');
+    const sel = document.querySelector('#filter-locality');
     const valorActual = sel.value;
-    sel.innerHTML = '<option value="">Todas las localidades</option>';
+    sel.innerHTML = '';
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = 'Todas las localidades';
+    sel.appendChild(o);
     const lista = zoneId
         ? allLocalities.filter(l => String(l.zoneId) === String(zoneId))
         : allLocalities;
     lista.forEach(l => {
-        const o = document.createElement('option');
-        o.value = l.id; o.textContent = l.name;
-        sel.appendChild(o);
+        const opt = document.createElement('option');
+        opt.value = l.id; opt.textContent = l.name;
+        sel.appendChild(opt);
     });
     if (valorActual && lista.some(l => String(l.id) === String(valorActual))) {
         sel.value = valorActual;
@@ -102,34 +81,81 @@ let pageSize = 20;
 let totalPages = 1;
 
 function renderTable(stores) {
-    const tbody = document.getElementById('stores-tbody');
+    const tbody = document.querySelector('#stores-tbody');
+    tbody.innerHTML = '';
     if (!stores.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td></tr>';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 8;
+        td.className = 'table-empty';
+        td.textContent = 'No hay tiendas que coincidan con los filtros.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         return;
     }
-    tbody.innerHTML = stores.map(s => `
-        <tr>
-            <td>${s.id}</td>
-            <td><strong>${escHtml(s.name)}</strong></td>
-            <td>${escHtml(s.address || '—')}</td>
-            <td>${escHtml(s.locality || '—')}</td>
-            <td>${escHtml(s.postalCode || '—')}</td>
-            <td>${escHtml(s.zone || '—')}</td>
-            <td>${escHtml(s.chainName || '—')}</td>
-            <td>
-                <div class="td-actions">
-                    <button class="btn btn-edit btn-sm" onclick="openEdit(${s.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteStore(${s.id}, '${escAttr(s.name)}')">Eliminar</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    stores.forEach(s => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.textContent = s.id;
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const strong = document.createElement('strong');
+        strong.textContent = escHtml(s.name);
+        td2.appendChild(strong);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        td3.textContent = escHtml(s.address || '—');
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        td4.textContent = escHtml(s.locality || '—');
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        td5.textContent = escHtml(s.postalCode || '—');
+        tr.appendChild(td5);
+
+        const td6 = document.createElement('td');
+        td6.textContent = escHtml(s.zone || '—');
+        tr.appendChild(td6);
+
+        const td7 = document.createElement('td');
+        td7.textContent = escHtml(s.chainName || '—');
+        tr.appendChild(td7);
+
+        const td8 = document.createElement('td');
+        const div = document.createElement('div');
+        div.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn btn-edit btn-sm';
+        btnEdit.setAttribute('data-action', 'edit');
+        btnEdit.setAttribute('data-store-id', s.id);
+        btnEdit.textContent = 'Editar';
+        div.appendChild(btnEdit);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn btn-danger btn-sm';
+        btnDelete.setAttribute('data-action', 'delete');
+        btnDelete.setAttribute('data-store-id', s.id);
+        btnDelete.setAttribute('data-store-name', escapeAttr(s.name));
+        btnDelete.textContent = 'Eliminar';
+        div.appendChild(btnDelete);
+
+        td8.appendChild(div);
+        tr.appendChild(td8);
+
+        tbody.appendChild(tr);
+    });
 }
 
 async function loadStores(page = 0) {
-    const chainId = document.getElementById('filter-chain').value;
-    const localityId = document.getElementById('filter-locality').value;
-    const zoneId = document.getElementById('filter-zone').value;
+    const chainId = document.querySelector('#filter-chain').value;
+    const localityId = document.querySelector('#filter-locality').value;
+    const zoneId = document.querySelector('#filter-zone').value;
 
     const params = new URLSearchParams();
     if (chainId) params.append('chainId', chainId);
@@ -139,22 +165,29 @@ async function loadStores(page = 0) {
     params.append('size', pageSize);
 
     try {
-        const res = await fetch(BACKEND + '/api/stores?' + params, { headers: authHeaders() });
+        const res = await fetch(API_BASE + '/api/stores?' + params, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         const data = await res.json();
 
         currentPage = page;
         totalPages = data.totalPages || 1;
 
-        document.getElementById('current-page').textContent = currentPage + 1;
-        document.getElementById('total-pages').textContent = totalPages;
-        document.getElementById('btn-prev-page').disabled = currentPage === 0;
-        document.getElementById('btn-next-page').disabled = currentPage >= totalPages - 1;
+        document.querySelector('#current-page').textContent = currentPage + 1;
+        document.querySelector('#total-pages').textContent = totalPages;
+        document.querySelector('#btn-prev-page').disabled = currentPage === 0;
+        document.querySelector('#btn-next-page').disabled = currentPage >= totalPages - 1;
 
         renderTable(data.content || []);
     } catch {
-        document.getElementById('stores-tbody').innerHTML =
-            '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
+        const tbodyErr = document.querySelector('#stores-tbody');
+        tbodyErr.innerHTML = '';
+        const trErr = document.createElement('tr');
+        const tdErr = document.createElement('td');
+        tdErr.colSpan = 8;
+        tdErr.className = 'table-empty';
+        tdErr.textContent = 'No se puede conectar con el servidor.';
+        trErr.appendChild(tdErr);
+        tbodyErr.appendChild(trErr);
     }
 }
 
@@ -165,45 +198,67 @@ function nextPage() {
     if (currentPage < totalPages - 1) loadStores(currentPage + 1);
 }
 function changePageSize() {
-    pageSize = parseInt(document.getElementById('page-size-select').value);
+    pageSize = parseInt(document.querySelector('#page-size-select').value);
     loadStores(0);
 }
 
 // Filtros
-document.getElementById('btn-apply-filters').addEventListener('click', () => loadStores(0));
-document.getElementById('btn-clear-filters').addEventListener('click', () => {
-    document.getElementById('filter-zone').value = '';
-    document.getElementById('filter-locality').value = '';
-    document.getElementById('filter-chain').value = '';
+document.querySelector('#btn-apply-filters').addEventListener('click', () => loadStores(0));
+document.querySelector('#btn-clear-filters').addEventListener('click', () => {
+    document.querySelector('#filter-zone').value = '';
+    document.querySelector('#filter-locality').value = '';
+    document.querySelector('#filter-chain').value = '';
     populateLocalities('');
     loadStores(0);
+});
+
+// Pagination and export buttons
+document.querySelector('#btn-prev-page').addEventListener('click', previousPage);
+document.querySelector('#btn-next-page').addEventListener('click', nextPage);
+document.querySelector('#page-size-select').addEventListener('change', changePageSize);
+document.querySelector('#btn-export-stores').addEventListener('click', function () {
+    exportarExcel('stores');
+});
+
+// Event delegation for table action buttons (edit / delete)
+document.querySelector('#stores-tbody').addEventListener('click', function (e) {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const action = button.getAttribute('data-action');
+    const storeId = button.getAttribute('data-store-id');
+    if (action === 'edit') {
+        openEdit(parseInt(storeId));
+    } else if (action === 'delete') {
+        const storeName = button.getAttribute('data-store-name');
+        deleteStore(parseInt(storeId), storeName);
+    }
 });
 
 let editingId = null;
 
 function openModal(titulo) {
-    document.getElementById('modal-title').textContent = titulo;
-    document.getElementById('modal-error').textContent = '';
-    document.getElementById('modal-backdrop').classList.add('open');
-    document.getElementById('input-nombre').focus();
+    document.querySelector('#modal-title').textContent = titulo;
+    document.querySelector('#modal-error').textContent = '';
+    document.querySelector('#modal-backdrop').classList.add('open');
+    document.querySelector('#input-nombre').focus();
 }
 function closeModal() {
-    document.getElementById('modal-backdrop').classList.remove('open');
-    document.getElementById('input-nombre').value = '';
-    document.getElementById('input-domicilio').value = '';
-    document.getElementById('input-cp').value = '';
-    document.getElementById('input-chain').value = '';
-    document.getElementById('modal-error').textContent = '';
+    document.querySelector('#modal-backdrop').classList.remove('open');
+    document.querySelector('#input-nombre').value = '';
+    document.querySelector('#input-domicilio').value = '';
+    document.querySelector('#input-cp').value = '';
+    document.querySelector('#input-chain').value = '';
+    document.querySelector('#modal-error').textContent = '';
     editingId = null;
 }
 
-document.getElementById('btn-nueva-tienda').addEventListener('click', () => {
+document.querySelector('#btn-nueva-tienda').addEventListener('click', () => {
     editingId = null;
     openModal('Nueva tienda');
 });
-document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
-document.getElementById('modal-backdrop').addEventListener('click', e => {
-    if (e.target === document.getElementById('modal-backdrop')) closeModal();
+document.querySelector('#btn-modal-cancel').addEventListener('click', closeModal);
+document.querySelector('#modal-backdrop').addEventListener('click', e => {
+    if (e.target === document.querySelector('#modal-backdrop')) closeModal();
 });
 
 async function openEdit(id) {
@@ -212,21 +267,21 @@ async function openEdit(id) {
         if (!res.ok) { showToast('Error al cargar la tienda.', 'error'); return; }
         const s = await res.json();
         editingId = s.id;
-        document.getElementById('input-nombre').value = s.name || '';
-        document.getElementById('input-domicilio').value = s.address || '';
-        document.getElementById('input-cp').value = s.postalCode || '';
-        document.getElementById('input-chain').value = s.chainId || '';
+        document.querySelector('#input-nombre').value = s.name || '';
+        document.querySelector('#input-domicilio').value = s.address || '';
+        document.querySelector('#input-cp').value = s.postalCode || '';
+        document.querySelector('#input-chain').value = s.chainId || '';
         openModal('Editar tienda');
     } catch { showToast('Error de conexión.', 'error'); }
 }
 
 // Guardar
-document.getElementById('btn-modal-save').addEventListener('click', async () => {
-    const nombre = document.getElementById('input-nombre').value.trim();
-    const domicilio = document.getElementById('input-domicilio').value.trim();
-    const cp = document.getElementById('input-cp').value.trim();
-    const chainId = document.getElementById('input-chain').value;
-    const errorEl = document.getElementById('modal-error');
+document.querySelector('#btn-modal-save').addEventListener('click', async () => {
+    const nombre = document.querySelector('#input-nombre').value.trim();
+    const domicilio = document.querySelector('#input-domicilio').value.trim();
+    const cp = document.querySelector('#input-cp').value.trim();
+    const chainId = document.querySelector('#input-chain').value;
+    const errorEl = document.querySelector('#modal-error');
 
     if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }
     if (nombre.length > 255) { errorEl.textContent = 'El nombre no puede superar 255 caracteres.'; return; }

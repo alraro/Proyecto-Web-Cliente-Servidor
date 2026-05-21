@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Ver Campañas</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/campanas.css">
     <script src="javascript/campanas.js" defer></script>
@@ -26,10 +25,10 @@
     </div>
 
     <div class="chips-bar">
-        <button class="chip chip-selected" data-status="" id="chip-all">Todas</button>
-        <button class="chip" data-status="ACTIVE"  id="chip-active">Activas: —</button>
-        <button class="chip" data-status="FUTURE"  id="chip-future">Futuras: —</button>
-        <button class="chip" data-status="PAST"    id="chip-past">Pasadas: —</button>
+        <button class="chip chip-selected chip-status-all" id="chip-all">Todas</button>
+        <button class="chip chip-status-active"  id="chip-active">Activas: —</button>
+        <button class="chip chip-status-future"  id="chip-future">Futuras: —</button>
+        <button class="chip chip-status-past"    id="chip-past">Pasadas: —</button>
     </div>
 
     <div class="filter-bar">
