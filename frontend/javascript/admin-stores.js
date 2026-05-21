@@ -3,15 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'login.html';
         return;
     }
-
-    
 });
-
-
 
 function escHtml(v) {
     return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
 // Datos auxiliares
 let allChains = [];
 let allLocalities = [];
@@ -27,7 +24,7 @@ async function loadAuxData() {
         if (resChains.ok) allChains = await resChains.json();
         if (resLoc.ok) allLocalities = await resLoc.json();
         if (resZones.ok) allZones = await resZones.json();
-    } catch { /* los selects quedan vacíos pero no rompe nada */ }
+    } catch {}
 
     const fz = document.querySelector('#filter-zone');
     allZones.forEach(z => {
@@ -212,7 +209,7 @@ document.querySelector('#btn-clear-filters').addEventListener('click', () => {
     loadStores(0);
 });
 
-// Pagination and export buttons
+// Botones de paginacion y exportacion
 document.querySelector('#btn-prev-page').addEventListener('click', previousPage);
 document.querySelector('#btn-next-page').addEventListener('click', nextPage);
 document.querySelector('#page-size-select').addEventListener('change', changePageSize);
@@ -220,7 +217,6 @@ document.querySelector('#btn-export-stores').addEventListener('click', function 
     exportarExcel('stores');
 });
 
-// Event delegation for table action buttons (edit / delete)
 document.querySelector('#stores-tbody').addEventListener('click', function (e) {
     const button = e.target.closest('button');
     if (!button) return;

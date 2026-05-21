@@ -1,5 +1,6 @@
-function getUser()    { return localStorage.getItem('nombre') || 'Responsable'; }
-
+function getUser() { 
+    return localStorage.getItem('nombre') || 'Responsable'; 
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken() || localStorage.getItem('role') !== 'RESPONSABLE_TIENDA') {
@@ -123,7 +124,6 @@ async function loadStoreDetail() {
         const data = await res.json();
         renderStoreInfo(data);
         renderShifts(data.scheduledShifts);
-
     } catch {
         showError('Error de conexión con el servidor.');
     }

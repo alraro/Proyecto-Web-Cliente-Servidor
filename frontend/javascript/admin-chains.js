@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 function renderTable(chains) {
     const tbody = document.querySelector('#chains-tbody');
     tbody.innerHTML = '';
+
     if (!chains.length) {
         const tr = document.createElement('tr');
         const td = document.createElement('td');
@@ -19,6 +19,7 @@ function renderTable(chains) {
         tbody.appendChild(tr);
         return;
     }
+
     chains.forEach(c => {
         const tr = document.createElement('tr');
 
@@ -72,7 +73,6 @@ function renderTable(chains) {
 
         td5.appendChild(div);
         tr.appendChild(td5);
-
         tbody.appendChild(tr);
     });
 }
@@ -156,12 +156,12 @@ document.querySelector('#modal-backdrop').addEventListener('click', e => {
     if (e.target === document.querySelector('#modal-backdrop')) closeModal();
 });
 
-// Export button
+// Boton de exportacion
 document.querySelector('#btn-export-chains').addEventListener('click', function () {
     exportarExcel('chains');
 });
 
-// Event delegation for table action buttons (edit / delete)
+// Delegacion de eventos para acciones de tabla (editar / eliminar)
 document.querySelector('#chains-tbody').addEventListener('click', function (e) {
     const button = e.target.closest('button');
     if (!button) return;
