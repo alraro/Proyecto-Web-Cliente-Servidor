@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'login.html';
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const nombre = localStorage.getItem('nombre') || 'Coordinador';
-    const welcomeNameEl = document.getElementById('welcome-name');
+    const welcomeNameEl = document.querySelector('#welcome-name');
 
     if (welcomeNameEl) welcomeNameEl.textContent = nombre;
 

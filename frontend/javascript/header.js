@@ -1,9 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const rolUsuario = localStorage.getItem('role') || 'Usuario';
     const nombreUsuario = localStorage.getItem('nombre') || 'Invitado';
 
     const checkHeader = setInterval(() => {
-        const userNameEl = document.getElementById('user-name');
+        const userNameEl = document.querySelector('#user-name');
 
         if(userNameEl){
             userNameEl.textContent = `${nombreUsuario} (${rolUsuario})`;

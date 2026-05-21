@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     
 
-    const campaignSelect  = document.getElementById('campaign-select');
-    const btnLoad         = document.getElementById('btn-load');
-    const storesTbody     = document.getElementById('stores-tbody');
-    const detailPanel     = document.getElementById('detail-panel');
-    const detailTitle     = document.getElementById('detail-title');
-    const shiftsContainer = document.getElementById('shifts-container');
+    const campaignSelect  = document.querySelector('#campaign-select');
+    const btnLoad         = document.querySelector('#btn-load');
+    const storesTbody     = document.querySelector('#stores-tbody');
+    const detailPanel     = document.querySelector('#detail-panel');
+    const detailTitle     = document.querySelector('#detail-title');
+    const shiftsContainer = document.querySelector('#shifts-container');
 
     // Carga campañas del capitán
     try {
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';
