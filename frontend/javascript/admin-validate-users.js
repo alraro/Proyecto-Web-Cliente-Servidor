@@ -5,10 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Refresh button
+    // Boton de actualizar
     document.querySelector('#btn-refresh-pending').addEventListener('click', loadPending);
 
-    // Event delegation for table action buttons (approve / reject)
     document.querySelector('#pending-tbody').addEventListener('click', function (e) {
         const button = e.target.closest('button');
         if (!button) return;
@@ -30,7 +29,7 @@ function escHtml(v) {
 }
 
 
-// ── Usuarios pendientes ────────────────────────────────────────────────────
+// Usuarios pendientes
 async function loadPending() {
     const tbody = document.querySelector('#pending-tbody');
     try {
