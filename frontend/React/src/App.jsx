@@ -9,6 +9,8 @@ function App() {
     switch (currentPage) {
       case 'volunteers':
         return <GestionVoluntarios />;
+      case 'login':
+        return <Login onNavigate={setCurrentPage} />;
       default:
         return <HomePage onNavigate={setCurrentPage} />;
     }
@@ -59,6 +61,9 @@ function HomePage({ onNavigate }) {
                 <li><span>Administrar turnos</span></li>
               </ul>
             </div>
+            
+            <button onClick={() => onNavigate('login')}>Login</button>
+
           </aside>
         </section>
 
