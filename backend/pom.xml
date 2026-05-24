@@ -85,6 +85,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 		<!-- Dependencia para generación de archivos Excel -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>

@@ -2,9 +2,9 @@ package es.grupo8.backend.dto;
 import lombok.Data;
 
 @Data
-public class ChainRequestDto {
-
+public class ExportChainDTO {
+    private Integer id;
     private String name;
     private String code;
-    private Boolean participation;
+    private String participation;
 }

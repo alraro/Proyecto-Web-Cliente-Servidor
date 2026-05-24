@@ -1,0 +1,24 @@
+/* Campanas — page-specific overrides */
+
+.chip {
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.chip.chip-selected { color: var(--white); }
+
+.pagination { gap: 1rem; margin-top: 1.25rem; }
+
+.pagination button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+#page-info { font-size: 0.88rem; color: var(--ink-light); font-weight: 600; }
