@@ -5,9 +5,6 @@ import org.springframework.stereotype.Component;
 import es.grupo8.backend.dto.ShiftResponseDto;
 import es.grupo8.backend.entity.Shift;
 
-/**
- * Mapper that converts a {@link Shift} entity into a {@link ShiftResponseDto}.
- */
 @Component
 public class ShiftMapper extends MapperDTO<ShiftResponseDto, Shift> {
 

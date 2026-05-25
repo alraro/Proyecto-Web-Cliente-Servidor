@@ -5,9 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * DTO for returning shift data to the client.
- */
+
 @Data
 public class ShiftResponseDto {
     private Integer shiftId;
