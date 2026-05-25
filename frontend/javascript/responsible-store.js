@@ -62,9 +62,17 @@ function renderShifts(shifts) {
         return;
     }
 
+<<<<<<< HEAD
     tbody.innerHTML = '';
     shifts.forEach(s => {
         const tr = document.createElement('tr');
+=======
+    tbody.innerHTML = shifts.map(s => {
+        let attendanceBadge;
+        if (s.attendance === true)       attendanceBadge = '<span class="badge-attendance badge-yes">✓ Sí</span>';
+        else if (s.attendance === false) attendanceBadge = '<span class="badge-attendance badge-no">✗ No</span>';
+        else                             attendanceBadge = '<span class="badge-attendance badge-pending">Pendiente</span>';
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
 
         const td0 = document.createElement('td');
         td0.textContent = s.campaignName || '\u2014';

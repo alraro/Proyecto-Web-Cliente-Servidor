@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿const API_BASE = 'http://localhost:8080';
+=======
+const API_BASE = 'http://localhost:8080';
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -9,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
+<<<<<<< HEAD
     const campaignSelect     = document.querySelector('#campaign-select');
     const btnLoad            = document.querySelector('#btn-load');
     const globalMessage      = document.querySelector('#global-message');
@@ -22,6 +27,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
+=======
+    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
+
+    const campaignSelect     = document.getElementById('campaign-select');
+    const btnLoad            = document.getElementById('btn-load');
+    const globalMessage      = document.getElementById('global-message');
+    const coordinatorsTbody  = document.getElementById('coordinators-tbody');
+    const coordinatorSelect  = document.getElementById('coordinator-select');
+    const btnAssign          = document.getElementById('btn-assign');
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    });
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
 
     coordinatorSelect.disabled = true;
     btnAssign.disabled = true;
@@ -119,11 +139,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
+<<<<<<< HEAD
         campaignSelect.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
         defaultOpt.textContent = 'Selecciona una campaña...';
         campaignSelect.appendChild(defaultOpt);
+=======
+        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -135,6 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCoordinatorsTable(coordinators) {
         coordinatorsTbody.innerHTML = '';
         if (!coordinators.length) {
+<<<<<<< HEAD
             const emptyRow = document.createElement('tr');
             const emptyTd = document.createElement('td');
             emptyTd.colSpan = 3;
@@ -142,10 +167,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             emptyTd.textContent = 'Sin coordinadores asignados.';
             emptyRow.appendChild(emptyTd);
             coordinatorsTbody.appendChild(emptyRow);
+=======
+            coordinatorsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin coordinadores asignados.</td></tr>";
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
             return;
         }
         coordinators.forEach(coordinator => {
             const row = document.createElement('tr');
+<<<<<<< HEAD
             const tdName = document.createElement('td');
             tdName.textContent = escapeHtml(coordinator.name || '');
             const tdEmail = document.createElement('td');
@@ -161,16 +190,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             row.appendChild(tdName);
             row.appendChild(tdEmail);
             row.appendChild(tdActions);
+=======
+            row.innerHTML = `
+                <td>${escapeHtml(coordinator.name || '')}</td>
+                <td>${escapeHtml(coordinator.email || '')}</td>
+                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button></td>
+            `;
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
             coordinatorsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
+<<<<<<< HEAD
         selectEl.innerHTML = '';
         const placeholderOpt = document.createElement('option');
         placeholderOpt.value = '';
         placeholderOpt.textContent = placeholder;
         selectEl.appendChild(placeholderOpt);
+=======
+        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);
@@ -185,6 +225,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         globalMessage.className = isError ? 'error' : 'success';
         clearTimeout(showMessage._t);
         showMessage._t = setTimeout(() => { globalMessage.hidden = true; }, 4000);
+<<<<<<< HEAD
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+=======
+>>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
     }
 
     function escapeHtml(value) {
