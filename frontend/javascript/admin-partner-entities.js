@@ -1,4 +1,4 @@
-const BACKEND = 'http://localhost:8080';
+﻿const BACKEND = 'http://localhost:8080';
 
 // ── Auth ──────────────────────────────────────────────────────────────
 function getToken() { 
@@ -28,26 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'btn-edit') {
-            window.location.href = 'edit.html';
-
-        } else if (e.target.id === 'btn-logout') {
-            logout();
-        }
-    })
 });
 
 
 // ── Toast ─────────────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
+    const container = document.querySelector('#toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast toast-' + type;
     toast.textContent = msg;
@@ -57,7 +43,7 @@ function showToast(msg, type = 'success') {
 
 // ── Tabla ─────────────────────────────────────────────────────────────
 function renderTable(partnerEntities) {
-    const tbody = document.getElementById('partner-entities-tbody');
+    const tbody = document.querySelector('#partner-entities-tbody');
     tbody.innerHTML = '';
     if (!partnerEntities.length) {
         const tr = document.createElement('tr');
@@ -160,7 +146,7 @@ async function cargarEntidades(page = 0) {
         const res = await fetch(BACKEND + '/api/partner-entities?' + params, { headers: authHeaders() });
         if (res.status === 401 || res.status === 403) { logout(); return; }
         if (!res.ok) {
-            const tbodyErr = document.getElementById('partner-entities-tbody');
+            const tbodyErr = document.querySelector('#partner-entities-tbody');
             tbodyErr.innerHTML = '';
             const trErr = document.createElement('tr');
             const tdErr = document.createElement('td');
@@ -176,15 +162,15 @@ async function cargarEntidades(page = 0) {
         totalPages = data.totalPages || 1;
 
         // Actualizar controles de paginación
-        document.getElementById('current-page').textContent = currentPage + 1;
-        document.getElementById('total-pages').textContent = totalPages;
-        document.getElementById('btn-prev-page').disabled = currentPage === 0;
-        document.getElementById('btn-next-page').disabled = currentPage >= totalPages - 1;
+        document.querySelector('#current-page').textContent = currentPage + 1;
+        document.querySelector('#total-pages').textContent = totalPages;
+        document.querySelector('#btn-prev-page').disabled = currentPage === 0;
+        document.querySelector('#btn-next-page').disabled = currentPage >= totalPages - 1;
 
         const items = data.content || [];
         renderTable(Array.isArray(items) ? items : []);
     } catch {
-        const tbodyErr = document.getElementById('partner-entities-tbody');
+        const tbodyErr = document.querySelector('#partner-entities-tbody');
         tbodyErr.innerHTML = '';
         const trErr = document.createElement('tr');
         const tdErr = document.createElement('td');
@@ -209,24 +195,24 @@ function nextPage() {
 }
 
 function changePageSize() {
-    pageSize = parseInt(document.getElementById('page-size-select').value);
+    pageSize = parseInt(document.querySelector('#page-size-select').value);
     currentPage = 0;
     cargarEntidades(0);
 }
 
 // ── Filtros y búsqueda ────────────────────────────────────────────────
 function applyFilters() {
-    searchQuery = document.getElementById('filter-search').value.trim();
-    sortBy = document.getElementById('filter-sort-by').value;
-    sortOrder = document.getElementById('filter-sort-order').value;
+    searchQuery = document.querySelector('#filter-search').value.trim();
+    sortBy = document.querySelector('#filter-sort-by').value;
+    sortOrder = document.querySelector('#filter-sort-order').value;
     currentPage = 0;
     cargarEntidades(0);
 }
 
 function clearFilters() {
-    document.getElementById('filter-search').value = '';
-    document.getElementById('filter-sort-by').value = 'id';
-    document.getElementById('filter-sort-order').value = 'asc';
+    document.querySelector('#filter-search').value = '';
+    document.querySelector('#filter-sort-by').value = 'id';
+    document.querySelector('#filter-sort-order').value = 'asc';
     searchQuery = '';
     sortBy = 'id';
     sortOrder = 'asc';
@@ -234,19 +220,19 @@ function clearFilters() {
     cargarEntidades(0);
 }
 
-document.getElementById('btn-apply-filters').addEventListener('click', applyFilters);
-document.getElementById('btn-clear-filters').addEventListener('click', clearFilters);
+document.querySelector('#btn-apply-filters').addEventListener('click', applyFilters);
+document.querySelector('#btn-clear-filters').addEventListener('click', clearFilters);
 
 // Pagination and export buttons
-document.getElementById('btn-prev-page').addEventListener('click', previousPage);
-document.getElementById('btn-next-page').addEventListener('click', nextPage);
-document.getElementById('page-size-select').addEventListener('change', changePageSize);
-document.getElementById('btn-export-pe').addEventListener('click', function () {
+document.querySelector('#btn-prev-page').addEventListener('click', previousPage);
+document.querySelector('#btn-next-page').addEventListener('click', nextPage);
+document.querySelector('#page-size-select').addEventListener('change', changePageSize);
+document.querySelector('#btn-export-pe').addEventListener('click', function () {
     exportarExcel('partner-entities');
 });
 
 // Event delegation for table action buttons (edit / delete)
-document.getElementById('partner-entities-tbody').addEventListener('click', function (e) {
+document.querySelector('#partner-entities-tbody').addEventListener('click', function (e) {
     const button = e.target.closest('button');
     if (!button) return;
     const action = button.getAttribute('data-action');
@@ -260,7 +246,7 @@ document.getElementById('partner-entities-tbody').addEventListener('click', func
 });
 
 // Permitir buscar presionando Enter en el campo de búsqueda
-document.getElementById('filter-search').addEventListener('keypress', e => {
+document.querySelector('#filter-search').addEventListener('keypress', e => {
     if (e.key === 'Enter') {
         applyFilters();
     }
@@ -270,18 +256,18 @@ document.getElementById('filter-search').addEventListener('keypress', e => {
 let editandoId = null;
 
 function abrirModal(titulo) {
-    document.getElementById('modal-title').textContent = titulo;
-    document.getElementById('modal-error').textContent = '';
-    document.getElementById('modal-backdrop').classList.add('open');
-    document.getElementById('input-nombre').focus();
+    document.querySelector('#modal-title').textContent = titulo;
+    document.querySelector('#modal-error').textContent = '';
+    document.querySelector('#modal-backdrop').classList.add('open');
+    document.querySelector('#input-nombre').focus();
 }
 
 function cerrarModal() {
-    document.getElementById('modal-backdrop').classList.remove('open');
-    document.getElementById('input-nombre').value = '';
-    document.getElementById('input-direccion').value = '';
-    document.getElementById('input-telefono').value = '';
-    document.getElementById('modal-error').textContent = '';
+    document.querySelector('#modal-backdrop').classList.remove('open');
+    document.querySelector('#input-nombre').value = '';
+    document.querySelector('#input-direccion').value = '';
+    document.querySelector('#input-telefono').value = '';
+    document.querySelector('#modal-error').textContent = '';
     editandoId = null;
 }
 
@@ -297,27 +283,27 @@ async function abrirEditar(id) {
         const entidad = await res.json();
 
         editandoId = entidad.id;
-        document.getElementById('input-nombre').value = entidad.name || '';
-        document.getElementById('input-direccion').value = entidad.address || '';
-        document.getElementById('input-telefono').value = entidad.phone || '';
+        document.querySelector('#input-nombre').value = entidad.name || '';
+        document.querySelector('#input-direccion').value = entidad.address || '';
+        document.querySelector('#input-telefono').value = entidad.phone || '';
         abrirModal('Editar entidad socia');
     } catch {
         showToast('Error al cargar la entidad socia.', 'error');
     }
 }
 
-document.getElementById('btn-nueva').addEventListener('click', abrirCrear);
-document.getElementById('btn-cancelar').addEventListener('click', cerrarModal);
-document.getElementById('modal-backdrop').addEventListener('click', e => {
-    if (e.target === document.getElementById('modal-backdrop')) cerrarModal();
+document.querySelector('#btn-nueva').addEventListener('click', abrirCrear);
+document.querySelector('#btn-cancelar').addEventListener('click', cerrarModal);
+document.querySelector('#modal-backdrop').addEventListener('click', e => {
+    if (e.target === document.querySelector('#modal-backdrop')) cerrarModal();
 });
 
 // ── Guardar ───────────────────────────────────────────────────────────
-document.getElementById('btn-guardar').addEventListener('click', async () => {
-    const nombre = document.getElementById('input-nombre').value.trim();
-    const direccion = document.getElementById('input-direccion').value.trim();
-    const telefono = document.getElementById('input-telefono').value.trim();
-    const errorEl = document.getElementById('modal-error');
+document.querySelector('#btn-guardar').addEventListener('click', async () => {
+    const nombre = document.querySelector('#input-nombre').value.trim();
+    const direccion = document.querySelector('#input-direccion').value.trim();
+    const telefono = document.querySelector('#input-telefono').value.trim();
+    const errorEl = document.querySelector('#modal-error');
 
     // Validación cliente
     if (!nombre) { errorEl.textContent = 'El nombre es obligatorio.'; return; }

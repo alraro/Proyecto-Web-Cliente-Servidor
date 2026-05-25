@@ -1,43 +1,23 @@
-const BACKEND = 'http://localhost:8080';
-
-function getToken()   { return localStorage.getItem('token'); }
-function getUser()    { return localStorage.getItem('nombre') || 'Responsable'; }
-function getStoreId() { return localStorage.getItem('storeId'); }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-function logout() { localStorage.clear(); window.location.href = 'login.html'; }
-
+function getUser() { 
+    return localStorage.getItem('nombre') || 'Responsable'; 
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken() || localStorage.getItem('role') !== 'RESPONSABLE_TIENDA') {
         window.location.href = 'login.html';
         return;
     }
-
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Responsable';
-    }
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            logout();
-        }
-    })
 });
 
 function showError(msg) {
-    const el = document.getElementById('error-msg');
+    const el = document.querySelector('#error-msg');
     el.textContent = msg;
     el.classList.remove('hidden');
 }
 
 function renderStoreInfo(store) {
-    document.getElementById('store-title').textContent = store.name || 'Tienda';
-    document.getElementById('card-tienda').classList.remove('hidden');
+    document.querySelector('#store-title').textContent = store.name || 'Tienda';
+    document.querySelector('#card-tienda').classList.remove('hidden');
 
     const fields = [
         { label: 'Nombre',        value: store.name       },
@@ -48,7 +28,7 @@ function renderStoreInfo(store) {
         { label: 'Cadena',        value: store.chainName  },
     ];
 
-    const infoGrid = document.getElementById('info-grid');
+    const infoGrid = document.querySelector('#info-grid');
     infoGrid.innerHTML = '';
     fields.forEach(f => {
         const item = document.createElement('div');
@@ -67,8 +47,8 @@ function renderStoreInfo(store) {
 }
 
 function renderShifts(shifts) {
-    document.getElementById('card-turnos').classList.remove('hidden');
-    const tbody = document.getElementById('shifts-tbody');
+    document.querySelector('#card-turnos').classList.remove('hidden');
+    const tbody = document.querySelector('#shifts-tbody');
 
     if (!shifts || !shifts.length) {
         tbody.innerHTML = '';
@@ -132,7 +112,7 @@ async function loadStoreDetail() {
     }
 
     try {
-        const res = await fetch(`${BACKEND}/api/stores/${storeId}/detail`, {
+        const res = await fetch(`${API_BASE}/api/stores/${storeId}/detail`, {
             headers: authHeaders()
         });
 
@@ -144,7 +124,6 @@ async function loadStoreDetail() {
         const data = await res.json();
         renderStoreInfo(data);
         renderShifts(data.scheduledShifts);
-
     } catch {
         showError('Error de conexión con el servidor.');
     }

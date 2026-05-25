@@ -19,7 +19,7 @@ function formatDate(iso) {
 
 async function loadCampaigns() {
     const token = localStorage.getItem('token');
-    const tbody = document.getElementById('campaigns-tbody');
+    const tbody = document.querySelector('#campaigns-tbody');
     try {
         let url = API_BASE + '/api/campaigns?page=' + currentPage + '&size=' + PAGE_SIZE
                   + '&sort=' + encodeURIComponent(currentSort);
@@ -46,7 +46,7 @@ async function loadCampaigns() {
 }
 
 function renderTable(campaigns) {
-    const tbody = document.getElementById('campaigns-tbody');
+    const tbody = document.querySelector('#campaigns-tbody');
     if (!campaigns.length) {
         tbody.replaceChildren();
         const tr = document.createElement('tr');
@@ -96,16 +96,16 @@ function renderPagination(p) {
     const page  = p.page        || 0;
     const total = p.totalPages  || 0;
     const count = p.totalElements || 0;
-    document.getElementById('page-info').textContent =
+    document.querySelector('#page-info').textContent =
         'Página ' + (page + 1) + ' de ' + total + ' (' + count + ' resultados)';
-    document.getElementById('btn-prev').disabled = Boolean(p.isFirst);
-    document.getElementById('btn-next').disabled = Boolean(p.isLast);
+    document.querySelector('#btn-prev').disabled = Boolean(p.isFirst);
+    document.querySelector('#btn-next').disabled = Boolean(p.isLast);
 }
 
 function renderSummary(s) {
-    document.getElementById('chip-active').textContent = 'Activas: '  + (s.totalActive  ?? 0);
-    document.getElementById('chip-future').textContent = 'Futuras: '  + (s.totalFuture  ?? 0);
-    document.getElementById('chip-past').textContent   = 'Pasadas: '  + (s.totalPast    ?? 0);
+    document.querySelector('#chip-active').textContent = 'Activas: '  + (s.totalActive  ?? 0);
+    document.querySelector('#chip-future').textContent = 'Futuras: '  + (s.totalFuture  ?? 0);
+    document.querySelector('#chip-past').textContent   = 'Pasadas: '  + (s.totalPast    ?? 0);
 }
 
 function updateChips() {
@@ -119,17 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'login.html';
         return;
     }
-
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
 
 
 
@@ -150,14 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('sort-select').addEventListener('change', e => {
+    document.querySelector('#sort-select').addEventListener('change', e => {
         currentSort = e.target.value;
         currentPage = 0;
         loadCampaigns();
     });
 
-    document.getElementById('btn-prev').addEventListener('click', () => { currentPage--; loadCampaigns(); });
-    document.getElementById('btn-next').addEventListener('click', () => { currentPage++; loadCampaigns(); });
+    document.querySelector('#btn-prev').addEventListener('click', () => { currentPage--; loadCampaigns(); });
+    document.querySelector('#btn-next').addEventListener('click', () => { currentPage++; loadCampaigns(); });
 
     loadCampaigns();
 });

@@ -1,4 +1,4 @@
-// Cached DOM references
+// Referencias DOM en cache
 let usersTbody = null;
 let modalBackdrop = null;
 let inputRole = null;
@@ -10,7 +10,7 @@ let btnExport = null;
 let currentUserId = null;
 let usersCache = [];
 
-// Auth helpers
+// Ayudas de autenticacion
 function getToken() {
     return localStorage.getItem('token');
 }
@@ -27,25 +27,12 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Toast notification
-function showToast(msg, type) {
-    console.log("El toast se muestra con el mensaje: " + msg + " y el tipo: " + type);
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(function () {
-        toast.remove();
-    }, 3500);
-}
-
-// Escape HTML for safe attribute usage
+// Escapar HTML para uso seguro en atributos
 function escHtml(value) {
     return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Create a role badge element
+// Crear un badge de rol
 function createRoleBadge(role) {
     const span = document.createElement('span');
     const roleValue = role || 'PENDIENTE';
@@ -55,65 +42,58 @@ function createRoleBadge(role) {
     return span;
 }
 
-// Render a single user table row using DOM API
+// Renderizar una fila de usuario con DOM
 function renderUserRow(user) {
     const tr = document.createElement('tr');
 
-    // ID
     const tdId = document.createElement('td');
     tdId.textContent = user.id;
     tr.appendChild(tdId);
 
-    // Name
     const tdName = document.createElement('td');
     const strong = document.createElement('strong');
     strong.textContent = user.name;
     tdName.appendChild(strong);
     tr.appendChild(tdName);
 
-    // Email
     const tdEmail = document.createElement('td');
     tdEmail.textContent = user.email;
     tr.appendChild(tdEmail);
 
-    // Phone
     const tdPhone = document.createElement('td');
     tdPhone.textContent = user.phone || '—';
     tr.appendChild(tdPhone);
 
-    // Role badge
     const tdRole = document.createElement('td');
     tdRole.appendChild(createRoleBadge(user.role));
     tr.appendChild(tdRole);
 
-    // Actions
     const tdActions = document.createElement('td');
     tdActions.className = 'td-actions';
 
-    // Edit button
     const btnEdit = document.createElement('button');
     btnEdit.className = 'btn btn-primary btn-sm';
     btnEdit.textContent = 'Editar';
+    btnEdit.setAttribute('data-action', 'edit');
     btnEdit.setAttribute('data-userid', user.id);
     tdActions.appendChild(btnEdit);
 
-    // Delete button
     const btnDelete = document.createElement('button');
     btnDelete.className = 'btn btn-danger btn-sm';
     btnDelete.textContent = 'Eliminar';
+    btnDelete.setAttribute('data-action', 'delete');
     btnDelete.setAttribute('data-userid', user.id);
     tdActions.appendChild(btnDelete);
 
     tr.appendChild(tdActions);
-
     return tr;
 }
 
-// Load all users from API
+// Cargar usuarios desde la API
 async function loadUsers() {
     if (!usersTbody) return;
 
-    // Clear existing rows
+    // Limpiar filas actuales
     usersTbody.innerHTML = '';
 
     try {
@@ -147,9 +127,9 @@ async function loadUsers() {
 
         usersCache = data;
 
-        for (let i = 0; i < data.length; i++) {
-            usersTbody.appendChild(renderUserRow(data[i]));
-        }
+        data.forEach(function (user) {
+            usersTbody.appendChild(renderUserRow(user));
+        });
     } catch (error) {
         usersTbody.innerHTML = '';
         const errorRow = document.createElement('tr');
@@ -162,7 +142,6 @@ async function loadUsers() {
     }
 }
 
-// Find user in cache by ID
 function findUserById(userId) {
     for (let i = 0; i < usersCache.length; i++) {
         if (String(usersCache[i].id) === String(userId)) {
@@ -172,7 +151,6 @@ function findUserById(userId) {
     return null;
 }
 
-// Open edit modal for a user
 function openEditModal(userId) {
     currentUserId = userId;
     inputRole.value = '';
@@ -180,7 +158,6 @@ function openEditModal(userId) {
     modalBackdrop.classList.add('open');
 }
 
-// Close modal
 function closeModal() {
     modalBackdrop.classList.remove('open');
     currentUserId = null;
@@ -188,7 +165,6 @@ function closeModal() {
     modalError.textContent = '';
 }
 
-// Save new role for user
 async function saveUserRole() {
     if (!currentUserId) return;
 
@@ -230,7 +206,6 @@ async function saveUserRole() {
     btnGuardar.disabled = false;
 }
 
-// Delete a user
 async function deleteUser(userId) {
     const user = findUserById(userId);
     if (!user) return;
@@ -258,19 +233,17 @@ async function deleteUser(userId) {
     }
 }
 
-// Initialize on DOM ready
+// Inicializar al cargar el DOM
 document.addEventListener('DOMContentLoaded', function () {
-    // Cache DOM elements
-    usersTbody = document.getElementById('users-tbody');
-    modalBackdrop = document.getElementById('modal-backdrop');
-    inputRole = document.getElementById('input-role');
-    modalError = document.getElementById('modal-error');
-    btnGuardar = document.getElementById('btn-guardar');
-    btnCancelar = document.getElementById('btn-cancelar');
-    btnRefresh = document.getElementById('btn-refresh');
-    btnExport = document.getElementById('btn-export');
+    usersTbody = document.querySelector('#users-tbody');
+    modalBackdrop = document.querySelector('#modal-backdrop');
+    inputRole = document.querySelector('#input-role');
+    modalError = document.querySelector('#modal-error');
+    btnGuardar = document.querySelector('#btn-guardar');
+    btnCancelar = document.querySelector('#btn-cancelar');
+    btnRefresh = document.querySelector('#btn-refresh');
+    btnExport = document.querySelector('#btn-export');
 
-    // Auth check
     if (!getToken()) {
         window.location.href = 'login.html';
         return;
@@ -281,13 +254,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Set welcome name
-    const userNameEl = document.getElementById('user-name');
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
-
-    // Event listeners
     btnRefresh.addEventListener('click', loadUsers);
 
     btnExport.addEventListener('click', function () {
@@ -298,37 +264,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     btnGuardar.addEventListener('click', saveUserRole);
 
-    // Close modal when clicking on backdrop
+    // Cerrar modal al hacer clic en el fondo
     modalBackdrop.addEventListener('click', function (e) {
         if (e.target === modalBackdrop) {
             closeModal();
         }
     });
 
-    // Delegate table button clicks (edit / delete)
     usersTbody.addEventListener('click', function (e) {
         const button = e.target.closest('button');
         if (!button) return;
 
         const userId = button.getAttribute('data-userid');
-        const action = button.textContent;
+        const action = button.getAttribute('data-action');
 
-        if (action === 'Editar') {
+        if (action === 'edit') {
             openEditModal(userId);
-        } else if (action === 'Eliminar') {
+        } else if (action === 'delete') {
             deleteUser(userId);
         }
     });
 
-    // Header button listeners
-    document.addEventListener('click', function (e) {
-        if (e.target.id === 'btn-edit') {
-            window.location.href = 'edit.html';
-        } else if (e.target.id === 'btn-logout') {
-            logout();
-        }
-    });
-
-    // Load initial data
     loadUsers();
 });

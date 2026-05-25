@@ -51,7 +51,7 @@ async function fetchArray(url, options) {
 }
 
 function showMessage(text, isError) {
-    const el = document.getElementById('global-message');
+    const el = document.querySelector('#global-message');
     el.hidden = false;
     el.textContent = text;
     el.className = isError ? 'error' : 'success';
@@ -60,25 +60,25 @@ function showMessage(text, isError) {
 }
 
 function showModalError(text) {
-    const el = document.getElementById('modal-error');
+    const el = document.querySelector('#modal-error');
     el.hidden = false;
     el.textContent = text;
 }
 
 function clearModalError() {
-    const el = document.getElementById('modal-error');
+    const el = document.querySelector('#modal-error');
     el.hidden = true;
     el.textContent = '';
 }
 
 function showModal() {
-    const m = document.getElementById('campaign-modal');
+    const m = document.querySelector('#campaign-modal');
     m.classList.remove('hidden');
     m.classList.add('open');
 }
 
 function hideModal() {
-    const m = document.getElementById('campaign-modal');
+    const m = document.querySelector('#campaign-modal');
     m.classList.add('hidden');
     m.classList.remove('open');
     clearModalError();
@@ -94,7 +94,7 @@ async function loadStoreFilters() {
         fetchArray(API_BASE + '/api/localities', opts)
     ]);
 
-    const chainSel = document.getElementById('store-filter-chain');
+    const chainSel = document.querySelector('#store-filter-chain');
     chainSel.innerHTML = '';
     const chainDefault = document.createElement('option');
     chainDefault.value = '';
@@ -107,7 +107,7 @@ async function loadStoreFilters() {
         chainSel.appendChild(opt);
     });
 
-    const zoneSel = document.getElementById('store-filter-zone');
+    const zoneSel = document.querySelector('#store-filter-zone');
     zoneSel.innerHTML = '';
     const zoneDefault = document.createElement('option');
     zoneDefault.value = '';
@@ -120,7 +120,7 @@ async function loadStoreFilters() {
         zoneSel.appendChild(opt);
     });
 
-    const localSel = document.getElementById('store-filter-locality');
+    const localSel = document.querySelector('#store-filter-locality');
     localSel.innerHTML = '';
     const localDefault = document.createElement('option');
     localDefault.value = '';
@@ -135,9 +135,9 @@ async function loadStoreFilters() {
 }
 
 async function loadAvailableStores() {
-    const chainId    = document.getElementById('store-filter-chain').value;
-    const zoneId     = document.getElementById('store-filter-zone').value;
-    const localityId = document.getElementById('store-filter-locality').value;
+    const chainId    = document.querySelector('#store-filter-chain').value;
+    const zoneId     = document.querySelector('#store-filter-zone').value;
+    const localityId = document.querySelector('#store-filter-locality').value;
 
     const params = new URLSearchParams();
     if (chainId)    params.append('chainId',    chainId);
@@ -151,7 +151,7 @@ async function loadAvailableStores() {
 }
 
 function renderAvailableList() {
-    const ul = document.getElementById('available-stores');
+    const ul = document.querySelector('#available-stores');
     const available = allFilteredStores.filter(s => !selectedStores.has(Number(s.id)));
 
     if (!available.length) {
@@ -160,7 +160,7 @@ function renderAvailableList() {
         li.className = 'store-list-empty';
         li.textContent = 'Sin tiendas disponibles con estos filtros.';
         ul.appendChild(li);
-        document.getElementById('available-count').textContent = '0';
+        document.querySelector('#available-count').textContent = '0';
         return;
     }
 
@@ -180,11 +180,11 @@ function renderAvailableList() {
         li.appendChild(btn);
         ul.appendChild(li);
     });
-    document.getElementById('available-count').textContent = String(available.length);
+    document.querySelector('#available-count').textContent = String(available.length);
 }
 
 function renderSelectedList() {
-    const ul = document.getElementById('selected-stores');
+    const ul = document.querySelector('#selected-stores');
     const items = [...selectedStores.values()];
 
     if (!items.length) {
@@ -193,7 +193,7 @@ function renderSelectedList() {
         li.className = 'store-list-empty';
         li.textContent = 'Sin tiendas seleccionadas.';
         ul.appendChild(li);
-        document.getElementById('selected-count').textContent = '0';
+        document.querySelector('#selected-count').textContent = '0';
         return;
     }
 
@@ -212,7 +212,7 @@ function renderSelectedList() {
         li.appendChild(btn);
         ul.appendChild(li);
     });
-    document.getElementById('selected-count').textContent = String(items.length);
+    document.querySelector('#selected-count').textContent = String(items.length);
 }
 
 // ── Campaign table ──────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ async function loadCampaigns() {
 }
 
 function renderTable(campaigns) {
-    const tbody = document.getElementById('campaigns-tbody');
+    const tbody = document.querySelector('#campaigns-tbody');
     tbody.innerHTML = '';
     if (!campaigns.length) {
         const tr = document.createElement('tr');
@@ -286,11 +286,11 @@ function renderTable(campaigns) {
 
 async function openCreateModal() {
     currentCampaignId = null;
-    document.getElementById('modal-title').textContent = 'Nueva campaña';
-    document.getElementById('campaign-name').value  = '';
-    document.getElementById('campaign-type').value  = '';
-    document.getElementById('campaign-start').value = '';
-    document.getElementById('campaign-end').value   = '';
+    document.querySelector('#modal-title').textContent = 'Nueva campaña';
+    document.querySelector('#campaign-name').value  = '';
+    document.querySelector('#campaign-type').value  = '';
+    document.querySelector('#campaign-start').value = '';
+    document.querySelector('#campaign-end').value   = '';
     selectedStores = new Map();
     clearModalError();
     showModal();
@@ -303,11 +303,11 @@ async function openEditModal(id) {
     try {
         const c = await fetchJson(API_BASE + '/api/campaigns/' + id, { headers: authHeaders() });
         currentCampaignId = id;
-        document.getElementById('modal-title').textContent = 'Editar campaña';
-        document.getElementById('campaign-name').value  = c.name  || '';
-        document.getElementById('campaign-type').value  = (c.type && c.type.id !== null) ? String(c.type.id) : '';
-        document.getElementById('campaign-start').value = c.startDate || '';
-        document.getElementById('campaign-end').value   = c.endDate   || '';
+        document.querySelector('#modal-title').textContent = 'Editar campaña';
+        document.querySelector('#campaign-name').value  = c.name  || '';
+        document.querySelector('#campaign-type').value  = (c.type && c.type.id !== null) ? String(c.type.id) : '';
+        document.querySelector('#campaign-start').value = c.startDate || '';
+        document.querySelector('#campaign-end').value   = c.endDate   || '';
         selectedStores = new Map();
         try {
             const sd = await fetchJson(API_BASE + '/api/campaigns/' + id + '/stores',
@@ -323,10 +323,10 @@ async function openEditModal(id) {
 }
 
 async function saveCampaign() {
-    const name      = (document.getElementById('campaign-name').value  || '').trim();
-    const typeIdRaw = (document.getElementById('campaign-type').value  || '').trim();
-    const startDate = (document.getElementById('campaign-start').value || '').trim();
-    const endDate   = (document.getElementById('campaign-end').value   || '').trim();
+    const name      = (document.querySelector('#campaign-name').value  || '').trim();
+    const typeIdRaw = (document.querySelector('#campaign-type').value  || '').trim();
+    const startDate = (document.querySelector('#campaign-start').value || '').trim();
+    const endDate   = (document.querySelector('#campaign-end').value   || '').trim();
     clearModalError();
 
     if (!name)      return showModalError('El nombre de la campaña es obligatorio.');
@@ -381,7 +381,7 @@ async function deleteCampaign(id, name) {
 
 async function loadCampaignTypes() {
     cachedTypes = await fetchJson(API_BASE + '/api/campaign-types', { headers: authHeaders() });
-    const sel = document.getElementById('campaign-type');
+    const sel = document.querySelector('#campaign-type');
     sel.innerHTML = '';
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '';
@@ -400,35 +400,19 @@ async function loadCampaignTypes() {
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
+    document.querySelector('#btn-new').addEventListener('click', openCreateModal);
+    document.querySelector('#btn-cancel-modal').addEventListener('click', hideModal);
+    document.querySelector('#btn-save').addEventListener('click', saveCampaign);
 
-
-    document.getElementById('btn-new').addEventListener('click', openCreateModal);
-    document.getElementById('btn-cancel-modal').addEventListener('click', hideModal);
-    document.getElementById('btn-save').addEventListener('click', saveCampaign);
-
-    document.getElementById('btn-store-filter').addEventListener('click', loadAvailableStores);
-    document.getElementById('btn-store-clear').addEventListener('click', () => {
+    document.querySelector('#btn-store-filter').addEventListener('click', loadAvailableStores);
+    document.querySelector('#btn-store-clear').addEventListener('click', () => {
         ['store-filter-chain','store-filter-zone','store-filter-locality']
-            .forEach(id => document.getElementById(id).value = '');
+            .forEach(id => document.querySelector(`#${id}`).value = '');
         loadAvailableStores();
     });
 
-    document.getElementById('available-stores').addEventListener('click', e => {
+    document.querySelector('#available-stores').addEventListener('click', e => {
         const btn = e.target.closest('.btn-add-store');
         if (!btn) return;
         const storeId = Number(btn.closest('li').dataset.storeid);
@@ -437,24 +421,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderAvailableList(); renderSelectedList();
     });
 
-    document.getElementById('selected-stores').addEventListener('click', e => {
+    document.querySelector('#selected-stores').addEventListener('click', e => {
         const btn = e.target.closest('.btn-remove-store');
         if (!btn) return;
         selectedStores.delete(Number(btn.closest('li').dataset.storeid));
         renderAvailableList(); renderSelectedList();
     });
 
-    document.getElementById('campaign-modal').addEventListener('click', e => {
-        if (e.target === document.getElementById('campaign-modal')) hideModal();
+    document.querySelector('#campaign-modal').addEventListener('click', e => {
+        if (e.target === document.querySelector('#campaign-modal')) hideModal();
     });
 
     // Export button
-    document.getElementById('btn-export-campaigns').addEventListener('click', function () {
+    document.querySelector('#btn-export-campaigns').addEventListener('click', function () {
         exportarExcel('campaigns');
     });
 
     // Event delegation for table action buttons (edit / delete)
-    document.getElementById('campaigns-table').addEventListener('click', function (e) {
+    document.querySelector('#campaigns-table').addEventListener('click', function (e) {
         const button = e.target.closest('button');
         if (!button) return;
         const action = button.getAttribute('data-action');

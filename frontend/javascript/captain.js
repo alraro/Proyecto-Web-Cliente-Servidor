@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -9,28 +9,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
-    const campaignSelect  = document.getElementById('campaign-select');
-    const btnLoad         = document.getElementById('btn-load');
-    const globalMessage   = document.getElementById('global-message');
-    const captainsTbody   = document.getElementById('captains-tbody');
-    const captainSelect   = document.getElementById('captain-select');
-    const btnAssign       = document.getElementById('btn-assign');
+    const campaignSelect  = document.querySelector('#campaign-select');
+    const btnLoad         = document.querySelector('#btn-load');
+    const globalMessage   = document.querySelector('#global-message');
+    const captainsTbody   = document.querySelector('#captains-tbody');
+    const captainSelect   = document.querySelector('#captain-select');
+    const btnAssign       = document.querySelector('#btn-assign');
 
     if (!token || localStorage.getItem('role') !== 'CAPITAN') {
         window.location.href = 'login.html';
         return;
     }
 
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
     
 
     captainSelect.disabled = true;

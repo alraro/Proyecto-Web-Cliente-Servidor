@@ -6,24 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const welcomeNameEl = document.getElementById('welcome-name');
-
-    if (welcomeNameEl) {
-        welcomeNameEl.textContent = localStorage.getItem('nombre') || 'Admin';
-    }
-
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
 
     const token = localStorage.getItem('token');
-    const nombre = localStorage.getItem('nombre') || '';
+    const nombre = localStorage.getItem('nombre') || 'Administrador';
+    const welcomeNameEl = document.querySelector('#welcome-name');
+
+    if (welcomeNameEl) welcomeNameEl.textContent = nombre;
+
     if (token) {
         const backendLinks = document.querySelectorAll(`a.menu-card[href^="${API_BASE}/admin-"]`);
         backendLinks.forEach((link) => {
@@ -35,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 link.href = targetUrl.toString();
             } catch (_) {
-                // Ignore malformed URLs to avoid breaking navigation.
+                // Si la URL no es válida, no hacemos nada
             }
         });
     }

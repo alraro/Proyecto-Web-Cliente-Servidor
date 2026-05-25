@@ -1,0 +1,4 @@
+/* Coordinator dashboard — page-specific overrides */
+
+.icon-teal { background: var(--color-teal-bg); color: var(--color-teal); }
+.icon-green { background: var(--color-green-icon-bg); color: var(--color-green-icon); }

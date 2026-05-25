@@ -55,12 +55,15 @@ form.addEventListener('submit', async (event) => {
     try {
         const res = await fetch(`${API_BASE}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify({ email, password })
         });
 
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json();
 
+        // Solo cuando es correcto pero no tiene rol asignado
         if (res.status === 403) {
             message.textContent = 'Tu cuenta está pendiente de verificación por un administrador.';
             message.classList.add('is-error');
@@ -79,12 +82,14 @@ form.addEventListener('submit', async (event) => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('role', data.role);
 
+
         // Guardar storeId si el rol es Responsable de Tienda
         if (data.storeId != null) {
             localStorage.setItem('storeId', data.storeId);
         } else {
             localStorage.removeItem('storeId');
         }
+
 
         // Redirigir según rol
         window.location.href = data.redirectUrl;

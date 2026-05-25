@@ -1,26 +1,11 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Coordinador';
-    }
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-
-    const tbody = document.getElementById('campaigns-tbody');
+    const tbody = document.querySelector('#campaigns-tbody');
 
     try {
         const campaigns = await fetchJson(API_BASE + '/api/coordinator/my-campaigns', {
@@ -86,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

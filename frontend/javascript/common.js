@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 function getToken() {
     return localStorage.getItem('token');
@@ -47,12 +47,12 @@ function requireAuth(expectedRole) {
 }
 
 function setWelcomeName(elementId, defaultName) {
-    const el = document.getElementById(elementId);
+    const el = document.querySelector(`#${elementId}`);
     if (el) el.textContent = getUserName() || defaultName;
 }
 
 function setUserNameDisplay() {
-    const userNameEl = document.getElementById('user-name');
+    const userNameEl = document.querySelector('#user-name');
     if (userNameEl) {
         userNameEl.textContent = `${getUserName()} (${getUserRole() || 'Usuario'})`;
     }
@@ -72,7 +72,7 @@ function escapeAttr(value) {
 }
 
 function showMessage(text, isError) {
-    const el = document.getElementById('global-message');
+    const el = document.querySelector('#global-message');
     if (!el) return;
     el.hidden = false;
     el.textContent = text;
@@ -82,7 +82,7 @@ function showMessage(text, isError) {
 }
 
 function showToast(msg, type = 'success', containerId = 'toast-container') {
-    const container = document.getElementById(containerId);
+    const container = document.querySelector(`#${containerId}`);
     if (!container) return;
     const toast = document.createElement('div');
     toast.className = 'toast toast-' + type;

@@ -1,28 +1,13 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Coordinador';
-    }
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-
-    const campaignSelect = document.getElementById('campaign-select');
-    const btnLoad        = document.getElementById('btn-load');
-    const entitiesTbody  = document.getElementById('entities-tbody');
+    const campaignSelect = document.querySelector('#campaign-select');
+    const btnLoad        = document.querySelector('#btn-load');
+    const entitiesTbody  = document.querySelector('#entities-tbody');
 
     // Cache de voluntarios por campaña para los paneles expandibles
     let volunteersCache = [];
@@ -154,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         entitiesTbody.addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-target]');
             if (!btn) return;
-            const target = document.getElementById(btn.dataset.target);
+            const target = document.querySelector(`#${btn.dataset.target}`);
             if (!target) return;
             target.hidden = !target.hidden;
             btn.textContent = target.hidden ? 'Ver voluntarios' : 'Ocultar';
@@ -236,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

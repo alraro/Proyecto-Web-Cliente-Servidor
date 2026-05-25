@@ -1,30 +1,16 @@
-const API_BASE = 'http://localhost:8080';
+﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    const userNameEl = document.getElementById('user-name');
-	
-    if (userNameEl) {
-        userNameEl.textContent = localStorage.getItem('nombre') || 'Administrador';
-    }
+    
 
-    document.addEventListener('click', (e) => {
-        if(e.target.id === 'btn-edit'){
-            window.location.href = 'edit.html';
-            
-        } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    })
-
-    const campaignSelect = document.getElementById('campaign-select');
-    const storeSelect    = document.getElementById('store-select');
-    const description    = document.getElementById('description');
-    const btnSubmit      = document.getElementById('btn-submit');
-    const incidentsTbody = document.getElementById('incidents-tbody');
+    const campaignSelect = document.querySelector('#campaign-select');
+    const storeSelect    = document.querySelector('#store-select');
+    const description    = document.querySelector('#description');
+    const btnSubmit      = document.querySelector('#btn-submit');
+    const incidentsTbody = document.querySelector('#incidents-tbody');
 
     // Carga campañas del capitán
     try {
@@ -182,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function showMessage(text, isError) {
-        const el = document.getElementById('global-message');
+        const el = document.querySelector('#global-message');
         el.hidden = false;
         el.textContent = text;
         el.className = isError ? 'error' : 'success';

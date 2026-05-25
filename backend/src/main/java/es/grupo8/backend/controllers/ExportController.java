@@ -1,11 +1,16 @@
+/*
+*   Participación en el proyecto:
+*  - Hugo Herrero González: 80%
+*  - IA Generativa: 20%
+*/
+
+
+
 package es.grupo8.backend.controllers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -27,59 +32,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import es.grupo8.backend.dao.AdminRepository;
-import es.grupo8.backend.dao.CampaignRepository;
-import es.grupo8.backend.dao.CampaignStoreRepository;
-import es.grupo8.backend.dao.CaptainRepository;
-import es.grupo8.backend.dao.ChainRepository;
-import es.grupo8.backend.dao.CoordinatorRepository;
-import es.grupo8.backend.dao.PartnerEntityRepository;
-import es.grupo8.backend.dao.StoreRepository;
-import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.entity.AdminEntity;
-import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.ChainEntity;
-import es.grupo8.backend.entity.PartnerEntity;
-import es.grupo8.backend.entity.Store;
-import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.dto.*;
+import es.grupo8.backend.services.ExportService;
 
 @Controller
 @RequestMapping("/api/export")
 public class ExportController {
 
-    @Autowired 
-    private StoreRepository storeRepository;
-
-    @Autowired 
-    private ChainRepository chainRepository;
-
-    @Autowired 
-    private CampaignRepository campaignRepository;
-
-    @Autowired 
-    private PartnerEntityRepository partnerEntityRepository;
-    
-    @Autowired 
-    private UserRepository userRepository;
-    
-    @Autowired 
-    private CampaignStoreRepository campaignStoreRepository;
-    
-    @Autowired 
-    private AdminRepository adminRepository;
-    
-    @Autowired 
-    private CoordinatorRepository coordinatorRepository;
-    
-    @Autowired 
-    private CaptainRepository captainRepository;
-
+    @Autowired
+    private ExportService exportService;
 
 
     @GetMapping("/{resource}")
     public ResponseEntity<?> export(
-            @PathVariable String resource,
-            @RequestParam(required = false) Integer campaignId) {
+            @PathVariable String resource) {
         try {
             byte[] xlsx = switch (resource) {
                 case "stores"    -> exportStores();
@@ -94,11 +60,9 @@ public class ExportController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recurso no válido");
             }
 
-            String file = resource + "_export.xlsx";
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file + "\"")
-                    .contentType(MediaType.parseMediaType(
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource + "_export.xlsx")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(xlsx);
 
         } catch (IOException e) {
@@ -109,7 +73,7 @@ public class ExportController {
 
     // Tiendas
     private byte[] exportStores() throws IOException {
-        List<Store> stores = storeRepository.findAll();
+        List<ExportStoreDTO> stores = exportService.getStores();
 
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Tiendas");
@@ -120,21 +84,15 @@ public class ExportController {
             }, hs);
 
             int r = 1;
-            for (Store s : stores) {
+            for (ExportStoreDTO s : stores) {
                 Row row = sheet.createRow(r++);
-                row.createCell(0).setCellValue((double) s.getId()); // ID
+                row.createCell(0).setCellValue(s.getId()); // ID
                 row.createCell(1).setCellValue(s.getName()); // Nombre
-                row.createCell(2).setCellValue(nullSafe(s.getAddress())); // Domicilio
-                if (s.getPostalCode() != null) {
-                    if (s.getPostalCode().getIdLocality() != null) {
-                        row.createCell(3).setCellValue(s.getPostalCode().getIdLocality().getName()); // Localidad
-                        if (s.getPostalCode().getIdLocality().getIdZone() != null)
-                            row.createCell(5).setCellValue(s.getPostalCode().getIdLocality().getIdZone().getName()); // Zona
-                    }
-                    row.createCell(4).setCellValue(s.getPostalCode().getPostalCode()); // CP
-                }
-                if (s.getIdChain() != null)
-                    row.createCell(6).setCellValue(s.getIdChain().getName()); // Cadena
+                row.createCell(2).setCellValue(s.getAddress()); // Domicilio
+                row.createCell(3).setCellValue(s.getLocality()); // Localidad
+                row.createCell(4).setCellValue(s.getPostalCode()); // CP
+                row.createCell(5).setCellValue(s.getZone()); // Zona
+                row.createCell(6).setCellValue(s.getChain()); // Cadena
             }
             autoSizeColumns(sheet, 7);
             return toBytes(wb);
@@ -143,7 +101,7 @@ public class ExportController {
 
     // Cadenas
     private byte[] exportChains() throws IOException {
-        List<ChainEntity> chains = chainRepository.findAll();
+        List<ExportChainDTO> chains = exportService.getChains();
 
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Cadenas");
@@ -154,12 +112,12 @@ public class ExportController {
             }, hs);
 
             int r = 1;
-            for (ChainEntity c : chains) {
+            for (ExportChainDTO c : chains) {
                 Row row = sheet.createRow(r++);
-                row.createCell(0).setCellValue((double) c.getIdChain()); // ID
+                row.createCell(0).setCellValue(c.getId()); // ID
                 row.createCell(1).setCellValue(c.getName()); // Nombre
                 row.createCell(2).setCellValue(c.getCode()); // Código
-                row.createCell(3).setCellValue(Boolean.TRUE.equals(c.getParticipation()) ? "Sí" : "No"); // Participa
+                row.createCell(3).setCellValue(c.getParticipation()); // Participa
             }
 
             autoSizeColumns(sheet, 4);
@@ -169,7 +127,7 @@ public class ExportController {
 
     // Campañas
     private byte[] exportCampaigns() throws IOException {
-        List<Campaign> campaigns = campaignRepository.findAll();
+        List<ExportCampaignDTO> campaigns = exportService.getCampaigns();
 
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Campañas");
@@ -180,13 +138,13 @@ public class ExportController {
             }, hs);
 
             int r = 1;
-            for (Campaign c : campaigns) {
+            for (ExportCampaignDTO c : campaigns) {
                 Row row = sheet.createRow(r++);
-                row.createCell(0).setCellValue((double) c.getId()); // ID
+                row.createCell(0).setCellValue(c.getId()); // ID
                 row.createCell(1).setCellValue(c.getName()); // Nombre
-                row.createCell(2).setCellValue(c.getIdType() != null ? c.getIdType().getName() : ""); // Tipo
-                row.createCell(3).setCellValue(c.getStartDate().toString()); // Fecha inicio
-                row.createCell(4).setCellValue(c.getEndDate().toString()); // Fecha fin
+                row.createCell(2).setCellValue(c.getType()); // Tipo
+                row.createCell(3).setCellValue(c.getStartDate()); // Fecha inicio
+                row.createCell(4).setCellValue(c.getEndDate()); // Fecha fin
             }
 
             autoSizeColumns(sheet, 5);
@@ -196,7 +154,7 @@ public class ExportController {
 
     // Entidades colaboradoras 
     private byte[] exportPartners() throws IOException {
-        List<PartnerEntity> partners = partnerEntityRepository.findAll();
+        List<ExportPartnerDTO> partners = exportService.getPartners();
 
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Entidades colaboradoras");
@@ -207,12 +165,12 @@ public class ExportController {
             }, hs);
 
             int r = 1;
-            for (PartnerEntity p : partners) {
+            for (ExportPartnerDTO p : partners) {
                 Row row = sheet.createRow(r++);
-                row.createCell(0).setCellValue((double) p.getId()); // ID
+                row.createCell(0).setCellValue(p.getId()); // ID
                 row.createCell(1).setCellValue(p.getName()); // Nombre
-                row.createCell(2).setCellValue(nullSafe(p.getAddress())); // Dirección
-                row.createCell(3).setCellValue(nullSafe(p.getPhone())); // Teléfono
+                row.createCell(2).setCellValue(p.getAddress()); // Dirección
+                row.createCell(3).setCellValue(p.getPhone()); // Teléfono
             }
 
             autoSizeColumns(sheet, 4);
@@ -222,7 +180,7 @@ public class ExportController {
 
     // Usuarios 
     private byte[] exportUsers() throws IOException {
-        List<UserEntity> users = userRepository.findAll();
+        List<ExportUserDTO> users = exportService.getUsers();
 
         try (XSSFWorkbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Usuarios");
@@ -232,14 +190,14 @@ public class ExportController {
             }, hs);
 
             int r = 1;
-            for (UserEntity u : users) {
+            for (ExportUserDTO u : users) {
                 Row row = sheet.createRow(r++);
-                row.createCell(0).setCellValue((double) u.getIdUser()); // ID
+                row.createCell(0).setCellValue(u.getId()); // ID
                 row.createCell(1).setCellValue(u.getName()); // Nombre
                 row.createCell(2).setCellValue(u.getEmail()); // Email
-                row.createCell(3).setCellValue(nullSafe(u.getPhone())); // Teléfono
-                row.createCell(4).setCellValue(nullSafe(u.getAddress())); // Dirección
-                row.createCell(5).setCellValue(nullSafe(u.getPostalCode())); // CP
+                row.createCell(3).setCellValue(u.getPhone()); // Teléfono
+                row.createCell(4).setCellValue(u.getAddress()); // Dirección
+                row.createCell(5).setCellValue(u.getPostalCode()); // CP
             }
 
             autoSizeColumns(sheet, 6);
@@ -282,9 +240,5 @@ public class ExportController {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         wb.write(out);
         return out.toByteArray();
-    }
-
-    private String nullSafe(String value) {
-        return value != null ? value : "";
     }
 }
