@@ -14,6 +14,8 @@ public class ShiftMapper extends MapperDTO<ShiftResponseDto, Shift> {
      * @param shift the Shift entity to map
      * @return the populated ShiftResponseDto, or null if the entity is null
      */
+    private String nullSafe(String v) { return v != null ? v : ""; }
+
     @Override
     public ShiftResponseDto toDTO(Shift shift) {
         if (shift == null) return null;
@@ -29,8 +31,8 @@ public class ShiftMapper extends MapperDTO<ShiftResponseDto, Shift> {
         dto.setStartTime(shift.getStartTime());
         dto.setEndTime(shift.getEndTime());
         dto.setVolunteersNeeded(shift.getVolunteersNeeded());
-        dto.setLocation(shift.getLocation() != null ? shift.getLocation() : "");
-        dto.setObservations(shift.getObservations() != null ? shift.getObservations() : "");
+        dto.setLocation(nullSafe(shift.getLocation()));
+        dto.setObservations(nullSafe(shift.getObservations()));
 
         return dto;
     }

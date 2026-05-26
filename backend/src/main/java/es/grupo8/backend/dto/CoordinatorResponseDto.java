@@ -1,10 +1,13 @@
 package es.grupo8.backend.dto;
 
+import lombok.Data;
+
 // DTO for returning coordinator-campaign assignment data.
-public record CoordinatorResponseDto(
-        Integer idUser,
-        String userName,
-        String userEmail,
-        Integer idCampaign,
-        String campaignName
-) {}
+@Data
+public class CoordinatorResponseDto {
+    private Integer idUser;
+    private String userName;
+    private String userEmail;
+    private Integer idCampaign;
+    private String campaignName;
+}
