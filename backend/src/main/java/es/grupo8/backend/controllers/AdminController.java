@@ -99,4 +99,16 @@ public class AdminController {
         // redirect: prefix tells Spring MVC to send an HTTP 302 to the browser.
         return "redirect:" + base + "/admin.html";
     }
+
+    @GetMapping("/admin-chains")
+    public String adminChains() { return "admin-chains"; }
+
+    @GetMapping("/admin-stores")
+    public String adminStores() { return "admin-stores"; }
+
+    @GetMapping("/admin-validate-users")
+    public String adminValidateUsers() { return "admin-validate-users"; }
+
+    @GetMapping("/responsible-store")
+    public String responsibleStore() { return "responsible-store"; }
 }

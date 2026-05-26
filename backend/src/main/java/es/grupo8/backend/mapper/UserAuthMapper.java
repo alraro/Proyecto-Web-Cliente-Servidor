@@ -11,7 +11,7 @@ import es.grupo8.backend.entity.UserEntity;
 @Component
 public class UserAuthMapper {
     @Autowired
-    private UserMapper userMapper;
+    private ProfileMapper profileMapper;
 
     public LoginResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
 
@@ -48,7 +48,7 @@ public class UserAuthMapper {
 
     public ProfileDTO toProfileDTO(UserEntity user, String role, String redirectUrl, String message) {
 
-        ProfileDTO dto = userMapper.toDTO(user);
+        ProfileDTO dto = profileMapper.toDTO(user);
         dto.setRole(role);
         dto.setRedirectUrl(redirectUrl);
         dto.setMessage(message);

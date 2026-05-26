@@ -1,9 +1,7 @@
 package es.grupo8.backend.services;
 
-import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
-import es.grupo8.backend.dao.VolunteerShiftRepository;
 import es.grupo8.backend.dto.VoluntarioRequestDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto.CampaignInfo;
@@ -11,7 +9,6 @@ import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
-import es.grupo8.backend.entity.VolunteerShiftId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +26,6 @@ public class VolunteerService {
 
     @Autowired
     private PartnerEntityRepository partnerEntityRepository;
-
-    @Autowired
-    private CampaignRepository campaignRepository;
-
-    @Autowired
-    private VolunteerShiftRepository volunteerShiftRepository;
 
     public List<VoluntarioResponseDto> getVolunteersByEntity(Integer partnerEntityId) {
         List<Volunteer> volunteers = volunteerRepository.findByIdPartnerEntity_Id(partnerEntityId);

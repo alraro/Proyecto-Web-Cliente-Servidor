@@ -24,11 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.StoreRepository;
-import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.dto.StoreDTO;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
 import es.grupo8.backend.entity.Store;
+import es.grupo8.backend.mapper.StoreMapper;
 import es.grupo8.backend.security.AdminGuard;
 
 /**
@@ -57,6 +58,9 @@ public class CampaignStoreController {
 	@Autowired
 	private CampaignStoreRepository campaignStoreRepository;
 
+	@Autowired
+	private StoreMapper storeMapper;
+
 	@GetMapping("/api/campaigns/{campaignId}/stores")
 	public ResponseEntity<?> getCampaignStores(
 			@RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -72,10 +76,10 @@ public class CampaignStoreController {
 					.body(Map.of("message", "Campaign not found"));
 		}
 
-		List<StoreResponseDto> stores = new ArrayList<>();
+		List<StoreDTO> stores = new ArrayList<>();
 		for (CampaignStore campaignStore : campaignStoreRepository.findByIdCampaign_Id(campaignId)) {
 			if (campaignStore != null && campaignStore.getIdStore() != null) {
-				stores.add(StoreController.toDto(campaignStore.getIdStore()));
+				stores.add(storeMapper.toDTO(campaignStore.getIdStore()));
 			}
 		}
 
