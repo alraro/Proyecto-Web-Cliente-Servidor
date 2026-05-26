@@ -1,0 +1,58 @@
+package es.grupo8.backend.mapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.ProfileDTO;
+import es.grupo8.backend.dto.RegisterResponseDTO;
+import es.grupo8.backend.entity.UserEntity;
+
+
+@Component
+public class UserAuthMapper {
+    @Autowired
+    private UserMapper userMapper;
+
+    public LoginResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
+
+        LoginResponseDTO dto = new LoginResponseDTO();
+        dto.setId(user.getIdUser());
+        dto.setNombre(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(role);
+        dto.setRedirectUrl(redirectUrl);
+        dto.setMessage("Login correcto");
+        dto.setToken(token);
+        dto.setTokenType("Bearer");
+        dto.setExpiresInSeconds(expiresInSeconds);
+        dto.setStoreId(storeId);
+
+        return dto;
+    }
+
+
+    public RegisterResponseDTO toRegisterReponse(UserEntity user, String token, Long expiresInSeconds) {
+        
+        RegisterResponseDTO dto = new RegisterResponseDTO();
+        dto.setUserId(user.getIdUser());
+        dto.setNombre(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setMessage("Registro correcto");
+        dto.setToken(token);
+        dto.setTokenType("Bearer");
+        dto.setExpiresInSeconds(expiresInSeconds);
+
+        return dto;
+    }
+
+
+    public ProfileDTO toProfileDTO(UserEntity user, String role, String redirectUrl, String message) {
+
+        ProfileDTO dto = userMapper.toDTO(user);
+        dto.setRole(role);
+        dto.setRedirectUrl(redirectUrl);
+        dto.setMessage(message);
+
+        return dto;
+    }
+}
