@@ -1,4 +1,4 @@
-﻿let selectedCampaign = null;
+﻿﻿let selectedCampaign = null;
 
 
 document.addEventListener('DOMContentLoaded', () => {
