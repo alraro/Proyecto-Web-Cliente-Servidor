@@ -7,17 +7,17 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import es.grupo8.backend.dto.CampaignSummaryDTO;
+import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CoverageItemDTO;
 
 @Component
 public class DashboardMapper {
     
     // Transforma fila al dto de campaña
-    public CampaignSummaryDTO toCampaignSummaryDTO(Object[] row) {
+    public CampaignDTO toCampaignDTO(Object[] row) {
         if(row == null) return null;
 
-        CampaignSummaryDTO dto = new CampaignSummaryDTO();
+        CampaignDTO dto = new CampaignDTO();
 
         dto.setId((Integer) row[0]);
         dto.setName((String) row[1]);
@@ -29,9 +29,9 @@ public class DashboardMapper {
     }
 
     // Transforma lista de filas a lista de dto de campaña
-    public List<CampaignSummaryDTO> toCampaignSummaryDTOList(List<Object[]> rows) {
+    public List<CampaignDTO> toCampaignSummaryDTOList(List<Object[]> rows) {
         if(rows == null) return null;
-        return rows.stream().map(this::toCampaignSummaryDTO).collect(Collectors.toList());    }
+        return rows.stream().map(this::toCampaignDTO).collect(Collectors.toList());    }
 
     // Transforma fila al dto de cobertura
     public CoverageItemDTO toCoverageItemDTO(Object[] row){
