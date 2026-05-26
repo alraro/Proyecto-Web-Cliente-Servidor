@@ -2,45 +2,35 @@ package es.grupo8.backend.controllers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import es.grupo8.backend.dao.CampaignRepository;
-import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.RegisterResponseDTO;
+import es.grupo8.backend.services.AuthService;
 
 class ApiControllerRegisterTest {
 
-    private ApiController controller;
-    private UserRepository userRepository;
-    private CampaignRepository campaignRepository;
+    private AuthController controller;
+    private AuthService authService;
 
     @BeforeEach
     void setUp() {
-        controller = new ApiController();
-        userRepository = mock(UserRepository.class);
-        campaignRepository = mock(CampaignRepository.class);
+        controller = new AuthController();
+        authService = mock(AuthService.class);
 
-        ReflectionTestUtils.setField(controller, "userRepository", userRepository);
-        ReflectionTestUtils.setField(controller, "campaignRepository", campaignRepository);
-        ReflectionTestUtils.setField(controller, "jwtSecret", "change-this-secret-in-production-change-this-secret-in-production");
-        ReflectionTestUtils.setField(controller, "jwtExpirationMs", 7200000L);
-        ReflectionTestUtils.setField(controller, "frontendBaseUrl", "http://localhost:80");
-        controller.initJwt();
+        ReflectionTestUtils.setField(controller, "authService", authService);
     }
 
     @Test
@@ -51,7 +41,7 @@ class ApiControllerRegisterTest {
         ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verifyNoInteractions(authService);
     }
 
     @Test
@@ -62,7 +52,7 @@ class ApiControllerRegisterTest {
         ResponseEntity<?> response = controller.register(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verifyNoInteractions(authService);
     }
 
     @Test
@@ -81,64 +71,45 @@ class ApiControllerRegisterTest {
 
     @Test
     void registerRejectsDuplicatedEmail() {
-        when(userRepository.existsByEmail("user@bancosol.org")).thenReturn(true);
+        when(authService.emailExists("user@bancosol.org")).thenReturn(true);
 
         ResponseEntity<?> response = controller.register(validRequest());
 
-        // El código retorna 400 cuando falla por DataIntegrityViolationException
-        // Pero aquí debería retornar 409 CONFLICT porque existe el email
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verify(authService, never()).register(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void registerCreatesUserWithHashedPasswordAndReturnsCreated() {
-        when(userRepository.existsByEmail("user@bancosol.org")).thenReturn(false);
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
-            UserEntity user = invocation.getArgument(0);
-            user.setIdUser(99);
-            return user;
-        });
+        when(authService.emailExists("user@bancosol.org")).thenReturn(false);
+
+        RegisterResponseDTO dto = new RegisterResponseDTO();
+        dto.setMessage("Registro correcto");
+        when(authService.register("Test User", "user@bancosol.org", "password123", "600123123", "Main Street 1", "29001"))
+                .thenReturn(dto);
 
         ResponseEntity<?> response = controller.register(validRequest());
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
-        ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
-        verify(userRepository).save(captor.capture());
-        UserEntity saved = captor.getValue();
-
-        assertNotEquals("password123", saved.getPassword());
-        assertTrue(saved.getPassword().startsWith("$2"));
-
         @SuppressWarnings("unchecked")
         Map<String, Object> body = (Map<String, Object>) response.getBody();
-        // El código actual devuelve "Registro correcto" no "Registration successful"
         assertEquals("Registro correcto", body.get("message"));
+        verify(authService).register("Test User", "user@bancosol.org", "password123", "600123123", "Main Street 1", "29001");
     }
 
     @Test
-    void loginMigratesLegacyPassword() {
-        UserEntity legacy = new UserEntity();
-        legacy.setIdUser(1);
-        legacy.setName("Legacy User");
-        legacy.setEmail("legacy@bancosol.org");
-        legacy.setPassword("legacy123");
-
-        when(userRepository.findByEmail("legacy@bancosol.org")).thenReturn(Optional.of(legacy));
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    void loginReturnsForbiddenWhenRoleIsPending() {
+        LoginResponseDTO dto = new LoginResponseDTO();
+        dto.setRole("PENDIENTE");
+        when(authService.login("legacy@bancosol.org", "legacy123")).thenReturn(dto);
 
         Map<String, String> req = new HashMap<>();
         req.put("email", "legacy@bancosol.org");
         req.put("password", "legacy123");
 
         ResponseEntity<?> response = controller.login(req);
-        
-        // El test espera 200 pero el usuario "legacy" no tiene rol asignado
-        // Por lo que resolveRole devuelve "PENDIENTE" y el código retorna 403
-        // Para que pase, necesitamos que el usuario tenga rol o mockear el rol
-        // Como no podemos cambiar el código del controller, el test falla
-        // Este es un comportamiento esperado del código actual
+
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
