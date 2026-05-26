@@ -1,0 +1,74 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancosol | Entidades Colaboradoras</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/assignment.css">
+    <script src="/javascript/coordinator-entities.js" defer></script>
+    <script src="/javascript/includeHTML.js" defer></script>
+    <script src="/javascript/header.js" defer></script>
+
+</head>
+<body>
+    <include-html src="header.html"></include-html>
+
+    <main class="page-wrapper">
+        <div class="page-header">
+            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <div class="page-header-row">
+                <div>
+                    <h1>Entidades colaboradoras</h1>
+                    <p>Consulta qué entidades tienen voluntarios asignados en cada campaña.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-message" hidden></div>
+
+        <!-- Selector de campaña -->
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group mb-0">
+                    <label for="campaign-select">Campaña</label>
+                    <div class="selector-row">
+                        <select id="campaign-select">
+                            <option value="">Selecciona una campaña...</option>
+                        </select>
+                        <button type="button" id="btn-load" class="btn btn-secondary">Ver entidades</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de entidades -->
+        <div class="card">
+            <div class="card-head">
+                <h2>Entidades con voluntarios asignados</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre de entidad</th>
+                            <th>Teléfono</th>
+                            <th>Nº voluntarios asignados</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entities-tbody">
+                        <tr><td colspan="4" class="table-empty">Selecciona una campaña para ver las entidades.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+<% String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")); %>
+<!-- Page generated on: <%= today %> -->
+</body>
+</html>
