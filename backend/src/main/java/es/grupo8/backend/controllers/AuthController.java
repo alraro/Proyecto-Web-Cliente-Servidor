@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,11 +26,12 @@ public class AuthController {
 
 
     @PostMapping("/api/auth/login")
+	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
 		// Sacamos email y contraseña
-		String email = AuthService.normalizeEmail(request == null ? null : request.get("email"));
-		String password = AuthService.trimToNull(request == null ? null : request.get("password"));
+		String email = AuthService.normalizeEmail(request.get("email"));
+		String password = AuthService.trimToNull(request.get("password"));
 
 		// Validamos el email y contraseña
 		if (email == null || password == null) {
@@ -55,14 +56,14 @@ public class AuthController {
 	@ResponseBody
 	public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
 
-		String nombre = AuthService.trimToNull(request == null ? null : request.get("nombre"));
-		String email = AuthService.normalizeEmail(request == null ? null : request.get("email"));
-		String password = AuthService.trimToNull(request == null ? null : request.get("password"));
-		String telefono = AuthService.trimToNull(request == null ? null : request.get("telefono"));
-		String domicilio = AuthService.trimToNull(request == null ? null : request.get("domicilio"));
-		String cp = AuthService.trimToNull(request == null ? null : request.get("cp"));
+		String nombre = AuthService.trimToNull(request.get("nombre"));
+		String email = AuthService.normalizeEmail(request.get("email"));
+		String password = AuthService.trimToNull(request.get("password"));
+		String telefono = AuthService.trimToNull(request.get("telefono"));
+		String domicilio = AuthService.trimToNull(request.get("domicilio"));
+		String cp = AuthService.trimToNull(request.get("cp"));
 
-		// Comprobamos datos obligatorios
+		// Comprobamos datos obligatorios como nombre, email y contraseña
 		if (nombre == null || email == null || password == null) {
 			return ResponseEntity.badRequest().body(Map.of("message", "Nombre, email y contrasena son obligatorios"));
 		}
@@ -105,7 +106,6 @@ public class AuthController {
 
     // Endpoint para obtener el perfil del usuario
 	@GetMapping("/api/auth/profile")
-	@ResponseBody
 	public ResponseEntity<?> getProfile(@RequestHeader(value = "Authorization", required = false) String auth) {
 
 		// Obtenemos el ID del usuario
