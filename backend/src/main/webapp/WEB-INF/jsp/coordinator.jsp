@@ -21,7 +21,7 @@
     <a class="brand" href="/coordinator" aria-label="Bancosol home">Bancosol</a>
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Coordinador" : nombre %></span>
-        <a id="btn-logout" class="btn" href="/login">Cerrar sesión</a>
+        <a id="btn-logout" class="btn" href="/logout">Cerrar sesión</a>
     </div>
 </header>
 

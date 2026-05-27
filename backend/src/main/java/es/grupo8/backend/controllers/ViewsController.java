@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import es.grupo8.backend.dto.RegisterResponseDTO;
 
 import es.grupo8.backend.dto.LoginResponseDTO;
 import es.grupo8.backend.services.AuthService;
@@ -96,6 +97,33 @@ public class ViewsController {
         
 		return "register";
 	}
+
+    @PostMapping("/register")
+    public String submitRegister(@RequestParam(value = "nombre", required = false) String nombre,
+                                 @RequestParam(value = "email", required = false) String email,
+                                 @RequestParam(value = "telefono", required = false) String telefono,
+                                 @RequestParam(value = "password", required = false) String password,
+                                 @RequestParam(value = "domicilio", required = false) String domicilio,
+                                 @RequestParam(value = "cp", required = false) String cp,
+                                 Model model) {
+
+        RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+
+        if (dto == null) {
+            model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+            model.addAttribute("registerError", "No se han podido registrar los datos.");
+            return "register";
+        }
+
+        return "redirect:/login";
+    }
+
+    @GetMapping("logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "login";
+    }
+
 
 	@GetMapping("/coordinator")
 	public String coordinator() {

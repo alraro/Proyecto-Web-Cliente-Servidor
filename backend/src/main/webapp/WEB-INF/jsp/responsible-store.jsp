@@ -27,7 +27,7 @@
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Responsable" : nombre %></span>
         <a class="btn" href="/edit">Editar perfil</a>
-        <a id="btn-logout" class="btn" href="/login">Cerrar sesión</a>
+        <a id="btn-logout" class="btn" href="/logout">Cerrar sesión</a>
     </div>
 </header>
 

@@ -95,13 +95,14 @@ public class AuthService {
     public RegisterResponseDTO register(String nombreParam, String emailParam, String passwordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = new UserEntity();
+
         user.setName(trimToNull(nombreParam));
         user.setEmail(normalizeEmail(emailParam));
         user.setPhone(trimToNull(telefonoParam));
         user.setPassword(hashPassword(trimToNull(passwordParam)));
         user.setAddress(trimToNull(domicilioParam));
         user.setPostalCode(trimToNull(cpParam));
-
+		
 		// Comprobamos datos obligatorios como nombre, email y contraseña
 		if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
 			throw new IllegalArgumentException("Nombre, email y contraseña son obligatorios");
