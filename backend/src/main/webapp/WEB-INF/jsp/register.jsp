@@ -1,30 +1,23 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-    String contextPath = request.getContextPath();
-    Object pageTitleAttribute = request.getAttribute("pageTitle");
-    String pageTitle = pageTitleAttribute == null ? "Bancosol | Crear cuenta" : pageTitleAttribute.toString();
-%>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<%= contextPath %>/css/register.css">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/register.css">
 </head>
 
 <body>
 <header class="topbar topbar-login">
-    <a class="brand" href="<%= contextPath %>/" aria-label="Bancosol inicio">
-        <img src="<%= contextPath %>/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+    <a class="brand" href="/" aria-label="Bancosol inicio">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
     </a>
 
     <nav class="main-nav main-nav-login" id="main-nav">
-        <a href="<%= contextPath %>/">Inicio</a>
-        <a href="<%= contextPath %>/login">Iniciar sesión</a>
-        <a href="<%= contextPath %>/#contacto">Contacto</a>
+        <a href="/">Inicio</a>
+        <a href="/login">Iniciar sesión</a>
+        <a href="/#contacto">Contacto</a>
     </nav>
 </header>
 
@@ -33,7 +26,7 @@
 
     <section class="login-card register-card" aria-labelledby="register-title">
         <div class="brand-lockup">
-            <img src="<%= contextPath %>/assets/Bancosol.png" alt="Bancosol" class="logo">
+            <img src="/assets/Bancosol.png" alt="Bancosol" class="logo">
             <div>
                 <p class="brand-name">Bancosol</p>
                 <p class="brand-subtitle">Crear una cuenta nueva</p>
@@ -45,7 +38,7 @@
             <p>Rellena los datos básicos para darte de alta en el sistema.</p>
         </div>
 
-        <form id="register-form" class="login-form register-form" method="post" action="<%= contextPath %>/register">
+        <form id="register-form" class="login-form register-form" method="post" action="/register">
             <div class="field-grid">
                 <div class="field-group">
                     <label for="nombre">Nombre completo *</label>
@@ -64,9 +57,9 @@
 
             <div class="field-grid">
                 <div class="field-group">
-                    <label for="telefono">Teléfono *</label>
+                    <label for="telefono">Teléfono</label>
                     <div class="input-shell">
-                        <input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel" required>
+                        <input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel">
                     </div>
                 </div>
 
@@ -122,13 +115,13 @@
             <% } else { %>
                 <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             <% } %>
-            <p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="<%= contextPath %>/login">Iniciar sesión</a></p>
+            <p class="auth-switch">¿Ya tienes cuenta? <a class="forgot-link" href="/login">Iniciar sesión</a></p>
         </form>
     </section>
 </main>
 
 <footer class="site-footer" aria-label="Pie de página">
-    <img src="<%= contextPath %>/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+    <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
     <p>Bancosol · Banco de alimentos</p>
 </footer>
 </body>

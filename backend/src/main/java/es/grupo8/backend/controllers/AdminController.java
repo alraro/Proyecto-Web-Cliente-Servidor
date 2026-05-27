@@ -1,6 +1,5 @@
 package es.grupo8.backend.controllers;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -25,18 +24,10 @@ import org.springframework.web.bind.annotation.GetMapping;
  *                               └── WEB-INF/jsp/admin-captains.jsp
  *                                       └── "← Volver al menú" → GET /admin
  *                                               └── AdminController.backToMenu()
- *                                                       └── redirect to frontend admin.html
+ *                                                       └── WEB-INF/jsp/admin.jsp
  */
 @Controller
 public class AdminController {
-
-    /**
-     * Frontend base URL injected from application.properties / environment variable.
-     * Defaults to http://localhost:80 (Nginx static frontend).
-     * In Docker Compose, set FRONTEND_BASE_URL to the actual host.
-     */
-    @Value("${app.frontend.base-url:http://localhost:80}")
-    private String frontendBaseUrl;
 
     // Removed /admin-campaign-assignments because RF-14 now uses dedicated
     // independent views for each role: /admin-coordinators and /admin-captains.
@@ -91,13 +82,7 @@ public class AdminController {
      */
     @GetMapping("/admin")
     public String backToMenu() {
-        // Build the redirect URL using the configured frontend base.
-        String base = frontendBaseUrl == null ? "http://localhost:80" : frontendBaseUrl.trim();
-        if (base.endsWith("/")) {
-            base = base.substring(0, base.length() - 1);
-        }
-        // redirect: prefix tells Spring MVC to send an HTTP 302 to the browser.
-        return "redirect:" + base + "/admin.html";
+        return "admin";
     }
 
     @GetMapping("/admin-chains")
