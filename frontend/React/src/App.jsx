@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router';
 import Index from './pages/index';
 import Login from './pages/login';
 import Admin from './pages/admin/admin';
+import Dashboard from './pages/admin/admin-dashboard';
 import Coordinator from './pages/coordinator/coordinator';
 import Captain from './pages/captain/captain';
 import Colaborator from './pages/colaborator/colaborator';
@@ -16,6 +17,7 @@ function App() {
         <Route index element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/coordinator" element={<Coordinator />} />
         <Route path="/captain" element={<Captain />} />
         <Route path="/colaborator" element={<Colaborator />} />

@@ -1,6 +1,5 @@
 package es.grupo8.backend.services;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -96,12 +95,43 @@ public class AuthService {
     public RegisterResponseDTO register(String nombreParam, String emailParam, String passwordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = new UserEntity();
+
         user.setName(trimToNull(nombreParam));
         user.setEmail(normalizeEmail(emailParam));
         user.setPhone(trimToNull(telefonoParam));
         user.setPassword(hashPassword(trimToNull(passwordParam)));
         user.setAddress(trimToNull(domicilioParam));
         user.setPostalCode(trimToNull(cpParam));
+		
+		// Comprobamos datos obligatorios como nombre, email y contraseña
+		if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
+			throw new IllegalArgumentException("Nombre, email y contraseña son obligatorios");
+		}
+
+		// Validamos formato de email
+		if (!isValidEmail(user.getEmail())) {
+			throw new IllegalArgumentException("El email no tiene un formato valido");
+		}
+
+		// Validamos formato telefono
+		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+			throw new IllegalArgumentException("El telefono no tiene un formato valido");
+		}
+
+		// Validamos formato código postal
+		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+			throw new IllegalArgumentException("El codigo postal no es valido");
+		}
+
+		// Validamos tamaño minimo contraseña
+		if (user.getPassword().length() < 6) {
+			throw new IllegalArgumentException("La contrasena debe tener al menos 6 caracteres");
+		}
+
+		// Validamos si existe un usuario con ese email
+		if (emailExists(user.getEmail())) {
+			throw new IllegalStateException("Ya existe un usuario con ese email");
+		}
 
         UserEntity created = userRepository.save(user);
         String token = generateToken(created.getIdUser(), created.getEmail(), created.getName());
@@ -130,6 +160,22 @@ public class AuthService {
         user.setPhone(trimToNull(telefonoParam));
         user.setAddress(trimToNull(domicilioParam));
         user.setPostalCode(trimToNull(cpParam));
+
+		if (user.getEmail() == null) {
+			throw new IllegalArgumentException("El email es obligatorio");
+		}
+
+		if (!isValidEmail(user.getEmail())) {
+			throw new IllegalArgumentException("El email no tiene un formato valido");
+		}
+
+		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+			throw new IllegalArgumentException("El telefono no tiene un formato valido");
+		}
+
+		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+			throw new IllegalArgumentException("El codigo postal no es valido");
+		}
 
         UserEntity updated = userRepository.save(user);
         String role = resolveRole(userId);
@@ -180,7 +226,7 @@ public class AuthService {
 		return telefono != null && telefono.matches("^[0-9+\\-\\s]{7,20}$");
 	}
 	
-	// Valida que el código postal tenga exactamente 5 dígitos.
+	// Valida que el código postal tenga exactamente 5 dígitos y estén entre el 0 y 9, que no sean letras
 	public static boolean isValidPostalCode(String cp) {
 		return cp != null && cp.matches("^[0-9]{5}$");
 	}
@@ -234,25 +280,6 @@ public class AuthService {
 			} catch (NoSuchAlgorithmException ex) {
 				throw new IllegalStateException("No se pudo inicializar la clave JWT", ex);
 			}
-		}
-	}
-
-	// Coge el id Usuario dependiendo de si está autorizado o no, devolviendo null si el token es inválido o no se proporcionó.
-	private Integer extractUserIdFromAuthHeader(String authHeader) {
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return null;
-		}
-
-		try {
-			String subject = Jwts.parser()
-					.verifyWith(signingKey)
-					.build()
-					.parseSignedClaims(authHeader.substring(7).trim())
-					.getPayload()
-					.getSubject();
-			return subject == null ? null : Integer.valueOf(subject);
-		} catch (Exception ex) {
-			return null;
 		}
 	}
 
@@ -318,11 +345,6 @@ public class AuthService {
 		}
 
 		return base + "/" + path;
-	}
-
-	// Codifica un valor para poder usarlo en URLs, como en los mensajes de error al redirigir a la página de login o registro.
-	private static String urlEncode(String value) {
-		return URLEncoder.encode(value, StandardCharsets.UTF_8);
 	}
 
 	public boolean emailExists(String email) {
