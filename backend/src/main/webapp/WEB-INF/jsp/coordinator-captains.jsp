@@ -20,7 +20,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="coordinator-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <a href="/coordinator-dashboard" class="back-link-inline">← Volver al panel</a>
             <div class="page-header-row">
                 <div>
                     <h1>Capitanes</h1>

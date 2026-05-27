@@ -21,7 +21,7 @@
 
     <main class="page-wrapper">
         <div class="page-header">
-            <a href="captain-dashboard.html" class="back-link-inline">← Volver al panel</a>
+            <a href="/captain-dashboard" class="back-link-inline">← Volver al panel</a>
             <div class="page-header-row">
                 <div>
                     <h1>Asistencia del Equipo</h1>

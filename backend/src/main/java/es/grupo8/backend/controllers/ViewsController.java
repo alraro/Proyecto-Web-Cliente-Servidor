@@ -130,15 +130,54 @@ public class ViewsController {
 		return "coordinator";
 	}
 
+	@GetMapping("/coordinator-dashboard")
+	public String coordinatorDashboard() { return "coordinator-dashboard"; }
+
+	@GetMapping("/coordinator-campaigns")
+	public String coordinatorCampaigns() { return "coordinator-campaigns"; }
+
+	@GetMapping("/coordinator-stores")
+	public String coordinatorStores() { return "coordinator-stores"; }
+
+	@GetMapping("/coordinator-captains")
+	public String coordinatorCaptains() { return "coordinator-captains"; }
+
+	@GetMapping("/coordinator-volunteers")
+	public String coordinatorVolunteers() { return "coordinator-volunteers"; }
+
+	@GetMapping("/coordinator-collaborators")
+	public String coordinatorCollaborators() { return "coordinator-collaborators"; }
+
+	@GetMapping("/coordinator-entities")
+	public String coordinatorEntities() { return "coordinator-entities"; }
+
 	@GetMapping("/captain")
 	public String captain() {
 		return "captain";
 	}
 
+	@GetMapping("/captain-dashboard")
+	public String captainDashboard() { return "captain-dashboard"; }
+
+	@GetMapping("/captain-stores")
+	public String captainStores() { return "captain-stores"; }
+
+	@GetMapping("/captain-incidents")
+	public String captainIncidents() { return "captain-incidents"; }
+
+	@GetMapping("/captain-attendance")
+	public String captainAttendance() { return "captain-attendance"; }
+
 	@GetMapping("/collaborator")
 	public String collaborator() {
 		return "colaborator";
 	}
+
+	@GetMapping("/login.html")
+	public String loginHtml() { return "redirect:/login"; }
+
+	@GetMapping("/edit.html")
+	public String editHtml() { return "redirect:/edit"; }
 
 	private String resolveRolePath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {

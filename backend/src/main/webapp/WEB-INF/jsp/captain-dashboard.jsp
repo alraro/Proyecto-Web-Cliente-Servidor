@@ -29,19 +29,19 @@
 
         <p class="section-title">Mi área de trabajo</p>
         <div class="menu-grid">
-            <a class="menu-card" href="captain-stores.html">
+            <a class="menu-card" href="/captain-stores">
                 <div class="menu-card-icon icon-green">🏬</div>
                 <h3>Mis Tiendas</h3>
                 <p>Consulta las tiendas que tienes asignadas y los voluntarios de cada turno.</p>
                 <span class="menu-card-arrow">Ver tiendas →</span>
             </a>
-            <a class="menu-card" href="captain-incidents.html">
+            <a class="menu-card" href="/captain-incidents">
                 <div class="menu-card-icon icon-orange">⚠️</div>
                 <h3>Registrar Incidencia</h3>
                 <p>Notifica incidencias ocurridas durante la campaña en tus tiendas.</p>
                 <span class="menu-card-arrow">Reportar incidencia →</span>
             </a>
-            <a class="menu-card" href="captain-attendance.html">
+            <a class="menu-card" href="/captain-attendance">
                 <div class="menu-card-icon icon-blue">✅</div>
                 <h3>Asistencia del Equipo</h3>
                 <p>Consulta los turnos de tu equipo y marca la asistencia de los voluntarios.</p>

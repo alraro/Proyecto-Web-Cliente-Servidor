@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 ﻿const API_BASE = 'http://localhost:8080';
-=======
-const API_BASE = 'http://localhost:8080';
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -13,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('token');
 
-<<<<<<< HEAD
     const campaignSelect  = document.querySelector('#campaign-select');
     const btnLoad         = document.querySelector('#btn-load');
     const globalMessage   = document.querySelector('#global-message');
@@ -27,21 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     
-=======
-    document.getElementById('user-name').textContent = localStorage.getItem('nombre') || 'Administrador';
-
-    const campaignSelect  = document.getElementById('campaign-select');
-    const btnLoad         = document.getElementById('btn-load');
-    const globalMessage   = document.getElementById('global-message');
-    const captainsTbody   = document.getElementById('captains-tbody');
-    const captainSelect   = document.getElementById('captain-select');
-    const btnAssign       = document.getElementById('btn-assign');
-
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    });
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
 
     captainSelect.disabled = true;
     btnAssign.disabled = true;
@@ -139,15 +119,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateCampaignSelect(campaigns) {
-<<<<<<< HEAD
         campaignSelect.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
         defaultOpt.textContent = 'Selecciona una campaña...';
         campaignSelect.appendChild(defaultOpt);
-=======
-        campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
         (campaigns || []).forEach(campaign => {
             const option = document.createElement('option');
             option.value = String(campaign.id);
@@ -159,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCaptainsTable(captains) {
         captainsTbody.innerHTML = '';
         if (!captains.length) {
-<<<<<<< HEAD
             const tr = document.createElement('tr');
             const td = document.createElement('td');
             td.colSpan = 3;
@@ -167,14 +142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             td.textContent = 'Sin capitanes asignados.';
             tr.appendChild(td);
             captainsTbody.appendChild(tr);
-=======
-            captainsTbody.innerHTML = "<tr><td colspan='3' class='table-empty'>Sin capitanes asignados.</td></tr>";
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
             return;
         }
         captains.forEach(captain => {
             const row = document.createElement('tr');
-<<<<<<< HEAD
             const td0 = document.createElement('td');
             td0.textContent = escapeHtml(captain.name || '');
             row.appendChild(td0);
@@ -190,27 +161,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.textContent = 'Eliminar';
             td2.appendChild(btn);
             row.appendChild(td2);
-=======
-            row.innerHTML = `
-                <td>${escapeHtml(captain.name || '')}</td>
-                <td>${escapeHtml(captain.email || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-userid="${captain.userId}" data-role="CAPTAIN">Eliminar</button></td>
-            `;
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
             captainsTbody.appendChild(row);
         });
     }
 
     function populateSelect(selectEl, users, placeholder) {
-<<<<<<< HEAD
         selectEl.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
         defaultOpt.textContent = placeholder;
         selectEl.appendChild(defaultOpt);
-=======
-        selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
         (users || []).forEach(user => {
             const option = document.createElement('option');
             option.value = String(user.userId);
@@ -232,8 +192,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/&/g, '&amp;').replace(/</g, '&lt;')
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35

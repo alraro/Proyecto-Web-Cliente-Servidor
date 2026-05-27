@@ -29,37 +29,37 @@
 
         <p class="section-title">Mi área de trabajo</p>
         <div class="menu-grid">
-            <a class="menu-card" href="coordinator-campaigns.html">
+            <a class="menu-card" href="/coordinator-campaigns">
                 <div class="menu-card-icon icon-orange">📢</div>
                 <h3>Mis Campañas</h3>
                 <p>Consulta las campañas en las que participas como coordinador.</p>
                 <span class="menu-card-arrow">Ver campañas →</span>
             </a>
-            <a class="menu-card" href="coordinator-stores.html">
+            <a class="menu-card" href="/coordinator-stores">
                 <div class="menu-card-icon icon-green">🏬</div>
                 <h3>Mis Tiendas</h3>
                 <p>Ver las tiendas asignadas a ti en cada campaña.</p>
                 <span class="menu-card-arrow">Ver tiendas →</span>
             </a>
-            <a class="menu-card" href="coordinator-volunteers.html">
+            <a class="menu-card" href="/coordinator-volunteers">
                 <div class="menu-card-icon icon-blue">🙋</div>
                 <h3>Asignación de Voluntarios</h3>
                 <p>Asigna colaboradores y voluntarios a los turnos de tus tiendas.</p>
                 <span class="menu-card-arrow">Gestionar voluntarios →</span>
             </a>
-            <a class="menu-card" href="coordinator-captains.html">
+            <a class="menu-card" href="/coordinator-captains">
                 <div class="menu-card-icon icon-red">⚓</div>
                 <h3>Capitanes</h3>
                 <p>Asigna capitanes a tus tiendas y registra nuevos si es necesario.</p>
                 <span class="menu-card-arrow">Gestionar capitanes →</span>
             </a>
-            <a class="menu-card" href="coordinator-collaborators.html">
+            <a class="menu-card" href="/coordinator-collaborators">
                 <div class="menu-card-icon icon-teal">🤝</div>
                 <h3>Colaboradores</h3>
                 <p>Actualiza datos de contacto y da de alta nuevos colaboradores.</p>
                 <span class="menu-card-arrow">Gestionar colaboradores →</span>
             </a>
-            <a class="menu-card" href="coordinator-entities.html">
+            <a class="menu-card" href="/coordinator-entities">
                 <div class="menu-card-icon icon-teal">🏢</div>
                 <h3>Entidades colaboradoras</h3>
                 <p>Consulta qué entidades tienen voluntarios asignados en cada campaña.</p>

@@ -21,7 +21,7 @@
 
 <main class="page-wrapper">
     <div class="page-header">
-        <a href="admin.html" class="back-link-inline">← Volver al panel</a>
+        <a href="/admin" class="back-link-inline">← Volver al panel</a>
         <h1>Campañas de recogida</h1>
         <p>Consulta el estado de todas las campañas de Bancosol.</p>
     </div>

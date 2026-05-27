@@ -46,7 +46,6 @@
 .card + .card {
     margin-top: 1.5rem;
 }
-<<<<<<< HEAD
 
 /* Badges de estado para solicitudes */
 .status-badge {
@@ -160,5 +159,3 @@
     from { opacity: 0; transform: translateY(-12px) scale(0.97); }
     to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
-=======
->>>>>>> 571d3fabdaca241a6043cef2ef50c84e2c97ff35
