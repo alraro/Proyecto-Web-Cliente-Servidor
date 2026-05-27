@@ -1,7 +1,7 @@
 /*
 *   Participación en el proyecto:
-*  - Hugo Herrero González: 80%
-*  - IA Generativa: 20%
+*  - Hugo Herrero González: 70%
+*  - IA Generativa: 30%
 */
 
 

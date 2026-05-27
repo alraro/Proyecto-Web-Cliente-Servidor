@@ -102,6 +102,36 @@ public class AuthService {
         user.setAddress(trimToNull(domicilioParam));
         user.setPostalCode(trimToNull(cpParam));
 
+		// Comprobamos datos obligatorios como nombre, email y contraseña
+		if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
+			throw new IllegalArgumentException("Nombre, email y contraseña son obligatorios");
+		}
+
+		// Validamos formato de email
+		if (!isValidEmail(user.getEmail())) {
+			throw new IllegalArgumentException("El email no tiene un formato valido");
+		}
+
+		// Validamos formato telefono
+		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+			throw new IllegalArgumentException("El telefono no tiene un formato valido");
+		}
+
+		// Validamos formato código postal
+		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+			throw new IllegalArgumentException("El codigo postal no es valido");
+		}
+
+		// Validamos tamaño minimo contraseña
+		if (user.getPassword().length() < 6) {
+			throw new IllegalArgumentException("La contrasena debe tener al menos 6 caracteres");
+		}
+
+		// Validamos si existe un usuario con ese email
+		if (emailExists(user.getEmail())) {
+			throw new IllegalStateException("Ya existe un usuario con ese email");
+		}
+
         UserEntity created = userRepository.save(user);
         String token = generateToken(created.getIdUser(), created.getEmail(), created.getName());
         
@@ -129,6 +159,22 @@ public class AuthService {
         user.setPhone(trimToNull(telefonoParam));
         user.setAddress(trimToNull(domicilioParam));
         user.setPostalCode(trimToNull(cpParam));
+
+		if (user.getEmail() == null) {
+			throw new IllegalArgumentException("El email es obligatorio");
+		}
+
+		if (!isValidEmail(user.getEmail())) {
+			throw new IllegalArgumentException("El email no tiene un formato valido");
+		}
+
+		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+			throw new IllegalArgumentException("El telefono no tiene un formato valido");
+		}
+
+		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+			throw new IllegalArgumentException("El codigo postal no es valido");
+		}
 
         UserEntity updated = userRepository.save(user);
         String role = resolveRole(userId);

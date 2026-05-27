@@ -40,9 +40,4 @@ public class DashboardService {
         List<Object[]> rows = campaignStoreRepository.coverageByZone(campaignId);
         return dashboardMapper.toCoverageItemDTOList(rows);
     }
-
-
-
-
-
 }
