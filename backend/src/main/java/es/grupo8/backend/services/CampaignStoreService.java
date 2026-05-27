@@ -15,13 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.StoreRepository;
-import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.dto.StoreDTO;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
-import es.grupo8.backend.entity.Locality;
-import es.grupo8.backend.entity.PostalCode;
 import es.grupo8.backend.entity.Store;
+import es.grupo8.backend.mapper.StoreMapper;
 import lombok.AllArgsConstructor;
 
 // RF-12: campaign–store assignment management, admin only.
@@ -34,15 +33,16 @@ public class CampaignStoreService {
     private final CampaignRepository campaignRepository;
     private final StoreRepository storeRepository;
     private final CampaignStoreRepository campaignStoreRepository;
+    private final StoreMapper storeMapper;
 
     public Map<String, Object> getCampaignStores(Integer adminUserId, Integer campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
 
-        List<StoreResponseDto> stores = new ArrayList<>();
+        List<StoreDTO> stores = new ArrayList<>();
         for (CampaignStore cs : campaignStoreRepository.findByIdCampaign_Id(campaignId)) {
             if (cs != null && cs.getIdStore() != null) {
-                stores.add(toDto(cs.getIdStore()));
+                stores.add(storeMapper.toDTO(cs.getIdStore()));
             }
         }
 
@@ -136,32 +136,4 @@ public class CampaignStoreService {
         return response;
     }
 
-    private StoreResponseDto toDto(Store s) {
-        String postalCode = null, locality = null, zone = null;
-        Integer localityId = null, zoneId = null, chainId = null;
-        String chainName = null;
-
-        if (s.getPostalCode() != null) {
-            PostalCode pc = s.getPostalCode();
-            postalCode = pc.getPostalCode();
-            if (pc.getIdLocality() != null) {
-                Locality loc = pc.getIdLocality();
-                locality   = loc.getName();
-                localityId = loc.getId();
-                if (loc.getIdZone() != null) {
-                    zone   = loc.getIdZone().getName();
-                    zoneId = loc.getIdZone().getId();
-                }
-            }
-        }
-        if (s.getIdChain() != null) {
-            chainId   = s.getIdChain().getIdChain();
-            chainName = s.getIdChain().getName();
-        }
-
-        return new StoreResponseDto(
-                s.getId(), s.getName(), s.getAddress(),
-                postalCode, locality, localityId, zone, zoneId,
-                chainId, chainName);
-    }
 }

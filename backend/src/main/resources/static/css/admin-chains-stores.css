@@ -1,0 +1,257 @@
+/* ── Compartido: badges de participación/asistencia ─────────────────── */
+.badge-yes {
+    background: #dcfce7;
+    color: #166534;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-no {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* ── Código inline ──────────────────────────────────────────────────── */
+.inline-code {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+/* ── Cabecera de tarjeta con acciones ────────────────────────────────── */
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* ── Acciones en celda de tabla ──────────────────────────────────────── */
+.td-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #193a6b, #2d65a0);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-edit:hover {
+    background: #dbeafe;
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #fecaca;
+}
+
+/* ── Celda vacía ─────────────────────────────────────────────────────── */
+.table-empty {
+    text-align: center;
+    color: #94a3b8;
+    padding: 1.5rem;
+}
+
+/* ── Barra de filtros (stores) ───────────────────────────────────────── */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.filters-bar select {
+    width: auto;
+    min-width: 160px;
+    min-height: 38px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.88rem;
+}
+
+.filters-bar .btn-filter {
+    background: linear-gradient(135deg, #193a6b, #2d65a0);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 38px;
+}
+
+.filters-bar .btn-filter:hover {
+    filter: brightness(1.06);
+}
+
+.filters-bar .btn-clear {
+    background: #f1f5f9;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 38px;
+}
+
+.filters-bar .btn-clear:hover {
+    background: #e2e8f0;
+}
+
+/* ── Paginación (stores) ─────────────────────────────────────────────── */
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.pagination-info {
+    font-size: 0.88rem;
+    color: #64748b;
+}
+
+.pagination-select {
+    width: auto;
+    min-height: 36px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+}
+
+/* ── Modal ───────────────────────────────────────────────────────────── */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
+    box-shadow: 0 16px 48px rgba(25, 58, 107, 0.18);
+    width: 100%;
+    max-width: 480px;
+}
+
+.modal-card h2 {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #193a6b;
+    margin-bottom: 1.25rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.3rem;
+}
+
+.required-asterisk { color: #ef4444; }
+
+.field-help {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.form-message {
+    color: #ef4444;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-top: 0.5rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+    accent-color: #2d65a0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+    border-radius: 999px;
+    padding: 0.5rem 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-cancel:hover { background: #e2e8f0; }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .modal-card { padding: 1.25rem; }
+    .filters-bar { flex-direction: column; }
+}
