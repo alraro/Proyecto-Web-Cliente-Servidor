@@ -173,12 +173,6 @@ public class ViewsController {
 		return "colaborator";
 	}
 
-	@GetMapping("/login.html")
-	public String loginHtml() { return "redirect:/login"; }
-
-	@GetMapping("/edit.html")
-	public String editHtml() { return "redirect:/edit"; }
-
 	private String resolveRolePath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
 			return "/admin";
