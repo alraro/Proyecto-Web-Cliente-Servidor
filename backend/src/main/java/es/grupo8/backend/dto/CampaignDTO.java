@@ -1,15 +1,16 @@
 package es.grupo8.backend.dto;
 
+import lombok.Data;
 import java.time.LocalDate;
 
-import lombok.Data;
-
 @Data
-public class CampaignSummaryDTO {
+public class CampaignDTO {
     private Integer id;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private long storesInCampaign;
-    private boolean active;
+    private String status;
+    private Integer typeId;
+    private String typeName;
 }

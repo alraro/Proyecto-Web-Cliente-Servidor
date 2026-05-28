@@ -1,4 +1,4 @@
-package es.grupo8.backend.controllers;
+package es.grupo8.backend.controllers.rest;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.dto.CampaignSummaryDTO;
+import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CoverageItemDTO;
 import es.grupo8.backend.services.DashboardService;
 
@@ -25,8 +25,8 @@ public class DashboardController {
 
     // Devolver listado de campañas con su cobertura total (para el dashboard general)
     @GetMapping("/campaigns")
-    public ResponseEntity<List<CampaignSummaryDTO>> getAllCampaignsCoverage(){
-        List<CampaignSummaryDTO> result = dashboardService.getAllCampaignsCoverage();
+    public ResponseEntity<List<CampaignDTO>> getAllCampaignsCoverage(){
+        List<CampaignDTO> result = dashboardService.getAllCampaignsCoverage();
 
         return ResponseEntity.ok(result);
     }
