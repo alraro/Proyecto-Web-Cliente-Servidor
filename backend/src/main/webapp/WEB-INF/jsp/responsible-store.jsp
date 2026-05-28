@@ -25,7 +25,7 @@
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <span id="user-name"><%= nombre == null ? "Responsable" : nombre %></span>
         <a href="/edit" class="edit-link">Editar perfil</a>
         <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
