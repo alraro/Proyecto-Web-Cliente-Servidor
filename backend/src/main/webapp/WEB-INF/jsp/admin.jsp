@@ -18,12 +18,13 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/admin" aria-label="Bancosol admin home">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a id="btn-logout" class="btn" href="/logout">Cerrar sesión</a>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 
@@ -40,6 +41,7 @@
         <a class="card" href="/admin-stores">Tiendas</a>
         <a class="card" href="/admin-validate-users">Validar usuarios</a>
         <a class="card" href="/campaigns">Ver campañas</a>
+        <a class="card" href="/dashboard">Dashboard de Cobertura</a>
     </section>
 </main>
 </body>
