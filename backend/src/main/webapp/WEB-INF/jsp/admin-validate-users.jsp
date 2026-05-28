@@ -1,4 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%
+    String sessionToken = (String) session.getAttribute("token");
+    String sessionRole = (String) session.getAttribute("role");
+    String sessionName = (String) session.getAttribute("nombre");
+
+    String initialToken = sessionToken == null ? "" : sessionToken;
+    String initialRole = sessionRole == null ? "" : sessionRole;
+    String initialName = sessionName == null ? "Admin" : sessionName;
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -60,10 +69,15 @@
 
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= initialToken %>' || localStorage.getItem("token") || "";
+        var role  = '<%= initialRole %>' || localStorage.getItem("role") || "";
+        var name  = '<%= initialName %>' || localStorage.getItem("nombre") || "Admin";
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Admin";
+        if (token) { localStorage.setItem("token", token); }
+        if (role) { localStorage.setItem("role", role); }
+        if (name) { localStorage.setItem("nombre", name); }
+
+        document.getElementById("user-name").textContent = name;
         document.getElementById("btn-logout").addEventListener("click", function () {
             localStorage.clear(); window.location.href = "/login";
         });

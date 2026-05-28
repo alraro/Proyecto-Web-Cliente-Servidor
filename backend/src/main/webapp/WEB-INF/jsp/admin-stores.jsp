@@ -1,4 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+
+    if (token == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -113,15 +123,14 @@
 
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= token == null ? "" : token %>';
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Admin";
+        document.getElementById("user-name").textContent = '<%= nombre == null ? "Admin" : nombre %>';
         document.getElementById("btn-logout").addEventListener("click", function () {
-            localStorage.clear(); window.location.href = "/login";
+            window.location.href = "/logout";
         });
 
-        if (!token || role !== "ADMINISTRADOR") { window.location.href = "/login"; return; }
+        if (!token) { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
