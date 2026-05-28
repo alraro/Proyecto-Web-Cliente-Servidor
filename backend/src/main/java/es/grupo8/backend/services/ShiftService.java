@@ -1,5 +1,6 @@
 package es.grupo8.backend.services;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,8 @@ import es.grupo8.backend.mapper.ShiftMapper;
 
 @Service
 public class ShiftService {
+
+    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     @Autowired
     private ShiftRepository shiftRepository;
@@ -102,7 +107,11 @@ public class ShiftService {
         shift.setObservations(request.getObservations());
         shift.setCreatedBy(userId);
 
-        return shiftMapper.toDTO(shiftRepository.save(shift));
+        ShiftResponseDto result = shiftMapper.toDTO(shiftRepository.save(shift));
+        auditLog.info("ACTION=CREATE_SHIFT userId={} timestamp={} shiftId={} campaignId={} storeId={} day={} startTime={} endTime={}",
+                userId, Instant.now(), result.getShiftId(), result.getCampaignId(),
+                result.getStoreId(), result.getDay(), result.getStartTime(), result.getEndTime());
+        return result;
     }
 
     /**
