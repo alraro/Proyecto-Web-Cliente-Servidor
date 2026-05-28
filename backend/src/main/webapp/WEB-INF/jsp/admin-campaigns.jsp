@@ -19,14 +19,14 @@
     <link rel="stylesheet" href="/css/admin-campaigns.css">
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" href="/index" aria-label="Bancosol admin home">
+<header class="topbar" aria-label="Top navigation">
+    <a class="brand" href="/index" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/login" class="logout-link">Cerrar sesión</a>    
+        <span id="user-name">Admin</span>
+        <a class="btn" href="/edit">Editar perfil</a>
+        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
     </div>
 </header>
 
@@ -367,14 +367,16 @@
                 const campaignNameForJs = escapeJsString(campaign.name || "");
                 const typeName = escapeHtml((campaign.type && campaign.type.name) ? campaign.type.name : "-");
 
-                row.innerHTML = '<td>' + campaignName + '</td>' +
-                                '<td>' + typeName + '</td>' +
-                                '<td>' + formatDate(campaign.startDate) + '</td>' +
-                                '<td>' + formatDate(campaign.endDate) + '</td>' +
-                                '<td class="actions-cell">' +
-                                    '<button class="btn btn-sm btn-secondary" onclick="openEditModal(' + campaignId + ')">Editar</button>' +
-                                    '<button class="btn btn-sm btn-danger" onclick="deleteCampaign(' + campaignId + ', \'' + campaignNameForJs + '\')">Eliminar</button>' +
-                                '</td>';
+                row.innerHTML = `
+                    <td>${campaignName}</td>
+                    <td>${typeName}</td>
+                    <td>${formatDate(campaign.startDate)}</td>
+                    <td>${formatDate(campaign.endDate)}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-sm btn-secondary" onclick="openEditModal(${campaignId})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCampaign(${campaignId}, '${campaignNameForJs}')">Eliminar</button>
+                    </td>
+                `;
                 campaignsTbody.appendChild(row);
             });
         }

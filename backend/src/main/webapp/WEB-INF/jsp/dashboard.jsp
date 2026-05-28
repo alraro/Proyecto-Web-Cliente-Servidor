@@ -242,8 +242,6 @@
 
     <div class="page-header">
         <a href="/admin" class="back-link">← Volver al panel</a>
-        <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/login" class="logout-link">Cerrar sesión</a>
         <h1>Dashboard de Cobertura</h1>
         <p>Visualiza métricas de cobertura por cadena, localidad y zona geográfica.</p>
     </div>

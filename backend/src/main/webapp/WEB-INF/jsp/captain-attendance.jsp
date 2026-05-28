@@ -11,21 +11,13 @@
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/captain-attendance.css">
     <script src="/javascript/common.js" defer></script>
-
+    <script src="/javascript/captain-attendance.js" defer></script>
+    <script src="/javascript/includeHTML.js" defer></script>
+    <script src="/javascript/header.js" defer></script>
 
 </head>
 <body>
-<header class="topbar">
-    <a class="brand" href="/index" aria-label="Bancosol admin home">
-        <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
-    </a>
-    <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/login" class="logout-link">Cerrar sesión</a>    
-    </div>
-</header>
-
+    <include-html src="header.html"></include-html>
 
     <main class="page-wrapper">
         <div class="page-header">

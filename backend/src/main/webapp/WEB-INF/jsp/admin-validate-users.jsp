@@ -1,13 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%
-    String nombre = (String) session.getAttribute("nombre");
-    String token = (String) session.getAttribute("token");
-    String role = (String) session.getAttribute("role");
+    String sessionToken = (String) session.getAttribute("token");
+    String sessionRole = (String) session.getAttribute("role");
+    String sessionName = (String) session.getAttribute("nombre");
 
-    if (token == null || !"ADMINISTRADOR".equals(role)) {
-        response.sendRedirect("/login");
-        return;
-    }
+    String initialToken = sessionToken == null ? "" : sessionToken;
+    String initialRole = sessionRole == null ? "" : sessionRole;
+    String initialName = sessionName == null ? "Admin" : sessionName;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,14 +19,14 @@
 </head>
 <body>
 
-<header class="topbar">
-    <a class="brand" href="/index" aria-label="Bancosol admin home">
+<header class="topbar" aria-label="Top navigation">
+    <a class="brand" href="/index" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/login" class="logout-link">Cerrar sesión</a>    
+        <span id="user-name">Admin</span>
+        <a class="btn" href="/edit">Editar perfil</a>
+        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
     </div>
 </header>
 
@@ -70,14 +69,20 @@
 
 <script>
     (function () {
-        var token = '<%= token == null ? "" : token %>';
+        var token = '<%= initialToken %>' || localStorage.getItem("token") || "";
+        var role  = '<%= initialRole %>' || localStorage.getItem("role") || "";
+        var name  = '<%= initialName %>' || localStorage.getItem("nombre") || "Admin";
 
-        document.getElementById("user-name").textContent = '<%= nombre == null ? "Admin" : nombre %>';
+        if (token) { localStorage.setItem("token", token); }
+        if (role) { localStorage.setItem("role", role); }
+        if (name) { localStorage.setItem("nombre", name); }
+
+        document.getElementById("user-name").textContent = name;
         document.getElementById("btn-logout").addEventListener("click", function () {
-            window.location.href = "/logout";
+            localStorage.clear(); window.location.href = "/login";
         });
 
-        if (!token) { window.location.href = "/login"; return; }
+        if (!token || role !== "ADMINISTRADOR") { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };

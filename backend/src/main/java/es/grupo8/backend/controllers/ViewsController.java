@@ -109,15 +109,27 @@ public class ViewsController {
                                  @RequestParam(value = "cp", required = false) String cp,
                                  Model model) {
 
-        RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+		try {
+			RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
 
-        if (dto == null) {
-            model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
-            model.addAttribute("registerError", "No se han podido registrar los datos.");
-            return "register";
-        }
+			if (dto == null) {
+				model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+				model.addAttribute("registerError", "No se han podido registrar los datos.");
+				return "register";
+			}
 
-        return "redirect:/login";
+			return "redirect:/login";
+
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+			model.addAttribute("registerError", e.getMessage());
+			return "register";
+
+		} catch (IllegalStateException e) {
+			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+			model.addAttribute("registerError", e.getMessage());
+			return "register";
+		}
     }
 
     @GetMapping("logout")
