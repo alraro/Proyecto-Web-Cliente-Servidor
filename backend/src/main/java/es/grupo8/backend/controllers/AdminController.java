@@ -85,6 +85,11 @@ public class AdminController {
         return "admin";
     }
 
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "dashboard";
+    }
+
     @GetMapping("/admin-chains")
     public String adminChains() { return "admin-chains"; }
 

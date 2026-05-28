@@ -18,10 +18,13 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/collaborator" aria-label="Bancosol home">Bancosol</a>
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
+    </a>
     <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Colaborador" : nombre %></span>
-        <a id="btn-logout" class="btn" href="/logout">Cerrar sesión</a>
+        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 

@@ -8,15 +8,14 @@
     <link rel="stylesheet" href="/css/administrador.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-
     <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 

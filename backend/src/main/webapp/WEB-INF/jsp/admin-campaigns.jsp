@@ -1,4 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+    String nombre = (String) session.getAttribute("nombre");
+
+    if (token == null || role == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,14 +19,14 @@
     <link rel="stylesheet" href="/css/admin-campaigns.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 
@@ -119,23 +129,17 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        const params = new URLSearchParams(window.location.search);
-        const tokenFromQuery = params.get("token");
-        const nameFromQuery = params.get("nombre");
-        if (tokenFromQuery) { localStorage.setItem("token", tokenFromQuery); }
-        if (nameFromQuery) { localStorage.setItem("nombre", nameFromQuery); }
-
-        const token = localStorage.getItem("token");
+        const token = '<%= token %>';
+        const nombre = '<%= nombre == null ? "Admin" : nombre %>';
         if (!token) {
             window.location.href = "/login";
             return;
         }
 
-        // NEW: auth options for calls that only require Authorization header
         const authOpts = { headers: { Authorization: "Bearer " + token } };
 
         const userNameEl = document.getElementById("user-name");
-        userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
+        userNameEl.textContent = nombre || "Admin";
 
         const btnLogout = document.getElementById("btn-logout");
         const btnNew = document.getElementById("btn-new");
@@ -292,7 +296,7 @@
             availableStores.forEach((store) => {
                 const li = document.createElement("li");
                 li.dataset.storeid = String(store.id);
-                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} — ${escapeHtml(store.locality || "-")} <button type="button" class="btn-add-store btn btn-sm btn-primary">+</button>`;
+                li.innerHTML = escapeHtml(store.name || "-") + ' — ' + escapeHtml(store.chainName || "-") + ' — ' + escapeHtml(store.locality || "-") + ' <button type="button" class="btn-add-store btn btn-sm btn-primary">+</button>';
                 availableStoresEl.appendChild(li);
             });
 
@@ -312,7 +316,7 @@
             Array.from(selectedStores.values()).forEach((store) => {
                 const li = document.createElement("li");
                 li.dataset.storeid = String(store.id);
-                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>`;
+                li.innerHTML = escapeHtml(store.name || "-") + ' — ' + escapeHtml(store.chainName || "-") + ' <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>';
                 selectedStoresEl.appendChild(li);
             });
 
@@ -363,16 +367,14 @@
                 const campaignNameForJs = escapeJsString(campaign.name || "");
                 const typeName = escapeHtml((campaign.type && campaign.type.name) ? campaign.type.name : "-");
 
-                row.innerHTML = `
-                    <td>${campaignName}</td>
-                    <td>${typeName}</td>
-                    <td>${formatDate(campaign.startDate)}</td>
-                    <td>${formatDate(campaign.endDate)}</td>
-                    <td class="actions-cell">
-                        <button class="btn btn-sm btn-secondary" onclick="openEditModal(${campaignId})">Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCampaign(${campaignId}, '${campaignNameForJs}')">Eliminar</button>
-                    </td>
-                `;
+                row.innerHTML = '<td>' + campaignName + '</td>' +
+                                '<td>' + typeName + '</td>' +
+                                '<td>' + formatDate(campaign.startDate) + '</td>' +
+                                '<td>' + formatDate(campaign.endDate) + '</td>' +
+                                '<td class="actions-cell">' +
+                                    '<button class="btn btn-sm btn-secondary" onclick="openEditModal(' + campaignId + ')">Editar</button>' +
+                                    '<button class="btn btn-sm btn-danger" onclick="deleteCampaign(' + campaignId + ', \'' + campaignNameForJs + '\')">Eliminar</button>' +
+                                '</td>';
                 campaignsTbody.appendChild(row);
             });
         }

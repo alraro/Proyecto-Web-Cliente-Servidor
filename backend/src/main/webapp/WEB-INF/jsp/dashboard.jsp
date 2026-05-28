@@ -1,6 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+    if (!"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -16,10 +24,15 @@
 
     <script>
         // Configuración global de la API
-        const TOKEN_KEY = 'token';
+        const TOKEN = '<%= token == null ? "" : token %>';
         const API_BASE = 'http://localhost:8080'; 
-        
-        const getToken = () => localStorage.getItem(TOKEN_KEY);
+
+        function authHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + TOKEN
+            };
+        }
 
         function formatDate(dateString) {
             if (!dateString) return '-';
@@ -33,15 +46,11 @@
             });
         }
 
-        function authHeaders() {
-            return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
-        }
-
         async function apiFetch(url) {
-            const res = await fetch(`${API_BASE}${url}`, { headers: authHeaders() });
-            if (res.status === 401) { window.location.href = 'login.html'; throw new Error('Unauthorized'); }
+            const res = await fetch(API_BASE + url, { headers: authHeaders() });
+            if (res.status === 401) { window.location.href = '/login'; throw new Error('Unauthorized'); }
             if (res.status === 403) { throw new Error('Acceso denegado'); }
-            if (!res.ok) { throw new Error(`Error ${res.status}`); }
+            if (!res.ok) { throw new Error('Error ' + res.status); }
             return res.json();
         }
 
@@ -50,11 +59,6 @@
         let currentCampaignId = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
-                window.location.href = 'login.html';
-                return;
-            }
-
             await loadCampaigns();
 
             document.querySelector('#campaignSelect').addEventListener('change', onCampaignChange);
@@ -77,7 +81,7 @@
                     const start = formatDate(c.startDate);
                     const end = formatDate(c.endDate);
 
-                    opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${start} → ${end})`;
+                    opt.textContent = c.name + ' ' + (c.active ? '🔄' : '✅') + ' (' + start + ' → ' + end + ')';
                     sel.appendChild(opt);
                 });
 
@@ -107,9 +111,9 @@
 
             try {
                 const [chainData, localityData, zoneData] = await Promise.all([
-                    apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/chain`),
-                    apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/locality`),
-                    apiFetch(`/api/dashboard/campaigns/${campaignId}/coverage/zone`),
+                    apiFetch('/api/dashboard/campaigns/' + campaignId + '/coverage/chain'),
+                    apiFetch('/api/dashboard/campaigns/' + campaignId + '/coverage/locality'),
+                    apiFetch('/api/dashboard/campaigns/' + campaignId + '/coverage/zone'),
                 ]);
 
                 updateKPIs(chainData, zoneData);
@@ -120,7 +124,7 @@
                 document.querySelector('#kpiRow').classList.remove('hidden');
                 document.querySelector('#chartsGrid').classList.remove('hidden');
                 document.querySelector('#noSelection').classList.add('hidden');
-                document.querySelector('#lastUpdated').textContent = `Actualizado: ${new Date().toLocaleTimeString('es-ES')}`;
+                document.querySelector('#lastUpdated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-ES');
 
             } catch (e) {
                 showError(e.message);
@@ -140,7 +144,7 @@
         }
 
         function renderChart(canvasId, data, type, dimensionLabel) {
-            const canvas = document.querySelector(`#${canvasId}`);
+            const canvas = document.querySelector('#' + canvasId);
             const labels = data.map(d => d.label);
             const covered = data.map(d => d.storesInCampaign);
             const total = data.map(d => d.totalStores);
@@ -182,7 +186,7 @@
                             callbacks: {
                                 afterBody: (items) => {
                                     const i = items[0].dataIndex;
-                                    return [`Cobertura: ${pct[i]}%`];
+                                    return ['Cobertura: ' + pct[i] + '%'];
                                 }
                             }
                         },
@@ -204,11 +208,6 @@
             }
         }
 
-        function showLoading(on) {
-            const el = document.querySelector('#loadingSpinner');
-            if (on) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
-        }
-
         function showNoSelection() {
             document.querySelector('#kpiRow').classList.add('hidden');
             document.querySelector('#chartsGrid').classList.add('hidden');
@@ -217,7 +216,7 @@
 
         function showError(msg) {
             const el = document.querySelector('#errorMsg');
-            el.textContent = `Error: ${msg}`;
+            el.textContent = 'Error: ' + msg;
             el.classList.remove('hidden');
         }
 
@@ -227,12 +226,24 @@
     </script>
 </head>
 <body>
+<header class="topbar">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
+    </a>
+    <div class="topbar-actions">
+        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
+    </div>
+</header>
 
 
 <main class="dashboard-main">
 
     <div class="page-header">
         <a href="/admin" class="back-link">← Volver al panel</a>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>
         <h1>Dashboard de Cobertura</h1>
         <p>Visualiza métricas de cobertura por cadena, localidad y zona geográfica.</p>
     </div>
@@ -291,7 +302,6 @@
     <div id="noSelection" class="no-selection">
         Selecciona una campaña para ver las métricas de cobertura.
     </div>
-    <div id="loadingSpinner" class="spinner hidden">Cargando datos…</div>
     <div id="errorMsg" class="error-msg hidden"></div>
 
 </main>

@@ -1,4 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+
+    if (token == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,14 +20,14 @@
 </head>
 <body>
 
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 
@@ -60,15 +70,14 @@
 
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= token == null ? "" : token %>';
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Admin";
+        document.getElementById("user-name").textContent = '<%= nombre == null ? "Admin" : nombre %>';
         document.getElementById("btn-logout").addEventListener("click", function () {
-            localStorage.clear(); window.location.href = "/login";
+            window.location.href = "/logout";
         });
 
-        if (!token || role !== "ADMINISTRADOR") { window.location.href = "/login"; return; }
+        if (!token) { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };

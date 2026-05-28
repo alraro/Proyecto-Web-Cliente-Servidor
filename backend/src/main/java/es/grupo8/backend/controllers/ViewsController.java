@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.grupo8.backend.dto.RegisterResponseDTO;
 
 import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 
@@ -66,6 +67,7 @@ public class ViewsController {
 		}
 
 		session.setAttribute("token", dto.getToken());
+		session.setAttribute("userID", dto.getId());
 		session.setAttribute("nombre", dto.getNombre());
 		session.setAttribute("role", dto.getRole());
 		if (dto.getStoreId() != null) {
@@ -124,6 +126,59 @@ public class ViewsController {
         
 		return "login";
     }
+
+	@GetMapping("/edit")
+	public String editProfile(HttpSession session,
+							  Model model) {
+		Integer userId = (Integer) session.getAttribute("userID");
+		if (userId == null) {
+			return "redirect:/login";
+		}
+
+		ProfileDTO dto = authService.getProfile(userId);
+		if(dto == null) {
+			model.addAttribute("editError", "No se han podido cargar los datos del perfil.");
+			return "edit";
+		}
+
+		model.addAttribute("dto", dto);
+
+		return "edit";
+	}
+
+	@PostMapping("/edit")
+	public String submitEditProfile(@RequestParam(value = "email", required = false) String email,
+									@RequestParam(value = "telefono", required = false) String telefono,
+									@RequestParam(value = "domicilio", required = false) String domicilio,
+									@RequestParam(value = "cp", required = false) String cp,
+									HttpSession session,
+									Model model) {
+		Integer userId = (Integer) session.getAttribute("userID");
+
+		if(userId == null){
+			return "redirect:/login";
+		}
+		
+		try {
+			ProfileDTO dto = authService.updateProfile(userId, email, telefono, domicilio, cp);
+
+			String role = (String) session.getAttribute("role");
+
+			if(dto == null) {
+				model.addAttribute("editError", "No se pueden actualizar los datos");
+				return "edit";
+			}
+
+			session.setAttribute("email", dto.getEmail());
+
+			return "redirect:" + resolveRolePath(role);
+
+		} catch (IllegalStateException e) {
+			model.addAttribute("editError", e.getMessage());
+			return "edit";
+		}
+
+	}
 
 
 	@GetMapping("/coordinator")
