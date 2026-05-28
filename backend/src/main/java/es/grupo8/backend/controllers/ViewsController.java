@@ -121,7 +121,8 @@ public class ViewsController {
     @GetMapping("logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "login";
+        
+		return "login";
     }
 
 

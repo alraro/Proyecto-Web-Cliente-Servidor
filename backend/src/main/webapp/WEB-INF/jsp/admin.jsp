@@ -40,6 +40,7 @@
         <a class="card" href="/admin-stores">Tiendas</a>
         <a class="card" href="/admin-validate-users">Validar usuarios</a>
         <a class="card" href="/campaigns">Ver campañas</a>
+        <a class="card" href="/dashboard">Dashboard de Cobertura</a>
     </section>
 </main>
 </body>
