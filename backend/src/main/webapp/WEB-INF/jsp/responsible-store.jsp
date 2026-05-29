@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String token = (String) session.getAttribute("token");
@@ -25,7 +25,7 @@
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        <span id="user-name"><%= nombre == null ? "Responsable" : nombre %></span>
         <a href="/edit" class="edit-link">Editar perfil</a>
         <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
