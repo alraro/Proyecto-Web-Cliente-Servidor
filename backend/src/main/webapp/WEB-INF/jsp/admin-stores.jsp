@@ -39,6 +39,7 @@
                 <h1>Tiendas</h1>
                 <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
             </div>
+            <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>
             <button type="button" id="btn-nueva-tienda" class="btn-primary">+ Nueva tienda</button>
         </div>
     </section>

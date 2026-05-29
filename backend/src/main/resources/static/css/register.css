@@ -1,4 +1,4 @@
-@import url('login.css');
+/* Register — page-specific styles only */
 
 .login-card {
     max-width: 540px;
@@ -34,7 +34,7 @@
     color: rgba(53, 51, 53, 0.62);
 }
 
-@media (max-width: 640px) {
+@media screen and (width <= 640px) {
     .register-form .field-grid {
         grid-template-columns: 1fr;
     }
