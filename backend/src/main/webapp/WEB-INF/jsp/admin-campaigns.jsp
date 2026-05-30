@@ -1,4 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+    String nombre = (String) session.getAttribute("nombre");
+
+    if (token == null || role == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -28,6 +38,7 @@
                 <h1>Gestión de Campañas</h1>
                 <p>Crea, edita y elimina campañas de recogida de alimentos.</p>
             </div>
+            <a href="/api/export/campaigns" class="btn btn-secondary">Exportar datos</a>
             <button type="button" id="btn-new" class="btn btn-primary">Nueva campaña</button>
         </div>
     </section>
@@ -119,23 +130,17 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        const params = new URLSearchParams(window.location.search);
-        const tokenFromQuery = params.get("token");
-        const nameFromQuery = params.get("nombre");
-        if (tokenFromQuery) { localStorage.setItem("token", tokenFromQuery); }
-        if (nameFromQuery) { localStorage.setItem("nombre", nameFromQuery); }
-
-        const token = localStorage.getItem("token");
+        const token = '<%= token %>';
+        const nombre = '<%= nombre == null ? "Admin" : nombre %>';
         if (!token) {
             window.location.href = "/login";
             return;
         }
 
-        // NEW: auth options for calls that only require Authorization header
         const authOpts = { headers: { Authorization: "Bearer " + token } };
 
         const userNameEl = document.getElementById("user-name");
-        userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
+        userNameEl.textContent = nombre || "Admin";
 
         const btnLogout = document.getElementById("btn-logout");
         const btnNew = document.getElementById("btn-new");
@@ -292,7 +297,7 @@
             availableStores.forEach((store) => {
                 const li = document.createElement("li");
                 li.dataset.storeid = String(store.id);
-                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} — ${escapeHtml(store.locality || "-")} <button type="button" class="btn-add-store btn btn-sm btn-primary">+</button>`;
+                li.innerHTML = escapeHtml(store.name || "-") + ' — ' + escapeHtml(store.chainName || "-") + ' — ' + escapeHtml(store.locality || "-") + ' <button type="button" class="btn-add-store btn btn-sm btn-primary">+</button>';
                 availableStoresEl.appendChild(li);
             });
 
@@ -312,7 +317,7 @@
             Array.from(selectedStores.values()).forEach((store) => {
                 const li = document.createElement("li");
                 li.dataset.storeid = String(store.id);
-                li.innerHTML = `${escapeHtml(store.name || "-")} — ${escapeHtml(store.chainName || "-")} <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>`;
+                li.innerHTML = escapeHtml(store.name || "-") + ' — ' + escapeHtml(store.chainName || "-") + ' <button type="button" class="btn-remove-store btn btn-sm btn-danger">×</button>';
                 selectedStoresEl.appendChild(li);
             });
 

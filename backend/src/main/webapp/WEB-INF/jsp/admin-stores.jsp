@@ -1,4 +1,14 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+
+    if (token == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,6 +39,7 @@
                 <h1>Tiendas</h1>
                 <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
             </div>
+            <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>
             <button type="button" id="btn-nueva-tienda" class="btn-primary">+ Nueva tienda</button>
         </div>
     </section>
@@ -113,15 +124,14 @@
 
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= token == null ? "" : token %>';
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Admin";
+        document.getElementById("user-name").textContent = '<%= nombre == null ? "Admin" : nombre %>';
         document.getElementById("btn-logout").addEventListener("click", function () {
-            localStorage.clear(); window.location.href = "/login";
+            window.location.href = "/logout";
         });
 
-        if (!token || role !== "ADMINISTRADOR") { window.location.href = "/login"; return; }
+        if (!token) { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };

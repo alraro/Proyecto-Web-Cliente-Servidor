@@ -1,6 +1,7 @@
 package es.grupo8.backend.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,4 +37,23 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
 
     /* Check if a user is responsible for any store */
     boolean existsByIdResponsible_IdUser(Integer userId);
+
+
+   @Query("SELECT s.idChain.name AS chainName, " +
+           "SUM(CASE WHEN s IN (SELECT st FROM Campaign c JOIN c.stores st WHERE c.id = :campaignId) THEN 1 ELSE 0 END) AS covered, " +
+           "COUNT(s) AS total " +
+           "FROM Store s GROUP BY s.idChain.name")
+    List<Map<String, Object>> findChainCoverageCampaign(@Param("campaignId") Integer campaignId);
+
+    @Query("SELECT s.postalCode.idLocality.name AS localityName, " +
+           "SUM(CASE WHEN s IN (SELECT st FROM Campaign c JOIN c.stores st WHERE c.id = :campaignId) THEN 1 ELSE 0 END) AS covered, " +
+           "COUNT(s) AS total " +
+           "FROM Store s GROUP BY s.postalCode.idLocality.name")
+    List<Map<String, Object>> findLocalityCoverageCampaign(@Param("campaignId") Integer campaignId);
+
+    @Query("SELECT s.postalCode.idLocality.idZone.name AS zoneName, " +
+           "SUM(CASE WHEN s IN (SELECT st FROM Campaign c JOIN c.stores st WHERE c.id = :campaignId) THEN 1 ELSE 0 END) AS covered, " +
+           "COUNT(s) AS total " +
+           "FROM Store s GROUP BY s.postalCode.idLocality.idZone.name")
+    List<Map<String, Object>> findZoneCoverageCampaign(@Param("campaignId") Integer campaignId);
 }
