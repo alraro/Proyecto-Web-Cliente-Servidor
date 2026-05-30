@@ -9,23 +9,23 @@
         return;
     }
 %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Dashboard de Cobertura</title>
-    
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
+
         // Configuración global de la API
         const TOKEN = '<%= token == null ? "" : token %>';
-        const API_BASE = 'http://localhost:8080'; 
+        const API_BASE = 'http://localhost:8080';
 
         function authHeaders() {
             return {
@@ -75,6 +75,7 @@
                 sel.innerHTML = '<option value="">Selecciona una campaña</option>';
 
                 campaigns.forEach(c => {
+
                     const opt = document.createElement('option');
                     opt.value = c.id;
 
@@ -85,7 +86,6 @@
                     sel.appendChild(opt);
                 });
 
-                // Arreglado bug del script original: se valida kpiStatus antes de asignar el valor a kpiChains
                 if (document.querySelector('#kpiStatus')) {
                     document.querySelector('#kpiStatus').textContent = campaigns.filter(c => c.active).length + " Activas";
                 }
@@ -94,7 +94,9 @@
             }
         }
 
+
         function onCampaignChange(e) {
+
             currentCampaignId = e.target.value ? parseInt(e.target.value) : null;
             if (currentCampaignId) {
                 loadMetrics(currentCampaignId);
@@ -106,7 +108,6 @@
 
         async function loadMetrics(campaignId) {
             if (!campaignId) return;
-            showLoading(true);
             hideError();
 
             try {
@@ -128,12 +129,11 @@
 
             } catch (e) {
                 showError(e.message);
-            } finally {
-                showLoading(false);
             }
         }
 
         function updateKPIs(chainData, zoneData) {
+
             const totalStores = chainData.reduce((s, c) => s + c.storesInCampaign, 0);
             const chainsActive = chainData.filter(c => c.storesInCampaign > 0).length;
             const zonesActive = zoneData.filter(z => z.storesInCampaign > 0).length;
@@ -144,18 +144,20 @@
         }
 
         function renderChart(canvasId, data, type, dimensionLabel) {
+
             const canvas = document.querySelector('#' + canvasId);
             const labels = data.map(d => d.label);
             const covered = data.map(d => d.storesInCampaign);
             const total = data.map(d => d.totalStores);
             const pct = data.map(d => d.coveragePercent);
 
-            if (charts[canvasId]) { 
-                charts[canvasId].destroy(); 
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
             }
 
             const isHorizontal = (type === 'horizontalBar');
             charts[canvasId] = new Chart(canvas, {
+
                 type: 'bar',
                 data: {
                     labels,
@@ -176,6 +178,7 @@
                         },
                     ]
                 },
+
                 options: {
                     indexAxis: isHorizontal ? 'y' : 'x',
                     responsive: true,
@@ -192,6 +195,7 @@
                         },
                         legend: { position: 'top' }
                     },
+
                     scales: {
                         x: { stacked: false },
                         y: { stacked: false, beginAtZero: true }
@@ -202,7 +206,9 @@
 
         function resetTimer() {
             if (refreshTimer) clearInterval(refreshTimer);
+            
             const ms = parseInt(document.querySelector('#refreshInterval').value);
+
             if (ms > 0 && currentCampaignId) {
                 refreshTimer = setInterval(() => loadMetrics(currentCampaignId), ms);
             }
@@ -223,20 +229,24 @@
         function hideError() {
             document.querySelector('#errorMsg').classList.add('hidden');
         }
+
     </script>
+
 </head>
+
 <body>
+
 <header class="topbar">
     <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
+
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         <a href="/edit" class="edit-link">Editar perfil</a>
         <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
-
 
 <main class="dashboard-main">
 
@@ -251,7 +261,7 @@
         <select id="campaignSelect">
             <option value="">Selecciona una campaña</option>
         </select>
-        
+
         <label for="refreshInterval">Actualizar cada:</label>
         <select id="refreshInterval">
             <option value="0">Manual</option>
@@ -268,14 +278,17 @@
             <span class="kpi-label">Tiendas en campaña</span>
             <span class="kpi-value" id="kpiStores">—</span>
         </div>
+
         <div class="kpi-card">
             <span class="kpi-label">Estado</span>
             <span class="kpi-value" id="kpiStatus">—</span>
         </div>
+
         <div class="kpi-card">
             <span class="kpi-label">Cadenas cubiertas</span>
             <span class="kpi-value" id="kpiChains">—</span>
         </div>
+
         <div class="kpi-card">
             <span class="kpi-label">Zonas cubiertas</span>
             <span class="kpi-value" id="kpiZones">—</span>
@@ -283,26 +296,28 @@
     </section>
 
     <section class="charts-grid hidden" id="chartsGrid">
+
         <div class="chart-card">
             <h3>Cobertura por Cadena</h3>
             <div class="chart-wrap"><canvas id="chainChart"></canvas></div>
         </div>
+
         <div class="chart-card">
             <h3>Cobertura por Localidad</h3>
             <div class="chart-wrap"><canvas id="localityChart"></canvas></div>
         </div>
+
         <div class="chart-card chart-card--wide">
             <h3>Cobertura por Zona Geográfica</h3>
             <div class="chart-wrap"><canvas id="zoneChart"></canvas></div>
         </div>
     </section>
 
-    <div id="noSelection" class="no-selection">
-        Selecciona una campaña para ver las métricas de cobertura.
-    </div>
+    <div id="noSelection" class="no-selection">Selecciona una campaña para ver las métricas de cobertura.</div>
+
     <div id="errorMsg" class="error-msg hidden"></div>
 
 </main>
-
 </body>
-</html>
+</html> 
+

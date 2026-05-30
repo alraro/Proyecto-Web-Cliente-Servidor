@@ -6,9 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import es.grupo8.backend.dto.RegisterResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 
-import es.grupo8.backend.dto.LoginResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -52,7 +51,7 @@ public class ViewsController {
 							  Model model,
 							  HttpSession session) {
 
-		LoginResponseDTO dto = authService.login(email, password);
+		AuthResponseDTO dto = authService.login(email, password);
 
 		if (dto == null) {
 			model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
@@ -110,7 +109,7 @@ public class ViewsController {
                                  Model model) {
 
 		try {
-			RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+			AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
 
 			if (dto == null) {
 				model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
@@ -190,6 +189,13 @@ public class ViewsController {
 			return "edit";
 		}
 
+	}
+
+	@GetMapping("/cancel-edit")
+	public String cancelEdit(HttpSession session) {
+		String role = (String) session.getAttribute("role");
+
+		return "redirect:" + resolveRolePath(role);
 	}
 
 

@@ -2,9 +2,8 @@ package es.grupo8.backend.mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
-import es.grupo8.backend.dto.RegisterResponseDTO;
 import es.grupo8.backend.entity.UserEntity;
 
 
@@ -13,9 +12,9 @@ public class UserAuthMapper {
     @Autowired
     private ProfileMapper profileMapper;
 
-    public LoginResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
+    public AuthResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
 
-        LoginResponseDTO dto = new LoginResponseDTO();
+        AuthResponseDTO dto = new AuthResponseDTO();
         dto.setId(user.getIdUser());
         dto.setNombre(user.getName());
         dto.setEmail(user.getEmail());
@@ -31,10 +30,10 @@ public class UserAuthMapper {
     }
 
 
-    public RegisterResponseDTO toRegisterReponse(UserEntity user, String token, Long expiresInSeconds) {
+    public AuthResponseDTO toRegisterResponse(UserEntity user, String token, Long expiresInSeconds) {
         
-        RegisterResponseDTO dto = new RegisterResponseDTO();
-        dto.setUserId(user.getIdUser());
+        AuthResponseDTO dto = new AuthResponseDTO();
+        dto.setId(user.getIdUser());
         dto.setNombre(user.getName());
         dto.setEmail(user.getEmail());
         dto.setMessage("Registro correcto");

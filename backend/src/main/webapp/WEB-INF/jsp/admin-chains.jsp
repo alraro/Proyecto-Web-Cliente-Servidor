@@ -29,6 +29,7 @@
                 <h1>Cadenas de supermercados</h1>
                 <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
             </div>
+            <a href="/api/export/chains" class="btn btn-secondary">Exportar datos</a>
             <button type="button" id="btn-nueva" class="btn-primary">+ Nueva cadena</button>
         </div>
     </section>

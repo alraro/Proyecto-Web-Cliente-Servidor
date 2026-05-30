@@ -38,6 +38,7 @@
                 <h1>Gestión de Campañas</h1>
                 <p>Crea, edita y elimina campañas de recogida de alimentos.</p>
             </div>
+            <a href="/api/export/campaigns" class="btn btn-secondary">Exportar datos</a>
             <button type="button" id="btn-new" class="btn btn-primary">Nueva campaña</button>
         </div>
     </section>

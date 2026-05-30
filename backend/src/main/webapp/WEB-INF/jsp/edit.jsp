@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    String contextPath = request.getContextPath();
     String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
 
@@ -18,60 +17,6 @@
     <link rel="stylesheet" href="/css/login.css">
     <link rel="stylesheet" href="/css/register.css">
     <link rel="stylesheet" href="/css/edit.css">
-    <script>
-        const SESSION_TOKEN = '<%= token == null ? "" : token %>';
-        const SESSION_ROLE = '<%= role == null ? "" : role %>';
-
-        const ROLE_ROUTES = {
-            ADMINISTRADOR: '/admin',
-            COORDINADOR: '/coordinator',
-            CAPITAN: '/captain',
-            COLABORADOR: '/colaborator',
-            RESPONSABLE_TIENDA: '/responsible-store'
-        };
-
-        let nameInput;
-        let emailInput;
-        let telefonoInput;
-        let localidadInput;
-        let domicilioInput;
-        let cpInput;
-        let cancelButton;
-        let roleReturnLink;
-
-        function getRoleRoute() {
-            return ROLE_ROUTES[SESSION_ROLE] || '/login';
-        }
-
-        function redirectToRolePage() {
-            window.location.href = getRoleRoute();
-        }
-
-        // Esta función es la que envía el retorno en mi panel, se pone # porque esto se encarga
-        function setRoleLink() {
-            if (roleReturnLink) {
-                roleReturnLink.setAttribute('href', getRoleRoute());
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            nameInput = document.querySelector('#name');
-            emailInput = document.querySelector('#email');
-            telefonoInput = document.querySelector('#telefono');
-            localidadInput = document.querySelector('#localidad');
-            domicilioInput = document.querySelector('#domicilio');
-            cpInput = document.querySelector('#cp');
-            cancelButton = document.querySelector('#cancel-button');
-            roleReturnLink = document.querySelector('#role-return-link');
-
-
-            cancelButton.addEventListener('click', function () {
-                redirectToRolePage();
-            });
-
-            setRoleLink();
-        });
-    </script>
 </head>
 <body>
     <header class="topbar topbar-login">
@@ -81,7 +26,7 @@
 
         <nav class="main-nav main-nav-login" id="main-nav">
             <a href="/index">Inicio</a>
-            <a href="#" id="role-return-link">Mi panel</a>
+            <a href="/cancel-edit" id="role-return-link">Mi panel</a>
         </nav>
     </header>
 
@@ -148,10 +93,9 @@
 
                 <div class="edit-actions">
                     <button type="submit" class="login-button">Guardar cambios</button>
-                    <button type="button" class="secondary-button" id="cancel-button">Cancelar</button>
+                    <a href="/cancel-edit" id="cancel-button">Cancelar</a>
                 </div>
 
-                <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             </form>
         </section>
     </main>

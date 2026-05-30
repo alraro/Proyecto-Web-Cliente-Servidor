@@ -35,13 +35,14 @@
     </section>
 
     <section class="card-grid">
-        <a class="card" href="/admin-coordinators">Coordinadores</a>
-        <a class="card" href="/admin-captains">Capitanes</a>
-        <a class="card" href="/admin-campaigns">Campañas</a>
-        <a class="card" href="/admin-stores">Tiendas</a>
-        <a class="card" href="/admin-validate-users">Validar usuarios</a>
-        <a class="card" href="/campaigns">Ver campañas</a>
-        <a class="card" href="/dashboard">Dashboard de Cobertura</a>
+        <a href="/admin-coordinators">Coordinadores</a>
+        <a href="/admin-captains">Capitanes</a>
+        <a href="/admin-campaigns">Campañas</a>
+        <a href="/admin-stores">Tiendas</a>
+        <a href="/admin-chains">Cadenas</a>
+        <a href="/admin-validate-users">Validar usuarios</a>
+        <a href="/campaigns">Ver campañas</a>
+        <a href="/admin-dashboard">Dashboard de Cobertura</a>
     </section>
 </main>
 </body>
