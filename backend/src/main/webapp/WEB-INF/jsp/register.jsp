@@ -62,13 +62,6 @@
                         <input id="telefono" name="telefono" type="tel" placeholder="600123123" autocomplete="tel">
                     </div>
                 </div>
-
-                <div class="field-group">
-                    <label for="localidad">Localidad</label>
-                    <div class="input-shell">
-                        <input id="localidad" name="localidad" type="text" placeholder="Málaga" autocomplete="address-level2">
-                    </div>
-                </div>
             </div>
 
             <div class="field-grid">

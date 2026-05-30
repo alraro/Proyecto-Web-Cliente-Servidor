@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
-import es.grupo8.backend.dto.RegisterResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.services.AuthService;
 
 // Devolver datos en formato JSON, no vistas
@@ -28,13 +28,13 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginResponseDTO request) {
+	public ResponseEntity<?> login(@RequestBody AuthResponseDTO request) {
 
 		// Sacamos email y contraseña
 		String email = request.getEmail();
 		String password = request.getPassword();
 
-		LoginResponseDTO dto = authService.login(email, password);
+		AuthResponseDTO dto = authService.login(email, password);
 		// Si no existe el usuario, fuera
 		if (dto == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No existen los datos"));
@@ -49,7 +49,7 @@ public class AuthController {
 
     // Endpoint para registro
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody RegisterResponseDTO request) {
+	public ResponseEntity<?> register(@RequestBody AuthResponseDTO request) {
 
 		String nombre = request.getNombre();
 		String email = request.getEmail();
@@ -59,7 +59,7 @@ public class AuthController {
 		String cp = request.getPostalCode();
 
         try {
-            RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+            AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 

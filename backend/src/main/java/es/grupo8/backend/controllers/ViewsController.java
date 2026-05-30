@@ -6,9 +6,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import es.grupo8.backend.dto.RegisterResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 
-import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
 
@@ -51,7 +51,7 @@ public class ViewsController {
 							  Model model,
 							  HttpSession session) {
 
-		LoginResponseDTO dto = authService.login(email, password);
+		AuthResponseDTO dto = authService.login(email, password);
 
 		if (dto == null) {
 			model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
@@ -66,6 +66,7 @@ public class ViewsController {
 		}
 
 		session.setAttribute("token", dto.getToken());
+		session.setAttribute("userID", dto.getId());
 		session.setAttribute("nombre", dto.getNombre());
 		session.setAttribute("role", dto.getRole());
 		if (dto.getStoreId() != null) {
@@ -107,22 +108,95 @@ public class ViewsController {
                                  @RequestParam(value = "cp", required = false) String cp,
                                  Model model) {
 
-        RegisterResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+		try {
+			AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
 
-        if (dto == null) {
-            model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
-            model.addAttribute("registerError", "No se han podido registrar los datos.");
-            return "register";
-        }
+			if (dto == null) {
+				model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+				model.addAttribute("registerError", "No se han podido registrar los datos.");
+				return "register";
+			}
 
-        return "redirect:/login";
+			return "redirect:/login";
+
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+			model.addAttribute("registerError", e.getMessage());
+			return "register";
+
+		} catch (IllegalStateException e) {
+			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
+			model.addAttribute("registerError", e.getMessage());
+			return "register";
+		}
     }
 
     @GetMapping("logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "login";
+        
+		return "login";
     }
+
+	@GetMapping("/edit")
+	public String editProfile(HttpSession session,
+							  Model model) {
+		Integer userId = (Integer) session.getAttribute("userID");
+		if (userId == null) {
+			return "redirect:/login";
+		}
+
+		ProfileDTO dto = authService.getProfile(userId);
+		if(dto == null) {
+			model.addAttribute("editError", "No se han podido cargar los datos del perfil.");
+			return "edit";
+		}
+
+		model.addAttribute("dto", dto);
+
+		return "edit";
+	}
+
+	@PostMapping("/edit")
+	public String submitEditProfile(@RequestParam(value = "email", required = false) String email,
+									@RequestParam(value = "telefono", required = false) String telefono,
+									@RequestParam(value = "domicilio", required = false) String domicilio,
+									@RequestParam(value = "cp", required = false) String cp,
+									HttpSession session,
+									Model model) {
+		Integer userId = (Integer) session.getAttribute("userID");
+
+		if(userId == null){
+			return "redirect:/login";
+		}
+		
+		try {
+			ProfileDTO dto = authService.updateProfile(userId, email, telefono, domicilio, cp);
+
+			String role = (String) session.getAttribute("role");
+
+			if(dto == null) {
+				model.addAttribute("editError", "No se pueden actualizar los datos");
+				return "edit";
+			}
+
+			session.setAttribute("email", dto.getEmail());
+
+			return "redirect:" + resolveRolePath(role);
+
+		} catch (IllegalStateException e) {
+			model.addAttribute("editError", e.getMessage());
+			return "edit";
+		}
+
+	}
+
+	@GetMapping("/cancel-edit")
+	public String cancelEdit(HttpSession session) {
+		String role = (String) session.getAttribute("role");
+
+		return "redirect:" + resolveRolePath(role);
+	}
 
 
 	@GetMapping("/coordinator")

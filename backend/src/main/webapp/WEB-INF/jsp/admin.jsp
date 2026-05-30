@@ -18,12 +18,13 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/admin" aria-label="Bancosol admin home">
+    <a class="brand" href="/index" aria-label="Bancosol admin home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a id="btn-logout" class="btn" href="/logout">Cerrar sesión</a>
+        <a href="/edit" class="edit-link">Editar perfil</a>
+        <a href="/login" class="logout-link">Cerrar sesión</a>    
     </div>
 </header>
 
@@ -34,12 +35,14 @@
     </section>
 
     <section class="card-grid">
-        <a class="card" href="/admin-coordinators">Coordinadores</a>
-        <a class="card" href="/admin-captains">Capitanes</a>
-        <a class="card" href="/admin-campaigns">Campañas</a>
-        <a class="card" href="/admin-stores">Tiendas</a>
-        <a class="card" href="/admin-validate-users">Validar usuarios</a>
-        <a class="card" href="/campaigns">Ver campañas</a>
+        <a href="/admin-coordinators">Coordinadores</a>
+        <a href="/admin-captains">Capitanes</a>
+        <a href="/admin-campaigns">Campañas</a>
+        <a href="/admin-stores">Tiendas</a>
+        <a href="/admin-chains">Cadenas</a>
+        <a href="/admin-validate-users">Validar usuarios</a>
+        <a href="/campaigns">Ver campañas</a>
+        <a href="/admin-dashboard">Dashboard de Cobertura</a>
     </section>
 </main>
 </body>
