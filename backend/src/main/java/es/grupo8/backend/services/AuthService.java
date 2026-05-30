@@ -15,9 +15,8 @@ import org.springframework.stereotype.Service;
 
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.dto.LoginResponseDTO;
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
-import es.grupo8.backend.dto.RegisterResponseDTO;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.mapper.UserAuthMapper;
 import io.jsonwebtoken.Jwts;
@@ -61,7 +60,7 @@ public class AuthService {
 
 
     // Login
-    public LoginResponseDTO login(String emailParam, String passwordParam) {
+    public AuthResponseDTO login(String emailParam, String passwordParam) {
         String email = normalizeEmail(emailParam);
         String password = trimToNull(passwordParam);
 
@@ -92,7 +91,7 @@ public class AuthService {
 
 
     // Register
-    public RegisterResponseDTO register(String nombreParam, String emailParam, String passwordParam, String telefonoParam, String domicilioParam, String cpParam) {
+    public AuthResponseDTO register(String nombreParam, String emailParam, String passwordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = new UserEntity();
 
@@ -136,7 +135,7 @@ public class AuthService {
         UserEntity created = userRepository.save(user);
         String token = generateToken(created.getIdUser(), created.getEmail(), created.getName());
         
-        return userAuthMapper.toRegisterReponse(created, token, Math.max(1, jwtExpirationMs / 1000));
+        return userAuthMapper.toRegisterResponse(created, token, Math.max(1, jwtExpirationMs / 1000));
     }
 
 
