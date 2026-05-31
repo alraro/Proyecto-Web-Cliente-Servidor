@@ -1,3 +1,10 @@
+/**
+ * DTO para transferir datos de usuarios.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 60%
+ * - Alfonso Ramos: 40%
+ */
 package es.grupo8.backend.dto;
 
 import lombok.Data;

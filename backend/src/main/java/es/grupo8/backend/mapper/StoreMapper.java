@@ -1,3 +1,10 @@
+/**
+ * Mapeador entre StoreDTO y Store.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dto.StoreDTO;

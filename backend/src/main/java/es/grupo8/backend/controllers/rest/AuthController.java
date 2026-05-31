@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
-import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.services.AuthService;
 
 // Devolver datos en formato JSON, no vistas

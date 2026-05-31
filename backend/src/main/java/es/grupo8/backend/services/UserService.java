@@ -1,3 +1,10 @@
+/**
+ * Servicio de negocio para operaciones de usuarios.
+ *
+ * Autores:
+ * - Alfonso Ramos: 60%
+ * - Alejandra Ortiz: 40%
+ */
 package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.UserRepository;

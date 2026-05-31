@@ -1,3 +1,10 @@
+/**
+ * Mapeador entre UserDTO y UserEntity.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 70%
+ * - Alfonso Ramos: 30%
+ */
 package es.grupo8.backend.mapper;
  
 import es.grupo8.backend.dao.StoreRepository;

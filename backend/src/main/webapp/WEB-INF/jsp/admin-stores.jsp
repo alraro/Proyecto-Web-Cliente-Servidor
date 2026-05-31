@@ -1,3 +1,10 @@
+<%--
+    Pagina de administracion de tiendas.
+
+    Autores:
+    - Alejandra Ortiz: 80%
+    - IA Generativa: 20%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
@@ -15,8 +22,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Tiendas</title>
-    <link rel="stylesheet" href="/css/administrador.css">
-    <link rel="stylesheet" href="/css/admin-chains-stores.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/admin-stores.css">
 </head>
 <body>
 
@@ -24,35 +33,38 @@
     <a class="brand" href="/index" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-    <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
     </div>
 </header>
 
-<main class="admin-page" aria-label="Stores management page">
-    <section class="page-header">
-        <a href="/admin" class="back-link">&larr; Volver al menú</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Tiendas</h1>
-                <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
+<main class="page-wrapper" aria-label="Stores management page">
+    <div class="page-header">
+        <a href="/admin" class="back-link-inline">← Volver al panel</a>
+        <h1>Tiendas</h1>
+        <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Listado de tiendas</h2>
+            <div class="card-actions">
+                <button id="btn-export-stores" class="btn btn-secondary">Exportar datos</button>
+                <button class="btn btn-primary" id="btn-nueva-tienda">+ Nueva tienda</button>
             </div>
-            <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>
-            <button type="button" id="btn-nueva-tienda" class="btn-primary">+ Nueva tienda</button>
         </div>
-    </section>
 
-    <div id="global-message" hidden></div>
-
-    <section class="card" aria-label="Listado de tiendas">
         <div class="filters-bar">
             <select id="filter-zone"><option value="">Todas las zonas</option></select>
             <select id="filter-locality"><option value="">Todas las localidades</option></select>
             <select id="filter-chain"><option value="">Todas las cadenas</option></select>
-            <button type="button" id="btn-apply-filters" class="btn-filter">Filtrar</button>
-            <button type="button" id="btn-clear-filters" class="btn-clear">Limpiar</button>
+            <button type="button" id="btn-apply-filters">Filtrar</button>
+            <button type="button" class="btn-clear" id="btn-clear-filters">Limpiar</button>
         </div>
 
         <div class="table-wrap">
@@ -87,12 +99,12 @@
                 <option value="100">100 por página</option>
             </select>
         </div>
-    </section>
+    </div>
 </main>
 
-<div id="modal-backdrop" class="modal-overlay" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h2 id="modal-title">Nueva tienda</h2>
+<div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal modal-store" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">Nueva tienda</h3>
 
         <div class="form-group">
             <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
@@ -114,19 +126,22 @@
         </div>
 
         <p class="form-message" id="modal-error"></p>
-
         <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
-            <button type="button" class="btn-primary" id="btn-modal-save">Guardar</button>
+            <button class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
+            <button class="btn btn-primary" id="btn-modal-save">Guardar</button>
         </div>
     </div>
 </div>
+
+<div class="toast-container" id="toast-container"></div>
 
 <script>
     (function () {
         var token = '<%= token == null ? "" : token %>';
 
-        document.getElementById("user-name").textContent = '<%= nombre == null ? "Admin" : nombre %>';
+        document.getElementById("btn-edit").addEventListener("click", function () {
+            window.location.href = "/edit";
+        });
         document.getElementById("btn-logout").addEventListener("click", function () {
             window.location.href = "/logout";
         });
@@ -140,6 +155,15 @@
         function escHtml(v) {
             return String(v == null ? "" : v)
                 .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function showToast(msg, type) {
+            var container = document.getElementById("toast-container");
+            var toast = document.createElement("div");
+            toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(function () { toast.remove(); }, 3500);
         }
 
         var allChains = [], allLocalities = [], allZones = [];
@@ -195,18 +219,38 @@
             }
             stores.forEach(function (s) {
                 var tr = document.createElement("tr");
-                tr.innerHTML =
-                    "<td>" + s.id + "</td>" +
-                    "<td><strong>" + escHtml(s.name) + "</strong></td>" +
-                    "<td>" + escHtml(s.address || "\u2014") + "</td>" +
-                    "<td>" + escHtml(s.locality || "\u2014") + "</td>" +
-                    "<td>" + escHtml(s.postalCode || "\u2014") + "</td>" +
-                    "<td>" + escHtml(s.zone || "\u2014") + "</td>" +
-                    "<td>" + escHtml(s.chainName || "\u2014") + "</td>" +
-                    "<td><div class='td-actions'>" +
-                        "<button class='btn btn-edit btn-sm' data-action='edit'   data-store-id='" + s.id + "'>Editar</button>" +
-                        "<button class='btn-danger btn-sm'  data-action='delete' data-store-id='" + s.id + "' data-store-name='" + escHtml(s.name) + "'>Eliminar</button>" +
-                    "</div></td>";
+
+                var td1 = document.createElement("td"); td1.textContent = s.id; tr.appendChild(td1);
+
+                var td2 = document.createElement("td");
+                var strong = document.createElement("strong"); strong.textContent = escHtml(s.name);
+                td2.appendChild(strong); tr.appendChild(td2);
+
+                var td3 = document.createElement("td"); td3.textContent = escHtml(s.address || "\u2014"); tr.appendChild(td3);
+                var td4 = document.createElement("td"); td4.textContent = escHtml(s.locality || "\u2014"); tr.appendChild(td4);
+                var td5 = document.createElement("td"); td5.textContent = escHtml(s.postalCode || "\u2014"); tr.appendChild(td5);
+                var td6 = document.createElement("td"); td6.textContent = escHtml(s.zone || "\u2014"); tr.appendChild(td6);
+                var td7 = document.createElement("td"); td7.textContent = escHtml(s.chainName || "\u2014"); tr.appendChild(td7);
+
+                var td8 = document.createElement("td");
+                var div = document.createElement("div"); div.className = "td-actions";
+
+                var btnEdit = document.createElement("button");
+                btnEdit.className = "btn btn-edit btn-sm";
+                btnEdit.setAttribute("data-action", "edit");
+                btnEdit.setAttribute("data-store-id", s.id);
+                btnEdit.textContent = "Editar";
+                div.appendChild(btnEdit);
+
+                var btnDelete = document.createElement("button");
+                btnDelete.className = "btn btn-danger btn-sm";
+                btnDelete.setAttribute("data-action", "delete");
+                btnDelete.setAttribute("data-store-id", s.id);
+                btnDelete.setAttribute("data-store-name", escHtml(s.name));
+                btnDelete.textContent = "Eliminar";
+                div.appendChild(btnDelete);
+
+                td8.appendChild(div); tr.appendChild(td8);
                 tbody.appendChild(tr);
             });
         }
@@ -224,7 +268,7 @@
 
             fetch("/api/stores?" + params, { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { localStorage.clear(); window.location.href = "/login"; return null; }
+                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
                     if (!r.ok) throw new Error();
                     return r.json();
                 })
@@ -253,6 +297,9 @@
         document.getElementById("btn-prev-page").addEventListener("click", function () { if (currentPage > 0) loadStores(currentPage - 1); });
         document.getElementById("btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
         document.getElementById("page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
+        document.getElementById("btn-export-stores").addEventListener("click", function () {
+            window.location.href = "/api/export/stores";
+        });
 
         document.getElementById("stores-tbody").addEventListener("click", function (e) {
             var btn = e.target.closest("button");
@@ -267,14 +314,12 @@
         function openModal(titulo) {
             document.getElementById("modal-title").textContent = titulo;
             document.getElementById("modal-error").textContent = "";
-            var bd = document.getElementById("modal-backdrop");
-            bd.style.display = "flex"; bd.setAttribute("aria-hidden", "false");
+            document.getElementById("modal-backdrop").classList.add("open");
             document.getElementById("input-nombre").focus();
         }
 
         function closeModal() {
-            var bd = document.getElementById("modal-backdrop");
-            bd.style.display = "none"; bd.setAttribute("aria-hidden", "true");
+            document.getElementById("modal-backdrop").classList.remove("open");
             ["input-nombre","input-domicilio","input-cp"].forEach(function (id) { document.getElementById(id).value = ""; });
             document.getElementById("input-chain").value = "";
             document.getElementById("modal-error").textContent = "";
@@ -292,7 +337,7 @@
                     document.getElementById("input-chain").value     = s.chainId || "";
                     openModal("Editar tienda");
                 })
-                .catch(function () { showMessage("Error al cargar la tienda.", true); });
+                .catch(function () { showToast("Error al cargar la tienda.", "error"); });
         }
 
         document.getElementById("btn-nueva-tienda").addEventListener("click", function () { editingId = null; openModal("Nueva tienda"); });
@@ -318,7 +363,7 @@
                 .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
                 .then(function (r) {
                     if (!r.ok) { errEl.textContent = r.data.message || "Error al guardar."; return; }
-                    closeModal(); showMessage(editingId ? "Tienda actualizada." : "Tienda creada.", false); loadStores(currentPage);
+                    closeModal(); showToast(editingId ? "Tienda actualizada." : "Tienda creada."); loadStores(currentPage);
                 })
                 .catch(function () { errEl.textContent = "Error de conexión."; });
         });
@@ -327,18 +372,10 @@
             if (!confirm("¿Eliminar la tienda \"" + nombre + "\"?\nEsta acción no se puede deshacer.")) return;
             fetch("/api/stores/" + id, { method: "DELETE", headers: authHeaders() })
                 .then(function (r) {
-                    if (!r.ok) r.json().then(function (d) { showMessage(d.message || "Error al eliminar.", true); });
-                    else { showMessage("Tienda eliminada.", false); loadStores(currentPage); }
+                    if (!r.ok) r.json().then(function (d) { showToast(d.message || "Error al eliminar.", "error"); });
+                    else { showToast("Tienda eliminada."); loadStores(currentPage); }
                 })
-                .catch(function () { showMessage("Error de conexión.", true); });
-        }
-
-        function showMessage(text, isError) {
-            var el = document.getElementById("global-message");
-            el.hidden = false; el.textContent = text;
-            el.className = isError ? "error" : "success";
-            clearTimeout(showMessage._t);
-            showMessage._t = setTimeout(function () { el.hidden = true; }, 4000);
+                .catch(function () { showToast("Error de conexión.", "error"); });
         }
 
         loadAuxData().then(function () { loadStores(0); });

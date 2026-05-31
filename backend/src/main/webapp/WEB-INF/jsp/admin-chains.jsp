@@ -1,12 +1,30 @@
+<%--
+    Pagina de administracion de cadenas.
+
+    Autores:
+    - Alejandra Ortiz: 80%
+    - IA Generativa: 20%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+
+    if (token == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Cadenas</title>
-    <link rel="stylesheet" href="/css/administrador.css">
-    <link rel="stylesheet" href="/css/admin-chains-stores.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
 
@@ -14,30 +32,31 @@
     <a class="brand" href="/index" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-    <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
     </div>
 </header>
 
-<main class="admin-page" aria-label="Chains management page">
-    <section class="page-header">
-        <a href="/admin" class="back-link">&larr; Volver al menú</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Cadenas de supermercados</h1>
-                <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
+<main class="page-wrapper" aria-label="Chains management page">
+    <div class="page-header">
+        <a href="/admin" class="back-link-inline">← Volver al panel</a>
+        <h1>Cadenas de supermercados</h1>
+        <p>Gestiona las cadenas participantes en las campañas de Bancosol.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Listado de cadenas</h2>
+            <div class="card-actions">
+                <button id="btn-export-chains" class="btn btn-secondary">Exportar datos</button>
+                <button class="btn btn-primary" id="btn-nueva">+ Nueva cadena</button>
             </div>
-            <a href="/api/export/chains" class="btn btn-secondary">Exportar datos</a>
-            <button type="button" id="btn-nueva" class="btn-primary">+ Nueva cadena</button>
         </div>
-    </section>
-
-    <div id="global-message" hidden></div>
-
-    <section class="card" aria-label="Listado de cadenas">
-        <h2>Listado de cadenas</h2>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -54,12 +73,12 @@
                 </tbody>
             </table>
         </div>
-    </section>
+    </div>
 </main>
 
-<div id="modal-backdrop" class="modal-overlay" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h2 id="modal-title">Nueva cadena</h2>
+<div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">Nueva cadena</h3>
 
         <div class="form-group">
             <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
@@ -78,23 +97,26 @@
         <p class="form-message" id="modal-error"></p>
 
         <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="btn-cancelar">Cancelar</button>
-            <button type="button" class="btn-primary" id="btn-guardar">Guardar</button>
+            <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
+            <button class="btn btn-primary" id="btn-guardar">Guardar</button>
         </div>
     </div>
 </div>
 
+<div class="toast-container" id="toast-container"></div>
+
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= token == null ? "" : token %>';
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Admin";
+        document.getElementById("btn-edit").addEventListener("click", function () {
+            window.location.href = "/edit";
+        });
         document.getElementById("btn-logout").addEventListener("click", function () {
-            localStorage.clear(); window.location.href = "/login";
+            window.location.href = "/logout";
         });
 
-        if (!token || role !== "ADMINISTRADOR") { window.location.href = "/login"; return; }
+        if (!token) { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
@@ -103,6 +125,15 @@
         function escHtml(v) {
             return String(v == null ? "" : v)
                 .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function showToast(msg, type) {
+            var container = document.getElementById("toast-container");
+            var toast = document.createElement("div");
+            toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(function () { toast.remove(); }, 3500);
         }
 
         function renderTable(chains) {
@@ -114,17 +145,45 @@
             }
             chains.forEach(function (c) {
                 var tr = document.createElement("tr");
-                tr.innerHTML =
-                    "<td>" + c.id + "</td>" +
-                    "<td><strong>" + escHtml(c.name) + "</strong></td>" +
-                    "<td><code class='inline-code'>" + escHtml(c.code) + "</code></td>" +
-                    "<td>" + (c.participation
-                        ? '<span class="badge-yes">\u2713 S\u00ed</span>'
-                        : '<span class="badge-no">\u2014 No</span>') + "</td>" +
-                    "<td><div class='td-actions'>" +
-                        "<button class='btn btn-edit btn-sm' data-action='edit'   data-chain-id='" + c.id + "'>Editar</button>" +
-                        "<button class='btn-danger btn-sm'  data-action='delete' data-chain-id='" + c.id + "' data-chain-name='" + escHtml(c.name) + "'>Eliminar</button>" +
-                    "</div></td>";
+
+                var td1 = document.createElement("td"); td1.textContent = c.id; tr.appendChild(td1);
+
+                var td2 = document.createElement("td");
+                var strong = document.createElement("strong"); strong.textContent = escHtml(c.name);
+                td2.appendChild(strong); tr.appendChild(td2);
+
+                var td3 = document.createElement("td");
+                var code = document.createElement("code"); code.className = "inline-code"; code.textContent = escHtml(c.code);
+                td3.appendChild(code); tr.appendChild(td3);
+
+                var td4 = document.createElement("td");
+                var badge = document.createElement("span");
+                if (c.participation) {
+                    badge.className = "badge badge-yes"; badge.textContent = "\u2713 S\u00ed";
+                } else {
+                    badge.className = "badge badge-no"; badge.textContent = "\u2014 No";
+                }
+                td4.appendChild(badge); tr.appendChild(td4);
+
+                var td5 = document.createElement("td");
+                var div = document.createElement("div"); div.className = "td-actions";
+
+                var btnEdit = document.createElement("button");
+                btnEdit.className = "btn btn-edit btn-sm";
+                btnEdit.setAttribute("data-action", "edit");
+                btnEdit.setAttribute("data-chain-id", c.id);
+                btnEdit.textContent = "Editar";
+                div.appendChild(btnEdit);
+
+                var btnDelete = document.createElement("button");
+                btnDelete.className = "btn btn-danger btn-sm";
+                btnDelete.setAttribute("data-action", "delete");
+                btnDelete.setAttribute("data-chain-id", c.id);
+                btnDelete.setAttribute("data-chain-name", escHtml(c.name));
+                btnDelete.textContent = "Eliminar";
+                div.appendChild(btnDelete);
+
+                td5.appendChild(div); tr.appendChild(td5);
                 tbody.appendChild(tr);
             });
         }
@@ -132,7 +191,7 @@
         function loadChains() {
             fetch("/api/chains", { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { localStorage.clear(); window.location.href = "/login"; return null; }
+                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
                     if (!r.ok) throw new Error();
                     return r.json();
                 })
@@ -148,14 +207,12 @@
         function openModal(titulo) {
             document.getElementById("modal-title").textContent = titulo;
             document.getElementById("modal-error").textContent = "";
-            var bd = document.getElementById("modal-backdrop");
-            bd.style.display = "flex"; bd.setAttribute("aria-hidden", "false");
+            document.getElementById("modal-backdrop").classList.add("open");
             document.getElementById("input-nombre").focus();
         }
 
         function closeModal() {
-            var bd = document.getElementById("modal-backdrop");
-            bd.style.display = "none"; bd.setAttribute("aria-hidden", "true");
+            document.getElementById("modal-backdrop").classList.remove("open");
             document.getElementById("input-nombre").value = "";
             document.getElementById("input-codigo").value = "";
             document.getElementById("input-participacion").checked = false;
@@ -173,7 +230,7 @@
                     document.getElementById("input-participacion").checked = !!c.participation;
                     openModal("Editar cadena");
                 })
-                .catch(function () { showMessage("Error al cargar la cadena.", true); });
+                .catch(function () { showToast("Error al cargar la cadena.", "error"); });
         }
 
         document.getElementById("chains-tbody").addEventListener("click", function (e) {
@@ -188,6 +245,9 @@
         document.getElementById("btn-cancelar").addEventListener("click", closeModal);
         document.getElementById("modal-backdrop").addEventListener("click", function (e) {
             if (e.target === document.getElementById("modal-backdrop")) closeModal();
+        });
+        document.getElementById("btn-export-chains").addEventListener("click", function () {
+            window.location.href = "/api/export/chains";
         });
 
         document.getElementById("btn-guardar").addEventListener("click", function () {
@@ -207,9 +267,7 @@
                 .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
                 .then(function (r) {
                     if (!r.ok) { errEl.textContent = r.data.message || "Error al guardar."; return; }
-                    closeModal();
-                    showMessage(editingId ? "Cadena actualizada." : "Cadena creada.", false);
-                    loadChains();
+                    closeModal(); showToast(editingId ? "Cadena actualizada." : "Cadena creada."); loadChains();
                 })
                 .catch(function () { errEl.textContent = "Error de conexión."; });
         });
@@ -218,18 +276,10 @@
             if (!confirm("¿Eliminar la cadena \"" + nombre + "\"?\nEsta acción no se puede deshacer.")) return;
             fetch("/api/chains/" + id, { method: "DELETE", headers: authHeaders() })
                 .then(function (r) {
-                    if (!r.ok) r.json().then(function (d) { showMessage(d.message || "Error al eliminar.", true); });
-                    else { showMessage("Cadena eliminada.", false); loadChains(); }
+                    if (!r.ok) r.json().then(function (d) { showToast(d.message || "Error al eliminar.", "error"); });
+                    else { showToast("Cadena eliminada."); loadChains(); }
                 })
-                .catch(function () { showMessage("Error de conexión.", true); });
-        }
-
-        function showMessage(text, isError) {
-            var el = document.getElementById("global-message");
-            el.hidden = false; el.textContent = text;
-            el.className = isError ? "error" : "success";
-            clearTimeout(showMessage._t);
-            showMessage._t = setTimeout(function () { el.hidden = true; }, 4000);
+                .catch(function () { showToast("Error de conexión.", "error"); });
         }
 
         loadChains();
