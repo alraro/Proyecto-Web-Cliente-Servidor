@@ -1,37 +1,52 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../css/common.css';
 import '../css/layout.css';
 import '../css/admin.css';
 import '../css/responsible-store.css';
 
-const API_BASE = 'http://localhost:8080';
+const sampleStore = {
+    name: 'ECHEVERRIA',
+    address: 'Avda Pio Baroja, 6',
+    postalCode: '29017',
+    locality: 'Alameda',
+    zone: 'Antequera',
+    chainName: 'CARREFOUR',
+    scheduledShifts: [
+        {
+            campaignName: 'Spring Campaign',
+            volunteerName: 'Arantxa',
+            endTime: '2026-05-09 14:00',
+            attendance: true,
+            notes: 'Llego temprano'
+        },
+        {
+            campaignName: 'Spring Campaign',
+            volunteerName: 'Diego Vazquez',
+            endTime: '2026-05-10 12:00',
+            attendance: false,
+            notes: 'No se presento'
+        }
+    ]
+};
 
-function authHeaders() {
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('token')
-    };
-}
-
-function InfoTienda({ tienda }) {
-    const campos = [
-        { label: 'Nombre',        valor: tienda.name       },
-        { label: 'Domicilio',     valor: tienda.address    },
-        { label: 'Código postal', valor: tienda.postalCode },
-        { label: 'Localidad',     valor: tienda.locality   },
-        { label: 'Zona geog.',    valor: tienda.zone       },
-        { label: 'Cadena',        valor: tienda.chainName  },
+function StoreInfo({ store }) {
+    const fields = [
+        { label: 'Nombre', value: store.name },
+        { label: 'Direccion', value: store.address },
+        { label: 'Codigo postal', value: store.postalCode },
+        { label: 'Localidad', value: store.locality },
+        { label: 'Zona', value: store.zone },
+        { label: 'Cadena', value: store.chainName }
     ];
 
     return (
         <section className="card" id="card-tienda">
-            <h2 id="store-title">{tienda.name || 'Tienda'}</h2>
+            <h2 id="store-title">{store.name || 'Tienda'}</h2>
             <div className="info-grid">
-                {campos.map(c => (
-                    <div key={c.label} className="info-item">
-                        <label>{c.label}</label>
-                        <span>{c.valor || '—'}</span>
+                {fields.map(field => (
+                    <div key={field.label} className="info-item">
+                        <label>{field.label}</label>
+                        <span>{field.value || 'N/A'}</span>
                     </div>
                 ))}
             </div>
@@ -39,32 +54,31 @@ function InfoTienda({ tienda }) {
     );
 }
 
-// Fila de un turno
-function TurnoRow({ turno }) {
-    let badgeClase = 'badge-pending';
-    let badgeTexto = 'Pendiente';
-    if (turno.attendance === true)  { badgeClase = 'badge-attendance badge-yes'; badgeTexto = '✓ Sí'; }
-    if (turno.attendance === false) { badgeClase = 'badge-attendance badge-no';  badgeTexto = '✗ No'; }
+function ShiftRow({ shift }) {
+    let badgeClass = 'badge-pending';
+    let badgeText = 'Pendiente';
+    if (shift.attendance === true) { badgeClass = 'badge-attendance badge-yes'; badgeText = 'Si'; }
+    if (shift.attendance === false) { badgeClass = 'badge-attendance badge-no'; badgeText = 'No'; }
 
     return (
         <tr>
-            <td>{turno.campaignName || '—'}</td>
-            <td>{turno.volunteerName || '—'}</td>
-            <td>{turno.endTime || '—'}</td>
-            <td><span className={`badge-attendance ${badgeClase}`}>{badgeTexto}</span></td>
-            <td>{turno.notes || '—'}</td>
+            <td>{shift.campaignName || 'N/A'}</td>
+            <td>{shift.volunteerName || 'N/A'}</td>
+            <td>{shift.endTime || 'N/A'}</td>
+            <td><span className={`badge-attendance ${badgeClass}`}>{badgeText}</span></td>
+            <td>{shift.notes || 'N/A'}</td>
         </tr>
     );
 }
 
-function TablaTurnos({ turnos }) {
+function ShiftsTable({ shifts }) {
     return (
         <section className="card" id="card-turnos">
             <h2>Turnos programados</h2>
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>Campaña</th>
+                        <th>Campana</th>
                         <th>Voluntario</th>
                         <th>Fin del turno</th>
                         <th>Asistencia</th>
@@ -72,12 +86,12 @@ function TablaTurnos({ turnos }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {!turnos || turnos.length === 0 ? (
+                    {!shifts || shifts.length === 0 ? (
                         <tr>
                             <td colSpan={5} className="table-empty">No hay turnos programados.</td>
                         </tr>
                     ) : (
-                        turnos.map((t, i) => <TurnoRow key={i} turno={t} />)
+                        shifts.map((shift, index) => <ShiftRow key={index} shift={shift} />)
                     )}
                 </tbody>
             </table>
@@ -86,52 +100,18 @@ function TablaTurnos({ turnos }) {
 }
 
 export default function ResponsibleStore() {
-    const [tienda, setTienda] = useState(null);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        cargarDetalleTienda();
-    }, []);
-
-    async function cargarDetalleTienda() {
-        const storeId = localStorage.getItem('storeId');
-        if (!storeId) {
-            setError('No tienes ninguna tienda asignada. Contacta con el administrador.');
-            setCargando(false);
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/api/stores/${storeId}/detail`, {
-                headers: authHeaders()
-            });
-
-            if (res.status === 403) { setError('No tienes permiso para ver esta tienda.'); setCargando(false); return; }
-            if (res.status === 404) { setError('Tienda no encontrada.'); setCargando(false); return; }
-            if (!res.ok) { setError('Error al cargar la información de la tienda.'); setCargando(false); return; }
-
-            const data = await res.json();
-            setTienda(data);
-        } catch {
-            setError('Error de conexión con el servidor.');
-        } finally {
-            setCargando(false);
-        }
-    }
-
     return (
         <div className="responsible-page">
             <header className="page-header">
                 <div className="page-header-row">
                     <div>
-                        <h1>Panel del Responsable</h1>
+                        <h1>Panel del responsable</h1>
                         <p>Consulta el estado de tu tienda y los turnos programados.</p>
                     </div>
                     <div className="topbar-right">
                         <span className="user-badge">
                             <span className="dot"></span>
-                            {localStorage.getItem('nombre') || 'Responsable'}
+                            Usuario responsable
                         </span>
                         <Link to="/login" className="btn btn-secondary btn-sm">Cerrar sesion</Link>
                     </div>
@@ -139,16 +119,8 @@ export default function ResponsibleStore() {
             </header>
 
             <main className="page-main">
-                {cargando && <p className="table-empty">Cargando informacion de tu tienda...</p>}
-
-                {!cargando && error && <p className="error-msg" id="error-msg">{error}</p>}
-
-                {!cargando && tienda && (
-                    <>
-                        <InfoTienda tienda={tienda} />
-                        <TablaTurnos turnos={tienda.scheduledShifts} />
-                    </>
-                )}
+                <StoreInfo store={sampleStore} />
+                <ShiftsTable shifts={sampleStore.scheduledShifts} />
             </main>
         </div>
     );

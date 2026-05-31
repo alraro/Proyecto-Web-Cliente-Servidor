@@ -1,138 +1,126 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../css/common.css';
 import '../css/layout.css';
 import '../css/admin.css';
 import '../css/admin-stores.css';
 
-const API_BASE = 'http://localhost:8080';
+const sampleChains = [
+    { id: 1, name: 'CARREFOUR' },
+    { id: 2, name: 'DIA' },
+    { id: 9, name: 'MERCADONA' }
+];
 
-function authHeaders() {
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('token')
-    };
-}
+const sampleZones = [
+    { id: 1, name: 'Antequera' },
+    { id: 7, name: 'Malaga' }
+];
 
-// Barra de filtros
-function FiltrosTiendas({ cadenas, zonas, localidades, onAplicar, onLimpiar }) {
-    const [filterChain, setFilterChain] = useState('');
-    const [filterZone, setFilterZone] = useState('');
-    const [filterLocality, setFilterLocality] = useState('');
+const sampleLocalities = [
+    { id: 1, name: 'Alameda', zoneId: 1 },
+    { id: 12, name: 'Antequera', zoneId: 1 },
+    { id: 37, name: 'Malaga', zoneId: 7 }
+];
 
-    const localidadesFiltradas = filterZone
-        ? localidades.filter(l => String(l.zoneId) === String(filterZone))
-        : localidades;
+const sampleStores = [
+    {
+        id: 1,
+        name: 'ECHEVERRIA',
+        address: 'Avda Pio Baroja, 6',
+        localityId: 37,
+        localityName: 'Malaga',
+        postalCode: '29017',
+        zoneId: 7,
+        zoneName: 'Malaga',
+        chainId: 1,
+        chainName: 'CARREFOUR'
+    },
+    {
+        id: 14,
+        name: 'DIA',
+        address: 'Avda Malaga Oloroso 30',
+        localityId: 37,
+        localityName: 'Malaga',
+        postalCode: '29014',
+        zoneId: 7,
+        zoneName: 'Malaga',
+        chainId: 2,
+        chainName: 'DIA'
+    }
+];
 
-    function handleZoneChange(e) {
-        setFilterZone(e.target.value);
-        setFilterLocality('');
+function StoreFilters({ chains, zones, localities, onApply, onClear }) {
+    const [chainId, setChainId] = useState('');
+    const [zoneId, setZoneId] = useState('');
+    const [localityId, setLocalityId] = useState('');
+
+    const filteredLocalities = zoneId
+        ? localities.filter(locality => String(locality.zoneId) === String(zoneId))
+        : localities;
+
+    function handleZoneChange(event) {
+        setZoneId(event.target.value);
+        setLocalityId('');
     }
 
-    function handleLimpiar() {
-        setFilterChain('');
-        setFilterZone('');
-        setFilterLocality('');
-        onLimpiar();
+    function handleClear() {
+        setChainId('');
+        setZoneId('');
+        setLocalityId('');
+        onClear();
     }
 
     return (
         <div className="filters-bar">
-            <select value={filterChain} onChange={e => setFilterChain(e.target.value)}>
+            <select value={chainId} onChange={event => setChainId(event.target.value)}>
                 <option value="">Todas las cadenas</option>
-                {cadenas.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {chains.map(chain => <option key={chain.id} value={chain.id}>{chain.name}</option>)}
             </select>
 
-            <select value={filterZone} onChange={handleZoneChange}>
+            <select value={zoneId} onChange={handleZoneChange}>
                 <option value="">Todas las zonas</option>
-                {zonas.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
+                {zones.map(zone => <option key={zone.id} value={zone.id}>{zone.name}</option>)}
             </select>
 
-            <select value={filterLocality} onChange={e => setFilterLocality(e.target.value)}>
+            <select value={localityId} onChange={event => setLocalityId(event.target.value)}>
                 <option value="">Todas las localidades</option>
-                {localidadesFiltradas.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                {filteredLocalities.map(locality => (
+                    <option key={locality.id} value={locality.id}>{locality.name}</option>
+                ))}
             </select>
 
-            <button className="btn btn-primary btn-sm" onClick={() => onAplicar({ filterChain, filterZone, filterLocality })}>
+            <button className="btn btn-primary btn-sm" onClick={() => onApply({ chainId, zoneId, localityId })}>
                 Aplicar filtros
             </button>
-            <button className="btn btn-secondary btn-sm" onClick={handleLimpiar}>
+            <button className="btn btn-secondary btn-sm" onClick={handleClear}>
                 Limpiar
             </button>
         </div>
     );
 }
 
-// Componente principal
 export default function AdminStores() {
-    const [tiendas, setTiendas] = useState([]);
-    const [cadenas, setCadenas] = useState([]);
-    const [zonas, setZonas] = useState([]);
-    const [localidades, setLocalidades] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState('');
-    const [filtros, setFiltros] = useState({});
-    const [paginaActual, setPaginaActual] = useState(0);
-    const [totalPaginas, setTotalPaginas] = useState(1);
-    const tamPagina = 20;
+    const [filters, setFilters] = useState({ chainId: '', zoneId: '', localityId: '' });
 
-    useEffect(() => {
-        cargarDatosAuxiliares();
-    }, []);
+    const filteredStores = sampleStores.filter(store => {
+        if (filters.chainId && String(store.chainId) !== String(filters.chainId)) return false;
+        if (filters.zoneId && String(store.zoneId) !== String(filters.zoneId)) return false;
+        if (filters.localityId && String(store.localityId) !== String(filters.localityId)) return false;
+        return true;
+    });
 
-    useEffect(() => {
-        cargarTiendas(paginaActual, filtros);
-    }, [paginaActual, filtros]);
-
-    async function cargarDatosAuxiliares() {
-        try {
-            const [resCadenas, resLoc, resZonas] = await Promise.all([
-                fetch(`${API_BASE}/api/chains`, { headers: authHeaders() }),
-                fetch(`${API_BASE}/api/localities`, { headers: authHeaders() }),
-                fetch(`${API_BASE}/api/zones`, { headers: authHeaders() })
-            ]);
-            if (resCadenas.ok) setCadenas(await resCadenas.json());
-            if (resLoc.ok) setLocalidades(await resLoc.json());
-            if (resZonas.ok) setZonas(await resZonas.json());
-        } catch {}
+    function handleApplyFilters(nextFilters) {
+        setFilters(nextFilters);
     }
 
-    async function cargarTiendas(pagina = 0, filtrosActivos = {}) {
-        setCargando(true);
-        setError('');
-        const params = new URLSearchParams();
-        if (filtrosActivos.filterChain) params.append('chainId', filtrosActivos.filterChain);
-        if (filtrosActivos.filterLocality) params.append('localityId', filtrosActivos.filterLocality);
-        if (filtrosActivos.filterZone) params.append('zoneId', filtrosActivos.filterZone);
-        params.append('page', pagina);
-        params.append('size', tamPagina);
-
-        try {
-            const res = await fetch(`${API_BASE}/api/stores?${params}`, { headers: authHeaders() });
-            const data = await res.json();
-            setTiendas(data.content || []);
-            setTotalPaginas(data.totalPages || 1);
-        } catch {
-            setError('No se puede conectar con el servidor.');
-        } finally {
-            setCargando(false);
-        }
-    }
-
-    function handleAplicarFiltros(nuevosFiltros) {
-        setFiltros(nuevosFiltros);
-        setPaginaActual(0);
-    }
-
-    function handleLimpiarFiltros() {
-        setFiltros({});
-        setPaginaActual(0);
+    function handleClearFilters() {
+        setFilters({ chainId: '', zoneId: '', localityId: '' });
     }
 
     return (
         <div className="admin-page">
             <header className="page-header">
-                <h1>Gestión de Tiendas</h1>
+                <h1>Gestion de Tiendas</h1>
                 <nav className="admin-tabs" aria-label="Navegacion de administrador">
                     <Link className="admin-tab" to="/admin">Volver al panel</Link>
                     <Link className="admin-tab" to="/login">Cerrar sesion</Link>
@@ -140,64 +128,46 @@ export default function AdminStores() {
             </header>
 
             <main className="page-main">
-                <FiltrosTiendas
-                    cadenas={cadenas}
-                    zonas={zonas}
-                    localidades={localidades}
-                    onAplicar={handleAplicarFiltros}
-                    onLimpiar={handleLimpiarFiltros}
+                <StoreFilters
+                    chains={sampleChains}
+                    zones={sampleZones}
+                    localities={sampleLocalities}
+                    onApply={handleApplyFilters}
+                    onClear={handleClearFilters}
                 />
 
-                {error && <p className="error-msg">{error}</p>}
-
-                {cargando ? (
-                    <p className="table-empty">Cargando tiendas...</p>
-                ) : (
-                    <>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Dirección</th>
-                                    <th>Localidad</th>
-                                    <th>CP</th>
-                                    <th>Zona</th>
-                                    <th>Cadena</th>
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Direccion</th>
+                            <th>Localidad</th>
+                            <th>Codigo postal</th>
+                            <th>Zona</th>
+                            <th>Cadena</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredStores.length === 0 ? (
+                            <tr>
+                                <td colSpan={7} className="table-empty">No hay tiendas que coincidan con los filtros.</td>
+                            </tr>
+                        ) : (
+                            filteredStores.map(store => (
+                                <tr key={store.id}>
+                                    <td>{store.id}</td>
+                                    <td><strong>{store.name}</strong></td>
+                                    <td>{store.address || 'N/A'}</td>
+                                    <td>{store.localityName || 'N/A'}</td>
+                                    <td>{store.postalCode || 'N/A'}</td>
+                                    <td>{store.zoneName || 'N/A'}</td>
+                                    <td>{store.chainName || 'N/A'}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {tiendas.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={7} className="table-empty">No hay tiendas que coincidan con los filtros.</td>
-                                    </tr>
-                                ) : (
-                                    tiendas.map(s => (
-                                        <tr key={s.id}>
-                                            <td>{s.id}</td>
-                                            <td><strong>{s.name}</strong></td>
-                                            <td>{s.address || '—'}</td>
-                                            <td>{s.locality || '—'}</td>
-                                            <td>{s.postalCode || '—'}</td>
-                                            <td>{s.zone || '—'}</td>
-                                            <td>{s.chainName || '—'}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-
-                        <div className="pagination">
-                            <button className="btn btn-secondary btn-sm" disabled={paginaActual === 0} onClick={() => setPaginaActual(p => p - 1)}>
-                                ← Anterior
-                            </button>
-                            <span>Página {paginaActual + 1} de {totalPaginas}</span>
-                            <button className="btn btn-secondary btn-sm" disabled={paginaActual >= totalPaginas - 1} onClick={() => setPaginaActual(p => p + 1)}>
-                                Siguiente →
-                            </button>
-                        </div>
-                    </>
-                )}
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </main>
         </div>
     );
