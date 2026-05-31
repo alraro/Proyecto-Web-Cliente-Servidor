@@ -133,10 +133,9 @@ export default function AdminStores() {
         <div className="admin-page">
             <header className="page-header">
                 <h1>Gestión de Tiendas</h1>
-                <nav>
-                    <Link to="/admin/chains">Cadenas</Link>
-                    <Link to="/admin/dashboard">Dashboard</Link>
-                    <Link to="/login">Cerrar sesión</Link>
+                <nav className="admin-tabs" aria-label="Navegacion de administrador">
+                    <Link className="admin-tab" to="/admin">Volver al panel</Link>
+                    <Link className="admin-tab" to="/login">Cerrar sesion</Link>
                 </nav>
             </header>
 

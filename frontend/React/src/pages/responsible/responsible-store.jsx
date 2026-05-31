@@ -123,17 +123,25 @@ export default function ResponsibleStore() {
     return (
         <div className="responsible-page">
             <header className="page-header">
-                <h1>Panel del Responsable</h1>
-                <div className="header-info">
-                    <span>Bienvenido, {localStorage.getItem('nombre') || 'Responsable'}</span>
-                    <Link to="/login" className="btn btn-secondary btn-sm">Cerrar sesión</Link>
+                <div className="page-header-row">
+                    <div>
+                        <h1>Panel del Responsable</h1>
+                        <p>Consulta el estado de tu tienda y los turnos programados.</p>
+                    </div>
+                    <div className="topbar-right">
+                        <span className="user-badge">
+                            <span className="dot"></span>
+                            {localStorage.getItem('nombre') || 'Responsable'}
+                        </span>
+                        <Link to="/login" className="btn btn-secondary btn-sm">Cerrar sesion</Link>
+                    </div>
                 </div>
             </header>
 
             <main className="page-main">
-                {cargando && <p className="table-empty">Cargando información de tu tienda...</p>}
+                {cargando && <p className="table-empty">Cargando informacion de tu tienda...</p>}
 
-                {error && <p className="error-msg" id="error-msg">{error}</p>}
+                {!cargando && error && <p className="error-msg" id="error-msg">{error}</p>}
 
                 {!cargando && tienda && (
                     <>

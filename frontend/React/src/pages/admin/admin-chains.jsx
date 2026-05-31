@@ -40,10 +40,9 @@ export default function AdminChains() {
         <div className="admin-page">
             <header className="page-header">
                 <h1>Gestión de Cadenas</h1>
-                <nav>
-                    <Link to="/admin/dashboard">Dashboard</Link>
-                    <Link to="/admin/stores">Tiendas</Link>
-                    <Link to="/login" onClick={() => localStorage.clear()}>Cerrar sesión</Link>
+                <nav className="admin-tabs" aria-label="Navegacion de administrador">
+                    <Link className="admin-tab" to="/admin">Volver al panel</Link>
+                    <Link className="admin-tab" to="/login" onClick={() => localStorage.clear()}>Cerrar sesion</Link>
                 </nav>
             </header>
 
@@ -72,7 +71,7 @@ export default function AdminChains() {
                                         <td><strong>{c.name}</strong></td>
                                         <td><code>{c.code}</code></td>
                                         <td>
-                                            <span style={{ color: c.participation ? 'green' : '#888' }}>
+                                                <span className={`badge ${c.participation ? 'badge-yes' : 'badge-no'}`}>
                                                 {c.participation ? '✓ Sí' : '— No'}
                                             </span>
                                         </td>
