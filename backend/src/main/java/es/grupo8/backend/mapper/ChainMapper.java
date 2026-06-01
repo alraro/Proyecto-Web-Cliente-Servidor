@@ -1,3 +1,9 @@
+/**
+ * Mapeador entre ChainDTO y ChainEntity.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dto.ChainDTO;

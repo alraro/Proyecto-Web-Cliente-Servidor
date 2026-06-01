@@ -1,3 +1,9 @@
+/**
+ * Base generica para mapeo DTO-entidad.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.mapper;
 import java.util.Set;
 import java.util.List;

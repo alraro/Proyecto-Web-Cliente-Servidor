@@ -1,3 +1,10 @@
+/**
+ * Controlador REST para gestionar tiendas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
 import java.time.Instant;
