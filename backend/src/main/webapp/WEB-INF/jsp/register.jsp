@@ -1,3 +1,9 @@
+<!--
+-
+- Autores:
+-	- Hugo Herrero González: 90%
+-   - IA Generativa: 10 %
+-->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html lang="es">

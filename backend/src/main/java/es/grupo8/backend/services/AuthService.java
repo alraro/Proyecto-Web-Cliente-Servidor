@@ -1,3 +1,9 @@
+/*
+*
+* Autores:
+*	- Hugo Herrero González: 60%
+*   - IA Generativa: 40%
+*/
 package es.grupo8.backend.services;
 
 import java.nio.charset.StandardCharsets;

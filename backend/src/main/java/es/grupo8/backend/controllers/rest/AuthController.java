@@ -1,3 +1,10 @@
+/*
+* RestController para la autenticación de usuario, creación de cuenta y gestión de perfil.
+*
+* Autores:
+*	- Hugo Herrero González: 80%
+*	- IA Generativa: 20%
+*/
 package es.grupo8.backend.controllers.rest;
 import java.util.Map;
 

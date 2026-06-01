@@ -1,3 +1,11 @@
+/*
+* Repository para la gestión de datos de las campañas en las tiendas.
+*
+* Autores:
+*	- Hugo Herrero González: 50%
+*       - Alejandra Ortiz Robles: 10%
+*       - Fernando Luis Pinilla Molina: 40%
+*/
 package es.grupo8.backend.dao;
  
 import java.util.List;
@@ -30,10 +38,10 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
         void deleteByCampaignId(@Param("campaignId") Integer campaignId);
 
     // Cobertura por Cadena para una campaña concreta
-    @Query("select s.idChain.name, COUNT(DISTINCT s.id), COUNT(DISTINCT cs.idStore.id) " +
+    @Query("select s.idChain.name, count(distinct s.id), count(distinct cs.idStore.id) " +
             "from Store s " +
             "left join CampaignStore cs ON cs.idStore.id = s.id AND cs.idCampaign.id = :campaignId " +
-            "where s.idChain IS NOT NULL " +
+            "where s.idChain is not null " +
             "group by s.idChain.id, s.idChain.name " +
             "order by s.idChain.name")
     List<Object[]> coverageByChain(@Param("campaignId") Integer campaignId);
