@@ -1,3 +1,9 @@
+/**
+ * Controlador REST para la vista de responsable de tienda.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.controllers;
 
 import java.time.Instant;

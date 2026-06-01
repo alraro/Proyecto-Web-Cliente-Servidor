@@ -1,3 +1,9 @@
+/**
+ * DTO para transferir datos de tiendas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.dto;
 
 import lombok.Data;

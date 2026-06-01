@@ -1,3 +1,9 @@
+/**
+ * Servicio para obtener el detalle de la tienda del responsable.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
