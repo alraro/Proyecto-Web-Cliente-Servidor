@@ -11,11 +11,9 @@ public class AuthResponseDTO {
     private String phone;
     private String address;
     private String postalCode;
-
     private String role;
     private String redirectUrl;
     private Integer storeId;
-
     private String message;
     private String token;
     private String tokenType;
