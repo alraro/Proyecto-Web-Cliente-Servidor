@@ -92,7 +92,7 @@
                 });
 
                 if (document.querySelector('#kpiStatus')) {
-                    document.querySelector('#kpiStatus').textContent = campaigns.filter(c => c.active).length + " Activas";
+                    document.querySelector('#kpiStatus').textContent = campaigns.filter(c => c.active).length;
                 }
             } catch (e) {
                 showError(e.message);
@@ -106,14 +106,11 @@
             if (currentCampaignId) {
                 loadMetrics(currentCampaignId);
                 resetTimer();
-            } else {
-                showNoSelection();
             }
         }
 
         async function loadMetrics(campaignId) {
             if (!campaignId) return;
-            hideError();
 
             try {
                 const [chainData, localityData, zoneData] = await Promise.all([
@@ -137,15 +134,16 @@
             }
         }
 
+        // Actualizamos la clave de rendimiento con los datos de la cobertura
         function updateKPIs(chainData, zoneData) {
 
             const totalStores = chainData.reduce((s, c) => s + c.storesInCampaign, 0);
             const chainsActive = chainData.filter(c => c.storesInCampaign > 0).length;
             const zonesActive = zoneData.filter(z => z.storesInCampaign > 0).length;
 
-            document.querySelector('#kpiStores').textContent = totalStores;
-            document.querySelector('#kpiChains').textContent = chainsActive;
-            document.querySelector('#kpiZones').textContent = zonesActive;
+            document.querySelector('#kpiStores').textContent = totalStores; // Volumen total establecimientos en campaña seleccionada
+            document.querySelector('#kpiChains').textContent = chainsActive; // Volumen total de cadenas distintas en campaña seleccionada
+            document.querySelector('#kpiZones').textContent = zonesActive; // Volumen total de zonas geográficas distintas en campaña seleccionada
         }
 
         function renderChart(canvasId, data, type, dimensionLabel) {
@@ -219,20 +217,10 @@
             }
         }
 
-        function showNoSelection() {
-            document.querySelector('#kpiRow').classList.add('hidden');
-            document.querySelector('#chartsGrid').classList.add('hidden');
-            document.querySelector('#noSelection').classList.remove('hidden');
-        }
-
         function showError(msg) {
             const el = document.querySelector('#errorMsg');
             el.textContent = 'Error: ' + msg;
             el.classList.remove('hidden');
-        }
-
-        function hideError() {
-            document.querySelector('#errorMsg').classList.add('hidden');
         }
 
     </script>
