@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
-import Index from './pages/index';
-import Login from './pages/login';
-import Admin from './pages/admin/admin';
-import Dashboard from './pages/admin/admin-dashboard';
-import AdminChains from './pages/admin/admin-chains';
-import AdminStores from './pages/admin/admin-stores';
-import Coordinator from './pages/coordinator/coordinator';
-import Captain from './pages/captain/captain';
-import Colaborator from './pages/colaborator/colaborator';
-import Responsible from './pages/responsible/responsible-store';
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Admin from './pages/admin/Admin';
+import Dashboard from './pages/admin/AdminDashboard';
+import AdminChains from './pages/admin/AdminChains';
+import AdminStores from './pages/admin/AdminStores';
+import Coordinator from './pages/coordinator/Coordinator';
+import Captain from './pages/captain/Captain';
+import Colaborator from './pages/colaborator/Colaborator';
+import Responsible from './pages/responsible/ResponsibleStore';
+import ErrorPage from './pages/ErrorPage';
 
 import './App.css';
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/captain" element={<Captain />} />
         <Route path="/colaborator" element={<Colaborator />} />
         <Route path="/responsible" element={<Responsible />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   )
