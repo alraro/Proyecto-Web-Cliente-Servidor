@@ -1,3 +1,11 @@
+/**
+ * Controlador REST para gestionar usuarios.
+ *
+ * Autores:
+ * - Alfonso Ramos: 40%
+ * - Alejandra Ortiz: 40%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
 import java.util.List;

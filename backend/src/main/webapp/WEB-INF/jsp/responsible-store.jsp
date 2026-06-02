@@ -1,39 +1,60 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%--
+    Pagina de detalle de tienda del responsable.
+
+    Autores:
+    - Alejandra Ortiz: 100%
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token = (String) session.getAttribute("token");
+    String role = (String) session.getAttribute("role");
+
+    if (token == null || !"RESPONSABLE_TIENDA".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Mi Tienda</title>
-    <link rel="stylesheet" href="/css/administrador.css">
-    <link rel="stylesheet" href="/css/admin-validate-responsible.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/responsible-store.css">
 </head>
 <body>
 
-<header class="topbar" aria-label="Top navigation">
+<header class="topbar">
     <a class="brand" href="/index" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-    <div class="topbar-actions">
-        <span id="user-name">Responsable</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Responsable" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
     </div>
 </header>
 
-<main class="admin-page" aria-label="Responsible store page">
-    <section class="page-header">
+<main class="page-wrapper" aria-label="Responsible store page">
+    <div class="page-header">
         <h1>Mi tienda</h1>
         <p>Información de tu tienda asignada y turnos programados.</p>
-    </section>
+    </div>
 
-    <section class="card hidden" id="card-tienda" aria-label="Información de la tienda">
-        <h2 id="store-title">Cargando...</h2>
+    <div class="card hidden" id="card-tienda">
+        <div class="card-header"><h2 id="store-title">Cargando...</h2></div>
         <div class="info-grid" id="info-grid"></div>
-    </section>
+    </div>
 
-    <section class="card hidden section-gap" id="card-turnos" aria-label="Turnos programados">
-        <h2>Turnos programados</h2>
+    <div class="card hidden" id="card-turnos">
+        <div class="card-header"><h2>Turnos programados</h2></div>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -50,22 +71,26 @@
                 </tbody>
             </table>
         </div>
-    </section>
+    </div>
 
     <div id="error-msg" class="error-panel hidden"></div>
 </main>
 
+<div class="toast-container" id="toast-container"></div>
+
 <script>
     (function () {
-        var token = localStorage.getItem("token");
-        var role  = localStorage.getItem("role");
+        var token = '<%= token == null ? "" : token %>';
+        var storeId = '<%= session.getAttribute("storeId") == null ? "" : session.getAttribute("storeId") %>';
 
-        document.getElementById("user-name").textContent = localStorage.getItem("nombre") || "Responsable";
+        document.getElementById("btn-edit").addEventListener("click", function () {
+            window.location.href = "/edit";
+        });
         document.getElementById("btn-logout").addEventListener("click", function () {
-            localStorage.clear(); window.location.href = "/login";
+            window.location.href = "/logout";
         });
 
-        if (!token || role !== "RESPONSABLE_TIENDA") { window.location.href = "/login"; return; }
+        if (!token) { window.location.href = "/login"; return; }
 
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
@@ -73,7 +98,8 @@
 
         function showError(msg) {
             var el = document.getElementById("error-msg");
-            el.textContent = msg; el.classList.remove("hidden");
+            el.textContent = msg;
+            el.classList.remove("hidden");
         }
 
         function renderStoreInfo(store) {
@@ -83,59 +109,84 @@
             var fields = [
                 { label: "Nombre",        value: store.name       },
                 { label: "Domicilio",     value: store.address    },
-                { label: "C\u00f3digo postal", value: store.postalCode },
+                { label: "Código postal", value: store.postalCode },
                 { label: "Localidad",     value: store.locality   },
                 { label: "Zona geog.",    value: store.zone       },
                 { label: "Cadena",        value: store.chainName  }
             ];
 
-            var grid = document.getElementById("info-grid");
-            grid.innerHTML = "";
+            var infoGrid = document.getElementById("info-grid");
+            infoGrid.innerHTML = "";
             fields.forEach(function (f) {
                 var item = document.createElement("div");
                 item.className = "info-item";
-                item.innerHTML = "<label>" + f.label + "</label><span>" + (f.value || "\u2014") + "</span>";
-                grid.appendChild(item);
+
+                var label = document.createElement("label");
+                label.textContent = f.label;
+                item.appendChild(label);
+
+                var span = document.createElement("span");
+                span.textContent = f.value || "\u2014";
+                item.appendChild(span);
+
+                infoGrid.appendChild(item);
             });
         }
 
         function renderShifts(shifts) {
             document.getElementById("card-turnos").classList.remove("hidden");
             var tbody = document.getElementById("shifts-tbody");
-            tbody.innerHTML = "";
 
             if (!shifts || !shifts.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay turnos programados.</td></tr>';
+                tbody.innerHTML = "";
+                var tr = document.createElement("tr");
+                var td = document.createElement("td");
+                td.colSpan = 5; td.className = "table-empty";
+                td.textContent = "No hay turnos programados.";
+                tr.appendChild(td); tbody.appendChild(tr);
                 return;
             }
 
+            tbody.innerHTML = "";
             shifts.forEach(function (s) {
-                var badgeClass, badgeText;
-                if (s.attendance === true)  { badgeClass = "badge-attendance badge-yes";     badgeText = "\u2713 S\u00ed"; }
-                else if (s.attendance === false) { badgeClass = "badge-attendance badge-no"; badgeText = "\u2717 No"; }
-                else                        { badgeClass = "badge-attendance badge-pending"; badgeText = "Pendiente"; }
-
                 var tr = document.createElement("tr");
-                tr.innerHTML =
-                    "<td>" + (s.campaignName  || "\u2014") + "</td>" +
-                    "<td>" + (s.volunteerName || "\u2014") + "</td>" +
-                    "<td>" + (s.endTime       || "\u2014") + "</td>" +
-                    "<td><span class='" + badgeClass + "'>" + badgeText + "</span></td>" +
-                    "<td>" + (s.notes         || "\u2014") + "</td>";
+
+                var td0 = document.createElement("td"); td0.textContent = s.campaignName || "\u2014"; tr.appendChild(td0);
+                var td1 = document.createElement("td"); td1.textContent = s.volunteerName || "\u2014"; tr.appendChild(td1);
+                var td2 = document.createElement("td"); td2.textContent = s.endTime || "\u2014"; tr.appendChild(td2);
+
+                var td3 = document.createElement("td");
+                var attendanceBadge = document.createElement("span");
+                if (s.attendance === true) {
+                    attendanceBadge.className = "badge-attendance badge-yes";
+                    attendanceBadge.textContent = "\u2713 S\u00ed";
+                } else if (s.attendance === false) {
+                    attendanceBadge.className = "badge-attendance badge-no";
+                    attendanceBadge.textContent = "\u2717 No";
+                } else {
+                    attendanceBadge.className = "badge-attendance badge-pending";
+                    attendanceBadge.textContent = "Pendiente";
+                }
+                td3.appendChild(attendanceBadge); tr.appendChild(td3);
+
+                var td4 = document.createElement("td"); td4.textContent = s.notes || "\u2014"; tr.appendChild(td4);
+
                 tbody.appendChild(tr);
             });
         }
 
         function loadStoreDetail() {
-            var storeId = localStorage.getItem("storeId");
-            if (!storeId) { showError("No tienes ninguna tienda asignada. Contacta con el administrador."); return; }
+            if (!storeId) {
+                showError("No tienes ninguna tienda asignada. Contacta con el administrador.");
+                return;
+            }
 
             fetch("/api/stores/" + storeId + "/detail", { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401) { localStorage.clear(); window.location.href = "/login"; return null; }
+                    if (r.status === 401) { window.location.href = "/login"; return null; }
                     if (r.status === 403) { showError("No tienes permiso para ver esta tienda."); return null; }
                     if (r.status === 404) { showError("Tienda no encontrada."); return null; }
-                    if (!r.ok)            { showError("Error al cargar la información de la tienda."); return null; }
+                    if (!r.ok) { showError("Error al cargar la información de la tienda."); return null; }
                     return r.json();
                 })
                 .then(function (data) {
@@ -143,7 +194,9 @@
                     renderStoreInfo(data);
                     renderShifts(data.scheduledShifts);
                 })
-                .catch(function () { showError("Error de conexión con el servidor."); });
+                .catch(function () {
+                    showError("Error de conexión con el servidor.");
+                });
         }
 
         loadStoreDetail();

@@ -1,37 +1,29 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-    String contextPath = request.getContextPath();
-    Object pageTitleAttribute = request.getAttribute("pageTitle");
-    String pageTitle = pageTitleAttribute == null ? "Bancosol | Inicio de sesión" : pageTitleAttribute.toString();
-%>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<%= contextPath %>/css/login.css">
+    <title><%= request.getAttribute("pageTitle") %></title>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 
 <body>
 <header class="topbar topbar-login">
-    <a class="brand" href="<%= contextPath %>/" aria-label="Bancosol inicio">
-        <img src="<%= contextPath %>/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+    <a class="brand" href="/" aria-label="Bancosol inicio">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
     </a>
 
     <nav class="main-nav main-nav-login" id="main-nav">
-        <a href="<%= contextPath %>/">Inicio</a>
-        <a href="<%= contextPath %>/register">No tengo cuenta</a>
-        <a href="<%= contextPath %>/#contacto">Contacto</a>
+        <a href="/">Inicio</a>
+        <a href="/register">No tengo cuenta</a>
+        <a href="/#contacto">Contacto</a>
     </nav>
 </header>
 
 <main class="login-page">
     <section class="login-card" aria-labelledby="login-title">
         <div class="brand-lockup">
-            <img src="<%= contextPath %>/assets/Bancosol.png" alt="Bancosol" class="logo">
+            <img src="/assets/Bancosol.png" alt="Bancosol" class="logo">
             <div>
                 <p class="brand-name">Bancosol</p>
                 <p class="brand-subtitle">Acceso interno y colaborador</p>
@@ -43,7 +35,7 @@
             <p>Ingresa tus credenciales para entrar al espacio de trabajo.</p>
         </div>
 
-        <form id="login-form" class="login-form" method="post" action="<%= contextPath %>/login">
+        <form id="login-form" class="login-form" method="post" action="/login">
             <label for="email">Correo</label>
             <div class="input-shell">
                 <input id="email" name="email" type="email" placeholder="bancosolseguimiento@gmail.com" autocomplete="username" required>
@@ -56,12 +48,6 @@
                 <input id="password" name="password" type="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
             </div>
 
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" id="remember-me">
-                    <span>Recordar acceso</span>
-                </label>
-            </div>
 
             <button type="submit" class="login-button">Entrar al espacio</button>
             <% if (request.getAttribute("loginError") != null) { %>
@@ -71,14 +57,13 @@
             <% } else { %>
                 <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             <% } %>
-            <p class="form-message">Credenciales de prueba: bancosolseguimiento@gmail.com / hash_pendiente</p>
-            <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="<%= contextPath %>/register">Crear cuenta</a></p>
+            <p class="auth-switch">No tengo cuenta: <a class="forgot-link" href="/register">Crear cuenta</a></p>
         </form>
     </section>
 </main>
 
 <footer class="site-footer" aria-label="Pie de página">
-    <img src="<%= contextPath %>/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
+    <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
     <p>Bancosol · Banco de alimentos</p>
 </footer>
 </body>

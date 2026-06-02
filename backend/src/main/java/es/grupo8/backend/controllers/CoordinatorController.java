@@ -79,11 +79,6 @@ public class CoordinatorController {
 
         Integer userId = coordinatorGuard.extractUserId(authHeader);
         ShiftResponseDto created = shiftService.createShift(userId, request);
-
-        auditLog.info("ACTION=CREATE_SHIFT userId={} timestamp={} shiftId={} campaignId={} storeId={} day={} startTime={} endTime={}",
-                userId, Instant.now(), created.getShiftId(), created.getCampaignId(),
-                created.getStoreId(), created.getDay(), created.getStartTime(), created.getEndTime());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

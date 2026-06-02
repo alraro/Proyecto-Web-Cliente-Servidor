@@ -1,5 +1,11 @@
+/**
+ * Base generica para mapeo DTO-entidad.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.mapper;
-
+import java.util.Set;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,5 +20,14 @@ public abstract class MapperDTO<DTOClass, EntityClass> {
         return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Set<DTOClass> toDtoSet(Set<EntityClass> entities) {
+        if (entities == null) {
+            return Set.of();
+        }
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toSet());
     }
 }
