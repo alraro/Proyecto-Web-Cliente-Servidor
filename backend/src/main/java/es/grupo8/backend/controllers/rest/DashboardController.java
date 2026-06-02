@@ -1,3 +1,10 @@
+/*
+* RestController para la cobertura por tipos del dashboard.
+*
+* Autores:
+*	- Hugo Herrero González: 70%
+*	- IA Generativa: 30%
+*/
 package es.grupo8.backend.controllers.rest;
 
 import java.util.List;
@@ -6,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,14 +48,15 @@ public class DashboardController {
 
     // Cobertura por localidad
     @GetMapping("/campaigns/{id}/coverage/locality")
-    public ResponseEntity<List<CoverageItemDTO>> coverageByLocality(@PathVariable Integer id, @RequestHeader(value = "Authorization", required = false) String auth){
+    public ResponseEntity<List<CoverageItemDTO>> coverageByLocality(@PathVariable Integer id){
         List<CoverageItemDTO> result = dashboardService.getCoverageByLocality(id);
+
         return ResponseEntity.ok(result);
     }
 
     // Cobertura por zona geográfica
     @GetMapping("/campaigns/{id}/coverage/zone")
-    public ResponseEntity<List<CoverageItemDTO>> coverageByZone(@PathVariable Integer id, @RequestHeader(value = "Authorization", required = false) String auth){
+    public ResponseEntity<List<CoverageItemDTO>> coverageByZone(@PathVariable Integer id){
         List<CoverageItemDTO> result = dashboardService.getCoverageByZone(id);
         return ResponseEntity.ok(result);
     }

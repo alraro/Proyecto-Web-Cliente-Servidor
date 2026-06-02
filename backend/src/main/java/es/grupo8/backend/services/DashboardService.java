@@ -1,3 +1,9 @@
+/*
+* Service para la gestión de datos del dashboard.
+*
+* Autores:
+*	- Hugo Herrero González: 100%
+*/
 package es.grupo8.backend.services;
 
 import java.util.List;
@@ -8,7 +14,8 @@ import org.springframework.stereotype.Service;
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CoverageItemDTO;
-import es.grupo8.backend.mapper.DashboardMapper;
+import es.grupo8.backend.mapper.CampaignDashboardMapper;
+import es.grupo8.backend.mapper.CoverageItemDashboardMapper;
 
 
 @Service
@@ -18,26 +25,29 @@ public class DashboardService {
     private CampaignStoreRepository campaignStoreRepository;
 
     @Autowired
-    private DashboardMapper dashboardMapper;
+    private CampaignDashboardMapper campaignDashboardMapper;
+
+    @Autowired
+    private CoverageItemDashboardMapper coverageItemDashboardMapper;
 
 
     public List<CampaignDTO> getAllCampaignsCoverage() {
         List<Object[]> rows = campaignStoreRepository.coverageAllCampaigns();
-        return dashboardMapper.toCampaignSummaryDTOList(rows);
+        return campaignDashboardMapper.toDTOList(rows);
     }
 
     public List<CoverageItemDTO> getCoverageByChain(Integer campaignId) {
         List<Object[]> rows = campaignStoreRepository.coverageByChain(campaignId);
-        return dashboardMapper.toCoverageItemDTOList(rows);
+        return coverageItemDashboardMapper.toDTOList(rows);
     }
 
     public List<CoverageItemDTO> getCoverageByLocality(Integer campaignId) {
         List<Object[]> rows = campaignStoreRepository.coverageByLocality(campaignId);
-        return dashboardMapper.toCoverageItemDTOList(rows);
+        return coverageItemDashboardMapper.toDTOList(rows);
     }
 
     public List<CoverageItemDTO> getCoverageByZone(Integer campaignId) {
         List<Object[]> rows = campaignStoreRepository.coverageByZone(campaignId);
-        return dashboardMapper.toCoverageItemDTOList(rows);
+        return coverageItemDashboardMapper.toDTOList(rows);
     }
 }

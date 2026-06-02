@@ -1,3 +1,8 @@
+<!--
+-
+- Autores:
+-	- Hugo Herrero González: 100%
+-->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String token = (String) session.getAttribute("token");

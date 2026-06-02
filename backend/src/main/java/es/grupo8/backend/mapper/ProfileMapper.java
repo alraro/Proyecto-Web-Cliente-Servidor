@@ -1,3 +1,8 @@
+/*
+*
+* Autores:
+*	- Hugo Herrero González: 100%
+*/
 package es.grupo8.backend.mapper;
 
 import org.springframework.stereotype.Component;
@@ -14,9 +19,9 @@ public class ProfileMapper extends MapperDTO<ProfileDTO, UserEntity> {
         dto.setId(user.getIdUser());
         dto.setNombre(user.getName());
         dto.setEmail(user.getEmail());
-        dto.setTelefono(user.getPhone() == null ? "" : user.getPhone());
-        dto.setDomicilio(user.getAddress() == null ? "" : user.getAddress());
-        dto.setCp(user.getPostalCode() == null ? "" : user.getPostalCode());
+        dto.setTelefono(user.getPhone());
+        dto.setDomicilio(user.getAddress());
+        dto.setCp(user.getPostalCode());
         return dto;
     }
 }

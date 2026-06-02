@@ -1,3 +1,9 @@
+/*
+*
+* Autores:
+*	- Hugo Herrero González: 50%
+*   - Fernando Luis Pinilla Molina: 50%
+*/
 package es.grupo8.backend.dto;
 
 import lombok.Data;

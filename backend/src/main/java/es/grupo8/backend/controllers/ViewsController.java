@@ -1,3 +1,10 @@
+/*
+*
+*
+* Autores:
+*	- Hugo Herrero González: 90%
+*   - IA Generativa: 10%
+*/
 package es.grupo8.backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +25,7 @@ public class ViewsController {
     @Autowired
     private AuthService authService;
 
-    // Pagina de inicio
+    // Pagina de inicio, sirve tanto el / como el index, es lo mismo
 	@GetMapping({"/", "/index"})
 	public String doInit(Model model) {
 		model.addAttribute("pageTitle", "Bancosol | Inicio");

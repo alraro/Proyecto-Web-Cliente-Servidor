@@ -1,3 +1,9 @@
+/*
+*
+* Autores:
+*	- Hugo Herrero González: 90%
+*   - IA Generativa: 10%
+*/
 package es.grupo8.backend.dto;
 import lombok.Data;
 
