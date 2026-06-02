@@ -9,6 +9,7 @@ import Coordinator from './pages/coordinator/Coordinator';
 import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import Responsible from './pages/responsible/ResponsibleStore';
+import ErrorPage from './pages/ErrorPage';
 
 import './App.css';
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/captain" element={<Captain />} />
         <Route path="/colaborator" element={<Colaborator />} />
         <Route path="/responsible" element={<Responsible />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   )
