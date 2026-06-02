@@ -15,7 +15,7 @@ function Admin() {
     return (
         <SecurePage >
             <GenericPageWrapper>
-                <WelcomeBar name={username} role={role} description={descripcionHeader} />
+                <WelcomeBar username={username} role={role} description={descripcionHeader} />
                 <MenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
