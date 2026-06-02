@@ -1,6 +1,11 @@
 import logoBancosol from '../../assets/LOGO_BANCOSOL.png'
+import { Link } from 'react-router-dom';
 
-function GenericHeader() {
+function GenericHeader({ username }) {
+
+    const editProfileLink = "/edit-profile" // Placeholder, update with actual route when available
+    const logoutLink = "/logout" // Placeholder, update with actual route when available
+
     return (
         <>
             <header className="topbar">  
@@ -10,10 +15,14 @@ function GenericHeader() {
             <div className="topbar-right">
                 <div className="user-badge">
                     <span className="dot"></span>
-                <span id="user-name">NOMBRE GENERICO POR CAMBIAR CON COOKIES</span>
+                    <span id="user-name">{username}</span>
                 </div>
-                <button className="btn-edit" id="btn-edit">Editar perfil 🖉</button>
-                <button className="btn-logout" id="btn-logout">Cerrar sesión x</button>
+                <Link to={editProfileLink}>
+                    <button className="btn-edit" id="btn-edit">Editar perfil 🖉</button>
+                </Link>
+                <Link to={logoutLink}>
+                    <button className="btn-logout" id="btn-logout">Cerrar sesión x</button>
+                </Link>
             </div>
             </header>
         </>

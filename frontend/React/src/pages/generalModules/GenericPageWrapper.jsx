@@ -1,9 +1,9 @@
 import GenericHeader from "./GenericHeader"
 
-function GenericPageWrapper({children}) {
+function GenericPageWrapper({ headerUsername, children }) {
     return (
         <main className="page-wrapper">
-            <GenericHeader />
+            <GenericHeader username={headerUsername} />
             {children}
         </main>
     )
