@@ -10,6 +10,7 @@ import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import Responsible from './pages/responsible/ResponsibleStore';
 import ErrorPage from './pages/ErrorPage';
+import AdminVolunteers from './pages/admin/AdminVolunteers';
 
 import './App.css';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/chains" element={<AdminChains />} />
         <Route path="/admin/stores" element={<AdminStores />} />
+        <Route path="/admin/volunteers" element={<AdminVolunteers />} />
         <Route path="/coordinator" element={<Coordinator />} />
         <Route path="/captain" element={<Captain />} />
         <Route path="/colaborator" element={<Colaborator />} />

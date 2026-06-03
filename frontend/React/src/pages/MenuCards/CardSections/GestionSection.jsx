@@ -21,4 +21,11 @@ gestionCards.push({
     link: "/admin/stores"
 });
 
+gestionCards.push({
+    icon: "VL",
+    title: "Voluntarios",
+    description: "Gestionar voluntarios, asignar roles y responsabilidades.",
+    link: "/admin/volunteers"
+});
+
 export default gestionCards;
