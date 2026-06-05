@@ -1,4 +1,6 @@
 import {Link} from 'react-router'
+import logoBancosol from '../assets/LOGO_BANCOSOL.png';
+import Bancosol from '../assets/Bancosol.png';
 import {useState} from 'react'
 import './css/login.css'
 
@@ -15,7 +17,7 @@ function Login() {
         <div className="login-wrapper">
             <header className="topbar-login">
                 <div className="brand">
-                    <img src="/src/assets/LOGO_BANCOSOL.png" alt="Logo de Bancosol" className="logo" />
+                    <img src={logoBancosol} alt="Logo de Bancosol" className="logo" />
                 
                 </div>
 
@@ -30,7 +32,7 @@ function Login() {
                 <div className="login-card">
                     
                     <div className="brand-lockup">
-                        <img src="/src/assets/Bancosol.png" className="logo" />
+                        <img src={Bancosol} alt="Logo de Bancosol" className="logo" />
                         
                         <div>
                             <h3 className="brand-name">Bancosol</h3>
@@ -83,7 +85,7 @@ function Login() {
             <br></br>
 
             <footer className="site-footer">
-                <img src="/src/assets/LOGO_BANCOSOL.png" alt="Bancosol Logo" className="logo" />
+                <img src={logoBancosol} alt="Bancosol Logo" className="logo" />
                 <p>© Bancosol Alimentos. Todos los derechos reservados.</p>
             </footer>
 
