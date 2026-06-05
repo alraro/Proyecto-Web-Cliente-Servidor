@@ -47,15 +47,6 @@ public class CoordinatorController {
     @Autowired
     private CoordinatorGuard coordinatorGuard;
 
-    /**
-     * Create a new pickup shift for a campaign and store.
-     * Only accessible by Coordinator (RNF-03).
-     * Creates audit log on creation (RNF-15).
-     *
-     * @param authHeader JWT authorization header
-     * @param request    shift creation data
-     * @return the created shift DTO with 201 status
-     */
     @Operation(summary = "Crear turno de recogida", description = "Crea un nuevo turno de recogida para una campaña y tienda. Solo accesible por Coordinadores.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Turno creado correctamente",
@@ -82,15 +73,6 @@ public class CoordinatorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    /**
-     * Get shifts for a specific campaign, optionally filtered by store.
-     * Only accessible by Coordinator.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId required campaign identifier
-     * @param storeId    optional store identifier
-     * @return list of shift response DTOs
-     */
     @GetMapping
     public ResponseEntity<?> getShifts(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -106,13 +88,6 @@ public class CoordinatorController {
         return ResponseEntity.ok(shifts);
     }
 
-    /**
-     * Returns stores assigned to a campaign so the coordinator can select one when creating a shift.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId the campaign identifier
-     * @return list of simple store DTOs sorted by name
-     */
     @Operation(summary = "Tiendas de una campaña para el Coordinador",
             description = "Devuelve las tiendas asignadas a una campaña para que el coordinador pueda seleccionarla al crear un turno.")
     @ApiResponses(value = {
@@ -128,14 +103,6 @@ public class CoordinatorController {
         return ResponseEntity.ok(stores);
     }
 
-    /**
-     * Returns the shift calendar for a campaign grouped by store → day → time slot.
-     * Optimised for RNF-06 with only two database queries.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId required campaign identifier
-     * @return list of calendar store DTOs
-     */
     @Operation(summary = "Calendario de turnos por tienda, día y franja horaria",
                description = "Devuelve los turnos agrupados por tienda → día → franja para el panel visual.")
     @GetMapping("/calendar")
@@ -152,24 +119,12 @@ public class CoordinatorController {
         return ResponseEntity.ok(calendar);
     }
 
-    /**
-     * Handles validation and business rule errors returning HTTP 400.
-     *
-     * @param e the exception thrown by the service
-     * @return error response with the exception message
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", e.getMessage()));
     }
 
-    /**
-     * Handles entity-not-found errors returning HTTP 404.
-     *
-     * @param e the exception thrown by the service
-     * @return error response with the exception message
-     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
