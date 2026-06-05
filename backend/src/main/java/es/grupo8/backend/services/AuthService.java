@@ -1,8 +1,8 @@
 /*
 *
 * Autores:
-*	- Hugo Herrero González: 60%
-*   - IA Generativa: 40%
+*	- Hugo Herrero González: 70%
+*   - IA Generativa: 30%
 */
 package es.grupo8.backend.services;
 
