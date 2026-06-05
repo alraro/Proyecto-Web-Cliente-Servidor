@@ -1,9 +1,21 @@
-function Dashboard() {
+import React from 'react';
+import GenericPageWrapper from '../generalModules/GenericPageWrapper';
+import SecurePage from '../generalModules/SecurePage';
+import { useAuth } from '../auth/useAuthHook';
 
+function Dashboard() {
+    const { usuario } = useAuth();
+    const username = usuario?.nombre ?? 'Admin';    
+    const role = usuario?.role ?? 'ADMINISTRADOR';
+
+    
     return (
-        <div>
-            <h1>Página de dashboard de administrador</h1>
-        </div>
+        <SecurePage >
+            <GenericPageWrapper headerUsername={username}>
+                <p>Bienvenido al dashboard de administrador</p>
+            </GenericPageWrapper>
+
+        </SecurePage>
     );
 }
 export default Dashboard;

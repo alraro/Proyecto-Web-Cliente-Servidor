@@ -1,10 +1,20 @@
 import logoBancosol from '../../assets/LOGO_BANCOSOL.png'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
+import { useAuth } from '../auth/useAuthHook';
+import edit from '../Edit.jsx';
+
 
 function GenericHeader({ username }) {
 
-    const editProfileLink = "/edit-profile" // Placeholder, update with actual route when available
-    const logoutLink = "/logout" // Placeholder, update with actual route when available
+    const editProfileLink = "/edit" // Placeholder, update with actual route when available
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    }
+
 
     return (
         <>
@@ -20,9 +30,9 @@ function GenericHeader({ username }) {
                 <Link to={editProfileLink}>
                     <button className="btn-edit" id="btn-edit">Editar perfil 🖉</button>
                 </Link>
-                <Link to={logoutLink}>
-                    <button className="btn-logout" id="btn-logout">Cerrar sesión x</button>
-                </Link>
+                <button className="btn-logout" id="btn-logout" onClick={handleLogout}>
+                    Cerrar sesión x
+                </button>
             </div>
             </header>
         </>
