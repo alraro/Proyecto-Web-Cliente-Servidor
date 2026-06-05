@@ -1,9 +1,12 @@
 <!--
 -
 - Autores:
--	- Hugo Herrero González: 100%
+-	- Hugo Herrero González: 90%
+-   - IA Generativa: 5%
+-   - Página Internet: 5%
 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, es.grupo8.backend.entity.Campaign, es.grupo8.backend.dto.AdminDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String token = (String) session.getAttribute("token");
@@ -21,9 +24,9 @@
     List<AdminDTO> localityData = (List<AdminDTO>) request.getAttribute("localityData");    
     List<AdminDTO> zoneData = (List<AdminDTO>) request.getAttribute("zoneData");
 
-    String kpiStores = (String) request.getAttribute("kpiStores");
-    String kpiChains = (String) request.getAttribute("kpiChains");
-    String kpiZones = (String) request.getAttribute("kpiZones");
+    Long kpiStores = (Long) request.getAttribute("kpiStores");
+    Long kpiChains = (Long) request.getAttribute("kpiChains");
+    Long kpiZones = (Long) request.getAttribute("kpiZones");
     String kpiStatus = (String) request.getAttribute("kpiStatus");
 
 %>
@@ -67,11 +70,11 @@
     <section class="controls">
         <form method="get" action="/admin-dashboard">
             <label for="campaignSelect">Campaña:</label>
-            <select id="campaignSelect" name="campaignId">
+            <select id="campaignSelect" name="campaignId" onChange="this.form.submit()">
                 <option value="">Selecciona una campaña</option>
                 <% if (campaignsList != null) { %>
                     <% for (Campaign campaign : campaignsList) { %>
-                        <option value="<%= campaign.getId() %>" <%= (selectedCampaignId != null && selectedCampaignId == campaign.getId()) ? "selected" : "" )%>>
+                        <option value="<%= campaign.getId() %>" <%= (selectedCampaignId != null && selectedCampaignId == campaign.getId()) ? "selected" : ""  %>>
                             <%= campaign.getName() %>
                         </option>
                     <% }} %>
@@ -180,18 +183,63 @@
         });
     }
 
-    renderChart("chainChart",
-        [<% for (int i=0; i<chainData.size(); i++) {%>
-            "<%= chainData.get(i).getLabel() %>" <%= i< chainData.size() -1 ? "," : "" %>
-        <%}%>],
+    var chainLabels = [<% for (int i=0; i<chainData.size(); i++) {%>
+        "<%= chainData.get(i).getLabel() %>"<%= i<chainData.size()-1 ? "," : "" %>
+    <%}%>];
 
-        [<% for (int i=0; i<chainData.size(); i++) {%><%= chainData.get(i).getStoresInCampaign() %><%= i< chainData.size() -1 ? "," : "" %><%}%>],
-        [<% for (int i=0; i<chainData.size(); i++) {%><%= chainData.get(i).getTotal() %><%= i< chainData.size() -1 ? "," : "" %><%}%>],
-        [<% for (int i=0; i<chainData.size(); i++) {%><%= chainData.get(i).getPct() %><%= i< chainData.size() -1 ? "," : "" %><%}%>],
-        "x"
-    )
+    var chainCovered = [<% for (int i=0; i<chainData.size(); i++) {%>
+        <%= chainData.get(i).getStoresInCampaign() %><%= i<chainData.size()-1 ? "," : "" %>
+    <%}%>];
 
-    
+    var chainTotal =  [<% for (int i=0; i<chainData.size(); i++) {%>
+        <%= chainData.get(i).getTotalStores() %><%= i<chainData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var chainPct = [<% for (int i=0; i<chainData.size(); i++) {%>
+        <%= chainData.get(i).getCoveragePercentage() %><%= i<chainData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    renderChart("chainChart", chainLabels, chainCovered, chainTotal, chainPct, "x");
+
+
+
+    var localityLabels = [<% for (int i=0; i<localityData.size(); i++) {%>
+        "<%= localityData.get(i).getLabel() %>"<%= i<localityData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var localityCovered = [<% for (int i=0; i<localityData.size(); i++) {%>
+        <%= localityData.get(i).getStoresInCampaign() %><%= i<localityData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var localityTotal = [<% for (int i=0; i<localityData.size(); i++) {%>
+        <%= localityData.get(i).getTotalStores() %><%= i<localityData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var localityPct = [<% for (int i=0; i<localityData.size(); i++) {%>
+        <%= localityData.get(i).getCoveragePercentage() %><%= i<localityData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    renderChart("localityChart", localityLabels, localityCovered, localityTotal, localityPct, "x");
+
+
+
+    var zoneLabels = [<% for (int i=0; i<zoneData.size(); i++) {%>
+        "<%= zoneData.get(i).getLabel() %>"<%= i<zoneData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var zoneCovered = [<% for (int i=0; i<zoneData.size(); i++) {%>
+        <%= zoneData.get(i).getStoresInCampaign() %><%= i<zoneData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var zoneTotal = [<% for (int i=0; i<zoneData.size(); i++) {%>
+        <%= zoneData.get(i).getTotalStores() %><%= i<zoneData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    var zonePct = [<% for (int i=0; i<zoneData.size(); i++) {%>
+        <%= zoneData.get(i).getCoveragePercentage() %><%= i<zoneData.size()-1 ? "," : "" %>
+    <%}%>];
+
+    renderChart("zoneChart", zoneLabels, zoneCovered, zoneTotal, zonePct, "y");
 
 </script>
 <% } %>
