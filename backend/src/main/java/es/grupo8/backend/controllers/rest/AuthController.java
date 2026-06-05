@@ -116,7 +116,6 @@ public class AuthController {
 		String domicilio = request.getDomicilio();
 		String cp = request.getCp();
 
-		// Quitarlo y poner en service
 		ProfileDTO current = authService.getProfile(userId);
         if (current == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
