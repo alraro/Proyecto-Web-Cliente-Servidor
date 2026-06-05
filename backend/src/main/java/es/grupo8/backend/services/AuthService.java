@@ -67,8 +67,8 @@ public class AuthService {
 
     // Login
     public AuthResponseDTO login(String emailParam, String passwordParam) {
-        String email = normalizeEmail(emailParam);
-        String password = trimToNull(passwordParam);
+        String email = utils.normalizeEmail(emailParam);
+        String password = utils.trimToNull(passwordParam);
 
         if(email == null || password == null) return null;
 
@@ -76,10 +76,10 @@ public class AuthService {
         if (user == null) return null;
 
         String stored = user.getPassword();
-        if(!matchesPassword(password, stored)) return null;
+        if(!utils.matchesPassword(password, stored)) return null;
 
-        if(needsMigration(stored)) {
-            user.setPassword(hashPassword(password));
+        if(utils.needsMigration(stored)) {
+            user.setPassword(utils.hashPassword(password));
             userRepository.save(user);
         }
 
@@ -101,12 +101,12 @@ public class AuthService {
 
         UserEntity user = new UserEntity();
 
-        user.setName(trimToNull(nombreParam));
-        user.setEmail(normalizeEmail(emailParam));
-        user.setPhone(trimToNull(telefonoParam));
-        user.setPassword(hashPassword(trimToNull(passwordParam)));
-        user.setAddress(trimToNull(domicilioParam));
-        user.setPostalCode(trimToNull(cpParam));
+        user.setName(utils.trimToNull(nombreParam));
+        user.setEmail(utils.normalizeEmail(emailParam));
+        user.setPhone(utils.trimToNull(telefonoParam));
+        user.setPassword(utils.hashPassword(utils.trimToNull(passwordParam)));
+        user.setAddress(utils.trimToNull(domicilioParam));
+        user.setPostalCode(utils.trimToNull(cpParam));
 		
 		// Comprobamos datos obligatorios como nombre, email y contraseña
 		if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
@@ -114,17 +114,17 @@ public class AuthService {
 		}
 
 		// Validamos formato de email
-		if (!isValidEmail(user.getEmail())) {
+		if (!utils.isValidEmail(user.getEmail())) {
 			throw new IllegalArgumentException("El email no tiene un formato valido");
 		}
 
 		// Validamos formato telefono
-		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+		if (user.getPhone() != null && !utils.isValidPhone(user.getPhone())) {
 			throw new IllegalArgumentException("El telefono no tiene un formato valido");
 		}
 
 		// Validamos formato código postal
-		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+		if (user.getPostalCode() != null && !utils.isValidPostalCode(user.getPostalCode())) {
 			throw new IllegalArgumentException("El codigo postal no es valido");
 		}
 
@@ -161,24 +161,24 @@ public class AuthService {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if(user == null) return null;
 
-        user.setEmail(normalizeEmail(emailParam));
-        user.setPhone(trimToNull(telefonoParam));
-        user.setAddress(trimToNull(domicilioParam));
-        user.setPostalCode(trimToNull(cpParam));
+        user.setEmail(utils.normalizeEmail(emailParam));
+        user.setPhone(utils.trimToNull(telefonoParam));
+        user.setAddress(utils.trimToNull(domicilioParam));
+        user.setPostalCode(utils.trimToNull(cpParam));
 
 		if (user.getEmail() == null) {
 			throw new IllegalArgumentException("El email es obligatorio");
 		}
 
-		if (!isValidEmail(user.getEmail())) {
+		if (!utils.isValidEmail(user.getEmail())) {
 			throw new IllegalArgumentException("El email no tiene un formato valido");
 		}
 
-		if (user.getPhone() != null && !isValidPhone(user.getPhone())) {
+		if (user.getPhone() != null && !utils.isValidPhone(user.getPhone())) {
 			throw new IllegalArgumentException("El telefono no tiene un formato valido");
 		}
 
-		if (user.getPostalCode() != null && !isValidPostalCode(user.getPostalCode())) {
+		if (user.getPostalCode() != null && !utils.isValidPostalCode(user.getPostalCode())) {
 			throw new IllegalArgumentException("El codigo postal no es valido");
 		}
 
@@ -201,63 +201,6 @@ public class AuthService {
             return null;
         }
     }
-
-
-
-    // Métodos auxiliares
-	// Limpiador de textos, se asegura de no guardar textos vacíos o llenos de espacios
-	public static String trimToNull(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		String trimmed = value.trim();
-		return trimmed.isEmpty() ? null : trimmed;
-	}
-
-	// Normaliza el email convirtiéndolo a minúsculas y eliminando espacios innecesarios
-	public static String normalizeEmail(String email) {
-		String trimmed = trimToNull(email);
-		return trimmed == null ? null : trimmed.toLowerCase();
-	}
-
-	// Valida el formato del email usando una expresión regular simple
-	public static boolean isValidEmail(String email) {
-		return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
-	}
-
-	// Valida el formato del teléfono permitiendo dígitos, espacios, guiones y signos de más, con una longitud razonable.
-	public static boolean isValidPhone(String telefono) {
-		return telefono != null && telefono.matches("^[0-9+\\-\\s]{7,20}$");
-	}
-	
-	// Valida que el código postal tenga exactamente 5 dígitos y estén entre el 0 y 9, que no sean letras
-	public static boolean isValidPostalCode(String cp) {
-		return cp != null && cp.matches("^[0-9]{5}$");
-	}
-
-	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.
-	public static String hashPassword(String rawPassword) {
-		return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
-	}
-
-	// Verifica si la contraseña proporcionada coincide con la contraseña almacenada, manejando tanto contraseñas sin formato como contraseñas hashadas con BCrypt.
-	public static boolean matchesPassword(String rawPassword, String storedPassword) {
-		if (rawPassword == null || storedPassword == null) {
-			return false;
-		}
-
-		if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
-			return BCrypt.checkpw(rawPassword, storedPassword);
-		}
-
-		return rawPassword.equals(storedPassword);
-	}
-
-	// Determina si la contraseña almacenada necesita ser migrada a un formato hashado con BCrypt
-	public static boolean needsMigration(String storedPassword) {
-		return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
-	}
 
 	// Genera un token JWT que incluye el ID del usuario, su email y nombre como claims, con una fecha de expiración basada en la configuración.
 	private String generateToken(Integer userId, String email, String nombre) {
