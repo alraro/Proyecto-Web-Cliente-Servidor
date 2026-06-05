@@ -7,7 +7,10 @@ import MenuCardSection from '../MenuCards/MenuCardSection';
 import {useAuth} from '../auth/useAuthHook';
 
 function MenuCardsList({ role }) {
-    if(role === 'ADMINISTRADOR'){
+    const { usuario } = useAuth();
+    const activeRole = role ?? usuario?.role;
+
+    if(activeRole === 'ADMINISTRADOR'){
         return (
             <>
             <MenuCardSection title="Gestión" cards={gestionCards} />
@@ -16,7 +19,7 @@ function MenuCardsList({ role }) {
         );
     }
 
-    if (role === 'CAPITAN') {
+    if (activeRole === 'CAPITAN') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={capitanCards} />
@@ -24,7 +27,7 @@ function MenuCardsList({ role }) {
         )
     }
 
-    if (role === 'COORDINADOR') {
+    if (activeRole === 'COORDINADOR') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={coordinadorCards} />
@@ -32,13 +35,15 @@ function MenuCardsList({ role }) {
         )
     }
 
-    if (role === 'COLABORADOR') {
+    if (activeRole === 'COLABORADOR') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={colaboradorCards} />
             </>
         )
     }
+
+    return null;
 }
 
 export default MenuCardsList;

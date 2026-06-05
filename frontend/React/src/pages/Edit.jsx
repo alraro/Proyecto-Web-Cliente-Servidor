@@ -6,8 +6,6 @@ import {useState, useEffect} from 'react'
 import {useAuth} from './auth/useAuthHook'
 import './css/login.css'
 
-const API_BASE = 'http://localhost:8080';
-
 const ROLE_ROUTES = {
     ADMINISTRADOR: '/admin',
     COORDINADOR: '/coordinator',
@@ -18,36 +16,30 @@ const ROLE_ROUTES = {
 
 function Edit() {
     const navigate = useNavigate();
+    const {usuario} = useAuth();
+    const role = usuario?.role;
 
-    const [formData, setFormData] = useState({
-        nombre: '',
-        email: '',
-        telefono: '',
-        localidad: '',
-        domicilio: '',
-        cp: ''
-    });
+    const [profileData, setProfileData] = useState(null);
 
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
-
-    const {usuario} = useAuth();
-    const role = usuario?.role;
     const returnRoute = ROLE_ROUTES[role] || '/login';
 
-    // Cargamos los datos del usuario al montar el componente
+    // Cargamos los datos del usuario al entrar
     useEffect(() => {
         const loadProfile = async () => {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
 
             if(!token) {
-                navigate('/login');
+                setMessage('No se ha encontrado una sesión activa para cargar el perfil.');
+                setMessageType('error');
+                
+                setTimeout(() => navigate('/login'), 1500);
                 return;
             }
 
             try {
-                const res = await fetch(`${API_BASE}/api/auth/profile`, {
-                    method: 'GET',
+                const res = await fetch('/api/auth/profile', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -61,14 +53,8 @@ function Edit() {
                     return;
                 }
 
-                setFormData({
-                    nombre: data.nombre || localStorage.getItem('nombre') || '',
-                    email: data.email || '',
-                    telefono: data.telefono || '',
-                    localidad: data.localidad || '',
-                    domicilio: data.domicilio || '',
-                    cp: data.cp || ''
-                });
+                setProfileData(data);
+                
             } catch (e) {
                 console.log(e);
                 setMessage('Error de conexión. Intenta nuevamente.');
@@ -77,19 +63,14 @@ function Edit() {
         };
 
         loadProfile();
-    }, [navigate]);
+    }, [navigate, usuario]);
 
-
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData(prev => ({
-            ...prev, 
-            [name]: value
-        }));
-    };
 
     const validateForm = () => {
-        const {email, telefono, cp} = formData;
+        const email = profileData?.email || '';
+        const telefono = profileData?.telefono || '';
+        const domicilio = profileData?.domicilio || '';
+        const cp = profileData?.cp || '';
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -129,22 +110,23 @@ function Edit() {
             return;
         }
 
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         if(!token) {
-            navigate('/login');
+            setMessage('No se ha encontrado una sesión activa para guardar los cambios.');
+            setMessageType('error');
             return;
         }
 
         const data = {
-            email: formData.email.trim(),
-            telefono: formData.telefono.trim(),
-            domicilio: formData.domicilio.trim(),
-            cp: formData.cp.trim()
+            email: (profileData?.email || '').trim(),
+            telefono: (profileData?.telefono || '').trim(),
+            domicilio: (profileData?.domicilio || '').trim(),
+            cp: (profileData?.cp || '').trim()
         };
 
         try {
-            const res = await fetch(`${API_BASE}/api/auth/profile`, {
+            const res = await fetch('/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -153,10 +135,10 @@ function Edit() {
                 body: JSON.stringify(data)
             });
 
-            const data = await res.json();
+            const responsedata = await res.json();
 
             if(!res.ok) {
-                setMessage(data.message || 'Error al actualizar perfil');
+                setMessage(responsedata.message || 'Error al actualizar perfil');
                 setMessageType('error');
                 return;
             }
@@ -167,6 +149,7 @@ function Edit() {
             setTimeout(() => {
                 navigate(returnRoute);
             }, 1500);
+            return;
 
         } catch (e) {
             console.log(e);
@@ -176,12 +159,20 @@ function Edit() {
 
     };
 
+    const handleInputChange = (e) => {
+        const {name, value} = e.target;
+        setProfileData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     return (
         <div className="login-wrapper">
             <header className="topbar-login">
-                <Link className="brand" to="/" aria-label="Bancosol inicio">
+                <div className="brand">
                     <img src={logoBancosol} alt="Logo Bancosol" className="logo" />
-                </Link>
+                </div>
 
                 <nav className="main-nav-login">
                     <Link to={returnRoute} id="role-return-link">Mi panel</Link>
@@ -205,94 +196,44 @@ function Edit() {
                     <form id="edit-form" className="login-form register-form edit-form" onSubmit={handleSubmit}>
                         <div className="field-grid">
                             <div className="field-group">
-                                <label htmlFor="name">Nombre completo</label>
+                                <label>Nombre completo</label>
                                 <div className="input-shell readonly-shell">
-                                    <input 
-                                        id="name" 
-                                        name="nombre" 
-                                        type="text" 
-                                        value={formData.nombre} 
-                                        readOnly 
-                                        title="Este dato no se puede editar"
-                                    />
+                                    <label id="name" name="nombre">{profileData?.nombre}</label>
                                 </div>
                                 <p className="field-note">Este dato no se puede editar.</p>
                             </div>
 
                             <div className="field-group">
-                                <label htmlFor="email">Correo *</label>
+                                <label>Correo *</label>
                                 <div className="input-shell">
-                                    <input 
-                                        id="email" 
-                                        name="email" 
-                                        type="email" 
-                                        placeholder="usuario@bancosol.org" 
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required 
-                                    />
+                                    <input id="email" name="email" type="email" placeholder="usuario@bancosol.info" value={profileData?.email || ''}onChange={handleInputChange}required />
                                 </div>
                             </div>
                         </div>
 
                         <div className="field-grid">
                             <div className="field-group">
-                                <label htmlFor="telefono">Teléfono</label>
+                                <label>Teléfono</label>
                                 <div className="input-shell">
-                                    <input 
-                                        id="telefono" 
-                                        name="telefono" 
-                                        type="tel" 
-                                        placeholder="600123123" 
-                                        value={formData.telefono}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="field-group">
-                                <label htmlFor="localidad">Localidad</label>
-                                <div className="input-shell">
-                                    <input 
-                                        id="localidad" 
-                                        name="localidad" 
-                                        type="text" 
-                                        placeholder="Málaga" 
-                                        value={formData.localidad}
-                                        onChange={handleChange}
-                                    />
+                                    <input id="telefono" name="telefono" type="tel" placeholder="123456789" value={profileData?.telefono || ''}onChange={handleInputChange}/>
                                 </div>
                             </div>
                         </div>
 
                         <div className="field-grid">
                             <div className="field-group full-width">
-                                <label htmlFor="domicilio">Domicilio</label>
+                                <label>Domicilio</label>
                                 <div className="input-shell">
-                                    <input 
-                                        id="domicilio" 
-                                        name="domicilio" 
-                                        type="text" 
-                                        placeholder="Calle, número, piso..." 
-                                        value={formData.domicilio}
-                                        onChange={handleChange}
-                                    />
+                                    <input id="domicilio" name="domicilio" type="text" placeholder="Calle, número, piso..." value={profileData?.domicilio || ''}onChange={handleInputChange}/>
                                 </div>
                             </div>
                         </div>
 
                         <div className="field-grid">
                             <div className="field-group">
-                                <label htmlFor="cp">Código postal</label>
+                                <label>Código postal</label>
                                 <div className="input-shell">
-                                    <input 
-                                        id="cp" 
-                                        name="cp" 
-                                        type="text" 
-                                        placeholder="29001" 
-                                        value={formData.cp}
-                                        onChange={handleChange}
-                                    />
+                                    <input id="cp" name="cp" type="text" placeholder="29001" value={profileData?.cp || ''}onChange={handleInputChange}/>
                                 </div>
                             </div>
 
@@ -301,17 +242,9 @@ function Edit() {
 
                         <div className="edit-actions">
                             <button type="submit" className="login-button">Guardar cambios</button>
-                            <button 
-                                type="button" 
-                                className="secondary-button" 
-                                id="cancel-button"
-                                onClick={() => navigate(returnRoute)}
-                            >
-                                Cancelar
-                            </button>
+                            <button type="button" className="secondary-button" id="cancel-button"onClick={() => navigate(returnRoute)}>Cancelar</button>
                         </div>
 
-                        {/* Mensaje de estado (Error/Éxito) */}
                         {message && (
                             <p 
                                 className={`form-message ${messageType === 'error' ? 'is-error' : 'is-success'}`} 

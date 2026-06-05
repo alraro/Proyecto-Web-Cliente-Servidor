@@ -26,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/edit" element={<Edit />} />
+        
         <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />

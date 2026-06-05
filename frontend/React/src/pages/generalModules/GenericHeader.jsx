@@ -1,7 +1,6 @@
 import logoBancosol from '../../assets/LOGO_BANCOSOL.png'
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../auth/useAuthHook';
-import edit from '../Edit.jsx';
 
 
 function GenericHeader({ username }) {
@@ -19,9 +18,9 @@ function GenericHeader({ username }) {
     return (
         <>
             <header className="topbar">  
-            <a className="brand" href="index.html">
+            <div className="brand">
                 <img src={logoBancosol} alt="Bancosol" className="logo" />
-            </a>
+            </div>
             <div className="topbar-right">
                 <div className="user-badge">
                     <span className="dot"></span>
