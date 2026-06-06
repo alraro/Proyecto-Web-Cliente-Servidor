@@ -195,7 +195,16 @@ body {
 .badge-past { background: var(--color-muted-bg); color: var(--color-muted); padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
 
 /* Tables */
-.table-wrap { overflow-x: auto; }
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  
+  /* SOLUCIÓN AL SCROLL: Evita que el contenedor colapse a 0px bruscamente */
+  height: 600px;
+  overflow-y: auto;
+  
+  transition: height 0.3s ease-in-out;
+}
 
 table { width: 100%; border-collapse: collapse; }
 
