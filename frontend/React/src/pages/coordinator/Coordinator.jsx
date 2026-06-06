@@ -8,16 +8,13 @@ import SecurePage from '../generalModules/SecurePage';
 
 function Coordinator() {
 
-    const { usuario } = useAuth();
-    const username = usuario?.nombre ?? 'Coordinador';    
-    const role = usuario?.role ?? 'COORDINADOR';
     const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
 
     return (
         <SecurePage >
-            <GenericPageWrapper headerUsername={username}>
-                <WelcomeBar username={username} role={role} description={descripcionHeader} />
-                <MenuCardsList role={role} />
+            <GenericPageWrapper >
+                <WelcomeBar description={descripcionHeader} />
+                <MenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
     );

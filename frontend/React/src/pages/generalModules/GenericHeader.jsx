@@ -2,8 +2,10 @@ import logoBancosol from '../../assets/LOGO_BANCOSOL.png'
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../auth/useAuthHook';
 
+function GenericHeader() {
 
-function GenericHeader({ username }) {
+    const { usuario } = useAuth();
+    const username = usuario?.nombre ?? '----ESTE USUARIO NO TIENE NOMBRE----';
 
     const editProfileLink = "/edit" // Placeholder, update with actual route when available
     const { logout } = useAuth();

@@ -1,14 +1,21 @@
+import { useAuth } from '../auth/useAuthHook';
 
-function WelcomeBar({username, role, description}) {
+function WelcomeBar({ description }) {
+
+    const { usuario } = useAuth();
+
+    const username = usuario?.nombre ?? '----ESTE USUARIO NO TIENE NOMBRE----';    
+    const role = usuario?.role ?? '----ESTE USUARIO NO TIENE ROL----';
+
     return (
         <>
-        <div className="welcome-bar">
-            <div>
-                <h2>Bienvenido, {username}</h2>
-                <p>{description}</p>
+            <div className="welcome-bar">
+                <div>
+                    <h2>Bienvenido, {username}</h2>
+                    <p>{description}</p>
+                </div>
+                <span className="role-pill">{role}</span>
             </div>
-            <span className="role-pill">{role}</span>
-        </div>
         </>
     )
 }

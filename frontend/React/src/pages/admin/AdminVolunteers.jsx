@@ -134,7 +134,7 @@ function AdminVolunteers() {
     return (
         <>
             <SecurePage >
-                <GenericPageWrapper headerUsername={"-----Placeholder------"}>
+                <GenericPageWrapper >
                     <div>
                         <h1>Admin Volunteers</h1>
                         <nav className="admin-tabs" aria-label="Navegacion de administrador">

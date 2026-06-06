@@ -9,17 +9,13 @@ import WelcomeBar from '../generalModules/GenericWelcomeBar';
 import SecurePage from '../generalModules/SecurePage';
 
 function Admin() {
-
-    const { usuario } = useAuth();
-    const username = usuario?.nombre ?? 'Admin';    
-    const role = usuario?.role ?? 'ADMINISTRADOR';
     const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
 
     return (
         <SecurePage >
-            <GenericPageWrapper headerUsername={username}>
-                <WelcomeBar username={username} role={role} description={descripcionHeader} />
-                <MenuCardsList role={role} />
+            <GenericPageWrapper >
+                <WelcomeBar description={descripcionHeader} />
+                <MenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
     );

@@ -6,11 +6,11 @@ import pendingCards from '../MenuCards/CardSections/PendingSection';
 import MenuCardSection from '../MenuCards/MenuCardSection';
 import {useAuth} from '../auth/useAuthHook';
 
-function MenuCardsList({ role }) {
+function MenuCardsList() {
     const { usuario } = useAuth();
-    const activeRole = role ?? usuario?.role;
+    const role = usuario?.role ?? "";
 
-    if(activeRole === 'ADMINISTRADOR'){
+    if(role === 'ADMINISTRADOR'){
         return (
             <>
             <MenuCardSection title="Gestión" cards={gestionCards} />
@@ -19,7 +19,7 @@ function MenuCardsList({ role }) {
         );
     }
 
-    if (activeRole === 'CAPITAN') {
+    if (role === 'CAPITAN') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={capitanCards} />
@@ -27,7 +27,7 @@ function MenuCardsList({ role }) {
         )
     }
 
-    if (activeRole === 'COORDINADOR') {
+    if (role === 'COORDINADOR') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={coordinadorCards} />
@@ -35,7 +35,7 @@ function MenuCardsList({ role }) {
         )
     }
 
-    if (activeRole === 'COLABORADOR') {
+    if (role === 'COLABORADOR') {
         return (
             <>
             <MenuCardSection title="Gestión" cards={colaboradorCards} />
