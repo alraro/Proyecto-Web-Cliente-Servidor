@@ -15,11 +15,12 @@ function renderTableHeaders(headers, editRowFunction, deleteRowFunction) {
 	)
 }
 
-function renderTableRows(data, headers, editRowFunction, deleteRowFunction) {
+function renderTableRows(data, headers, editRowFunction, deleteRowFunction, filterCondition) {
 	return (
 		<>
 			<tbody>
 				{data.map((row, rowIndex) => (
+					(filterCondition ? filterCondition(row) : true) &&
 					<tr key={rowIndex}>
 						{Object.keys(headers).map((header, colIndex) => (
 							<td key={colIndex}>{row[header.toLowerCase().replace(' ', '_')]}</td>
@@ -43,7 +44,7 @@ function renderNoData() {
 	)
 }
 
-function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFunction=null, addRowFunction=null, itemName="Fila" }) {
+function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFunction=null, addRowFunction=null, itemName="Fila", onChangeSearch=null, filterCondition=null }) {
 
 	if (!headers) return (<div>No headers provided</div>);
 
@@ -60,11 +61,13 @@ function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFun
 						)}
 					</div>
 				</div>
+				<div className="filters-bar">
+					<input type="text" placeholder="Buscar..." className="search-field" onChange={(e) => onChangeSearch && onChangeSearch(e.target.value)}/>
+				</div>
 				<div className="table-wrap">
-
 					<table>
 						{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
-						{data && data.length > 0 && renderTableRows(data, headers, editRowFunction, deleteRowFunction)}
+						{data && data.length > 0 && renderTableRows(data, headers, editRowFunction, deleteRowFunction, filterCondition)}
 						{!data || data.length === 0 && renderNoData()}
 					</table>
 				</div>

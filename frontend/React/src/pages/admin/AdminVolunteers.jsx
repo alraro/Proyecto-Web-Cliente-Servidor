@@ -51,6 +51,8 @@ function AdminVolunteers() {
 
 	const [isAddingModalOpen, setIsAddingModalOpen] = useState(false);
 
+	const [filterString, setFilterString] = useState("");
+
 	useEffect(() => {
 		async function fetchPartnerEntities() {
 			try {
@@ -166,11 +168,13 @@ function AdminVolunteers() {
 		<>
 			<SecurePage >
 				<GenericPageWrapper >
-					<nav className="admin-tabs" aria-label="Navegacion de administrador">
-						<Link className="admin-tab" to="/admin">Volver al panel</Link>
-					</nav>
-					<h1>Voluntarios</h1>
-					<p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
+					<div className="page-header">
+						<nav>
+							<Link className="back-link-inline" to="/admin">← Volver al panel</Link>
+						</nav>
+						<h1>Voluntarios</h1>
+						<p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
+					</div>
 					{partnerEntitiesSelector(partnerEntities, setEntidadId)}
 					<GenericTable
 						title={`Voluntarios de ${partnerEntities.find(e => e.id === parseInt(entidadId))?.name || "Entidad"}`}
@@ -180,6 +184,8 @@ function AdminVolunteers() {
 						editRowFunction={handleEditVolunteer}
 						deleteRowFunction={handleDeleteVolunteer}
 						itemName="Voluntario"
+						onChangeSearch={setFilterString}
+						filterCondition={(volunteer) => volunteer.name.toLowerCase().includes(filterString.toLowerCase()) || volunteer.email.toLowerCase().includes(filterString.toLowerCase())}
 					/>
 					<GenericModal
 						key={selectedVolunteer?.id}
