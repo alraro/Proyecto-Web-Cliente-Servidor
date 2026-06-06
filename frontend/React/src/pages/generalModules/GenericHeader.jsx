@@ -14,7 +14,6 @@ function GenericHeader({ username }) {
         navigate('/login');
     }
 
-
     return (
         <>
             <header className="topbar">  

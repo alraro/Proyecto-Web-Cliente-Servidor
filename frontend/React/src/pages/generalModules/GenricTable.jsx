@@ -29,6 +29,16 @@ function renderTableRows(data, headers) {
 	)
 }
 
+function renderNoData() {
+	return (
+		<tbody>
+			<tr>
+				<td colSpan="100%">No existen datos disponibles</td>
+			</tr>
+		</tbody>
+	)
+}
+
 function GenericTable({ headers, data }) {
 
 	if (!headers) return (<div>No headers provided</div>);
@@ -37,7 +47,8 @@ function GenericTable({ headers, data }) {
 		<div className="table-wrapper">
 			<table>
 				{renderTableHeaders(headers)}
-				{renderTableRows(data, headers)}
+				{data && data.length > 0 && renderTableRows(data, headers)}
+				{!data || data.length === 0 && renderNoData()}
 			</table>
 		</div>
   	);

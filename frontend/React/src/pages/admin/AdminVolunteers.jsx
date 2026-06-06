@@ -1,15 +1,19 @@
 import GenericTable from "../generalModules/GenricTable";
 import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
+import GenericPageWrapper from "../generalModules/GenericPageWrapper";
 
 function partnerEntitiesSelector(partnerEntities, setEntidadId) {
     return (
-        <select name="entidadId" id="entidadId" onChange={(e) => setEntidadId(e.target.value)}>
-            {partnerEntities.map((entity) => (
-                <option key={entity.id} value={entity.id}>
-                    {entity.name}
-                </option>
-            ))}
-        </select>
+        <div className="filters-bar">
+            <select name="entidadId" id="entidadId" onChange={(e) => setEntidadId(e.target.value)}>
+                {partnerEntities.map((entity) => (
+                    <option key={entity.id} value={entity.id}>
+                        {entity.name}
+                    </option>
+                ))}
+            </select>
+        </div>
     );
 }
 
@@ -71,15 +75,21 @@ function AdminVolunteers() {
     }, [fullURL]);
 
     return (
-        <div>
-            <h1>Admin Volunteers</h1>
-            {partnerEntitiesSelector(partnerEntities, setEntidadId)}
-            <GenericTable
-                title="Volunteers"
-                headers={tableHeaders}
-                data={volunteersData}
-            />
-        </div>
+        <GenericPageWrapper headerUsername={"-----Placeholder------"}>
+            <div>
+                <h1>Admin Volunteers</h1>
+                <nav className="admin-tabs" aria-label="Navegacion de administrador">
+                    <Link className="admin-tab" to="/admin">Volver al panel</Link>
+                    <Link className="admin-tab" to="/login">Cerrar sesion</Link>
+                </nav>
+                {partnerEntitiesSelector(partnerEntities, setEntidadId)}
+                <GenericTable
+                    title="Volunteers"
+                    headers={tableHeaders}
+                    data={volunteersData}
+                    />
+            </div>
+        </GenericPageWrapper>
     );
 }
 
