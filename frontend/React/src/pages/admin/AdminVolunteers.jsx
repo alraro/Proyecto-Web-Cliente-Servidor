@@ -13,10 +13,13 @@ const VOLUNTEER_FIELDS = [
 	{ name: "address", label: "Dirección", type: "text" },
 ];
 
-function partnerEntitiesSelector(partnerEntities, setEntidadId) {
+function partnerEntitiesSelector(partnerEntities, setEntidadId, setIsLoading) {
 	return (
 		<div className="filters-bar">
-			<select name="entidadId" id="entidadId" onChange={(e) => setEntidadId(e.target.value)}>
+			<select name="entidadId" id="entidadId" onChange={(e) => {
+				setEntidadId(e.target.value);
+				setIsLoading(true);
+			}}>
 				{partnerEntities.map((entity) => (
 					<option key={entity.id} value={entity.id}>
 						{entity.name}
@@ -53,6 +56,8 @@ function AdminVolunteers() {
 
 	const [filterString, setFilterString] = useState("");
 
+	const [isLoading, setIsLoading] = useState(true);
+
 	useEffect(() => {
 		async function fetchPartnerEntities() {
 			try {
@@ -86,6 +91,8 @@ function AdminVolunteers() {
 				setVolunteersData(data);
 			} catch (error) {
 				console.error("Error fetching volunteers data:", error);
+			} finally {
+				setIsLoading(false);
 			}
 		};
 		fetchVolunteersData()
@@ -175,7 +182,7 @@ function AdminVolunteers() {
 						<h1>Voluntarios</h1>
 						<p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
 					</div>
-					{partnerEntitiesSelector(partnerEntities, setEntidadId)}
+					{partnerEntitiesSelector(partnerEntities, setEntidadId, setIsLoading)}
 					<GenericTable
 						title={`Voluntarios de ${partnerEntities.find(e => e.id === parseInt(entidadId))?.name || "Entidad"}`}
 						headers={tableHeaders}
@@ -186,6 +193,7 @@ function AdminVolunteers() {
 						itemName="Voluntario"
 						onChangeSearch={setFilterString}
 						filterCondition={(volunteer) => volunteer.name.toLowerCase().includes(filterString.toLowerCase()) || volunteer.email.toLowerCase().includes(filterString.toLowerCase())}
+						isLoading={isLoading}
 					/>
 					<GenericModal
 						key={selectedVolunteer?.id}

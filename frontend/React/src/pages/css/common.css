@@ -1138,3 +1138,13 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
 
 /* Dashboard main */
 .dashboard-main { padding: 1.5rem; max-width: 1400px; margin: auto; }
+
+
+.loading-message {
+    text-align: center;
+    height: max-content;
+    width: max-content;
+    padding: 3rem;
+    font-size: 1rem;
+    color: var(--color-gray-light);
+}

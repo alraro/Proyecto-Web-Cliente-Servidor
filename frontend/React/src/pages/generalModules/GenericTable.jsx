@@ -16,12 +16,23 @@ function renderTableHeaders(headers, editRowFunction, deleteRowFunction) {
 	)
 }
 
-function renderTableRows(data, headers, editRowFunction, deleteRowFunction, filterCondition) {
+function renderTableRows(data, headers, editRowFunction, deleteRowFunction, isLoading) {
 	return (
 		<>
 			<tbody>
 				<AnimatePresence >
-					{data.length > 0 ? (
+					{isLoading ? (
+						<motion.tr
+							key="loading-state"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+						>
+							<td colSpan="100%" className='loading-message'>
+								<div className="spinner-loader">Cargando datos...</div>
+							</td>
+						</motion.tr>
+					) : data.length > 0 ? (
 						data.map((row, rowIndex) => (
 						<motion.tr
 							key={row.id}
@@ -56,7 +67,18 @@ function renderTableRows(data, headers, editRowFunction, deleteRowFunction, filt
 	)
 }
 
-function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFunction=null, addRowFunction=null, itemName="Fila", onChangeSearch=null, filterCondition=null }) {
+function GenericTable({
+	title,
+	headers,
+	data = [],
+	editRowFunction=null,
+	deleteRowFunction=null,
+	addRowFunction=null,
+	itemName="Fila",
+	onChangeSearch=null,
+	filterCondition=null,
+	isLoading=false
+}) {
 
 	if (!headers) return (<div>No headers provided</div>);
 
@@ -81,7 +103,7 @@ function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFun
 				<div className="table-wrap">
 					<table>
 						{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
-						{renderTableRows(data, headers, editRowFunction, deleteRowFunction)}
+						{renderTableRows(data, headers, editRowFunction, deleteRowFunction, isLoading)}
 					</table>
 				</div>
 			</div>
