@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import GenericPageWrapper from "../generalModules/GenericPageWrapper";
 import '../css/common.css';
+import SecurePage from "../generalModules/SecurePage";
 
 const VOLUNTEER_FIELDS = [
     { name: "id", label: "ID", type: "text", readOnly: true },
@@ -99,7 +100,7 @@ function AdminVolunteers() {
 
     async function handleSaveVolunteer(formData) {
         try {
-            const response = await fetch(`${apiUrl}${volunteersEndpoint}/${formData.id}`, {
+            const response = await fetch(`${apiUrl}${volunteersEndpoint}/${formData.id}?entidadId=${entidadId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -116,32 +117,50 @@ function AdminVolunteers() {
         }
     }
 
+    async function handleDeleteVolunteer(volunteer) {
+        try {
+            const response = await fetch(`${apiUrl}${volunteersEndpoint}/${volunteer.id}?entidadId=${entidadId}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setVolunteersData((prev) => prev.filter((v) => v.id !== volunteer.id));
+        } catch (error) {
+            console.error("Error deleting volunteer:", error);
+        }
+    }
+
     return (
-        <GenericPageWrapper headerUsername={"-----Placeholder------"}>
-            <div>
-                <h1>Admin Volunteers</h1>
-                <nav className="admin-tabs" aria-label="Navegacion de administrador">
-                    <Link className="admin-tab" to="/admin">Volver al panel</Link>
-                    <Link className="admin-tab" to="/login">Cerrar sesion</Link>
-                </nav>
-                {partnerEntitiesSelector(partnerEntities, setEntidadId)}
-                <GenericTable
-                    title="Volunteers"
-                    headers={tableHeaders}
-                    data={volunteersData}
-                    editRowFunction={handleEditVolunteer}
-                    deleteRowFunction={() => {console.log("Eliminando voluntario")}}
-                    />
-                <GenericModal
-                    title="Editar Voluntario"
-                    fields={VOLUNTEER_FIELDS}
-                    values={selectedVolunteer}
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    onSubmit={handleSaveVolunteer}
-                />
-            </div>
-        </GenericPageWrapper>
+        <>
+            <SecurePage >
+                <GenericPageWrapper headerUsername={"-----Placeholder------"}>
+                    <div>
+                        <h1>Admin Volunteers</h1>
+                        <nav className="admin-tabs" aria-label="Navegacion de administrador">
+                            <Link className="admin-tab" to="/admin">Volver al panel</Link>
+                            <Link className="admin-tab" to="/login">Cerrar sesion</Link>
+                        </nav>
+                        {partnerEntitiesSelector(partnerEntities, setEntidadId)}
+                        <GenericTable
+                            title="Volunteers"
+                            headers={tableHeaders}
+                            data={volunteersData}
+                            editRowFunction={handleEditVolunteer}
+                            deleteRowFunction={handleDeleteVolunteer}
+                            />
+                        <GenericModal
+                            title="Editar Voluntario"
+                            fields={VOLUNTEER_FIELDS}
+                            values={selectedVolunteer}
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                            onSubmit={handleSaveVolunteer}
+                        />
+                    </div>
+                </GenericPageWrapper>
+            </SecurePage>
+        </>
     );
 }
 
