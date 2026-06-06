@@ -156,18 +156,32 @@ public class AuthService {
     }
 
 
-    public ProfileDTO updateProfile(Integer userId, String emailParam, String telefonoParam, String domicilioParam, String cpParam) {
+    public ProfileDTO updateProfile(Integer userId, String emailParam, String passwordParam, String confirmPasswordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = userRepository.findById(userId).orElse(null);
         if(user == null) return null;
 
         user.setEmail(utils.normalizeEmail(emailParam));
+		user.setPassword(utils.hashPassword(utils.trimToNull(passwordParam)));
+		user.setConfirmPassword(utils.hashPassword(utils.trimToNull(confirmPasswordParam)));
         user.setPhone(utils.trimToNull(telefonoParam));
         user.setAddress(utils.trimToNull(domicilioParam));
         user.setPostalCode(utils.trimToNull(cpParam));
 
 		if (user.getEmail() == null) {
 			throw new IllegalArgumentException("El email es obligatorio");
+		}
+
+		if(user.getPassword() == null) {
+			throw new IllegalArgumentException("La contraseña es obligatoria");
+		}
+
+		if(user.getConfirmPassword() == null) {
+			throw new IllegalArgumentException("La confirmación de contraseña es obligatoria");
+		}
+
+		if(!utils.matchesPassword(passwordParam, user.getPassword())) {
+			throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
 		}
 
 		if (!utils.isValidEmail(user.getEmail())) {

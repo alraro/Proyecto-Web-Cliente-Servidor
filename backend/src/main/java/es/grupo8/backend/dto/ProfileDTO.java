@@ -12,6 +12,8 @@ public class ProfileDTO {
     private Integer id;
     private String nombre;
     private String email;
+    private String password;
+    private String confirmPassword;
     private String telefono;
     private String domicilio;
     private String cp;

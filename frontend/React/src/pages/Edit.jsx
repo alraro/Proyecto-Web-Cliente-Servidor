@@ -68,6 +68,8 @@ function Edit() {
 
     const validateForm = () => {
         const email = profileData?.email || '';
+        const password = profileData?.password || '';
+        const confirmPassword = profileData?.confirmPassword || '';
         const telefono = profileData?.telefono || '';
         const domicilio = profileData?.domicilio || '';
         const cp = profileData?.cp || '';
@@ -120,6 +122,8 @@ function Edit() {
 
         const data = {
             email: (profileData?.email || '').trim(),
+            password: profileData?.password || '',
+            confirmPassword: profileData?.confirmPassword || '',
             telefono: (profileData?.telefono || '').trim(),
             domicilio: (profileData?.domicilio || '').trim(),
             cp: (profileData?.cp || '').trim()
@@ -207,6 +211,22 @@ function Edit() {
                                 <label>Correo *</label>
                                 <div className="input-shell">
                                     <input id="email" name="email" type="email" placeholder="usuario@bancosol.info" value={profileData?.email || ''}onChange={handleInputChange}required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="field-grid">
+                            <div className="field-group">
+                                <label>Contraseña *</label>
+                                <div className="input-shell">
+                                    <input id="password" name="password" type="password" value={profileData?.password || ''} onChange={handleInputChange} required />
+                                </div>
+                            </div>
+
+                            <div className="field-group">
+                                <label>Confirmar contraseña *</label>
+                                <div className="input-shell">
+                                    <input id="confirmPassword" name="confirmPassword" type="password" value={profileData?.confirmPassword || ''} onChange={handleInputChange} required />
                                 </div>
                             </div>
                         </div>
