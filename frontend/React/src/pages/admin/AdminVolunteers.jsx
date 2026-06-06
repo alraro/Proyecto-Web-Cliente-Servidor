@@ -1,4 +1,4 @@
-import GenericTable from "../generalModules/GenricTable";
+import GenericTable from "../generalModules/GenericTable";
 import GenericModal from "../generalModules/GenericModal";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
