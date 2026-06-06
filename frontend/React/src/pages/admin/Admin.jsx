@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
+import { useAuth } from '../auth/useAuthHook';
+
 import '../css/common.css';
 import '../css/admin.css';
 import MenuCardsList from '../MenuCards/MenuCardsList';
@@ -8,15 +10,16 @@ import SecurePage from '../generalModules/SecurePage';
 
 function Admin() {
 
-    const username = "---USUARIO ADMIN PLACEHOLDER---"
-    const role = "🔑 Administrador"
+    const { usuario } = useAuth();
+    const username = usuario?.nombre ?? 'Admin';    
+    const role = usuario?.role ?? 'ADMINISTRADOR';
     const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
 
     return (
         <SecurePage >
             <GenericPageWrapper headerUsername={username}>
                 <WelcomeBar username={username} role={role} description={descripcionHeader} />
-                <MenuCardsList />
+                <MenuCardsList role={role} />
             </GenericPageWrapper>
         </SecurePage>
     );
