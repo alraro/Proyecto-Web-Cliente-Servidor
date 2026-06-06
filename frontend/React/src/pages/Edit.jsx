@@ -15,6 +15,13 @@ function Edit() {
 
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
+
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const returnRoute = getRoleRoute(role) ?? '/login';
 
     // Cargamos los datos del usuario al entrar
@@ -60,6 +67,8 @@ function Edit() {
 
     const validateForm = () => {
         const email = profileData?.email || '';
+        const password = profileData?.password || '';
+        const confirmPassword = profileData?.confirmPassword || '';
         const telefono = profileData?.telefono || '';
         const domicilio = profileData?.domicilio || '';
         const cp = profileData?.cp || '';
@@ -90,6 +99,19 @@ function Edit() {
             return false;
         }
 
+        if (password || confirmPassword) {
+            if (password.length < 6) {
+                setMessage('La contraseña debe tener al menos 6 caracteres');
+                setMessageType('error');
+                return false;
+            }
+            if(password !== confirmPassword) {
+                setMessage('Las contraseñas no coinciden');
+                setMessageType('error');
+                return false;
+            }
+        }
+
         return true;
     };
 
@@ -114,7 +136,8 @@ function Edit() {
             email: (profileData?.email || '').trim(),
             telefono: (profileData?.telefono || '').trim(),
             domicilio: (profileData?.domicilio || '').trim(),
-            cp: (profileData?.cp || '').trim()
+            cp: (profileData?.cp || '').trim(),
+            ...(password.trim() ? {password: password.trim(), confirmPassword: confirmPassword.trim()} : {}),
         };
 
         try {
@@ -199,6 +222,24 @@ function Edit() {
                                 <label>Correo *</label>
                                 <div className="input-shell">
                                     <input id="email" name="email" type="email" placeholder="usuario@bancosol.info" value={profileData?.email || ''}onChange={handleInputChange}required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="field-grid">
+                            <div className="field-group">
+                                <label>Nueva contraseña</label>
+                                <div className="input-shell">
+                                    <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} />
+                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Ocultar' : 'Mostrar'}</button>
+                                </div>
+                            </div>
+
+                            <div className="field-group">
+                                <label>Confirmar nueva contraseña</label>
+                                <div className="input-shell">
+                                    <input id="confirmpassword" name="confirmpassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Ocultar' : 'Mostrar'}</button>
                                 </div>
                             </div>
                         </div>

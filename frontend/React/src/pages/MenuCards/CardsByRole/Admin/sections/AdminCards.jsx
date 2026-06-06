@@ -28,4 +28,11 @@ gestionCards.push({
     link: "/admin/volunteers"
 });
 
+gestionCards.push({
+    icon: "👤",
+    title: "Creación usuarios",
+    description: "Crear nuevos usuarios.",
+    link: "/admin/create-user"
+});
+
 export default gestionCards;

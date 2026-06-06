@@ -50,10 +50,10 @@
                 <h2 id="edit-title">Mi perfil</h2>
             </div>
 
-            <form id="edit-form" class="login-form register-form edit-form" action="/edit" method="post">
+            <form id="edit-form" class="login-form register-form edit-form" action="/edit" method="post" onSubmit="return validateForm()">
                 <div class="field-grid">
                     <div class="field-group">
-                        <label for="name">Nombre completo</label>
+                        <label>Nombre completo</label>
                         <div class="input-shell readonly-shell">
                             <input id="name" name="nombre" type="text" value="${dto.getNombre()}" readonly>
                         </div>
@@ -61,7 +61,7 @@
                     </div>
 
                     <div class="field-group">
-                        <label for="email">Correo *</label>
+                        <label>Correo *</label>
                         <div class="input-shell">
                             <input id="email" name="email" type="email" value="${dto.getEmail()}" placeholder="usuario@bancosol.org" required>
                         </div>
@@ -70,7 +70,23 @@
 
                 <div class="field-grid">
                     <div class="field-group">
-                        <label for="telefono">Teléfono</label>
+                        <label>Nueva contraseña</label>
+                        <div class="input-shell">
+                            <input id="password" name="password" type="password">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Confirmar nueva contraseña</label>
+                        <div class="input-shell">
+                            <input id="confirm-password" name="confirmPassword" type="password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field-group">
+                        <label>Teléfono</label>
                         <div class="input-shell">
                             <input id="telefono" name="telefono" type="tel" value="${dto.getTelefono()}" placeholder="600123123">
                         </div>
@@ -79,7 +95,7 @@
 
                 <div class="field-grid">
                     <div class="field-group full-width">
-                        <label for="domicilio">Domicilio</label>
+                        <label>Domicilio</label>
                         <div class="input-shell">
                             <input id="domicilio" name="domicilio" type="text" value="${dto.getDomicilio()}" placeholder="Calle, número, piso...">
                         </div>
@@ -88,7 +104,7 @@
 
                 <div class="field-grid">
                     <div class="field-group">
-                        <label for="cp">Código postal</label>
+                        <label>Código postal</label>
                         <div class="input-shell">
                             <input id="cp" name="cp" type="text" value="${dto.getCp()}" placeholder="29001">
                         </div>
@@ -110,5 +126,23 @@
         <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" class="logo">
         <p>Bancosol · Banco de alimentos</p>
     </footer>
+    <script>
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const cp = document.getElementById('cp').value.trim();
+
+            if (password || confirmPassword) {
+                if (password.length < 6) {
+                    return showError('La contraseña debe tener al menos 6 caracteres');
+                }
+                if (password !== confirmPassword) {
+                    return showError('La contraseña no coincide con la confirmación');
+                }
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>

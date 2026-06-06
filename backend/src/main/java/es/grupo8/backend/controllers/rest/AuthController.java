@@ -112,6 +112,8 @@ public class AuthController {
 		}
 
 		String email = request.getEmail();
+		String password = request.getPassword();
+		String confirmPassword = request.getConfirmPassword();
 		String telefono = request.getTelefono();
 		String domicilio = request.getDomicilio();
 		String cp = request.getCp();
@@ -126,7 +128,7 @@ public class AuthController {
 
 
         try {
-            ProfileDTO dto = authService.updateProfile(userId, email, telefono, domicilio, cp);
+            ProfileDTO dto = authService.updateProfile(userId, email, password, confirmPassword, telefono, domicilio, cp);
 
             return ResponseEntity.ok(dto);
 		} catch (IllegalArgumentException e) {

@@ -6,12 +6,13 @@ import Admin from './pages/admin/Admin';
 import Dashboard from './pages/admin/AdminDashboard';
 import AdminChains from './pages/admin/AdminChains';
 import AdminStores from './pages/admin/AdminStores';
+import AdminCreateUser from './pages/admin/AdminCreateUser';
+import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Coordinator from './pages/coordinator/Coordinator';
 import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import Responsible from './pages/responsible/ResponsibleStore';
 import ErrorPage from './pages/ErrorPage';
-import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Edit from './pages/Edit.jsx';
 
 import './App.css';
@@ -37,6 +38,7 @@ function App() {
             <Route path="/admin/chains" element={<AdminChains />} />
             <Route path="/admin/stores" element={<AdminStores />} />
             <Route path="/admin/volunteers" element={<AdminVolunteers />} />
+            <Route path="/admin/create-user" element={<AdminCreateUser />} />
           </Route>
 
           {/* Coordinator routes */}
