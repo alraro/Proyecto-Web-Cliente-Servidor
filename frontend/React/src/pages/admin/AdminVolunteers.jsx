@@ -147,7 +147,7 @@ function AdminVolunteers() {
                             data={volunteersData}
                             editRowFunction={handleEditVolunteer}
                             deleteRowFunction={handleDeleteVolunteer}
-                            />
+                        />
                         <GenericModal
                             key={selectedVolunteer?.id}
                             title="Editar Voluntario"
