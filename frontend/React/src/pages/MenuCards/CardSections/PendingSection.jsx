@@ -1,3 +1,4 @@
+// Proximo a eliminar
 const pendingCards = []
 
 pendingCards.push({
