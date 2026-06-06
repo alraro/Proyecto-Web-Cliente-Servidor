@@ -139,8 +139,9 @@ public class ViewsController {
     }
 
     @GetMapping("logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, Model model) {
         session.invalidate();
+		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
         
 		return "login";
     }

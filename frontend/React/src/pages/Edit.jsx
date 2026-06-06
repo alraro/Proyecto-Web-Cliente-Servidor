@@ -15,6 +15,13 @@ function Edit() {
 
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
+
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const returnRoute = getRoleRoute(role) ?? '/login';
 
     // Cargamos los datos del usuario al entrar
@@ -92,6 +99,19 @@ function Edit() {
             return false;
         }
 
+        if (password || confirmPassword) {
+            if (password.length < 6) {
+                setMessage('La contraseña debe tener al menos 6 caracteres');
+                setMessageType('error');
+                return false;
+            }
+            if(password !== confirmPassword) {
+                setMessage('Las contraseñas no coinciden');
+                setMessageType('error');
+                return false;
+            }
+        }
+
         return true;
     };
 
@@ -114,11 +134,10 @@ function Edit() {
 
         const data = {
             email: (profileData?.email || '').trim(),
-            password: profileData?.password || '',
-            confirmPassword: profileData?.confirmPassword || '',
             telefono: (profileData?.telefono || '').trim(),
             domicilio: (profileData?.domicilio || '').trim(),
-            cp: (profileData?.cp || '').trim()
+            cp: (profileData?.cp || '').trim(),
+            ...(password.trim() ? {password: password.trim(), confirmPassword: confirmPassword.trim()} : {}),
         };
 
         try {
@@ -209,16 +228,18 @@ function Edit() {
 
                         <div className="field-grid">
                             <div className="field-group">
-                                <label>Contraseña *</label>
+                                <label>Nueva contraseña</label>
                                 <div className="input-shell">
-                                    <input id="password" name="password" type="password" value={profileData?.password || ''} onChange={handleInputChange} required />
+                                    <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} />
+                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Ocultar' : 'Mostrar'}</button>
                                 </div>
                             </div>
 
                             <div className="field-group">
-                                <label>Confirmar contraseña *</label>
+                                <label>Confirmar nueva contraseña</label>
                                 <div className="input-shell">
-                                    <input id="confirmPassword" name="confirmPassword" type="password" value={profileData?.confirmPassword || ''} onChange={handleInputChange} required />
+                                    <input id="confirmpassword" name="confirmpassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Ocultar' : 'Mostrar'}</button>
                                 </div>
                             </div>
                         </div>

@@ -19,8 +19,6 @@ public class ProfileMapper extends MapperDTO<ProfileDTO, UserEntity> {
         dto.setId(user.getIdUser());
         dto.setNombre(user.getName());
         dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setConfirmPassword(user.getConfirmPassword());
         dto.setTelefono(user.getPhone());
         dto.setDomicilio(user.getAddress());
         dto.setCp(user.getPostalCode());

@@ -162,26 +162,26 @@ public class AuthService {
         if(user == null) return null;
 
         user.setEmail(utils.normalizeEmail(emailParam));
-		user.setPassword(utils.hashPassword(utils.trimToNull(passwordParam)));
-		user.setConfirmPassword(utils.hashPassword(utils.trimToNull(confirmPasswordParam)));
         user.setPhone(utils.trimToNull(telefonoParam));
         user.setAddress(utils.trimToNull(domicilioParam));
         user.setPostalCode(utils.trimToNull(cpParam));
 
+		String newPassword = utils.trimToNull(passwordParam);
+		String newConfirm = utils.trimToNull(confirmPasswordParam);
+
+		if (newPassword != null) {
+			if (newPassword.length() < 6) {
+				throw new IllegalArgumentException("La contrasena debe tener al menos 6 caracteres");
+			}
+			if(!newPassword.equals(newConfirm)){
+				throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
+			}
+
+			user.setPassword(utils.hashPassword(newPassword));
+		}
+
 		if (user.getEmail() == null) {
 			throw new IllegalArgumentException("El email es obligatorio");
-		}
-
-		if(user.getPassword() == null) {
-			throw new IllegalArgumentException("La contraseña es obligatoria");
-		}
-
-		if(user.getConfirmPassword() == null) {
-			throw new IllegalArgumentException("La confirmación de contraseña es obligatoria");
-		}
-
-		if(!utils.matchesPassword(passwordParam, user.getPassword())) {
-			throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
 		}
 
 		if (!utils.isValidEmail(user.getEmail())) {

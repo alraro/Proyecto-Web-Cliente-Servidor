@@ -28,9 +28,6 @@ public class UserEntity {
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "confirm_password", nullable = false, length = 255)
-    private String confirmPassword;
-
     @Column(name = "address")
     private String address;
 
@@ -92,13 +89,5 @@ public class UserEntity {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 }
