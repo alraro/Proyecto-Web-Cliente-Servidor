@@ -1,6 +1,13 @@
 import GenericTable from "../generalModules/GenricTable";
+import { useEffect, useState } from "react";
 
 function AdminVolunteers() {
+
+    const apiUrl = "http://localhost:8080";
+    const endpoint = "/api/voluntarios";
+    const entidadId = 3
+
+    const fullURL = `${apiUrl}${endpoint}?entidadId=${entidadId}`;
 
     const tableHeaders = {
         "id": "ID",
@@ -11,24 +18,23 @@ function AdminVolunteers() {
         "id_partner_entity": "ID Entidad Asociada"
     }
 
-    const volunteersData = [
-        {
-            id: 1,
-            name: "Juan Perez",
-            phone: "123456789",
-            email: "juan.perez@example.com",
-            address: "Calle Principal 123",
-            id_partner_entity: 1
-        },
-        {
-            id: 2,
-            name: "Maria Gomez",
-            phone: "987654321",
-            email: "maria.gomez@example.com",
-            address: "Avenida Secundaria 456",
-            id_partner_entity: 2
-        }
-    ];
+    const [volunteersData, setVolunteersData] = useState([]);
+    
+    useEffect(() => {
+        const fetchVolunteersData = async () => {
+            try {
+                const response = await fetch(`${fullURL}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setVolunteersData(data);
+            } catch (error) {
+                console.error("Error fetching volunteers data:", error);
+            }
+        };
+        fetchVolunteersData().then(() => console.log(`Volunteers data fetched successfully: ${JSON.stringify(volunteersData)}`));
+    }, [fullURL]);
 
     return (
         <div>

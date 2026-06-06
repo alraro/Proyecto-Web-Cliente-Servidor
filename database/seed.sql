@@ -1068,8 +1068,38 @@ INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme'),
   (21, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
 
-INSERT INTO volunteers (id_volunteer, name, phone, email)
-VALUES (1, 'Voluntario Test', '600000010', 'voluntario@bancosol.info');
+INSERT INTO volunteers (id_volunteer, name, phone, email, address, id_partner_entity)
+VALUES
+  (1, 'Voluntario Test', '600000010', 'voluntario@bancosol.info', 'Calle Test, 1 - Málaga', 3),
+  (2, 'Laura Sánchez', '600000011', 'laura.sanchez@bancosol.info', 'Calle Larios, 12 - Málaga', 5),
+  (3, 'Miguel Torres', '600000012', 'miguel.torres@bancosol.info', 'Avenida de Andalucía, 45 - Málaga', 7),
+  (4, 'Carmen Ruiz', '600000013', 'carmen.ruiz@bancosol.info', 'Plaza de la Merced, 8 - Málaga', 9),
+  (5, 'Javier Moreno', '600000014', 'javier.moreno@bancosol.info', 'Calle Nueva, 21 - Marbella', 11),
+  (6, 'Sofía Navarro', '600000015', 'sofia.navarro@bancosol.info', 'Calle Calvario, 5 - Ronda', 12),
+  (7, 'David Herrera', '600000016', 'david.herrera@bancosol.info', 'Camino de la Corta, 14 - Málaga', 13),
+  (8, 'Elena Martín', '600000017', 'elena.martin@bancosol.info', 'Calle Córdoba, 29 - Antequera', 14),
+  (9, 'Pablo Iglesias', '600000018', 'pablo.iglesias@bancosol.info', 'Calle Tulipán, 48 - Málaga', 15),
+  (10, 'Marta Gil', '600000019', 'marta.gil@bancosol.info', 'Camino de la Corta s/n - Málaga', 16),
+  (11, 'Raúl Castro', '600000020', 'raul.castro@bancosol.info', 'Plaza de las Indias, 7 - Vélez-Málaga', 17),
+  (12, 'Lucía Vega', '600000021', 'lucia.vega@bancosol.info', 'Calle Salesianos, 6 - Málaga', 18),
+  (13, 'Andrés Molina', '600000022', 'andres.molina@bancosol.info', 'Avenida Estrella de Mar, 18 - Benalmádena', 19),
+  (14, 'Nuria Romero', '600000023', 'nuria.romero@bancosol.info', 'Plaza Hospital Civil, 1 - Málaga', 20),
+  (15, 'Carlos León', '600000024', 'carlos.leon@bancosol.info', 'Calle Jinetes, 5 - Málaga', 21),
+  (16, 'Alba Navarro', '600000025', 'alba.navarro@bancosol.info', 'Río Viñuela, 1 - Mijas Costa', 22),
+  (17, 'Diego Serrano', '600000026', 'diego.serrano@bancosol.info', 'Camino Viejo de Vélez, 5 - Rincón de la Victoria', 23),
+  (18, 'Sara Molina', '600000027', 'sara.molina@bancosol.info', 'Jaboneros, 7 - Málaga', 24),
+  (19, 'Iván Romero', '600000028', 'ivan.romero@bancosol.info', 'Calle Abul Beka, 15 - Málaga', 25),
+  (20, 'Paula Ortiz', '600000029', 'paula.ortiz@bancosol.info', 'Calle Eucalipto - Málaga', 26),
+  (21, 'Hugo Ramos', '600000030', 'hugo.ramos@bancosol.info', 'Plaza de España, 5 - Alameda', 27),
+  (22, 'Inés Prieto', '600000031', 'ines.prieto@bancosol.info', 'Calle Antonio Ruiz Rivas, 2 - Algarrobo', 28),
+  (23, 'Daniel Rubio', '600000032', 'daniel.rubio@bancosol.info', 'Calle Fuente, 2 - Algatocín', 29),
+  (24, 'Clara Domínguez', '600000033', 'clara.dominguez@bancosol.info', 'Plaza de la Constitución - Almogía', 31),
+  (25, 'Adrián Vázquez', '600000034', 'adrian.vazquez@bancosol.info', 'Calle Llanete de Abajo, 2 - Casabermeja', 34),
+  (26, 'Julia Campos', '600000035', 'julia.campos@bancosol.info', 'Plaza del Prado, 1 - Villanueva del Trabuco', 47),
+  (27, 'Marcos Prieto', '600000036', 'marcos.prieto@bancosol.info', 'Plaza del Prado, 1 - Villanueva de Algaidas', 48),
+  (28, 'Aitana Gil', '600000037', 'aitana.gil@bancosol.info', 'Avenida Pablo Ruiz Picasso, 20 - Álora', 49),
+  (29, 'Nicolás Reyes', '600000038', 'nicolas.reyes@bancosol.info', 'Calle del Calvario, s/n - Marbella', 51),
+  (30, 'Irene Blanco', '600000039', 'irene.blanco@bancosol.info', 'Mariana Pineda, 1 - Estepona', 57);
 
 INSERT INTO volunteer_shifts (id_volunteer, id_campaign, id_store, shift_day, start_time, end_time, attendance, notes)
 VALUES (1, 1, 48, '2026-05-10', '09:00', '13:00', false, 'Turno de prueba');
