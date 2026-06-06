@@ -166,40 +166,38 @@ function AdminVolunteers() {
 		<>
 			<SecurePage >
 				<GenericPageWrapper >
-					<div className="page-header">
-						<nav className="admin-tabs" aria-label="Navegacion de administrador">
-							<Link className="admin-tab" to="/admin">Volver al panel</Link>
-						</nav>
-						<h1>Admin Volunteers</h1>
-						<p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
-						{partnerEntitiesSelector(partnerEntities, setEntidadId)}
-						<button onClick={handleAddVolunteer}>Agregar Voluntario</button>
-						<GenericTable
-							title="Volunteers"
-							headers={tableHeaders}
-							data={volunteersData}
-							addRowFunction={handleAddVolunteer}
-							editRowFunction={handleEditVolunteer}
-							deleteRowFunction={handleDeleteVolunteer}
-						/>
-						<GenericModal
-							key={selectedVolunteer?.id}
-							title="Editar Voluntario"
-							fields={VOLUNTEER_FIELDS}
-							values={selectedVolunteer}
-							isOpen={isEditingModalOpen}
-							onClose={handleCloseEditingModal}
-							onSubmit={handleSaveVolunteerEdit}
-						/>
-						<GenericModal
-							title="Agregar Voluntario"
-							fields={VOLUNTEER_FIELDS.filter(f => f.name !== "id")}
-							values={{}}
-							isOpen={isAddingModalOpen}
-							onClose={handleCloseAddingModal}
-							onSubmit={handleSaveVolunteerAdd}
-						/>
-					</div>
+					<nav className="admin-tabs" aria-label="Navegacion de administrador">
+						<Link className="admin-tab" to="/admin">Volver al panel</Link>
+					</nav>
+					<h1>Voluntarios</h1>
+					<p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
+					{partnerEntitiesSelector(partnerEntities, setEntidadId)}
+					<GenericTable
+						title={`Voluntarios de ${partnerEntities.find(e => e.id === parseInt(entidadId))?.name || "Entidad"}`}
+						headers={tableHeaders}
+						data={volunteersData}
+						addRowFunction={handleAddVolunteer}
+						editRowFunction={handleEditVolunteer}
+						deleteRowFunction={handleDeleteVolunteer}
+						itemName="Voluntario"
+					/>
+					<GenericModal
+						key={selectedVolunteer?.id}
+						title="Editar Voluntario"
+						fields={VOLUNTEER_FIELDS}
+						values={selectedVolunteer}
+						isOpen={isEditingModalOpen}
+						onClose={handleCloseEditingModal}
+						onSubmit={handleSaveVolunteerEdit}
+					/>
+					<GenericModal
+						title="Agregar Voluntario"
+						fields={VOLUNTEER_FIELDS.filter(f => f.name !== "id")}
+						values={{}}
+						isOpen={isAddingModalOpen}
+						onClose={handleCloseAddingModal}
+						onSubmit={handleSaveVolunteerAdd}
+					/>
 				</GenericPageWrapper>
 			</SecurePage>
 		</>

@@ -43,18 +43,33 @@ function renderNoData() {
 	)
 }
 
-function GenericTable({ headers, data, editRowFunction=null, deleteRowFunction=null }) {
+function GenericTable({ title, headers, data, editRowFunction=null, deleteRowFunction=null, addRowFunction=null, itemName="Fila" }) {
 
 	if (!headers) return (<div>No headers provided</div>);
 
 	return (
-		<div className="table-wrapper card">
-			<table>
-				{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
-				{data && data.length > 0 && renderTableRows(data, headers, editRowFunction, deleteRowFunction)}
-				{!data || data.length === 0 && renderNoData()}
-			</table>
-		</div>
+		<>
+			<div className="card">
+				<div className="card-header">
+					<h2>{title}</h2>
+					<div className="card-actions">
+						{addRowFunction && (
+							<button className="btn btn-primary" onClick={addRowFunction}>
+								Agregar {itemName + 's'}
+							</button>
+						)}
+					</div>
+				</div>
+				<div className="table-wrap">
+
+					<table>
+						{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
+						{data && data.length > 0 && renderTableRows(data, headers, editRowFunction, deleteRowFunction)}
+						{!data || data.length === 0 && renderNoData()}
+					</table>
+				</div>
+			</div>
+		</>
   	);
 }
 
