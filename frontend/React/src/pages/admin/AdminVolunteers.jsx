@@ -26,7 +26,6 @@ function AdminVolunteers() {
         "phone": "Teléfono",
         "email": "Correo electrónico",
         "address": "Dirección",
-        "id_partner_entity": "ID Entidad Asociada"
     }
 
     const [entidadId, setEntidadId] = useState(1);
