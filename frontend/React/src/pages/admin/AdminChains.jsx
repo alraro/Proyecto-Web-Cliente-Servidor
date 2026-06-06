@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom';
-import '../css/common.css';
-import '../css/layout.css';
 import '../css/admin.css';
 
 export default function AdminChains() {

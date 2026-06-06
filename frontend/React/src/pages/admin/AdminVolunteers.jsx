@@ -3,7 +3,6 @@ import GenericModal from "../generalModules/GenericModal";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import GenericPageWrapper from "../generalModules/GenericPageWrapper";
-import '../css/common.css';
 import SecurePage from "../generalModules/SecurePage";
 
 const VOLUNTEER_FIELDS = [
@@ -150,6 +149,7 @@ function AdminVolunteers() {
                             deleteRowFunction={handleDeleteVolunteer}
                             />
                         <GenericModal
+                            key={selectedVolunteer?.id}
                             title="Editar Voluntario"
                             fields={VOLUNTEER_FIELDS}
                             values={selectedVolunteer}

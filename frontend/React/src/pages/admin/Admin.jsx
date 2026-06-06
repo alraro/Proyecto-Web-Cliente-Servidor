@@ -1,4 +1,3 @@
-import '../css/common.css';
 import '../css/admin.css';
 import AdminMenuCardsList from '../MenuCards/CardsByRole/Admin/AdminMenuCardsList';
 import GenericPageWrapper from '../generalModules/GenericPageWrapper';

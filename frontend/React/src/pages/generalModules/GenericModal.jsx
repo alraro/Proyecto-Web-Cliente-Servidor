@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function GenericModal({ title, fields, values, isOpen, onClose, onSubmit }) {
 
-    const [formData, setFormData] = useState({});
-
-    useEffect(() => {
-        if (isOpen && values) {
-            setFormData({ ...values });
-        }
-    }, [isOpen, values]);
+    const [formData, setFormData] = useState(() => ({ ...(values || {}) }));
 
     if (!isOpen) return null;
 
