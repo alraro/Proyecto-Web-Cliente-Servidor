@@ -29,14 +29,12 @@ function renderTableRows(data, headers) {
 	)
 }
 
-function GenericTable({ title, headers, data }) {
+function GenericTable({ headers, data }) {
 
-	title = title || "";
 	if (!headers) return (<div>No headers provided</div>);
 
 	return (
 		<div className="table-wrapper">
-			<h2>{title}</h2>
 			<table>
 				{renderTableHeaders(headers)}
 				{renderTableRows(data, headers)}
