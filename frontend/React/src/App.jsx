@@ -11,6 +11,7 @@ import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import Responsible from './pages/responsible/ResponsibleStore';
 import ErrorPage from './pages/ErrorPage';
+import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Edit from './pages/Edit.jsx';
 
 import './App.css';
@@ -20,39 +21,48 @@ import { ProveedorAuten } from './pages/auth/ProveedorAuten';
 function App() {
   return (
     <ProveedorAuten>
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/edit" element={<Edit />} />
-        
-        <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/chains" element={<AdminChains />} />
-          <Route path="/admin/stores" element={<AdminStores />} />
-        </Route>
+      <BrowserRouter>
+        <Routes>
 
-        <Route element={<RutaProtegida roles={['COORDINADOR']} />}>
-          <Route path="/coordinator" element={<Coordinator />} />
-        </Route>
+          {/* Account management routes */}
+          <Route index element={<Index />} /> 
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/edit" element={<Edit />} />
+          
+          {/* Admin routes */}
+          <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/chains" element={<AdminChains />} />
+            <Route path="/admin/stores" element={<AdminStores />} />
+            <Route path="/admin/volunteers" element={<AdminVolunteers />} />
+          </Route>
 
-        <Route element={<RutaProtegida roles={['CAPITAN']} />}>
-          <Route path="/captain" element={<Captain />} />
-        </Route>
+          {/* Coordinator routes */}
+          <Route element={<RutaProtegida roles={['COORDINADOR']} />}>
+            <Route path="/coordinator" element={<Coordinator />} />
+          </Route>
 
-        <Route element={<RutaProtegida roles={['COLABORADOR']} />}>
-          <Route path="/colaborator" element={<Colaborator />} />
-        </Route>
+          {/* Captain routes */}
+          <Route element={<RutaProtegida roles={['CAPITAN']} />}>
+            <Route path="/captain" element={<Captain />} />
+          </Route>
 
-        <Route element={<RutaProtegida roles={['RESPONSABLE_TIENDA']} />}>
-          <Route path="/responsible" element={<Responsible />} />
-        </Route>
+          {/* Colaborator routes */}
+          <Route element={<RutaProtegida roles={['COLABORADOR']} />}>
+            <Route path="/colaborator" element={<Colaborator />} />
+          </Route>
 
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Responsible routes */}
+          <Route element={<RutaProtegida roles={['RESPONSABLE_TIENDA']} />}>
+            <Route path="/responsible" element={<Responsible />} />
+          </Route>
+
+          {/* Error page route (fallback) */}
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </BrowserRouter>
     </ProveedorAuten>
   );
 }

@@ -1,24 +1,22 @@
 import {Link, useNavigate} from 'react-router'
 import logoBancosol from '../assets/LOGO_BANCOSOL.png';
 import Bancosol from '../assets/Bancosol.png';
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {useAuth} from './auth/useAuthHook'
+import {getRoleRoute} from './auth/roleRoutes'
 import './css/login.css'
-
-const ROLE_ROUTES = {
-    ADMINISTRADOR: '/admin',
-    COORDINADOR: '/coordinator',
-    CAPITAN: '/captain',
-    COLABORADOR: '/colaborator',
-    RESPONSABLE_TIENDA: '/responsible',
-}
-
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-    const {login} = useAuth();
+    const {login, usuario, estaAutenticado} = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (estaAutenticado && usuario?.role) {
+            navigate(getRoleRoute(usuario.role), { replace: true });
+        }
+    }, [estaAutenticado, usuario, navigate]);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -49,11 +47,14 @@ function Login() {
                 storeId: data.storeId ?? null
             }, data.token);
 
-            navigate(ROLE_ROUTES[data.role] ?? '/');
+            navigate(getRoleRoute(data.role));
         } catch (e) {
+            console.error("Login error:", e);
             setError("Error de conexión. Intenta nuevamente.");
         }
     }
+
+    if (estaAutenticado) return null;
 
     return (
         <div className="login-wrapper">
