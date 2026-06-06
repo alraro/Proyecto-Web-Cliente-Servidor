@@ -1,5 +1,5 @@
 
-function renderTableHeaders(headers) {
+function renderTableHeaders(headers, editRowFunction, deleteRowFunction) {
 	return (
 		<>
 			<thead>
@@ -7,13 +7,15 @@ function renderTableHeaders(headers) {
 					{Object.keys(headers).map((header, index) => (
 						<th key={index}>{headers[header]}</th>
 					))}
+					{editRowFunction && <th></th>}
+					{deleteRowFunction && <th></th>}
 				</tr>
 			</thead>
 		</>
 	)
 }
 
-function renderTableRows(data, headers) {
+function renderTableRows(data, headers, editRowFunction, deleteRowFunction) {
 	return (
 		<>
 			<tbody>
@@ -22,6 +24,8 @@ function renderTableRows(data, headers) {
 						{Object.keys(headers).map((header, colIndex) => (
 							<td key={colIndex}>{row[header.toLowerCase().replace(' ', '_')]}</td>
 						))}
+						{editRowFunction && <td><button className="btn btn-edit btn-sm" onClick={() => editRowFunction(row)}>Editar</button></td>}
+						{deleteRowFunction && <td><button className="btn btn-danger btn-sm" onClick={() => deleteRowFunction(row)}>Eliminar</button></td>}
 					</tr>
 				))}
 			</tbody>
@@ -39,15 +43,15 @@ function renderNoData() {
 	)
 }
 
-function GenericTable({ headers, data }) {
+function GenericTable({ headers, data, editRowFunction=null, deleteRowFunction=null }) {
 
 	if (!headers) return (<div>No headers provided</div>);
 
 	return (
-		<div className="table-wrapper">
+		<div className="table-wrapper card">
 			<table>
-				{renderTableHeaders(headers)}
-				{data && data.length > 0 && renderTableRows(data, headers)}
+				{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
+				{data && data.length > 0 && renderTableRows(data, headers, editRowFunction, deleteRowFunction)}
 				{!data || data.length === 0 && renderNoData()}
 			</table>
 		</div>

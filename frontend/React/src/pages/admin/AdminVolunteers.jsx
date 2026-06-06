@@ -87,6 +87,8 @@ function AdminVolunteers() {
                     title="Volunteers"
                     headers={tableHeaders}
                     data={volunteersData}
+                    editRowFunction={() => {console.log("Editando voluntario")}}
+                    deleteRowFunction={() => {console.log("Eliminando voluntario")}}
                     />
             </div>
         </GenericPageWrapper>
