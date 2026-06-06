@@ -134,12 +134,12 @@ function AdminVolunteers() {
         <>
             <SecurePage >
                 <GenericPageWrapper >
-                    <div>
-                        <h1>Admin Volunteers</h1>
+                    <div className="page-header">
                         <nav className="admin-tabs" aria-label="Navegacion de administrador">
                             <Link className="admin-tab" to="/admin">Volver al panel</Link>
-                            <Link className="admin-tab" to="/login">Cerrar sesion</Link>
                         </nav>
+                        <h1>Admin Volunteers</h1>
+                        <p>Aqui puedes gestionar los voluntarios de cada entidad colaboradora</p>
                         {partnerEntitiesSelector(partnerEntities, setEntidadId)}
                         <GenericTable
                             title="Volunteers"
