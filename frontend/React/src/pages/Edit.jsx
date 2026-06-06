@@ -4,15 +4,7 @@ import logoBancosol from '../assets/LOGO_BANCOSOL.png';
 import Bancosol from '../assets/Bancosol.png';
 import {useState, useEffect} from 'react'
 import {useAuth} from './auth/useAuthHook'
-import './css/login.css'
-
-const ROLE_ROUTES = {
-    ADMINISTRADOR: '/admin',
-    COORDINADOR: '/coordinator',
-    CAPITAN: '/captain',
-    COLABORADOR: '/colaborator',
-    RESPONSABLE_TIENDA: '/responsible',
-}
+import {getRoleRoute} from './auth/roleRoutes'
 
 function Edit() {
     const navigate = useNavigate();
@@ -23,7 +15,7 @@ function Edit() {
 
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
-    const returnRoute = ROLE_ROUTES[role] || '/login';
+    const returnRoute = getRoleRoute(role) ?? '/login';
 
     // Cargamos los datos del usuario al entrar
     useEffect(() => {
