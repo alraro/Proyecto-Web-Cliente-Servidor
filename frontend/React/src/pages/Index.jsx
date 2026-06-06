@@ -1,8 +1,13 @@
 import { Link } from 'react-router';
 import logoBancosol from '../assets/LOGO_BANCOSOL.png'; 
+import { useAuth } from './auth/useAuthHook';
+import { getRoleRoute } from './auth/roleRoutes';
 import './css/index.css'; 
 
 function Index() {
+    const { usuario, estaAutenticado } = useAuth();
+    const authRoute = estaAutenticado ? getRoleRoute(usuario.role) : '/login';
+
     return (
         <div className="index-wrapper">
             
@@ -13,7 +18,7 @@ function Index() {
                 
                 <nav className="main-nav">
                     <Link to="/" aria-current="page">Inicio</Link>
-                    <Link to="/login" className="primary-action">Área Encargados</Link>
+                    <Link to={authRoute} className="primary-action">Área Encargados</Link>
                 </nav>
             </header>
 
@@ -27,7 +32,9 @@ function Index() {
                         recursos para la delegación de la Costa del Sol.
                     </p>
                     <div className="hero-actions">
-                        <Link to="/login" className="primary-action">Iniciar Sesión</Link>
+                        <Link to={authRoute} className="primary-action">
+                            {estaAutenticado ? 'Ir a mi panel' : 'Iniciar Sesión'}
+                        </Link>
                     </div>
                 </section>
 

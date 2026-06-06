@@ -18,7 +18,6 @@ a {
 }
 
 .topbar {
-    max-width: 1220px;
     margin: 0 auto;
     padding: 1.2rem 1.5rem 0;
     display: flex;

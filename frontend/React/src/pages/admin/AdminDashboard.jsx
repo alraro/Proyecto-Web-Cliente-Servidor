@@ -69,13 +69,10 @@ function Dashboard() {
         fetch();
     }, [token]);
 
-
-
-    
     return (
         <SecurePage >
-            <GenericPageWrapper headerUsername={username}>
-                <Link to="/admin">Volver al panel</Link>
+            <GenericPageWrapper >
+                <p>Bienvenido al dashboard de administrador</p>
             </GenericPageWrapper>
 
         </SecurePage>
