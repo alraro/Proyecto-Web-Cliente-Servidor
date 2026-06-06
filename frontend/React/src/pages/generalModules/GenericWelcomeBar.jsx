@@ -11,7 +11,7 @@ function WelcomeBar({ description }) {
         <>
             <div className="welcome-bar">
                 <div>
-                    <h2>Bienvenido, {username}</h2>
+                    <h2>Bienvenido, {username} 👋</h2>
                     <p>{description}</p>
                 </div>
                 <span className="role-pill">{role}</span>
