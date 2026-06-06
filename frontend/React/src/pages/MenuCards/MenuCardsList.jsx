@@ -1,49 +1,49 @@
-import gestionCards from './CardSections/AdminCards';
-import capitanCards from './CardSections/CapitanCards';
-import coordinadorCards from './CardSections/CoordinadorCards';
-import colaboradorCards from './CardSections/ColaboradorCards';
-import pendingCards from '../MenuCards/CardSections/PendingSection';
-import MenuCardSection from '../MenuCards/MenuCardSection';
-import {useAuth} from '../auth/useAuthHook';
+// import gestionCards from './CardsByRole/Admin/sections/AdminCards';
+// import capitanCards from './CardsByRole/Capitan/sections/CapitanCards';
+// import coordinadorCards from './CardsByRole/Coordinador/sections/CoordinadorCards';
+// import colaboradorCards from './CardsByRole/Colaborador/sections/ColaboradorCards';
+// import pendingCards from './CardsByRole/Admin/sections/AdminPendingCards';
+// import MenuCardSection from '../MenuCards/MenuCardSection';
+// import {useAuth} from '../auth/useAuthHook';
 
-function MenuCardsList() {
-    const { usuario } = useAuth();
-    const role = usuario?.role ?? "";
+// function MenuCardsList() {
+//     const { usuario } = useAuth();
+//     const role = usuario?.role ?? "";
 
-    if(role === 'ADMINISTRADOR'){
-        return (
-            <>
-            <MenuCardSection title="Gestión" cards={gestionCards} />
-            <MenuCardSection title="Pendientes" cards={pendingCards} />
-            </>
-        );
-    }
+//     if(role === 'ADMINISTRADOR'){
+//         return (
+//             <>
+//             <MenuCardSection title="Gestión" cards={gestionCards} />
+//             <MenuCardSection title="Pendientes" cards={pendingCards} />
+//             </>
+//         );
+//     }
 
-    if (role === 'CAPITAN') {
-        return (
-            <>
-            <MenuCardSection title="Gestión" cards={capitanCards} />
-            </>
-        )
-    }
+//     if (role === 'CAPITAN') {
+//         return (
+//             <>
+//             <MenuCardSection title="Gestión" cards={capitanCards} />
+//             </>
+//         )
+//     }
 
-    if (role === 'COORDINADOR') {
-        return (
-            <>
-            <MenuCardSection title="Gestión" cards={coordinadorCards} />
-            </>
-        )
-    }
+//     if (role === 'COORDINADOR') {
+//         return (
+//             <>
+//             <MenuCardSection title="Gestión" cards={coordinadorCards} />
+//             </>
+//         )
+//     }
 
-    if (role === 'COLABORADOR') {
-        return (
-            <>
-            <MenuCardSection title="Gestión" cards={colaboradorCards} />
-            </>
-        )
-    }
+//     if (role === 'COLABORADOR') {
+//         return (
+//             <>
+//             <MenuCardSection title="Gestión" cards={colaboradorCards} />
+//             </>
+//         )
+//     }
 
-    return null;
-}
+//     return null;
+// }
 
-export default MenuCardsList;
+// export default MenuCardsList;

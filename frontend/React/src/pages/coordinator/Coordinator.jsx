@@ -1,10 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router';
-import { useAuth } from '../auth/useAuthHook';
-import MenuCardsList from '../MenuCards/MenuCardsList';
 import GenericPageWrapper from '../generalModules/GenericPageWrapper';
 import WelcomeBar from '../generalModules/GenericWelcomeBar';
 import SecurePage from '../generalModules/SecurePage';
+import CoordinadorMenuCardsList from '../MenuCards/CardsByRole/Coordinador/CoordinadorMenuCardsList';
 
 function Coordinator() {
 
@@ -14,7 +11,7 @@ function Coordinator() {
         <SecurePage >
             <GenericPageWrapper >
                 <WelcomeBar description={descripcionHeader} />
-                <MenuCardsList />
+                <CoordinadorMenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
     );

@@ -1,9 +1,6 @@
-import { Link } from 'react-router';
-import { useAuth } from '../auth/useAuthHook';
-
 import '../css/common.css';
 import '../css/admin.css';
-import MenuCardsList from '../MenuCards/MenuCardsList';
+import AdminMenuCardsList from '../MenuCards/CardsByRole/Admin/AdminMenuCardsList';
 import GenericPageWrapper from '../generalModules/GenericPageWrapper';
 import WelcomeBar from '../generalModules/GenericWelcomeBar';
 import SecurePage from '../generalModules/SecurePage';
@@ -15,7 +12,7 @@ function Admin() {
         <SecurePage >
             <GenericPageWrapper >
                 <WelcomeBar description={descripcionHeader} />
-                <MenuCardsList />
+                <AdminMenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
     );

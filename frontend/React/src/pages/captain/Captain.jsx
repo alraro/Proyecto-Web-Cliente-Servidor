@@ -1,10 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router';
-import { useAuth } from '../auth/useAuthHook';
-import MenuCardsList from '../MenuCards/MenuCardsList';
 import GenericPageWrapper from '../generalModules/GenericPageWrapper';
 import WelcomeBar from '../generalModules/GenericWelcomeBar';
 import SecurePage from '../generalModules/SecurePage';
+import CapitanMenuCardsList from '../MenuCards/CardsByRole/Capitan/CapitanMenuCardsList';
 
 
 
@@ -16,7 +13,7 @@ function Captain() {
         <SecurePage >
             <GenericPageWrapper >
                 <WelcomeBar description={descripcionHeader} />
-                <MenuCardsList />
+                <CapitanMenuCardsList />
             </GenericPageWrapper>
         </SecurePage>
     );
