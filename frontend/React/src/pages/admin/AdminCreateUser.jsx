@@ -1,5 +1,4 @@
 import {React} from 'react';
-<<<<<<< HEAD
 import {Link, useNavigate} from 'react-router';
 import {useAuth} from '../auth/useAuthHook'
 import { useState } from 'react';
@@ -160,23 +159,6 @@ function CrearUsuario() {
                 </section>
             </GenericPageWrapper>
         </SecurePage>
-
-
-
-
-
-
-
     );
-=======
-
-function CrearUsuario() {
-    return (
-
-        <div>
-            <h1>Crear Usuario</h1>
-        </div>
-    )
->>>>>>> 670446c5188d54b3289b5d548be07304b9017e74
 }
 export default CrearUsuario;
