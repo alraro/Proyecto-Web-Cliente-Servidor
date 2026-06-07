@@ -82,6 +82,12 @@
             <p>Visualiza cobertura por cadena, localidad y zona para cada campaña.</p>
             <span class="menu-card-arrow">Ir a dashboard →</span>
         </a>
+        <a class="menu-card" href="/admin-createusers">
+            <div class="menu-card-icon icon-orange">👤</div>
+            <h3>Crear usuarios</h3>
+            <p>Crear nuevos usuarios con roles asignados.</p>
+            <span class="menu-card-arrow">Ir a crear usuarios →</span>
+        </a>
     </div>
 
     <p class="section-title">Usuarios y accesos</p>

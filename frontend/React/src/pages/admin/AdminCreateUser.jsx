@@ -56,7 +56,7 @@ function CrearUsuario() {
             const data = await res.json();
 
             if (res.ok) {
-                    setMessage(`Usuario "${nombre}" esperando validación de rol.`);
+                    setMessage(`Usuario "${nombre}" creado, esperando validación de rol.`);
                     e.target.reset();
                     setTimeout(() => {
                         navigate('/admin');
