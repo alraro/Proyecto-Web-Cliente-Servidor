@@ -208,7 +208,6 @@ public class ViewsController {
 		return "redirect:" + resolveRolePath(role);
 	}
 
-
 	@GetMapping("/coordinator")
 	public String coordinator() {
 		return "coordinator";

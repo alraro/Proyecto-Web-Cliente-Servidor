@@ -138,4 +138,34 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "No se pudo actualizar el perfil. Revisa email y codigo postal"));
         }
 	}
+
+	@PostMapping("/admin/users")
+	public ResponseEntity<?> createUser(@RequestHeader(value = "Authorization", required = false) String auth,
+										@RequestBody AuthResponseDTO request){
+
+	Integer adminId = authService.extractUserIdFromToken(auth);
+	if(adminId == null) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido"));
+	}
+
+	try {
+		AuthResponseDTO dto = authService.register(
+			request.getNombre(),
+			request.getEmail(),
+			request.getPassword(),
+			request.getPhone(),
+			request.getAddress(),
+			request.getPostalCode()
+		);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+
+	} catch(Exception e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+	}
+	
+
+	} 
+
+
 }
