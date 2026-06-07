@@ -37,6 +37,7 @@ public class utils {
 
 	// Métodos relacionados con la gestión de contraseñas usando BCrypt para hashing seguro, verificación de contraseñas y detección de si una contraseña necesita ser migrada a un formato más seguro.
 	public static String hashPassword(String rawPassword) {
+		if (rawPassword == null) return null;
 		return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
 	}
 
@@ -55,6 +56,9 @@ public class utils {
 
 	// Determina si la contraseña almacenada necesita ser migrada a un formato hashado con BCrypt
 	public static boolean needsMigration(String storedPassword) {
+		if (storedPassword == null) {
+			return false;
+		}
 		return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
 	}
 }

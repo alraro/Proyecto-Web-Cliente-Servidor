@@ -1,7 +1,2 @@
-* {
-    color: #000000;
-}
-
-h1 {
-    color: #000000;
-}
+@import './pages/css/common.css';
+@import './pages/css/layout.css';

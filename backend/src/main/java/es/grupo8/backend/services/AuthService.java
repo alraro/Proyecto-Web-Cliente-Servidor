@@ -156,7 +156,7 @@ public class AuthService {
     }
 
 
-    public ProfileDTO updateProfile(Integer userId, String emailParam, String telefonoParam, String domicilioParam, String cpParam) {
+    public ProfileDTO updateProfile(Integer userId, String emailParam, String passwordParam, String confirmPasswordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = userRepository.findById(userId).orElse(null);
         if(user == null) return null;
@@ -165,6 +165,20 @@ public class AuthService {
         user.setPhone(utils.trimToNull(telefonoParam));
         user.setAddress(utils.trimToNull(domicilioParam));
         user.setPostalCode(utils.trimToNull(cpParam));
+
+		String newPassword = utils.trimToNull(passwordParam);
+		String newConfirm = utils.trimToNull(confirmPasswordParam);
+
+		if (newPassword != null) {
+			if (newPassword.length() < 6) {
+				throw new IllegalArgumentException("La contrasena debe tener al menos 6 caracteres");
+			}
+			if(!newPassword.equals(newConfirm)){
+				throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
+			}
+
+			user.setPassword(utils.hashPassword(newPassword));
+		}
 
 		if (user.getEmail() == null) {
 			throw new IllegalArgumentException("El email es obligatorio");

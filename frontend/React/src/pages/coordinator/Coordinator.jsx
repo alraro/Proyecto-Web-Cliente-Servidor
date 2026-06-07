@@ -1,13 +1,21 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-function Coordinator() {
-return (
-    <div>
-        <h1>Página de coordinador</h1>
-        <Link to="/login">Cerrar sesión</Link> <br></br>
+import GenericPageWrapper from '../generalModules/GenericPageWrapper';
+import WelcomeBar from '../generalModules/GenericWelcomeBar';
+import SecurePage from '../generalModules/SecurePage';
+import CoordinadorMenuCardsList from '../MenuCards/CardsByRole/Coordinador/CoordinadorMenuCardsList';
 
-    </div>
-);
+function Coordinator() {
+
+    const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
+
+    return (
+        <SecurePage >
+            <GenericPageWrapper >
+                <WelcomeBar description={descripcionHeader} />
+                <CoordinadorMenuCardsList />
+            </GenericPageWrapper>
+        </SecurePage>
+    );
+
 }
 
 export default Coordinator;

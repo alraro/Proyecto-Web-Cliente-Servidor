@@ -1,13 +1,21 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-function Colaborator() {
-return (
-    <div>
-        <h1>Página de colaborador</h1>
-        <Link to="/login">Cerrar sesión</Link> <br></br>
+import GenericPageWrapper from '../generalModules/GenericPageWrapper';
+import WelcomeBar from '../generalModules/GenericWelcomeBar';
+import SecurePage from '../generalModules/SecurePage';
+import ColaboradorMenuCardsList from '../MenuCards/CardsByRole/Colaborador/ColaboradorMenuCardsList';
 
-    </div>
-)
+function Colaborator() {
+
+    const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
+
+    return (
+        <SecurePage >
+            <GenericPageWrapper >
+                <WelcomeBar description={descripcionHeader} />
+                <ColaboradorMenuCardsList />
+            </GenericPageWrapper>
+        </SecurePage>
+    );
+
 }
 
 export default Colaborator;

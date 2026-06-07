@@ -17,7 +17,6 @@
 }
 .btn-edit:hover { background: rgba(235, 123, 49, 0.22); }
 
-.btn-edit:hover { background: var(--color-error-light); color: var(--color-error-text); border-color: var(--color-error-border); }
 
 @keyframes modalIn {
     from { opacity: 0; transform: translateY(12px) scale(0.97); }

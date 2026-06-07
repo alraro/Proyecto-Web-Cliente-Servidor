@@ -146,8 +146,9 @@ public class ViewsController {
     }
 
     @GetMapping("logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, Model model) {
         session.invalidate();
+		model.addAttribute("pageTitle", "Bancosol | Inicio de sesión");
         
 		return "login";
     }
@@ -173,6 +174,8 @@ public class ViewsController {
 
 	@PostMapping("/edit")
 	public String submitEditProfile(@RequestParam(value = "email", required = false) String email,
+									@RequestParam(value = "password", required = false) String password,
+									@RequestParam(value = "confirmPassword", required = false) String confirmPassword,
 									@RequestParam(value = "telefono", required = false) String telefono,
 									@RequestParam(value = "domicilio", required = false) String domicilio,
 									@RequestParam(value = "cp", required = false) String cp,
@@ -185,7 +188,7 @@ public class ViewsController {
 		}
 		
 		try {
-			ProfileDTO dto = authService.updateProfile(userId, email, telefono, domicilio, cp);
+			ProfileDTO dto = authService.updateProfile(userId, email, password, confirmPassword, telefono, domicilio, cp);
 
 			String role = (String) session.getAttribute("role");
 
