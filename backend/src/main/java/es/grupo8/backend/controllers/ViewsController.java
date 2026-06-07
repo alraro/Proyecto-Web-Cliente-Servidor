@@ -219,25 +219,39 @@ public class ViewsController {
 	}
 
 	@GetMapping("/coordinator-dashboard")
-	public String coordinatorDashboard() { return "coordinator-dashboard"; }
+	public String coordinatorDashboard(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-dashboard.html", session);
+	}
 
 	@GetMapping("/coordinator-campaigns")
-	public String coordinatorCampaigns() { return "coordinator-campaigns"; }
+	public String coordinatorCampaigns(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-campaigns.html", session);
+	}
 
 	@GetMapping("/coordinator-stores")
-	public String coordinatorStores() { return "coordinator-stores"; }
+	public String coordinatorStores(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-stores.html", session);
+	}
 
 	@GetMapping("/coordinator-captains")
-	public String coordinatorCaptains() { return "coordinator-captains"; }
+	public String coordinatorCaptains(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-captains.html", session);
+	}
 
 	@GetMapping("/coordinator-volunteers")
-	public String coordinatorVolunteers() { return "coordinator-volunteers"; }
+	public String coordinatorVolunteers(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-volunteers.html", session);
+	}
 
 	@GetMapping("/coordinator-collaborators")
-	public String coordinatorCollaborators() { return "coordinator-collaborators"; }
+	public String coordinatorCollaborators(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-collaborators.html", session);
+	}
 
 	@GetMapping("/coordinator-entities")
-	public String coordinatorEntities() { return "coordinator-entities"; }
+	public String coordinatorEntities(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-entities.html", session);
+	}
 
 	@GetMapping("/captain")
 	public String captain() {
@@ -245,16 +259,24 @@ public class ViewsController {
 	}
 
 	@GetMapping("/captain-dashboard")
-	public String captainDashboard() { return "captain-dashboard"; }
+	public String captainDashboard(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-dashboard.html", session);
+	}
 
 	@GetMapping("/captain-stores")
-	public String captainStores() { return "captain-stores"; }
+	public String captainStores(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-stores.html", session);
+	}
 
 	@GetMapping("/captain-incidents")
-	public String captainIncidents() { return "captain-incidents"; }
+	public String captainIncidents(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-incidents.html", session);
+	}
 
 	@GetMapping("/captain-attendance")
-	public String captainAttendance() { return "captain-attendance"; }
+	public String captainAttendance(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-attendance.html", session);
+	}
 
 	@GetMapping("/collaborator")
 	public String collaborator() {
