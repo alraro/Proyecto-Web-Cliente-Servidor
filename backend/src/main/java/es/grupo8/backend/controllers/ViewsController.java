@@ -7,7 +7,11 @@
 */
 package es.grupo8.backend.controllers;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +28,9 @@ public class ViewsController {
 
     @Autowired
     private AuthService authService;
+
+    @Value("${app.frontend.base-url:http://localhost}")
+    private String frontendBaseUrl;
 
     // Pagina de inicio, sirve tanto el / como el index, es lo mismo
 	@GetMapping({"/", "/index"})
@@ -254,6 +261,19 @@ public class ViewsController {
 		return "colaborator";
 	}
 
+	/** Redirects to the frontend create-shift page, passing the session JWT via URL so the
+	 *  frontend can bootstrap localStorage auth when the user came from the SSR login flow. */
+	@GetMapping("/create-shift")
+	public String redirectToCreateShift(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/create-shift.html", session);
+	}
+
+	/** Redirects to the frontend shifts-calendar page with the same token-bridging mechanism. */
+	@GetMapping("/shifts-calendar")
+	public String redirectToShiftsCalendar(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/shifts-calendar.html", session);
+	}
+
 	private String resolveRolePath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
 			return "/admin";
@@ -276,6 +296,24 @@ public class ViewsController {
 		}
 
 		return "/login";
+	}
+
+	/** Builds an absolute frontend URL for the given path, appending the session JWT and
+	 *  user name as query parameters so the frontend can bootstrap localStorage auth. */
+	private String buildFrontendUrl(String path, HttpSession session) {
+		String token  = (String) session.getAttribute("token");
+		String nombre = (String) session.getAttribute("nombre");
+
+		String base = frontendBaseUrl.replaceAll(":80$", "");
+		String url  = base + path;
+
+		if (token != null) {
+			url += "?token="  + URLEncoder.encode(token,  StandardCharsets.UTF_8);
+			if (nombre != null) {
+				url += "&nombre=" + URLEncoder.encode(nombre, StandardCharsets.UTF_8);
+			}
+		}
+		return url;
 	}
 
 }

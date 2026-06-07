@@ -1,4 +1,6 @@
-﻿
+﻿/* Extract token from URL params (used when navigating from the SSR coordinator portal). */
+handleUrlTokenParams();
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
