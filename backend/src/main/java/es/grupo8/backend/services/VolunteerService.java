@@ -54,10 +54,10 @@ public class VolunteerService {
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + partnerEntityId));
 
         Volunteer volunteer = new Volunteer();
-        volunteer.setName(trimToNull(request.name()));
+        volunteer.setName(utils.trimToNull(request.name()));
         volunteer.setPhone(normalizePhone(request.phone()));
-        volunteer.setEmail(trimToNull(request.email()));
-        volunteer.setAddress(trimToNull(request.address()));
+        volunteer.setEmail(utils.trimToNull(request.email()));
+        volunteer.setAddress(utils.trimToNull(request.address()));
         volunteer.setIdPartnerEntity(partnerEntity);
 
         Volunteer savedVolunteer = volunteerRepository.save(volunteer);
@@ -76,10 +76,10 @@ public class VolunteerService {
             throw new RuntimeException("Volunteer not found for this entity");
         }
 
-        volunteer.setName(trimToNull(request.name()));
+        volunteer.setName(utils.trimToNull(request.name()));
         volunteer.setPhone(normalizePhone(request.phone()));
-        volunteer.setEmail(trimToNull(request.email()));
-        volunteer.setAddress(trimToNull(request.address()));
+        volunteer.setEmail(utils.trimToNull(request.email()));
+        volunteer.setAddress(utils.trimToNull(request.address()));
 
         Volunteer updatedVolunteer = volunteerRepository.save(volunteer);
         return volunteerMapper.toDTO(updatedVolunteer);
@@ -119,7 +119,7 @@ public class VolunteerService {
         }
     }
 
-    public boolean verifyEntityAccess(Integer userId, Integer partnerEntityId) {
+    public boolean canAccessPartnerEntity(Integer userId, Integer partnerEntityId) {
         try {
             return userRepository.isAdmin(userId) || userRepository.isPartnerEntityManagerOfEntity(userId, partnerEntityId);
         } catch (Exception e) {
@@ -127,14 +127,8 @@ public class VolunteerService {
         }
     }
 
-    private String trimToNull(String value) {
-        if (value == null) return null;
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
-
     private String normalizePhone(String phone) {
-        String trimmed = trimToNull(phone);
+        String trimmed = utils.trimToNull(phone);
         if (trimmed == null) {
             return null;
         }

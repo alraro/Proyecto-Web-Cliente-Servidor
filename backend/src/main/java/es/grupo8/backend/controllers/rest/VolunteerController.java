@@ -32,7 +32,7 @@ public class VolunteerController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -51,7 +51,7 @@ public class VolunteerController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -71,7 +71,7 @@ public class VolunteerController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -90,7 +90,7 @@ public class VolunteerController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
