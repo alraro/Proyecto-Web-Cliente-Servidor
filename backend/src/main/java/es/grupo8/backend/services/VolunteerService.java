@@ -54,10 +54,10 @@ public class VolunteerService {
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + partnerEntityId));
 
         Volunteer volunteer = new Volunteer();
-        volunteer.setName(utils.trimToNull(request.name()));
+        volunteer.setName(UtilsService.trimToNull(request.name()));
         volunteer.setPhone(normalizePhone(request.phone()));
-        volunteer.setEmail(utils.trimToNull(request.email()));
-        volunteer.setAddress(utils.trimToNull(request.address()));
+        volunteer.setEmail(UtilsService.trimToNull(request.email()));
+        volunteer.setAddress(UtilsService.trimToNull(request.address()));
         volunteer.setIdPartnerEntity(partnerEntity);
 
         Volunteer savedVolunteer = volunteerRepository.save(volunteer);
@@ -76,10 +76,10 @@ public class VolunteerService {
             throw new RuntimeException("Volunteer not found for this entity");
         }
 
-        volunteer.setName(utils.trimToNull(request.name()));
+        volunteer.setName(UtilsService.trimToNull(request.name()));
         volunteer.setPhone(normalizePhone(request.phone()));
-        volunteer.setEmail(utils.trimToNull(request.email()));
-        volunteer.setAddress(utils.trimToNull(request.address()));
+        volunteer.setEmail(UtilsService.trimToNull(request.email()));
+        volunteer.setAddress(UtilsService.trimToNull(request.address()));
 
         Volunteer updatedVolunteer = volunteerRepository.save(volunteer);
         return volunteerMapper.toDTO(updatedVolunteer);
@@ -128,7 +128,7 @@ public class VolunteerService {
     }
 
     private String normalizePhone(String phone) {
-        String trimmed = utils.trimToNull(phone);
+        String trimmed = UtilsService.trimToNull(phone);
         if (trimmed == null) {
             return null;
         }
