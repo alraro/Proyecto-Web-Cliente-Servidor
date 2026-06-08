@@ -93,6 +93,31 @@ public class UserController {
 
         String role = roleRaw.trim().toUpperCase(Locale.ROOT);
 
+        // Remove all existing roles before assigning the new one
+        // Admin
+        adminRepository.findById(id).ifPresent(adminRepository::delete);
+
+        // Coordinator - delete all campaigns for this user
+        coordinatorRepository.findAll().stream()
+            .filter(c -> c.getId().getIdUser().equals(id))
+            .forEach(c -> coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(
+                c.getId().getIdUser(), c.getId().getIdCampaign()));
+
+        // Captain - delete all campaigns for this user
+        captainRepository.findAll().stream()
+            .filter(c -> c.getId().getIdUser().equals(id))
+            .forEach(c -> captainRepository.deleteByIdIdUserAndIdIdCampaign(
+                c.getId().getIdUser(), c.getId().getIdCampaign()));
+
+        // PartnerEntityManager
+        partnerEntityManagerRepository.findById(id).ifPresent(partnerEntityManagerRepository::delete);
+
+        // Store responsible - unset responsible without deleting the store
+        storeRepository.findByIdResponsible_IdUser(id).ifPresent(store -> {
+            store.setIdResponsible(null);
+            storeRepository.save(store);
+        });
+
         switch (role) {
             case "ADMINISTRADOR" -> {
                 if (!adminRepository.existsByIdUser(id)) {

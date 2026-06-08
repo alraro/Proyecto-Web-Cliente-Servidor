@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
@@ -155,4 +154,13 @@ public class AdminController {
 
     @GetMapping("/responsible-store")
     public String responsibleStore() { return "responsible-store"; }
+
+    @GetMapping("/admin-users")
+    public String adminUsers(HttpSession session) {
+    String role = (String) session.getAttribute("role");
+    if (!"ADMINISTRADOR".equals(role)) {
+        return "redirect:/login";
+    }
+    return "admin-users";
+    }
 }
