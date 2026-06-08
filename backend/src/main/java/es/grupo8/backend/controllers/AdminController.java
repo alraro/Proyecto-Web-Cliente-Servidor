@@ -37,17 +37,29 @@ public class AdminController {
     private AuthService authService;
 
     @GetMapping("/admin-coordinators")
-    public String adminCoordinators() {
+    public String adminCoordinators(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
         return "admin-coordinators";
     }
 
     @GetMapping("/admin-captains")
-    public String adminCaptains() {
+    public String adminCaptains(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
         return "admin-captains";
     }
 
     @GetMapping("/admin-campaigns")
-    public String adminCampaigns() {
+    public String adminCampaigns(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
         return "admin-campaigns";
     }
 
@@ -57,7 +69,11 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String backToMenu() {
+    public String backToMenu(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
         return "admin";
     }
 
@@ -150,13 +166,31 @@ public class AdminController {
 	}
 
     @GetMapping("/admin-chains")
-    public String adminChains() { return "admin-chains"; }
+    public String adminChains(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
+        return "admin-chains";
+    }
 
     @GetMapping("/admin-stores")
-    public String adminStores() { return "admin-stores"; }
+    public String adminStores(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
+        return "admin-stores";
+    }
 
     @GetMapping("/admin-validate-users")
-    public String adminValidateUsers() { return "admin-validate-users"; }
+    public String adminValidateUsers(
+            @RequestHeader("Authorization") String token) {
+        if (!userService.isAdminFromToken(token)) {
+            return "redirect:/login";
+        }
+        return "admin-validate-users";
+    }
 
     @GetMapping("/responsible-store")
     public String responsibleStore() { return "responsible-store"; }
@@ -165,8 +199,7 @@ public class AdminController {
     public String adminPartnerEntities(
             @RequestHeader("Authorization") String token
     ) {
-        Integer userId = authService.extractUserIdFromToken(token);
-        if (userId == null || !userService.isAdmin(userId)) {
+        if (!userService.isAdminFromToken(token)) {
             return "redirect:/login";
         }
         return "admin-partner-entities";

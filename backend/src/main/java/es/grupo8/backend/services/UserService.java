@@ -30,6 +30,9 @@ public class UserService {
     @Autowired private PasswordService passwordService;
     @Autowired private UserMapper userMapper;
 
+    @Autowired
+    private AuthService authService;
+
     public PaginatedResponse<UserDTO> getAllUsers(
             int page, int size, String sort, String search, String role) {
 
@@ -161,12 +164,22 @@ public class UserService {
         }
     }
 
+    public boolean isAdminFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isAdmin(userId);
+    }
+
     public boolean isCoordinator(Integer userId) {
         try {
             return userRepository.isCoordinator(userId);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean isCoordinatorFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isCoordinator(userId);
     }
 
     public boolean isCaptain(Integer userId) {
@@ -177,12 +190,22 @@ public class UserService {
         }
     }
 
+    public boolean isCaptainFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isCaptain(userId);
+    }
+
     public boolean isPartnerEntityManager(Integer userId) {
         try {
             return userRepository.isPartnerEntityManager(userId);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean isPartnerEntityManagerFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isPartnerEntityManager(userId);
     }
 
 
