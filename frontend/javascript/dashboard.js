@@ -1,6 +1,5 @@
-const TOKEN_KEY = 'token';
 const API_BASE = 'http://localhost:8080';
-const getToken  = () => localStorage.getItem(TOKEN_KEY);
+const getToken  = () => localStorage.getItem('token');
 
 function formatDate(dateString){
     if (!dateString) return '-';
@@ -16,14 +15,21 @@ function formatDate(dateString){
 }
 
 function authHeaders() {
-    return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
+    return { 
+        'Authorization': `Bearer ${getToken()}`, 
+        'Content-Type': 'application/json' 
+    };
 }
 
 async function apiFetch(url) {
-    const res = await fetch(`${API_BASE}${url}`, { headers: authHeaders() });
-    if (res.status === 401) { window.location.href = 'login.html'; throw new Error('Unauthorized'); }
-    if (res.status === 403) { throw new Error('Acceso denegado'); }
-    if (!res.ok) { throw new Error(`Error ${res.status}`); }
+    const res = await fetch(`${API_BASE}${url}`, { 
+        headers: authHeaders() 
+    });
+    
+    if (!res.ok) { 
+        throw new Error(`Error ${res.status}`); 
+    }
+
     return res.json();
 }
 
@@ -84,7 +90,6 @@ function onCampaignChange(e) {
 // Cargamos datos para mostrar KPIs y gráficos
 async function loadMetrics(campaignId) {
     if (!campaignId) return;
-    showLoading(true); // Mostramos spinner de carga
     hideError();
 
     try {
@@ -109,8 +114,6 @@ async function loadMetrics(campaignId) {
 
     } catch(e) {
         showError(e.message);
-    } finally {
-        showLoading(false);
     }
 }
 
@@ -191,12 +194,6 @@ function resetTimer() {
     if (ms > 0 && currentCampaignId) {
         refreshTimer = setInterval(() => loadMetrics(currentCampaignId), ms);
     }
-}
-
-
-function showLoading(on) {
-    const el = document.querySelector('#loadingSpinner');
-    if (on) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
 }
 
 // Mostramos vista inicial
