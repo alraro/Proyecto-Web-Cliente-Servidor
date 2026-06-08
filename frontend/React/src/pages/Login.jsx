@@ -6,6 +6,8 @@ import {useAuth} from './auth/useAuthHook'
 import {getRoleRoute} from './auth/roleRoutes'
 import './css/login.css'
 
+const ruta = "http://localhost:8080";
+
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -26,7 +28,7 @@ function Login() {
         const password = e.target.password.value;
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(`${ruta}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

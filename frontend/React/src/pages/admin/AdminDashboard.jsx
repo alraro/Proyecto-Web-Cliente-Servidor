@@ -10,6 +10,8 @@ import {Bar} from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+const ruta = "http://localhost:8080";
+
 function formatDate(date) {
     if (!date) return '-';
 
@@ -48,7 +50,7 @@ function Dashboard() {
     useEffect(() => {
         async function fetch() {
             try {
-                const res = await fetch('/api/campaigns', {
+                const res = await fetch(`${ruta}/api/campaigns`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

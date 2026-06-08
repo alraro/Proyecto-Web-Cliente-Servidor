@@ -1,3 +1,5 @@
+const API_BASE = 'http://localhost:8080';
+
 async function exportarExcel(resource, campaignId = null) {
     const btn = document.querySelector('.btn-export');
     const textoOriginal = btn.textContent;
@@ -6,7 +8,7 @@ async function exportarExcel(resource, campaignId = null) {
     btn.disabled = true;
 
     try {
-        let url = `http://localhost:8080/api/export/${resource}`;
+        let url = `${API_BASE}/api/export/${resource}`;
         
         /* Lo usamos solo si necesitamos exportar tambien el dashboard (en proceso)
         if (campaignId) url += `?campaignId=${campaignId}`;
