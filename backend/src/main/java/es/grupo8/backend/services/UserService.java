@@ -208,5 +208,11 @@ public class UserService {
         return isPartnerEntityManager(userId);
     }
 
-
+    public boolean isManagerOfEntity(Integer userId, Integer entityId) {
+        try {
+            return userRepository.isPartnerEntityManagerOfEntity(userId, entityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

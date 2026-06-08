@@ -28,7 +28,7 @@ public class PartnerEntityManagerController {
     @Autowired
     private UserService userService;
 
-    private Integer checkAuth(String auth) {
+    private void checkAuth(String auth) {
         Integer userId = authService.extractUserIdFromToken(auth);
         if (userId == null) {
             throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
@@ -36,7 +36,6 @@ public class PartnerEntityManagerController {
         if (!userService.isAdmin(userId)) {
             throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
         }
-        return userId;
     }
 
     @GetMapping

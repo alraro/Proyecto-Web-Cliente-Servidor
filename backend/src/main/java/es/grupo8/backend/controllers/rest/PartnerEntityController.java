@@ -27,7 +27,7 @@ public class PartnerEntityController {
     @Autowired
     private UserService userService;
 
-    private Integer checkAuth(String auth) {
+    private void checkAdmin(String auth) {
         Integer userId = authService.extractUserIdFromToken(auth);
         if (userId == null) {
             throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
@@ -35,7 +35,16 @@ public class PartnerEntityController {
         if (!userService.isAdmin(userId)) {
             throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
         }
-        return userId;
+    }
+
+    private void checkAdminOrEntityManager(String auth, Integer entityId) {
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!userService.isAdmin(userId) && !userService.isManagerOfEntity(userId, entityId)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
+        }
     }
 
     @GetMapping
@@ -46,7 +55,7 @@ public class PartnerEntityController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String search) {
 
-        checkAuth(auth);
+        checkAdmin(auth);
         PaginatedResponse<PartnerEntityResponseDto> response =
                 partnerEntityService.getAllPartnerEntities(page, size, sort, search);
         return ResponseEntity.ok(response);
@@ -57,7 +66,7 @@ public class PartnerEntityController {
             @RequestHeader("Authorization") String auth,
             @PathVariable Integer id) {
 
-        checkAuth(auth);
+        checkAdminOrEntityManager(auth, id);
         PartnerEntityResponseDto response = partnerEntityService.getPartnerEntityById(id);
         return ResponseEntity.ok(response);
     }
@@ -67,7 +76,7 @@ public class PartnerEntityController {
             @RequestHeader("Authorization") String auth,
             @RequestBody PartnerEntityRequestDto request) {
 
-        checkAuth(auth);
+        checkAdmin(auth);
         PartnerEntityResponseDto response = partnerEntityService.createPartnerEntity(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -78,7 +87,7 @@ public class PartnerEntityController {
             @PathVariable Integer id,
             @RequestBody PartnerEntityRequestDto request) {
 
-        checkAuth(auth);
+        checkAdminOrEntityManager(auth, id);
         PartnerEntityResponseDto response = partnerEntityService.updatePartnerEntity(id, request);
         return ResponseEntity.ok(response);
     }
@@ -88,7 +97,7 @@ public class PartnerEntityController {
             @RequestHeader("Authorization") String auth,
             @PathVariable Integer id) {
 
-        checkAuth(auth);
+        checkAdmin(auth);
         partnerEntityService.deletePartnerEntity(id);
         return ResponseEntity.noContent().build();
     }
