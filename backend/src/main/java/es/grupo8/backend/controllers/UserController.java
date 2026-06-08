@@ -93,26 +93,26 @@ public class UserController {
 
         String role = roleRaw.trim().toUpperCase(Locale.ROOT);
 
-        // Remove all existing roles before assigning the new one
-        // Admin
+        // Eliminar todos los roles existentes antes de asignar el nuevo
+        // Administrador
         adminRepository.findById(id).ifPresent(adminRepository::delete);
 
-        // Coordinator - delete all campaigns for this user
+        // Coordinador - eliminar todas las asignaciones de campañas de este usuario
         coordinatorRepository.findAll().stream()
             .filter(c -> c.getId().getIdUser().equals(id))
             .forEach(c -> coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(
                 c.getId().getIdUser(), c.getId().getIdCampaign()));
 
-        // Captain - delete all campaigns for this user
+        // Capitán - eliminar todas las asignaciones de campañas de este usuario
         captainRepository.findAll().stream()
             .filter(c -> c.getId().getIdUser().equals(id))
             .forEach(c -> captainRepository.deleteByIdIdUserAndIdIdCampaign(
                 c.getId().getIdUser(), c.getId().getIdCampaign()));
 
-        // PartnerEntityManager
+        // Responsable de entidad colaboradora
         partnerEntityManagerRepository.findById(id).ifPresent(partnerEntityManagerRepository::delete);
 
-        // Store responsible - unset responsible without deleting the store
+        // Responsable de tienda - quitar el responsable sin eliminar la tienda
         storeRepository.findByIdResponsible_IdUser(id).ifPresent(store -> {
             store.setIdResponsible(null);
             storeRepository.save(store);
