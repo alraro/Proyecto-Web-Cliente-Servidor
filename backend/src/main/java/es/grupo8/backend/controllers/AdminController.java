@@ -6,6 +6,7 @@
 
 package es.grupo8.backend.controllers;
 
+import es.grupo8.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -27,6 +29,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private AuthService authService;
@@ -155,4 +160,15 @@ public class AdminController {
 
     @GetMapping("/responsible-store")
     public String responsibleStore() { return "responsible-store"; }
+
+    @GetMapping("/admin-partner-entities")
+    public String adminPartnerEntities(
+            @RequestHeader("Authorization") String token
+    ) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        if (userId == null || !userService.isAdmin(userId)) {
+            return "redirect:/login";
+        }
+        return "admin-partner-entities";
+    }
 }

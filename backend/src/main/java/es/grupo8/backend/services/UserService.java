@@ -152,4 +152,38 @@ public class UserService {
         if (!List.of("ADMIN", "COORDINATOR", "CAPTAIN", "PARTNER_ENTITY_MANAGER").contains(role))
             throw new IllegalArgumentException("Rol no válido. Los roles válidos son: ADMIN, COORDINATOR, CAPTAIN, PARTNER_ENTITY_MANAGER.");
     }
+
+    public boolean isAdmin(Integer userId) {
+        try {
+            return userRepository.isAdmin(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isCoordinator(Integer userId) {
+        try {
+            return userRepository.isCoordinator(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isCaptain(Integer userId) {
+        try {
+            return userRepository.isCaptain(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPartnerEntityManager(Integer userId) {
+        try {
+            return userRepository.isPartnerEntityManager(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
 }
