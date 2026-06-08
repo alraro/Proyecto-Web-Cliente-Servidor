@@ -1,4 +1,4 @@
-package es.grupo8.backend.controllers;
+package es.grupo8.backend.controllers.rest;
 
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityManagerAssignRequestDto;

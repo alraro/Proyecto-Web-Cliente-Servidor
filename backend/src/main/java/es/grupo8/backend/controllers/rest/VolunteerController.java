@@ -2,6 +2,7 @@ package es.grupo8.backend.controllers.rest;
 
 import es.grupo8.backend.dto.VoluntarioRequestDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
+import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,80 +23,64 @@ public class VolunteerController {
     @Autowired
     private AuthService authService;
 
+    private void checkAuth(String auth, Integer entidadId) {
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<VoluntarioResponseDto>> listarVoluntarios(
             @RequestHeader("Authorization") String auth,
-            @RequestParam Integer entidadId)
-    {
-        Integer userId = authService.extractUserIdFromToken(auth);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+            @RequestParam Integer entidadId) {
 
-        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+        checkAuth(auth, entidadId);
         List<VoluntarioResponseDto> voluntarios = volunteerService.getVolunteersByEntity(entidadId);
         return ResponseEntity.ok(voluntarios);
     }
 
     @PostMapping
-    public ResponseEntity<?> crearVoluntario(
+    public ResponseEntity<VoluntarioResponseDto> crearVoluntario(
             @RequestHeader("Authorization") String auth,
             @RequestBody VoluntarioRequestDto request,
             @RequestParam Integer entidadId) {
 
-        Integer userId = authService.extractUserIdFromToken(auth);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+        checkAuth(auth, entidadId);
         VoluntarioResponseDto voluntario = volunteerService.createVolunteer(request, entidadId);
         return ResponseEntity.status(HttpStatus.CREATED).body(voluntario);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editarVoluntario(
+    public ResponseEntity<VoluntarioResponseDto> editarVoluntario(
             @RequestHeader("Authorization") String auth,
             @RequestBody VoluntarioRequestDto request,
             @RequestParam Integer entidadId,
             @PathVariable Integer id) {
 
-        Integer userId = authService.extractUserIdFromToken(auth);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+        checkAuth(auth, entidadId);
         VoluntarioResponseDto voluntario = volunteerService.updateVolunteer(id, request, entidadId);
         return ResponseEntity.ok(voluntario);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarVoluntario(
+    public ResponseEntity<Void> eliminarVoluntario(
             @RequestHeader("Authorization") String auth,
             @RequestParam Integer entidadId,
             @PathVariable Integer id) {
 
-        Integer userId = authService.extractUserIdFromToken(auth);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (!volunteerService.canAccessPartnerEntity(userId, entidadId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+        checkAuth(auth, entidadId);
         volunteerService.deleteVolunteer(id, entidadId);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
+        return ResponseEntity.status(e.getStatus())
+                .body(Map.of("message", e.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
