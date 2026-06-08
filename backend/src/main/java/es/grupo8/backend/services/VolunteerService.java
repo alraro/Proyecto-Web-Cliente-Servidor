@@ -1,21 +1,18 @@
 package es.grupo8.backend.services;
 
-import es.grupo8.backend.dao.PartnerEntityManagerRepository;
 import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
 import es.grupo8.backend.dto.VoluntarioRequestDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
-import es.grupo8.backend.dto.VoluntarioResponseDto.CampaignInfo;
-import es.grupo8.backend.entity.*;
+import es.grupo8.backend.entity.PartnerEntity;
+import es.grupo8.backend.entity.Volunteer;
+import es.grupo8.backend.mapper.VolunteerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class VolunteerService {
@@ -24,7 +21,7 @@ public class VolunteerService {
     private VolunteerRepository volunteerRepository;
 
     @Autowired
-    private PartnerEntityManagerRepository partnerEntityManagerRepository;
+    private VolunteerMapper volunteerMapper;
 
     @Autowired
     private PartnerEntityRepository partnerEntityRepository;
@@ -34,9 +31,7 @@ public class VolunteerService {
 
     public List<VoluntarioResponseDto> getVolunteersByEntity(Integer partnerEntityId) {
         List<Volunteer> volunteers = volunteerRepository.findByIdPartnerEntity_Id(partnerEntityId);
-        return volunteers.stream()
-                .map(this::toResponseDto)
-                .collect(Collectors.toList());
+        return volunteerMapper.toDTOList(volunteers);
     }
 
     public VoluntarioResponseDto getVolunteerById(Integer id, Integer partnerEntityId) {
@@ -48,7 +43,7 @@ public class VolunteerService {
             throw new RuntimeException("Volunteer not found for this entity");
         }
 
-        return toResponseDto(volunteer);
+        return volunteerMapper.toDTO(volunteer);
     }
 
     @Transactional
@@ -66,7 +61,7 @@ public class VolunteerService {
         volunteer.setIdPartnerEntity(partnerEntity);
 
         Volunteer savedVolunteer = volunteerRepository.save(volunteer);
-        return toResponseDto(savedVolunteer);
+        return volunteerMapper.toDTO(savedVolunteer);
     }
 
     @Transactional
@@ -87,7 +82,7 @@ public class VolunteerService {
         volunteer.setAddress(trimToNull(request.address()));
 
         Volunteer updatedVolunteer = volunteerRepository.save(volunteer);
-        return toResponseDto(updatedVolunteer);
+        return volunteerMapper.toDTO(updatedVolunteer);
     }
 
     @Transactional
@@ -144,42 +139,5 @@ public class VolunteerService {
             return null;
         }
         return trimmed.replaceAll("\\s+", " ");
-    }
-
-    private VoluntarioResponseDto toResponseDto(Volunteer volunteer) {
-        List<CampaignInfo> campaigns = new ArrayList<>();
-
-        Set<VolunteerShift> shifts = volunteer.getVolunteerShifts();
-        if (shifts != null) {
-            Set<Integer> addedCampaignIds = new java.util.HashSet<>();
-            for (VolunteerShift shift : shifts) {
-                if (shift.getCampaignStores() != null &&
-                    shift.getCampaignStores().getIdCampaign() != null) {
-
-                    Campaign campaign = shift.getCampaignStores().getIdCampaign();
-                    if (addedCampaignIds.add(campaign.getId())) {
-                        campaigns.add(new CampaignInfo(campaign.getId(), campaign.getName()));
-                    }
-                }
-            }
-        }
-
-        Integer entityId = null;
-        String entityName = null;
-        if (volunteer.getIdPartnerEntity() != null) {
-            entityId = volunteer.getIdPartnerEntity().getId();
-            entityName = volunteer.getIdPartnerEntity().getName();
-        }
-
-        return new VoluntarioResponseDto(
-                volunteer.getId(),
-                volunteer.getName(),
-                volunteer.getPhone(),
-                volunteer.getEmail(),
-                volunteer.getAddress(),
-                entityId,
-                entityName,
-                campaigns
-        );
     }
 }
