@@ -1,0 +1,112 @@
+package es.grupo8.backend.controllers.rest;
+
+import es.grupo8.backend.dto.VoluntarioRequestDto;
+import es.grupo8.backend.dto.VoluntarioResponseDto;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.VolunteerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/voluntarios")
+public class VolunteerController {
+
+    @Autowired
+    private VolunteerService volunteerService;
+
+    @Autowired
+    private AuthService authService;
+
+    @GetMapping
+    public ResponseEntity<List<VoluntarioResponseDto>> listarVoluntarios(
+            @RequestHeader("Authorization") String auth,
+            @RequestParam Integer entidadId)
+    {
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<VoluntarioResponseDto> voluntarios = volunteerService.getVolunteersByEntity(entidadId);
+        return ResponseEntity.ok(voluntarios);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> crearVoluntario(
+            @RequestHeader("Authorization") String auth,
+            @RequestBody VoluntarioRequestDto request,
+            @RequestParam Integer entidadId) {
+
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        VoluntarioResponseDto voluntario = volunteerService.createVolunteer(request, entidadId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(voluntario);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editarVoluntario(
+            @RequestHeader("Authorization") String auth,
+            @RequestBody VoluntarioRequestDto request,
+            @RequestParam Integer entidadId,
+            @PathVariable Integer id) {
+
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        VoluntarioResponseDto voluntario = volunteerService.updateVolunteer(id, request, entidadId);
+        return ResponseEntity.ok(voluntario);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarVoluntario(
+            @RequestHeader("Authorization") String auth,
+            @RequestParam Integer entidadId,
+            @PathVariable Integer id) {
+
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!volunteerService.verifyEntityAccess(userId, entidadId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        volunteerService.deleteVolunteer(id, entidadId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", e.getMessage()));
+    }
+}

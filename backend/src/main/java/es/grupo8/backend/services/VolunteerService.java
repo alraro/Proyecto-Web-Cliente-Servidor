@@ -1,14 +1,13 @@
 package es.grupo8.backend.services;
 
+import es.grupo8.backend.dao.PartnerEntityManagerRepository;
 import es.grupo8.backend.dao.PartnerEntityRepository;
+import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
 import es.grupo8.backend.dto.VoluntarioRequestDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto.CampaignInfo;
-import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.PartnerEntity;
-import es.grupo8.backend.entity.Volunteer;
-import es.grupo8.backend.entity.VolunteerShift;
+import es.grupo8.backend.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,13 @@ public class VolunteerService {
     private VolunteerRepository volunteerRepository;
 
     @Autowired
+    private PartnerEntityManagerRepository partnerEntityManagerRepository;
+
+    @Autowired
     private PartnerEntityRepository partnerEntityRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public List<VoluntarioResponseDto> getVolunteersByEntity(Integer partnerEntityId) {
         List<Volunteer> volunteers = volunteerRepository.findByIdPartnerEntity_Id(partnerEntityId);
@@ -116,6 +121,14 @@ public class VolunteerService {
             if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
                 throw new IllegalArgumentException("El formato del email es inválido.");
             }
+        }
+    }
+
+    public boolean verifyEntityAccess(Integer userId, Integer partnerEntityId) {
+        try {
+            return userRepository.isAdmin(userId) || userRepository.isPartnerEntityManagerOfEntity(userId, partnerEntityId);
+        } catch (Exception e) {
+            return false;
         }
     }
 
