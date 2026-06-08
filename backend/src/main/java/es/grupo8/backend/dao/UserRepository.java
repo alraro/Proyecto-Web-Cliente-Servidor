@@ -28,6 +28,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaS
     @Query(value = "SELECT EXISTS (SELECT 1 FROM partner_entity_managers r WHERE r.id_user = :userId)", nativeQuery = true)
     boolean isPartnerEntityManager(@Param("userId") Integer userId);
 
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM partner_entity_managers r WHERE r.id_user = :userId AND r.id_partner_entity = :entityId)", nativeQuery = true)
+    boolean isPartnerEntityManagerOfEntity(@Param("userId") Integer userId, @Param("entityId") Integer entityId);
+
     @Query(value = "SELECT u.* FROM user_accounts u INNER JOIN coordinators c ON u.id_user = c.id_user GROUP BY u.id_user", nativeQuery = true)
     List<UserEntity> findAllCoordinators();
 
