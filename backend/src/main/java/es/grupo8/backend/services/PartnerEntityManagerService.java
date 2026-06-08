@@ -11,6 +11,8 @@ import es.grupo8.backend.dto.PartnerEntityManagerUpdateRequestDto;
 import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.PartnerEntityManager;
 import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.mapper.PartnerEntityManagerMapper;
+import es.grupo8.backend.services.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,6 @@ import java.util.regex.Pattern;
 @Service
 public class PartnerEntityManagerService {
 
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9()\\-\\s]{7,20}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     @Autowired
@@ -35,6 +36,9 @@ public class PartnerEntityManagerService {
 
     @Autowired
     private PostalCodeRepository postalCodeRepository;
+
+    @Autowired
+    private PartnerEntityManagerMapper partnerEntityManagerMapper;
 
     public PaginatedResponse<PartnerEntityManagerResponseDto> getAllPartnerEntityManagers(
             int page,
@@ -71,10 +75,7 @@ public class PartnerEntityManagerService {
         if (startIndex >= allManagers.size()) {
             pageContent = List.of();
         } else {
-            pageContent = allManagers.subList(startIndex, endIndex)
-                    .stream()
-                    .map(this::toDto)
-                    .toList();
+            pageContent = partnerEntityManagerMapper.toDTOList(allManagers.subList(startIndex, endIndex));
         }
 
         return new PaginatedResponse<>(
@@ -91,7 +92,7 @@ public class PartnerEntityManagerService {
     public PartnerEntityManagerResponseDto getPartnerEntityManagerByUserId(Integer userId) {
         PartnerEntityManager manager = partnerEntityManagerRepository.findByIdWithRelations(userId)
                 .orElseThrow(() -> new RuntimeException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId));
-        return toDto(manager);
+        return partnerEntityManagerMapper.toDTO(manager);
     }
 
     public PartnerEntityManagerResponseDto promoteUserToPartnerEntityManager(
@@ -115,7 +116,7 @@ public class PartnerEntityManagerService {
         manager.setIdPartnerEntity(resolvePartnerEntity(request != null ? request.getPartnerEntityId() : null));
 
         PartnerEntityManager saved = partnerEntityManagerRepository.save(manager);
-        return toDto(saved);
+        return partnerEntityManagerMapper.toDTO(saved);
     }
 
     public PartnerEntityManagerResponseDto updatePartnerEntityManager(
@@ -156,9 +157,9 @@ public class PartnerEntityManagerService {
             throw new IllegalArgumentException("Ya existe otro usuario con ese email.");
         }
 
-        String normalizedPhone = normalizePhone(request.getPhone());
+        String normalizedPhone = UtilsService.normalizePhone(request.getPhone());
         if (normalizedPhone != null) {
-            if (!PHONE_PATTERN.matcher(normalizedPhone).matches()) {
+            if (!UtilsService.PHONE_PATTERN.matcher(normalizedPhone).matches()) {
                 throw new IllegalArgumentException("El teléfono tiene un formato inválido.");
             }
 
@@ -168,12 +169,12 @@ public class PartnerEntityManagerService {
             }
         }
 
-        String address = trimToNull(request.getAddress());
+        String address = UtilsService.trimToNull(request.getAddress());
         if (address != null && address.length() > 1000) {
             throw new IllegalArgumentException("La dirección no puede superar 1000 caracteres.");
         }
 
-        String postalCode = trimToNull(request.getPostalCode());
+        String postalCode = UtilsService.trimToNull(request.getPostalCode());
         if (postalCode != null) {
             if (postalCode.length() > 10) {
                 throw new IllegalArgumentException("El código postal no puede superar 10 caracteres.");
@@ -194,9 +195,7 @@ public class PartnerEntityManagerService {
         userRepository.save(user);
         partnerEntityManagerRepository.save(manager);
 
-        PartnerEntityManager updated = partnerEntityManagerRepository.findByIdWithRelations(userId)
-                .orElse(manager);
-        return toDto(updated);
+        return partnerEntityManagerMapper.toDTO(manager);
     }
 
     public void removePartnerEntityManagerRole(Integer userId) {
@@ -261,36 +260,6 @@ public class PartnerEntityManagerService {
         }
         return partnerEntityRepository.findById(partnerEntityId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe entidad socia con ID: " + partnerEntityId));
-    }
-
-    private PartnerEntityManagerResponseDto toDto(PartnerEntityManager manager) {
-        UserEntity user = manager.getUserAccounts();
-        PartnerEntity partnerEntity = manager.getIdPartnerEntity();
-
-        return new PartnerEntityManagerResponseDto(
-                manager.getId(),
-                user != null ? user.getName() : null,
-                user != null ? user.getEmail() : null,
-                user != null ? user.getPhone() : null,
-                user != null ? user.getAddress() : null,
-                user != null ? user.getPostalCode() : null,
-                partnerEntity != null ? partnerEntity.getId() : null,
-                partnerEntity != null ? partnerEntity.getName() : null
-        );
-    }
-
-    private String trimToNull(String value) {
-        if (value == null) return null;
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
-
-    private String normalizePhone(String phone) {
-        String trimmed = trimToNull(phone);
-        if (trimmed == null) {
-            return null;
-        }
-        return trimmed.replaceAll("\\s+", " ");
     }
 
     private String lowerValue(String value) {
