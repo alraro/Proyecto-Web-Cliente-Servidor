@@ -5,6 +5,8 @@ import { useState } from 'react';
 import './css/login.css';
 import './css/register.css';
 
+const ruta = "http://localhost:8080";
+
 function Register() {
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
@@ -40,7 +42,7 @@ function Register() {
         }
 
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await fetch(`${ruta}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

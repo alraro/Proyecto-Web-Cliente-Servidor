@@ -6,6 +6,8 @@ import {useState, useEffect} from 'react'
 import {useAuth} from './auth/useAuthHook'
 import {getRoleRoute} from './auth/roleRoutes'
 
+const ruta = "http://localhost:8080";
+
 function Edit() {
     const navigate = useNavigate();
     const {usuario} = useAuth();
@@ -38,7 +40,7 @@ function Edit() {
             }
 
             try {
-                const res = await fetch('/api/auth/profile', {
+                const res = await fetch(`${ruta}/api/auth/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -141,7 +143,7 @@ function Edit() {
         };
 
         try {
-            const res = await fetch('/api/auth/profile', {
+            const res = await fetch(`${ruta}/api/auth/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

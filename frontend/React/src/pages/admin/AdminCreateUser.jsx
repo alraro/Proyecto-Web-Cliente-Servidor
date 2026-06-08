@@ -8,6 +8,7 @@ import GenericPageWrapper from '../generalModules/GenericPageWrapper';
 import '../css/login.css';
 import '../css/register.css';
 
+const ruta = "http://localhost:8080";
 
 function CrearUsuario() {
     const navigate = useNavigate();
@@ -44,7 +45,7 @@ function CrearUsuario() {
         }
 
         try {
-            const res = await fetch('/api/auth/admin/users', {
+            const res = await fetch(`${ruta}/api/auth/admin/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
