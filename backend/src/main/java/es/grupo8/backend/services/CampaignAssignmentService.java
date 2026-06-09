@@ -54,6 +54,7 @@ public class CampaignAssignmentService {
      * @param adminUserId admin user identifier (for audit)
      * @return list of campaign DTOs
      */
+    @Transactional(readOnly = true)
     public List<CampaignDTO> getCampaigns(Integer adminUserId) {
         List<CampaignDTO> result = campaignMapper.toDTOList(campaignRepository.findAll());
         auditLog.info("ACTION=LIST_CAMPAIGNS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
@@ -69,6 +70,7 @@ public class CampaignAssignmentService {
      * @return typed DTO with campaign info and coordinator/captain lists
      * @throws NoSuchElementException if campaign not found
      */
+    @Transactional(readOnly = true)
     public CampaignAssignmentsDTO getCampaignAssignments(Integer adminUserId, Integer campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
@@ -94,6 +96,7 @@ public class CampaignAssignmentService {
      * @throws NoSuchElementException   if campaign not found
      * @throws IllegalArgumentException if role is invalid
      */
+    @Transactional(readOnly = true)
     public List<UserDTO> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
         if (!campaignRepository.existsById(campaignId)) {
             throw new NoSuchElementException("Campaign not found");

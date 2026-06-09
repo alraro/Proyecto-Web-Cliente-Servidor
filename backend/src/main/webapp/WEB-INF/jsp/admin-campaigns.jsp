@@ -139,10 +139,6 @@
     document.addEventListener("DOMContentLoaded", async () => {
         const token = '<%= token %>';
         const nombre = '<%= nombre == null ? "Admin" : nombre %>';
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
 
         const authOpts = { headers: { Authorization: "Bearer " + token } };
 
@@ -369,7 +365,7 @@
                 const campaignId = Number(campaign.id);
                 const campaignName = escapeHtml(campaign.name || "");
                 const campaignNameForJs = escapeJsString(campaign.name || "");
-                const typeName = escapeHtml((campaign.type && campaign.type.name) ? campaign.type.name : "-");
+                const typeName = escapeHtml(campaign.typeName || "-");
 
                 row.innerHTML = `
                     <td>${campaignName}</td>
@@ -412,7 +408,7 @@
                 currentCampaignId = campaignId;
                 modalTitle.textContent = "Editar campaña";
                 nameInput.value = campaign.name || "";
-                typeSelect.value = (campaign.type && campaign.type.id != null) ? String(campaign.type.id) : "";
+                typeSelect.value = campaign.typeId != null ? String(campaign.typeId) : "";
                 startInput.value = campaign.startDate || "";
                 endInput.value = campaign.endDate || "";
 

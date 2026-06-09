@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CaptainRepository;
@@ -75,6 +76,7 @@ public class CoordinatorDashboardService {
      * @param userId coordinator user identifier
      * @return list of campaign DTOs
      */
+    @Transactional(readOnly = true)
     public List<CampaignDTO> getMyCampaigns(Integer userId) {
         return campaignMapper.toDTOList(coordinatorRepository.findCampaignsByUserId(userId));
     }
@@ -86,6 +88,7 @@ public class CoordinatorDashboardService {
      * @return list of store DTOs
      * @throws IllegalArgumentException if campaignId is null
      */
+    @Transactional(readOnly = true)
     public List<StoreDTO> getMyStores(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
@@ -342,6 +345,7 @@ public class CoordinatorDashboardService {
      * @return list of campaign entity DTOs
      * @throws IllegalArgumentException if campaignId is null
      */
+    @Transactional(readOnly = true)
     public List<CampaignEntityDTO> getCampaignEntities(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");

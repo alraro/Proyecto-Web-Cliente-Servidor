@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CaptainRepository;
@@ -57,6 +58,7 @@ public class CaptainDashboardService {
      * @param userId captain user identifier
      * @return list of campaign DTOs
      */
+    @Transactional(readOnly = true)
     public List<CampaignDTO> getMyCampaigns(Integer userId) {
         return campaignMapper.toDTOList(captainRepository.findCampaignsByUserId(userId));
     }
@@ -69,6 +71,7 @@ public class CaptainDashboardService {
      * @return list of store DTOs
      * @throws IllegalArgumentException if campaignId is null
      */
+    @Transactional(readOnly = true)
     public List<StoreDTO> getMyStores(Integer userId, Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
@@ -88,6 +91,7 @@ public class CaptainDashboardService {
      * @return list of shift DTOs
      * @throws IllegalArgumentException if campaignId is null
      */
+    @Transactional(readOnly = true)
     public List<ShiftResponseDto> getShifts(Integer userId, Integer campaignId, Integer storeId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
@@ -99,21 +103,22 @@ public class CaptainDashboardService {
     }
 
     /**
-     * Returns volunteer-shift assignments filtered by campaign and store.
+     * Returns volunteer-shift assignments filtered by campaign and optionally by store.
      *
      * @param userId     captain user identifier
      * @param campaignId required campaign filter
-     * @param storeId    required store filter
+     * @param storeId    optional store filter; when null, returns all shifts for the campaign
      * @return list of volunteer-shift DTOs
-     * @throws IllegalArgumentException if campaignId or storeId is null
+     * @throws IllegalArgumentException if campaignId is null
      */
+    @Transactional(readOnly = true)
     public List<VolunteerShiftDTO> getVolunteerShifts(Integer userId, Integer campaignId, Integer storeId) {
-        if (campaignId == null || storeId == null) {
-            throw new IllegalArgumentException("campaignId y storeId son obligatorios");
+        if (campaignId == null) {
+            throw new IllegalArgumentException("campaignId es obligatorio");
         }
         List<es.grupo8.backend.entity.VolunteerShift> filtered = volunteerShiftRepository.findAll().stream()
                 .filter(vs -> vs.getId().getIdCampaign().equals(campaignId)
-                           && vs.getId().getIdStore().equals(storeId))
+                           && (storeId == null || vs.getId().getIdStore().equals(storeId)))
                 .collect(Collectors.toList());
         return volunteerShiftMapper.toDTOList(filtered);
     }
@@ -165,6 +170,7 @@ public class CaptainDashboardService {
      * @return list of incident DTOs
      * @throws IllegalArgumentException if campaignId or storeId is null
      */
+    @Transactional(readOnly = true)
     public List<IncidentDTO> getIncidents(Integer userId, Integer campaignId, Integer storeId) {
         if (campaignId == null || storeId == null) {
             throw new IllegalArgumentException("campaignId y storeId son obligatorios");

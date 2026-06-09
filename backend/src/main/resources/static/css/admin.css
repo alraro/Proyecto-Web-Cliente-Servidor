@@ -61,7 +61,7 @@
     font-weight: 700;
 }
 
-#campaign-modal .modal {
+#campaign-modal .modal-card {
     max-width: 960px;
     max-height: 90vh;
     overflow-y: auto;

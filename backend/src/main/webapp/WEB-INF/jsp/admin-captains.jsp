@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
 <%
     String token  = (String) session.getAttribute("token");
@@ -194,7 +194,7 @@
                 row.innerHTML = `
                     <td>${escapeHtml(captain.name || "")}</td>
                     <td>${escapeHtml(captain.email || "")}</td>
-                    <td><button type="button" data-userid="${captain.userId}" data-role="CAPTAIN">Eliminar</button></td>`;
+                    <td><button type="button" data-userid="${captain.idUser}" data-role="CAPTAIN">Eliminar</button></td>`;
                 captainsTbody.appendChild(row);
             });
         }
@@ -203,7 +203,7 @@
             selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
             (users || []).forEach((user) => {
                 const option = document.createElement("option");
-                option.value = String(user.userId);
+                option.value = String(user.idUser);
                 option.textContent = `${user.name} (${user.email})`;
                 selectEl.appendChild(option);
             });
