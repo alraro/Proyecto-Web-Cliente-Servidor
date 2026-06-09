@@ -1,93 +1,88 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../css/admin.css';
-import '../css/admin-stores.css';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import GenericPageWrapper from "../generalModules/GenericPageWrapper";
+import GenericTable from "../generalModules/GenericTable";
+import GenericModal from "../generalModules/GenericModal";
+import SecurePage from "../generalModules/SecurePage";
 
-const sampleChains = [
-    { id: 1, name: 'CARREFOUR' },
-    { id: 2, name: 'DIA' },
-    { id: 9, name: 'MERCADONA' }
+const STORE_FIELDS = [
+    { name: "id", label: "ID", type: "text", readOnly: true },
+    { name: "name", label: "Nombre", type: "text" },
+    { name: "address", label: "Dirección", type: "text" },
+    { name: "postalCode", label: "Código postal", type: "text" },
 ];
 
-const sampleZones = [
-    { id: 1, name: 'Antequera' },
-    { id: 7, name: 'Malaga' }
-];
+const apiUrl = "http://localhost:8080";
 
-const sampleLocalities = [
-    { id: 1, name: 'Alameda', zoneId: 1 },
-    { id: 12, name: 'Antequera', zoneId: 1 },
-    { id: 37, name: 'Malaga', zoneId: 7 }
-];
+function getAuthToken() {
+    return sessionStorage.getItem("token");
+}
 
-const sampleStores = [
-    {
-        id: 1,
-        name: 'ECHEVERRIA',
-        address: 'Avda Pio Baroja, 6',
-        localityId: 37,
-        localityName: 'Malaga',
-        postalCode: '29017',
-        zoneId: 7,
-        zoneName: 'Malaga',
-        chainId: 1,
-        chainName: 'CARREFOUR'
-    },
-    {
-        id: 14,
-        name: 'DIA',
-        address: 'Avda Malaga Oloroso 30',
-        localityId: 37,
-        localityName: 'Malaga',
-        postalCode: '29014',
-        zoneId: 7,
-        zoneName: 'Malaga',
-        chainId: 2,
-        chainName: 'DIA'
+function mapStoreToTableRow(store) {
+    return {
+        ...store,
+        locality: store.locality || "N/A",
+        postalcode: store.postalCode || "N/A",
+        zone: store.zone || "N/A",
+        chainname: store.chainName || "N/A",
+    };
+}
+
+function StoreFilters({ chains, zones, localities, value, onChange, onApply, onClear, onZoneChange }) {
+    function handleChainChange(event) {
+        onChange({ ...value, chainId: event.target.value });
     }
-];
-
-function StoreFilters({ chains, zones, localities, onApply, onClear }) {
-    const [chainId, setChainId] = useState('');
-    const [zoneId, setZoneId] = useState('');
-    const [localityId, setLocalityId] = useState('');
-
-    const filteredLocalities = zoneId
-        ? localities.filter(locality => String(locality.zoneId) === String(zoneId))
-        : localities;
 
     function handleZoneChange(event) {
-        setZoneId(event.target.value);
-        setLocalityId('');
+        const nextZoneId = event.target.value;
+        onChange({ ...value, zoneId: nextZoneId, localityId: "" });
+        if (onZoneChange) {
+            onZoneChange(nextZoneId);
+        }
+    }
+
+    function handleLocalityChange(event) {
+        onChange({ ...value, localityId: event.target.value });
     }
 
     function handleClear() {
-        setChainId('');
-        setZoneId('');
-        setLocalityId('');
         onClear();
     }
 
+    const filteredLocalities = value.zoneId
+        ? localities.filter((locality) => String(locality.zoneId) === String(value.zoneId))
+        : localities;
+
     return (
         <div className="filters-bar">
-            <select value={chainId} onChange={event => setChainId(event.target.value)}>
+            <select value={value.chainId} onChange={handleChainChange}>
                 <option value="">Todas las cadenas</option>
-                {chains.map(chain => <option key={chain.id} value={chain.id}>{chain.name}</option>)}
-            </select>
-
-            <select value={zoneId} onChange={handleZoneChange}>
-                <option value="">Todas las zonas</option>
-                {zones.map(zone => <option key={zone.id} value={zone.id}>{zone.name}</option>)}
-            </select>
-
-            <select value={localityId} onChange={event => setLocalityId(event.target.value)}>
-                <option value="">Todas las localidades</option>
-                {filteredLocalities.map(locality => (
-                    <option key={locality.id} value={locality.id}>{locality.name}</option>
+                {chains.map((chain) => (
+                    <option key={chain.id} value={chain.id}>
+                        {chain.name}
+                    </option>
                 ))}
             </select>
 
-            <button className="btn btn-primary btn-sm" onClick={() => onApply({ chainId, zoneId, localityId })}>
+            <select value={value.zoneId} onChange={handleZoneChange}>
+                <option value="">Todas las zonas</option>
+                {zones.map((zone) => (
+                    <option key={zone.id} value={zone.id}>
+                        {zone.name}
+                    </option>
+                ))}
+            </select>
+
+            <select value={value.localityId} onChange={handleLocalityChange}>
+                <option value="">Todas las localidades</option>
+                {filteredLocalities.map((locality) => (
+                    <option key={locality.id} value={locality.id}>
+                        {locality.name}
+                    </option>
+                ))}
+            </select>
+
+            <button className="btn btn-primary btn-sm" onClick={() => onApply(value)}>
                 Aplicar filtros
             </button>
             <button className="btn btn-secondary btn-sm" onClick={handleClear}>
@@ -98,75 +93,189 @@ function StoreFilters({ chains, zones, localities, onApply, onClear }) {
 }
 
 export default function AdminStores() {
-    const [filters, setFilters] = useState({ chainId: '', zoneId: '', localityId: '' });
+    const tableHeaders = {
+        id: "ID",
+        name: "Nombre",
+        address: "Dirección",
+        locality: "Localidad",
+        postalcode: "CP",
+        zone: "Zona",
+        chainname: "Cadena",
+    };
 
-    const filteredStores = sampleStores.filter(store => {
-        if (filters.chainId && String(store.chainId) !== String(filters.chainId)) return false;
-        if (filters.zoneId && String(store.zoneId) !== String(filters.zoneId)) return false;
-        if (filters.localityId && String(store.localityId) !== String(filters.localityId)) return false;
-        return true;
-    });
+    const [storesData, setStoresData] = useState([]);
+    const [chainsData, setChainsData] = useState([]);
+    const [zonesData, setZonesData] = useState([]);
+    const [localitiesData, setLocalitiesData] = useState([]);
+    const [filters, setFilters] = useState({ chainId: "", zoneId: "", localityId: "" });
+    const [filterString, setFilterString] = useState("");
+    const [selectedStore, setSelectedStore] = useState(null);
+    const [isEditingModalOpen, setIsEditingModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchInitialData() {
+            try {
+                const token = getAuthToken();
+                const [storesResponse, chainsResponse, zonesResponse] = await Promise.all([
+                    fetch(`${apiUrl}/api/stores`, { headers: { Authorization: `Bearer ${token}` } }),
+                    fetch(`${apiUrl}/api/chains`, { headers: { Authorization: `Bearer ${token}` } }),
+                    fetch(`${apiUrl}/api/zones`, { headers: { Authorization: `Bearer ${token}` } }),
+                ]);
+
+                if (!storesResponse.ok) {
+                    throw new Error(`HTTP error! status: ${storesResponse.status}`);
+                }
+                if (!chainsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${chainsResponse.status}`);
+                }
+                if (!zonesResponse.ok) {
+                    throw new Error(`HTTP error! status: ${zonesResponse.status}`);
+                }
+
+                const storesJson = await storesResponse.json();
+                const chainsJson = await chainsResponse.json();
+                const zonesJson = await zonesResponse.json();
+
+                setStoresData(Array.isArray(storesJson.content) ? storesJson.content : []);
+                setChainsData(Array.isArray(chainsJson) ? chainsJson : []);
+                setZonesData(Array.isArray(zonesJson) ? zonesJson : []);
+            } catch (error) {
+                console.error("Error fetching stores data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchInitialData();
+    }, []);
+
+    useEffect(() => {
+        async function fetchLocalities() {
+            try {
+                const token = getAuthToken();
+                const url = filters.zoneId ? `${apiUrl}/api/localities?zoneId=${filters.zoneId}` : `${apiUrl}/api/localities`;
+                const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const nextLocalities = Array.isArray(data) ? data : [];
+                setLocalitiesData(nextLocalities);
+            } catch (error) {
+                console.error("Error fetching localities data:", error);
+            }
+        }
+
+        fetchLocalities();
+    }, [filters.zoneId]);
 
     function handleApplyFilters(nextFilters) {
         setFilters(nextFilters);
     }
 
     function handleClearFilters() {
-        setFilters({ chainId: '', zoneId: '', localityId: '' });
+        setFilters({ chainId: "", zoneId: "", localityId: "" });
+        setFilterString("");
     }
 
-    return (
-        <div className="admin-page">
-            <header className="page-header">
-                <h1>Gestion de Tiendas</h1>
-                <nav className="admin-tabs" aria-label="Navegacion de administrador">
-                    <Link className="admin-tab" to="/admin">Volver al panel</Link>
-                    <Link className="admin-tab" to="/login">Cerrar sesion</Link>
-                </nav>
-            </header>
+    function handleUpdateFilters(nextFilters) {
+        setFilters(nextFilters);
+    }
 
-            <main className="page-main">
+    function handleEditStore(store) {
+        setSelectedStore(store);
+        setIsEditingModalOpen(true);
+    }
+
+    function handleCloseEditingModal() {
+        setIsEditingModalOpen(false);
+        setSelectedStore(null);
+    }
+
+    async function handleSaveStore(formData) {
+        try {
+            const token = getAuthToken();
+            const response = await fetch(`${apiUrl}/api/stores/${formData.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    address: formData.address,
+                    postalCode: formData.postalCode,
+                    chainId: selectedStore?.chainId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const updatedStore = await response.json();
+            setStoresData((prev) => prev.map((store) => (store.id === updatedStore.id ? updatedStore : store)));
+            handleCloseEditingModal();
+        } catch (error) {
+            console.error("Error saving store:", error);
+        }
+    }
+
+    const filteredStores = storesData.filter((store) => {
+        if (filters.chainId && String(store.chainId) !== String(filters.chainId)) return false;
+        if (filters.zoneId && String(store.zoneId) !== String(filters.zoneId)) return false;
+        if (filters.localityId && String(store.localityId) !== String(filters.localityId)) return false;
+        return true;
+    });
+
+    const visibleStores = filteredStores.map(mapStoreToTableRow);
+
+    return (
+        <SecurePage>
+            <GenericPageWrapper>
+                <div className="page-header">
+                    <nav>
+                        <Link className="back-link-inline" to="/admin">← Volver al panel</Link>
+                    </nav>
+                    <h1>Gestión de Tiendas</h1>
+                    <p>Consulta y modifica las tiendas registradas en la plataforma.</p>
+                </div>
+
                 <StoreFilters
-                    chains={sampleChains}
-                    zones={sampleZones}
-                    localities={sampleLocalities}
+                    chains={chainsData}
+                    zones={zonesData}
+                    localities={localitiesData}
+                    value={filters}
+                    onChange={handleUpdateFilters}
                     onApply={handleApplyFilters}
                     onClear={handleClearFilters}
+                    onZoneChange={(zoneId) => setFilters((prev) => ({ ...prev, zoneId, localityId: "" }))}
                 />
 
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Direccion</th>
-                            <th>Localidad</th>
-                            <th>Codigo postal</th>
-                            <th>Zona</th>
-                            <th>Cadena</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredStores.length === 0 ? (
-                            <tr>
-                                <td colSpan={7} className="table-empty">No hay tiendas que coincidan con los filtros.</td>
-                            </tr>
-                        ) : (
-                            filteredStores.map(store => (
-                                <tr key={store.id}>
-                                    <td>{store.id}</td>
-                                    <td><strong>{store.name}</strong></td>
-                                    <td>{store.address || 'N/A'}</td>
-                                    <td>{store.localityName || 'N/A'}</td>
-                                    <td>{store.postalCode || 'N/A'}</td>
-                                    <td>{store.zoneName || 'N/A'}</td>
-                                    <td>{store.chainName || 'N/A'}</td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </main>
-        </div>
+                <GenericTable
+                    title="Tiendas"
+                    headers={tableHeaders}
+                    data={visibleStores}
+                    editRowFunction={handleEditStore}
+                    itemName="Tienda"
+                    onChangeSearch={setFilterString}
+                    filterCondition={(store) => store.name.toLowerCase().includes(filterString.toLowerCase())}
+                    isLoading={isLoading}
+                />
+
+                <GenericModal
+                    key={selectedStore?.id}
+                    title="Editar tienda"
+                    fields={STORE_FIELDS}
+                    values={selectedStore}
+                    isOpen={isEditingModalOpen}
+                    onClose={handleCloseEditingModal}
+                    onSubmit={handleSaveStore}
+                />
+            </GenericPageWrapper>
+        </SecurePage>
     );
 }
