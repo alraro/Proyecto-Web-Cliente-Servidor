@@ -883,6 +883,14 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     white-space: nowrap;
 }
 
+.welcome-bar.COLABORADOR {
+    background: linear-gradient(135deg, #ca7506, #f07d1f);
+}
+
+.welcome-bar.COLABORADOR .role-pill {
+    background: rgba(235, 195, 18, 0.696);
+}
+
 .section-title {
     font-family: var(--font-heading);
     font-size: 0.78rem;

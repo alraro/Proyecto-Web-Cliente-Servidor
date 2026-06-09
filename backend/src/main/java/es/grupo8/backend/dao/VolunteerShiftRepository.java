@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.VolunteerShift;
 import es.grupo8.backend.entity.VolunteerShiftId;
@@ -70,4 +71,10 @@ public interface VolunteerShiftRepository extends JpaRepository<VolunteerShift, 
            "WHERE vs.id.idCampaign = :campaignId " +
            "GROUP BY vs.id.idStore, vs.id.shiftDay, vs.id.startTime")
     List<Object[]> countVolunteersPerShiftInCampaign(@Param("campaignId") Integer campaignId);
+
+    @Query("SELECT DISTINCT vs.campaignStores.idCampaign "
+         + "FROM VolunteerShift vs "
+         + "JOIN vs.idVolunteer v "
+         + "WHERE v.idPartnerEntity.id = :entityId")
+    List<Campaign> findCampaignsByEntityId(@Param("entityId") Integer entityId);
 }
