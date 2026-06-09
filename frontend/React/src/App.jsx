@@ -11,6 +11,8 @@ import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Coordinator from './pages/coordinator/Coordinator';
 import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
+import ColaboradorEntity from './pages/colaborator/ColaboradorEntity';
+import ColaboradorVolunteers from './pages/colaborator/ColaboradorVolunteers';
 import Responsible from './pages/responsible/ResponsibleStore';
 import ErrorPage from './pages/ErrorPage';
 import Edit from './pages/Edit.jsx';
@@ -54,6 +56,8 @@ function App() {
           {/* Colaborator routes */}
           <Route element={<RutaProtegida roles={['COLABORADOR']} />}>
             <Route path="/colaborator" element={<Colaborator />} />
+            <Route path="/colaborator/entity" element={<ColaboradorEntity />} />
+            <Route path="/colaborator/volunteers" element={<ColaboradorVolunteers />} />
           </Route>
 
           {/* Responsible routes */}

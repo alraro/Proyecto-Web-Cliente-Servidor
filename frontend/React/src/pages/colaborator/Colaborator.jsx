@@ -5,7 +5,7 @@ import ColaboradorMenuCardsList from '../MenuCards/CardsByRole/Colaborador/Colab
 
 function Colaborator() {
 
-    const descripcionHeader = "Desde aqui puedes gestionar todos los aspectos de las campanas de Bancosol."
+    const descripcionHeader = "Desde aquí puedes gestionar los datos de tu entidad colaboradora y sus voluntarios."
 
     return (
         <SecurePage >

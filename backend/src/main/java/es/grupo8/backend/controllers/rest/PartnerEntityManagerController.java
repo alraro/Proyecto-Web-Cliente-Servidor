@@ -38,6 +38,26 @@ public class PartnerEntityManagerController {
         }
     }
 
+    private Integer checkPartnerEntityManager(String auth) {
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!userService.isPartnerEntityManager(userId)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "No eres responsable de entidad colaboradora");
+        }
+        return userId;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<PartnerEntityManagerResponseDto> getMyManagerInfo(
+            @RequestHeader(value = "Authorization", required = false) String auth) {
+
+        Integer userId = checkPartnerEntityManager(auth);
+        PartnerEntityManagerResponseDto response = partnerEntityManagerService.getPartnerEntityManagerByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     public ResponseEntity<PaginatedResponse<PartnerEntityManagerResponseDto>> getPartnerEntityManagers(
             @RequestHeader(value = "Authorization", required = false) String auth,
