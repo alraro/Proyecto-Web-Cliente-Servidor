@@ -1,15 +1,12 @@
 <%--
-    Pagina de validacion de registros de usuarios.
-
-    Autores:
-    - Alejandra Ortiz: 80%
-    - IA Generativa: 20%
+    Página de gestión de usuarios (listado completo, cambio de rol, eliminar).
+    Autores: [vuestros nombres]
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String token = (String) session.getAttribute("token");
-    String role = (String) session.getAttribute("role");
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
 
     if (token == null || !"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
@@ -21,7 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bancosol | Validar registros</title>
+    <title>Bancosol | Usuarios</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
@@ -43,14 +40,14 @@
     </div>
 </header>
 
-<main class="page-wrapper" aria-label="Validate users page">
+<main class="page-wrapper" aria-label="Pending users page">
     <div class="page-header">
         <a href="/admin" class="back-link-inline">← Volver al panel</a>
         <h1>Validar registros</h1>
         <p>Revisa y aprueba o rechaza las solicitudes de nuevos usuarios.</p>
     </div>
 
-    <div class="card mb-lg">
+    <div class="card">
         <div class="card-header">
             <h2>Pendientes de aprobación <span id="badge-pending" class="badge badge-no hidden"></span></h2>
             <div class="card-actions">
@@ -80,152 +77,206 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-    (function () {
-        var token = '<%= token == null ? "" : token %>';
+(function () {
+    var token = '<%= token == null ? "" : token %>';
+    var usersCache = [];
 
-        document.getElementById("btn-edit").addEventListener("click", function () {
-            window.location.href = "/edit";
+    document.getElementById("btn-edit").addEventListener("click", function () { window.location.href = "/edit"; });
+    document.getElementById("btn-logout").addEventListener("click", function () { window.location.href = "/logout"; });
+
+    if (!token) { window.location.href = "/login"; return; }
+
+    function authHeaders() {
+        return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
+    }
+
+    function escHtml(v) {
+        return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function showToast(msg, type) {
+        var c = document.getElementById("toast-container");
+        var t = document.createElement("div");
+        t.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(function () { t.remove(); }, 3500);
+    }
+
+    function createRoleSelect(userId) {
+        var select = document.createElement("select");
+        select.id = "role-" + userId;
+
+        var optDefault = document.createElement("option");
+        optDefault.value = "";
+        optDefault.textContent = "Seleccionar rol...";
+        select.appendChild(optDefault);
+
+        ["ADMINISTRADOR", "COORDINADOR", "CAPITAN", "COLABORADOR", "RESPONSABLE_TIENDA"].forEach(function (role) {
+            var opt = document.createElement("option");
+            opt.value = role;
+            opt.textContent = role;
+            select.appendChild(opt);
         });
-        document.getElementById("btn-logout").addEventListener("click", function () {
-            window.location.href = "/logout";
-        });
 
-        if (!token) { window.location.href = "/login"; return; }
+        return select;
+    }
 
-        function authHeaders() {
-            return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
+    function renderRow(u) {
+        var tr = document.createElement("tr");
+
+        var td1 = document.createElement("td");
+        td1.textContent = u.idUser;
+        tr.appendChild(td1);
+
+        var td2 = document.createElement("td");
+        var strong = document.createElement("strong");
+        strong.textContent = escHtml(u.name);
+        td2.appendChild(strong);
+        tr.appendChild(td2);
+
+        var td3 = document.createElement("td");
+        td3.textContent = escHtml(u.email || "—");
+        tr.appendChild(td3);
+
+        var td4 = document.createElement("td");
+        td4.textContent = escHtml(u.phone || "—");
+        tr.appendChild(td4);
+
+        var td5 = document.createElement("td");
+        td5.appendChild(createRoleSelect(u.idUser));
+        tr.appendChild(td5);
+
+        var td6 = document.createElement("td");
+        var div = document.createElement("div");
+        div.className = "td-actions";
+
+        var btnApprove = document.createElement("button");
+        btnApprove.className = "btn btn-primary btn-sm";
+        btnApprove.setAttribute("data-action", "approve");
+        btnApprove.setAttribute("data-user-id", u.idUser);
+        btnApprove.textContent = "✓ Aprobar";
+        div.appendChild(btnApprove);
+
+        var btnReject = document.createElement("button");
+        btnReject.className = "btn btn-danger btn-sm";
+        btnReject.setAttribute("data-action", "reject");
+        btnReject.setAttribute("data-user-id", u.idUser);
+        btnReject.setAttribute("data-user-name", escHtml(u.name));
+        btnReject.textContent = "✗ Rechazar";
+        div.appendChild(btnReject);
+
+        td6.appendChild(div);
+        tr.appendChild(td6);
+        return tr;
+    }
+
+    function loadPending() {
+        var tbody = document.getElementById("pending-tbody");
+        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
+
+        fetch("/api/users/pending", { headers: authHeaders() })
+            .then(function (r) {
+                if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                if (!r.ok) throw new Error();
+                return r.json();
+            })
+            .then(function (data) {
+                var badge = document.getElementById("badge-pending");
+                if (!data) return;
+                usersCache = data;
+                if (data.length > 0) {
+                    badge.textContent = data.length;
+                    badge.classList.remove("hidden");
+                } else {
+                    badge.textContent = "";
+                    badge.classList.add("hidden");
+                }
+                tbody.innerHTML = "";
+                if (!data.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay usuarios pendientes de aprobación.</td></tr>';
+                    return;
+                }
+                data.forEach(function (u) { tbody.appendChild(renderRow(u)); });
+            })
+            .catch(function () {
+                document.getElementById("pending-tbody").innerHTML =
+                    '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
+            });
+    }
+
+    function approveUser(userId) {
+        var role = document.getElementById("role-" + userId).value;
+        if (!role) {
+            showToast("Selecciona un rol antes de aprobar.", "error");
+            return;
         }
 
-        function escHtml(v) {
-            return String(v == null ? "" : v)
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function showToast(msg, type) {
-            var container = document.getElementById("toast-container");
-            var toast = document.createElement("div");
-            toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
-            toast.textContent = msg;
-            container.appendChild(toast);
-            setTimeout(function () { toast.remove(); }, 3500);
-        }
-
-        function loadPending() {
-            var tbody = document.getElementById("pending-tbody");
-            tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
-
-            fetch("/api/users/pending", { headers: authHeaders() })
-                .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
-                    if (!r.ok) throw new Error();
-                    return r.json();
-                })
-                .then(function (data) {
-                    if (!data) return;
-                    var badge = document.getElementById("badge-pending");
-                    if (data.length > 0) { badge.textContent = data.length; badge.classList.remove("hidden"); }
-                    else { badge.classList.add("hidden"); }
-
-                    tbody.innerHTML = "";
-                    if (!data.length) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay usuarios pendientes de aprobación.</td></tr>';
-                        return;
-                    }
-
-                    data.forEach(function (u) {
-                        var tr = document.createElement("tr");
-
-                        var td1 = document.createElement("td"); td1.textContent = u.id; tr.appendChild(td1);
-
-                        var td2 = document.createElement("td");
-                        var strong = document.createElement("strong"); strong.textContent = escHtml(u.name);
-                        td2.appendChild(strong); tr.appendChild(td2);
-
-                        var td3 = document.createElement("td"); td3.textContent = escHtml(u.email || "\u2014"); tr.appendChild(td3);
-                        var td4 = document.createElement("td"); td4.textContent = escHtml(u.phone || "\u2014"); tr.appendChild(td4);
-
-                        var td5 = document.createElement("td");
-                        var select = document.createElement("select");
-                        select.id = "role-" + u.id;
-
-                        var roles = [
-                            { value: "",                   label: "Seleccionar rol..."    },
-                            { value: "ADMINISTRADOR",      label: "Administrador"         },
-                            { value: "COORDINADOR",        label: "Coordinador"           },
-                            { value: "CAPITAN",            label: "Capit\u00e1n"          },
-                            { value: "COLABORADOR",        label: "Colaborador"           },
-                            { value: "RESPONSABLE_TIENDA", label: "Responsable de Tienda" }
-                        ];
-                        roles.forEach(function (r) {
-                            var opt = document.createElement("option");
-                            opt.value = r.value; opt.textContent = r.label;
-                            select.appendChild(opt);
-                        });
-                        td5.appendChild(select); tr.appendChild(td5);
-
-                        var td6 = document.createElement("td");
-                        var div = document.createElement("div"); div.className = "td-actions";
-
-                        var btnApprove = document.createElement("button");
-                        btnApprove.className = "btn btn-primary btn-sm";
-                        btnApprove.setAttribute("data-action", "approve");
-                        btnApprove.setAttribute("data-user-id", u.id);
-                        btnApprove.textContent = "\u2713 Aprobar";
-                        div.appendChild(btnApprove);
-
-                        var btnReject = document.createElement("button");
-                        btnReject.className = "btn btn-danger btn-sm";
-                        btnReject.setAttribute("data-action", "reject");
-                        btnReject.setAttribute("data-user-id", u.id);
-                        btnReject.setAttribute("data-user-name", escHtml(u.name));
-                        btnReject.textContent = "\u2717 Rechazar";
-                        div.appendChild(btnReject);
-
-                        td6.appendChild(div); tr.appendChild(td6);
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(function () {
-                    document.getElementById("pending-tbody").innerHTML =
-                        '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
+        fetch("/api/users/" + userId + "/role", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({ role: role })
+        })
+            .then(function (r) {
+                return r.json().then(function (d) {
+                    return { ok: r.ok, data: d };
                 });
+            })
+            .then(function (result) {
+                if (!result.ok) {
+                    showToast(result.data.message || "Error al asignar rol.", "error");
+                    return;
+                }
+                showToast("Usuario aprobado correctamente.");
+                loadPending();
+            })
+            .catch(function () {
+                showToast("Error de conexión.", "error");
+            });
+    }
+
+    function rejectUser(userId, userName) {
+        if (!confirm("¿Rechazar y eliminar la cuenta de \"" + userName + "\"? Esta acción no se puede deshacer.")) return;
+
+        fetch("/api/users/" + userId, {
+            method: "DELETE",
+            headers: authHeaders()
+        })
+            .then(function (r) {
+                return r.json().then(function (d) {
+                    return { ok: r.ok, data: d };
+                });
+            })
+            .then(function (result) {
+                if (!result.ok) {
+                    showToast(result.data.message || "Error al eliminar.", "error");
+                    return;
+                }
+                showToast("Usuario rechazado y eliminado.");
+                loadPending();
+            })
+            .catch(function () {
+                showToast("Error de conexión.", "error");
+            });
+    }
+
+    document.getElementById("btn-refresh-pending").addEventListener("click", loadPending);
+    document.getElementById("pending-tbody").addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+
+        var action = btn.getAttribute("data-action");
+        var userId = btn.getAttribute("data-user-id");
+        if (action === "approve") {
+            approveUser(userId);
+        } else if (action === "reject") {
+            rejectUser(userId, btn.getAttribute("data-user-name"));
         }
+    });
 
-        function approveUser(id) {
-            var sel = document.getElementById("role-" + id);
-            var roleVal = sel ? sel.value : "";
-            if (!roleVal) { showToast("Selecciona un rol antes de aprobar.", "error"); return; }
-            fetch("/api/users/" + id + "/role", { method: "POST", headers: authHeaders(), body: JSON.stringify({ role: roleVal }) })
-                .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
-                .then(function (r) {
-                    if (!r.ok) { showToast(r.data.message || "Error al asignar rol.", "error"); return; }
-                    showToast("Usuario aprobado como " + roleVal + "."); loadPending();
-                })
-                .catch(function () { showToast("Error de conexión.", "error"); });
-        }
-
-        function rejectUser(id, name) {
-            if (!confirm("¿Rechazar y eliminar la cuenta de \"" + name + "\"?\nEsta acción no se puede deshacer.")) return;
-            fetch("/api/users/" + id, { method: "DELETE", headers: authHeaders() })
-                .then(function (r) {
-                    if (!r.ok) r.json().then(function (d) { showToast(d.message || "Error al eliminar.", "error"); });
-                    else { showToast("Usuario rechazado y eliminado."); loadPending(); }
-                })
-                .catch(function () { showToast("Error de conexión.", "error"); });
-        }
-
-        document.getElementById("pending-tbody").addEventListener("click", function (e) {
-            var btn = e.target.closest("button");
-            if (!btn) return;
-            var id = parseInt(btn.getAttribute("data-user-id"));
-            if (btn.getAttribute("data-action") === "approve") approveUser(id);
-            if (btn.getAttribute("data-action") === "reject")  rejectUser(id, btn.getAttribute("data-user-name"));
-        });
-
-        document.getElementById("btn-refresh-pending").addEventListener("click", loadPending);
-
-        loadPending();
-    }());
+    loadPending();
+}());
 </script>
 </body>
 </html>
