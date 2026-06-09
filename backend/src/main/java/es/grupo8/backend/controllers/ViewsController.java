@@ -213,6 +213,11 @@ public class ViewsController {
 		return "colaborator";
 	}
 
+	@GetMapping("/responsible-store")
+    public String responsibleStore() {
+        return "responsible-store";
+    }
+
 	private String resolveRolePath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
 			return "/admin";
