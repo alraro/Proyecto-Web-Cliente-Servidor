@@ -1,4 +1,7 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+﻿/* Bootstrap auth from URL params (when navigating from the SSR portal). */
+handleUrlTokenParams();
+
+document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'login.html';

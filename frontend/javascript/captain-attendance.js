@@ -1,4 +1,7 @@
 ﻿﻿
+/* Bootstrap auth from URL params (when navigating from the SSR portal). */
+handleUrlTokenParams();
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken()) { window.location.href = 'login.html'; return; }
 
