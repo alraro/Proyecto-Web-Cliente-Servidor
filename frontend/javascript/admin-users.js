@@ -47,7 +47,7 @@ function renderUserRow(user) {
     const tr = document.createElement('tr');
 
     const tdId = document.createElement('td');
-    tdId.textContent = user.id;
+    tdId.textContent = user.idUser;
     tr.appendChild(tdId);
 
     const tdName = document.createElement('td');
@@ -65,7 +65,8 @@ function renderUserRow(user) {
     tr.appendChild(tdPhone);
 
     const tdRole = document.createElement('td');
-    tdRole.appendChild(createRoleBadge(user.role));
+    const roleActual = (user.roles && user.roles.length > 0) ? user.roles[0] : null;
+    tdRole.appendChild(createRoleBadge(roleActual));
     tr.appendChild(tdRole);
 
     const tdActions = document.createElement('td');
@@ -75,14 +76,14 @@ function renderUserRow(user) {
     btnEdit.className = 'btn btn-primary btn-sm';
     btnEdit.textContent = 'Editar';
     btnEdit.setAttribute('data-action', 'edit');
-    btnEdit.setAttribute('data-userid', user.id);
+    btnEdit.setAttribute('data-userid', user.idUser);
     tdActions.appendChild(btnEdit);
 
     const btnDelete = document.createElement('button');
     btnDelete.className = 'btn btn-danger btn-sm';
     btnDelete.textContent = 'Eliminar';
     btnDelete.setAttribute('data-action', 'delete');
-    btnDelete.setAttribute('data-userid', user.id);
+    btnDelete.setAttribute('data-userid', user.idUser);
     tdActions.appendChild(btnDelete);
 
     tr.appendChild(tdActions);
@@ -144,7 +145,7 @@ async function loadUsers() {
 
 function findUserById(userId) {
     for (let i = 0; i < usersCache.length; i++) {
-        if (String(usersCache[i].id) === String(userId)) {
+        if (String(usersCache[i].idUser) === String(userId)) {
             return usersCache[i];
         }
     }
@@ -197,13 +198,13 @@ async function saveUserRole() {
 
         showToast('Rol actualizado correctamente.', 'success');
         closeModal();
+        btnGuardar.disabled = false;
         await loadUsers();
     } catch (error) {
         modalError.textContent = 'Error de conexion.';
         modalError.className = 'form-message is-error';
+        btnGuardar.disabled = false;
     }
-
-    btnGuardar.disabled = false;
 }
 
 async function deleteUser(userId) {

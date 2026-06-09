@@ -12,7 +12,6 @@ import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.PartnerEntityManager;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.mapper.PartnerEntityManagerMapper;
-import es.grupo8.backend.services.UtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
