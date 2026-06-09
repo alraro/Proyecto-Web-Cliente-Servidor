@@ -1,5 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
+
+    if (token == null || !"COORDINADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,18 +20,26 @@
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/coordinator-dashboard.css">
-    <script src="/javascript/coordinator-dashboard.js" defer></script>
-    <script src="/javascript/includeHTML.js" defer></script>
-    <script src="/javascript/header.js" defer></script>
-
 </head>
 <body>
-    <include-html src="header.html"></include-html>
+<header class="topbar">
+    <a class="brand" href="/coordinator-dashboard" aria-label="Bancosol coordinador home">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Coordinador" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil &#x270F;</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión &times;</button>
+    </div>
+</header>
 
     <main class="page-wrapper">
         <div class="welcome-bar">
             <div>
-                <h2>Bienvenido, <span id="welcome-name">Coordinador</span> 👋</h2>
+                <h2>Bienvenido, <span id="welcome-name"><%= nombre == null ? "Coordinador" : nombre %></span> &#x1F44B;</h2>
                 <p>Desde aquí puedes gestionar tus campañas, tiendas y voluntarios.</p>
             </div>
             <span class="role-pill">🗺️ Coordinador</span>
@@ -66,13 +83,13 @@
                 <p>Consulta qué entidades tienen voluntarios asignados en cada campaña.</p>
                 <span class="menu-card-arrow">Ver entidades →</span>
             </a>
-            <a class="menu-card" href="create-shift.html">
+            <a class="menu-card" href="/create-shift">
                 <div class="menu-card-icon icon-blue">🕐</div>
                 <h3>Crear turno</h3>
                 <p>Crea turnos de recogida para tus tiendas y asigna voluntarios y capitanes.</p>
                 <span class="menu-card-arrow">Ir a turnos →</span>
             </a>
-            <a class="menu-card" href="shifts-calendar.html">
+            <a class="menu-card" href="/shifts-calendar">
                 <div class="menu-card-icon icon-orange">📅</div>
                 <h3>Calendario de Turnos</h3>
                 <p>Visualiza los turnos de tu campaña por tienda, día y franja horaria.</p>
@@ -80,7 +97,10 @@
             </a>
         </div>
     </main>
-<% String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")); %>
-<!-- Page generated on: <%= today %> -->
+
+<script>
+    document.getElementById('btn-edit').addEventListener('click', () => { window.location.href = '/edit'; });
+    document.getElementById('btn-logout').addEventListener('click', () => { window.location.href = '/logout'; });
+</script>
 </body>
 </html>

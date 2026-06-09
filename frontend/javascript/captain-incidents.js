@@ -1,4 +1,5 @@
-﻿const API_BASE = 'http://localhost:8080';
+﻿/* Bootstrap auth from URL params (when navigating from the SSR portal). */
+handleUrlTokenParams();
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');

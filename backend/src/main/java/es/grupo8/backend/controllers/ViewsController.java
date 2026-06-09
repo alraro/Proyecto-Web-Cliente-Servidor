@@ -7,7 +7,11 @@
 */
 package es.grupo8.backend.controllers;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +28,9 @@ public class ViewsController {
 
     @Autowired
     private AuthService authService;
+
+    @Value("${app.frontend.base-url:http://localhost}")
+    private String frontendBaseUrl;
 
     // Pagina de inicio, sirve tanto el / como el index, es lo mismo
 	@GetMapping({"/", "/index"})
@@ -214,25 +221,39 @@ public class ViewsController {
 	}
 
 	@GetMapping("/coordinator-dashboard")
-	public String coordinatorDashboard() { return "coordinator-dashboard"; }
+	public String coordinatorDashboard() {
+		return "coordinator-dashboard";
+	}
 
 	@GetMapping("/coordinator-campaigns")
-	public String coordinatorCampaigns() { return "coordinator-campaigns"; }
+	public String coordinatorCampaigns(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-campaigns.html", session);
+	}
 
 	@GetMapping("/coordinator-stores")
-	public String coordinatorStores() { return "coordinator-stores"; }
+	public String coordinatorStores(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-stores.html", session);
+	}
 
 	@GetMapping("/coordinator-captains")
-	public String coordinatorCaptains() { return "coordinator-captains"; }
+	public String coordinatorCaptains(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-captains.html", session);
+	}
 
 	@GetMapping("/coordinator-volunteers")
-	public String coordinatorVolunteers() { return "coordinator-volunteers"; }
+	public String coordinatorVolunteers(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-volunteers.html", session);
+	}
 
 	@GetMapping("/coordinator-collaborators")
-	public String coordinatorCollaborators() { return "coordinator-collaborators"; }
+	public String coordinatorCollaborators(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-collaborators.html", session);
+	}
 
 	@GetMapping("/coordinator-entities")
-	public String coordinatorEntities() { return "coordinator-entities"; }
+	public String coordinatorEntities(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/coordinator-entities.html", session);
+	}
 
 	@GetMapping("/captain")
 	public String captain() {
@@ -240,20 +261,41 @@ public class ViewsController {
 	}
 
 	@GetMapping("/captain-dashboard")
-	public String captainDashboard() { return "captain-dashboard"; }
+	public String captainDashboard() {
+		return "captain-dashboard";
+	}
 
 	@GetMapping("/captain-stores")
-	public String captainStores() { return "captain-stores"; }
+	public String captainStores(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-stores.html", session);
+	}
 
 	@GetMapping("/captain-incidents")
-	public String captainIncidents() { return "captain-incidents"; }
+	public String captainIncidents(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-incidents.html", session);
+	}
 
 	@GetMapping("/captain-attendance")
-	public String captainAttendance() { return "captain-attendance"; }
+	public String captainAttendance(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/captain-attendance.html", session);
+	}
 
 	@GetMapping("/collaborator")
 	public String collaborator() {
 		return "colaborator";
+	}
+
+	/** Redirects to the frontend create-shift page, passing the session JWT via URL so the
+	 *  frontend can bootstrap localStorage auth when the user came from the SSR login flow. */
+	@GetMapping("/create-shift")
+	public String redirectToCreateShift(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/create-shift.html", session);
+	}
+
+	/** Redirects to the frontend shifts-calendar page with the same token-bridging mechanism. */
+	@GetMapping("/shifts-calendar")
+	public String redirectToShiftsCalendar(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/shifts-calendar.html", session);
 	}
 
 	private String resolveRolePath(String role) {
@@ -262,11 +304,11 @@ public class ViewsController {
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinator";
+			return "/coordinator-dashboard";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/captain";
+			return "/captain-dashboard";
 		}
 
 		if ("COLABORADOR".equals(role)) {
@@ -278,6 +320,24 @@ public class ViewsController {
 		}
 
 		return "/login";
+	}
+
+	/** Builds an absolute frontend URL for the given path, appending the session JWT and
+	 *  user name as query parameters so the frontend can bootstrap localStorage auth. */
+	private String buildFrontendUrl(String path, HttpSession session) {
+		String token  = (String) session.getAttribute("token");
+		String nombre = (String) session.getAttribute("nombre");
+
+		String base = frontendBaseUrl.replaceAll(":80$", "");
+		String url  = base + path;
+
+		if (token != null) {
+			url += "?token="  + URLEncoder.encode(token,  StandardCharsets.UTF_8);
+			if (nombre != null) {
+				url += "&nombre=" + URLEncoder.encode(nombre, StandardCharsets.UTF_8);
+			}
+		}
+		return url;
 	}
 
 }

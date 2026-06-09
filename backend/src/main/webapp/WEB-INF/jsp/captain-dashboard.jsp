@@ -1,5 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
+<%
+    String nombre = (String) session.getAttribute("nombre");
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
+
+    if (token == null || !"CAPITAN".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,18 +20,26 @@
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/captain-dashboard.css">
-    <script src="/javascript/captain-dashboard.js" defer></script>
-    <script src="/javascript/includeHTML.js" defer></script>
-    <script src="/javascript/header.js" defer></script>
-
 </head>
 <body>
-    <include-html src="header.html"></include-html>
+<header class="topbar">
+    <a class="brand" href="/captain-dashboard" aria-label="Bancosol capitán home">
+        <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
+    </a>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Capitán" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil &#x270F;</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión &times;</button>
+    </div>
+</header>
 
     <main class="page-wrapper">
         <div class="welcome-bar">
             <div>
-                <h2>Bienvenido, <span id="welcome-name">Capitán</span> 👋</h2>
+                <h2>Bienvenido, <span id="welcome-name"><%= nombre == null ? "Capitán" : nombre %></span> &#x1F44B;</h2>
                 <p>Desde aquí puedes consultar tus tiendas y reportar incidencias.</p>
             </div>
             <span class="role-pill">⚓ Capitán</span>
@@ -50,7 +67,10 @@
             </a>
         </div>
     </main>
-<% String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")); %>
-<!-- Page generated on: <%= today %> -->
+
+<script>
+    document.getElementById('btn-edit').addEventListener('click', () => { window.location.href = '/edit'; });
+    document.getElementById('btn-logout').addEventListener('click', () => { window.location.href = '/logout'; });
+</script>
 </body>
 </html>
