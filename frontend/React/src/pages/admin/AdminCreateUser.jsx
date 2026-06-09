@@ -7,13 +7,13 @@ import GenericPageWrapper from '../generalModules/GenericPageWrapper';
 
 import '../css/login.css';
 import '../css/register.css';
+import { authHeaders } from '../auth/authUtils';
 
 const ruta = "http://localhost:8080";
 
 function CrearUsuario() {
     const navigate = useNavigate();
     const {usuario} = useAuth();
-    const token = sessionStorage.getItem('token');
 
     const [message, setMessage] = useState('');
     
@@ -47,10 +47,7 @@ function CrearUsuario() {
         try {
             const res = await fetch(`${ruta}/api/auth/admin/users`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({nombre, email, telefono, password, domicilio, cp}),
             });
 
