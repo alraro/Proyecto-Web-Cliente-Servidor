@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignStoreService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -34,7 +35,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignStoreController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignStoreService campaignStoreService;
 
     @GetMapping("/api/campaigns/{campaignId}/stores")
@@ -42,9 +44,9 @@ public class CampaignStoreController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer campaignId) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignStoreService.getCampaignStores(
-                adminGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     @PostMapping("/api/campaigns/{campaignId}/stores")
@@ -53,7 +55,7 @@ public class CampaignStoreController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
 
         Integer storeId = valueAsInteger(request == null ? null : request.get("storeId"));
         if (storeId == null) {
@@ -62,7 +64,7 @@ public class CampaignStoreController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 campaignStoreService.assignStoreToCampaign(
-                        adminGuard.extractUserId(authHeader), campaignId, storeId));
+                        authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     @DeleteMapping("/api/campaigns/{campaignId}/stores/{storeId}")
@@ -71,9 +73,9 @@ public class CampaignStoreController {
             @PathVariable Integer campaignId,
             @PathVariable Integer storeId) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         campaignStoreService.removeStoreFromCampaign(
-                adminGuard.extractUserId(authHeader), campaignId, storeId);
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId);
         return ResponseEntity.ok(Map.of("message", "Tienda desasignada correctamente"));
     }
 
@@ -83,7 +85,7 @@ public class CampaignStoreController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
 
         List<Integer> storeIds = valueAsIntegerList(request == null ? null : request.get("storeIds"));
         if (storeIds == null) {
@@ -91,7 +93,7 @@ public class CampaignStoreController {
         }
 
         return ResponseEntity.ok(campaignStoreService.replaceCampaignStores(
-                adminGuard.extractUserId(authHeader), campaignId, storeIds));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeIds));
     }
 
     @ExceptionHandler(NoSuchElementException.class)
