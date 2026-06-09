@@ -6,7 +6,7 @@
  * - Alejandra Ortiz: 40%
  * - IA Generativa: 20%
  */
-package es.grupo8.backend.controllers;
+package es.grupo8.backend.controllers.rest;
 
 import java.util.List;
 import java.util.Locale;
@@ -30,8 +30,10 @@ import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dto.UserDTO;
 import es.grupo8.backend.entity.*;
+import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.mapper.UserMapper;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.UserService;
 
 @RestController
 @RequestMapping("/api/users")
@@ -47,41 +49,52 @@ public class UserController {
     @Autowired private PartnerEntityRepository partnerEntityRepository;
     @Autowired private PartnerEntityManagerRepository partnerEntityManagerRepository;
     @Autowired private StoreRepository storeRepository;
-    @Autowired private AdminGuard adminGuard;
+    @Autowired private AuthService authService;
+    @Autowired private UserService userService;
     @Autowired private UserMapper userMapper;
 
+    private void checkAdmin(String authHeader) {
+        Integer userId = authService.extractUserIdFromToken(authHeader);
+        if (userId == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!userService.isAdmin(userId)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
+        }
+    }
+
     @GetMapping
-    public ResponseEntity<?> getAllUsers(
+    public ResponseEntity<List<UserDTO>> getAllUsers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        checkAdmin(authHeader);
         List<UserDTO> users = userMapper.toDTOList(userRepository.findAll());
         auditLog.info("ACTION=LIST_USERS adminId={} total={}",
-                adminGuard.extractUserId(authHeader), users.size());
+                authService.extractUserIdFromToken(authHeader), users.size());
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<?> getPendingUsers(
+    public ResponseEntity<List<UserDTO>> getPendingUsers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        checkAdmin(authHeader);
         List<UserDTO> pending = userRepository.findAll().stream()
                 .filter(u -> "PENDIENTE".equals(userMapper.resolveRole(u.getIdUser())))
                 .map(userMapper::toDTO)
                 .toList();
         auditLog.info("ACTION=LIST_PENDING_USERS adminId={} total={}",
-                adminGuard.extractUserId(authHeader), pending.size());
+                authService.extractUserIdFromToken(authHeader), pending.size());
         return ResponseEntity.ok(pending);
     }
 
     @PostMapping("/{id}/role")
-    public ResponseEntity<?> assignRole(
+    public ResponseEntity<Map<String, Object>> assignRole(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
             @RequestBody(required = false) Map<String, Object> req) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        checkAdmin(authHeader);
 
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user == null)
@@ -174,20 +187,20 @@ public class UserController {
         }
 
         auditLog.info("ACTION=ASSIGN_ROLE adminId={} targetUserId={} role={}",
-                adminGuard.extractUserId(authHeader), id, role);
+                authService.extractUserIdFromToken(authHeader), id, role);
         return ResponseEntity.ok(Map.of("message", "Rol asignado", "userId", id, "role", role));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(
+    public ResponseEntity<Map<String, String>> deleteUser(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        checkAdmin(authHeader);
         if (!userRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
 
-        Integer adminId = adminGuard.extractUserId(authHeader);
+        Integer adminId = authService.extractUserIdFromToken(authHeader);
         if (id.equals(adminId))
             return ResponseEntity.badRequest().body(Map.of("message", "No puedes eliminar tu propia cuenta"));
 
@@ -196,8 +209,9 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Usuario eliminado correctamente"));
     }
 
-    private static ResponseEntity<?> forbidden() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Acceso restringido a administradores"));
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
+        return ResponseEntity.status(e.getStatus())
+                .body(Map.of("message", e.getMessage()));
     }
 }
