@@ -15,7 +15,6 @@ import es.grupo8.backend.mapper.PartnerEntityManagerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -47,41 +46,33 @@ public class PartnerEntityManagerService {
 
         page = Math.max(0, page);
         size = Math.max(1, Math.min(size, 100));
+        int offset = page * size;
 
-        List<PartnerEntityManager> allManagers = partnerEntityManagerRepository.findAllWithRelations();
-
-        if (search != null && !search.trim().isEmpty()) {
-            String searchLower = search.trim().toLowerCase();
-            allManagers = allManagers.stream()
-                    .filter(m -> matchesSearch(m, searchLower))
-                    .toList();
+        String sortField = "id";
+        String sortDir = "asc";
+        if (sort != null && sort.contains(",")) {
+            String[] parts = sort.split(",");
+            sortField = parts[0].trim().toLowerCase();
+            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
         }
 
-        if (sort != null && !sort.trim().isEmpty()) {
-            allManagers = applySorting(allManagers, sort);
-        } else {
-            allManagers = allManagers.stream()
-                    .sorted(Comparator.comparing(PartnerEntityManager::getId))
-                    .toList();
-        }
+        List<PartnerEntityManager> managers = switch (sortField) {
+            case "name" -> sortDir.equals("asc")
+                    ? partnerEntityManagerRepository.findAllByNameAsc(search, size, offset)
+                    : partnerEntityManagerRepository.findAllByNameDesc(search, size, offset);
+            default -> sortDir.equals("asc")
+                    ? partnerEntityManagerRepository.findAllByIdAsc(search, size, offset)
+                    : partnerEntityManagerRepository.findAllByIdDesc(search, size, offset);
+        };
 
-        long totalElements = allManagers.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, (int) totalElements);
-
-        List<PartnerEntityManagerResponseDto> pageContent;
-        if (startIndex >= allManagers.size()) {
-            pageContent = List.of();
-        } else {
-            pageContent = partnerEntityManagerMapper.toDTOList(allManagers.subList(startIndex, endIndex));
-        }
+        long total = partnerEntityManagerRepository.countWithSearch(search);
+        int totalPages = (int) Math.ceil((double) total / size);
 
         return new PaginatedResponse<>(
-                pageContent,
+                partnerEntityManagerMapper.toDTOList(managers),
                 page,
                 size,
-                totalElements,
+                total,
                 totalPages,
                 page < totalPages - 1,
                 page > 0
@@ -204,68 +195,11 @@ public class PartnerEntityManagerService {
         partnerEntityManagerRepository.deleteById(userId);
     }
 
-    private boolean matchesSearch(PartnerEntityManager manager, String searchLower) {
-        UserEntity user = manager.getUserAccounts();
-        PartnerEntity partnerEntity = manager.getIdPartnerEntity();
-
-        return String.valueOf(manager.getId()).contains(searchLower)
-                || containsIgnoreCase(user != null ? user.getName() : null, searchLower)
-                || containsIgnoreCase(user != null ? user.getEmail() : null, searchLower)
-                || containsIgnoreCase(user != null ? user.getPhone() : null, searchLower)
-                || containsIgnoreCase(user != null ? user.getAddress() : null, searchLower)
-                || containsIgnoreCase(user != null ? user.getPostalCode() : null, searchLower)
-                || containsIgnoreCase(partnerEntity != null ? partnerEntity.getName() : null, searchLower);
-    }
-
-    private List<PartnerEntityManager> applySorting(List<PartnerEntityManager> managers, String sort) {
-        try {
-            String[] parts = sort.split(",");
-            if (parts.length != 2) return managers;
-
-            String field = parts[0].trim().toLowerCase();
-            String direction = parts[1].trim().toLowerCase();
-
-            Comparator<PartnerEntityManager> comparator = getComparator(field);
-            if (comparator == null) return managers;
-
-            if ("desc".equals(direction)) {
-                comparator = comparator.reversed();
-            }
-
-            return managers.stream()
-                    .sorted(comparator)
-                    .toList();
-        } catch (Exception e) {
-            return managers;
-        }
-    }
-
-    private Comparator<PartnerEntityManager> getComparator(String field) {
-        return switch (field) {
-            case "id", "userid" -> Comparator.comparing(PartnerEntityManager::getId, Comparator.nullsLast(Integer::compareTo));
-            case "name" -> Comparator.comparing(m -> lowerValue(m.getUserAccounts() != null ? m.getUserAccounts().getName() : null));
-            case "email" -> Comparator.comparing(m -> lowerValue(m.getUserAccounts() != null ? m.getUserAccounts().getEmail() : null));
-            case "phone" -> Comparator.comparing(m -> lowerValue(m.getUserAccounts() != null ? m.getUserAccounts().getPhone() : null));
-            case "address" -> Comparator.comparing(m -> lowerValue(m.getUserAccounts() != null ? m.getUserAccounts().getAddress() : null));
-            case "postalcode" -> Comparator.comparing(m -> lowerValue(m.getUserAccounts() != null ? m.getUserAccounts().getPostalCode() : null));
-            case "partnerentity", "partnerentityname" -> Comparator.comparing(m -> lowerValue(m.getIdPartnerEntity() != null ? m.getIdPartnerEntity().getName() : null));
-            default -> null;
-        };
-    }
-
     private PartnerEntity resolvePartnerEntity(Integer partnerEntityId) {
         if (partnerEntityId == null) {
             return null;
         }
         return partnerEntityRepository.findById(partnerEntityId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe entidad socia con ID: " + partnerEntityId));
-    }
-
-    private String lowerValue(String value) {
-        return value == null ? "" : value.toLowerCase();
-    }
-
-    private boolean containsIgnoreCase(String value, String searchLower) {
-        return value != null && value.toLowerCase().contains(searchLower);
     }
 }

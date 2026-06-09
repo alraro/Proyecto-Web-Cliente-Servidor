@@ -4,15 +4,19 @@ import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityManagerAssignRequestDto;
 import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.dto.PartnerEntityManagerUpdateRequestDto;
+import es.grupo8.backend.dto.CampaignInfoDto;
+import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.PartnerEntityManagerService;
 import es.grupo8.backend.services.UserService;
+import es.grupo8.backend.services.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,6 +32,9 @@ public class PartnerEntityManagerController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private VolunteerService volunteerService;
+
     private void checkAuth(String auth) {
         Integer userId = authService.extractUserIdFromToken(auth);
         if (userId == null) {
@@ -36,6 +43,35 @@ public class PartnerEntityManagerController {
         if (!userService.isAdmin(userId)) {
             throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
         }
+    }
+
+    private Integer checkPartnerEntityManager(String auth) {
+        Integer userId = authService.extractUserIdFromToken(auth);
+        if (userId == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!userService.isPartnerEntityManager(userId)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "No eres responsable de entidad colaboradora");
+        }
+        return userId;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<PartnerEntityManagerResponseDto> getMyManagerInfo(
+            @RequestHeader(value = "Authorization", required = false) String auth) {
+
+        Integer userId = checkPartnerEntityManager(auth);
+        PartnerEntityManagerResponseDto response = partnerEntityManagerService.getPartnerEntityManagerByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/campaigns")
+    public ResponseEntity<List<CampaignInfoDto>> getMyCampaigns(
+            @RequestHeader(value = "Authorization", required = false) String auth) {
+
+        Integer userId = checkPartnerEntityManager(auth);
+        PartnerEntityManagerResponseDto manager = partnerEntityManagerService.getPartnerEntityManagerByUserId(userId);
+        return ResponseEntity.ok(volunteerService.getCampaignsByEntity(manager.partnerEntityId()));
     }
 
     @GetMapping

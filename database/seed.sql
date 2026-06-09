@@ -1110,7 +1110,7 @@ INSERT INTO administrators (id_user) VALUES (14);
 
 INSERT INTO captains (id_user, id_campaign) VALUES (15, 1);
 
-INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, NULL);
+INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, 1);
 
 -- ============================================================
 -- SEQUENCE RESYNC (PostgreSQL)
