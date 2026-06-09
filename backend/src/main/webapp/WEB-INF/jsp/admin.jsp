@@ -28,7 +28,7 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/index" aria-label="Bancosol admin home">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -131,6 +131,12 @@
             <h3>Solicitudes de Capitán</h3>
             <p>Revisa y aprueba o rechaza las solicitudes de nuevos capitanes.</p>
             <span class="menu-card-arrow">Ver solicitudes →</span>
+        </a>
+        <a class="menu-card" href="/admin-incidents">
+            <div class="menu-card-icon icon-red">🚨</div>
+            <h3>Incidencias</h3>
+            <p>Visualiza todas las incidencias reportadas por capitanes.</p>
+            <span class="menu-card-arrow">Ver incidencias →</span>
         </a>
     </div>
 </main>

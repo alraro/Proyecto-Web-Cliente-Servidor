@@ -9,7 +9,7 @@ function WelcomeBar({ description }) {
 
     return (
         <>
-            <div className="welcome-bar">
+            <div className={`welcome-bar ${role}`}>
                 <div>
                     <h2>Bienvenido, {username} 👋</h2>
                     <p>{description}</p>

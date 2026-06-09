@@ -3,10 +3,14 @@ package es.grupo8.backend.services;
 import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
+import es.grupo8.backend.dao.VolunteerShiftRepository;
+import es.grupo8.backend.dto.CampaignInfoDto;
 import es.grupo8.backend.dto.VoluntarioRequestDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
+import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.PartnerEntity;
 import es.grupo8.backend.entity.Volunteer;
+import es.grupo8.backend.mapper.CampaignInfoMapper;
 import es.grupo8.backend.mapper.VolunteerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,12 @@ public class VolunteerService {
     private VolunteerMapper volunteerMapper;
 
     @Autowired
+    private VolunteerShiftRepository volunteerShiftRepository;
+
+    @Autowired
+    private CampaignInfoMapper campaignInfoMapper;
+
+    @Autowired
     private PartnerEntityRepository partnerEntityRepository;
 
     @Autowired
@@ -32,6 +42,14 @@ public class VolunteerService {
     public List<VoluntarioResponseDto> getVolunteersByEntity(Integer partnerEntityId) {
         List<Volunteer> volunteers = volunteerRepository.findByIdPartnerEntity_Id(partnerEntityId);
         return volunteerMapper.toDTOList(volunteers);
+    }
+
+    public List<CampaignInfoDto> getCampaignsByEntity(Integer partnerEntityId) {
+        List<Campaign> campaigns = volunteerShiftRepository.findCampaignsByEntityId(partnerEntityId);
+        return campaigns.stream().map(c -> {
+            long count = volunteerShiftRepository.countVolunteersInCampaignByEntity(c.getId(), partnerEntityId);
+            return campaignInfoMapper.toDTO(c, count);
+        }).toList();
     }
 
     public VoluntarioResponseDto getVolunteerById(Integer id, Integer partnerEntityId) {

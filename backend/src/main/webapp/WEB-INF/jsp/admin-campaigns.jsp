@@ -21,14 +21,17 @@
     <link rel="stylesheet" href="/css/admin-campaigns.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-    <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        </div>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
 
@@ -144,7 +147,6 @@
         const userNameEl = document.getElementById("user-name");
         userNameEl.textContent = nombre || "Admin";
 
-        const btnLogout = document.getElementById("btn-logout");
         const btnNew = document.getElementById("btn-new");
         const campaignsTbody = document.getElementById("campaigns-tbody");
         const globalMessage = document.getElementById("global-message");
@@ -178,10 +180,7 @@
         let currentCampaigns = [];
         let cachedTypes = [];
 
-        btnLogout.addEventListener("click", () => {
-            localStorage.clear();
-            window.location.href = "/login";
-        });
+        
 
         btnNew.addEventListener("click", openCreateModal);
         btnCancelModal.addEventListener("click", hideModal);

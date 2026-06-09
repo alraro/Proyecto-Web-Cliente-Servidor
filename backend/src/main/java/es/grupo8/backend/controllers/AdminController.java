@@ -1,19 +1,15 @@
 /*
 * Autores:
-*  - Hugo Herrero González: 100%
+*  - Hugo Herrero González: 80%
+*  - Alfonso Ramos Rojas: 20%
 *
 */
 
 package es.grupo8.backend.controllers;
 
-import es.grupo8.backend.dto.AdminDTO;
-import es.grupo8.backend.dto.PaginatedResponse;
-import es.grupo8.backend.dto.PartnerEntityRequestDto;
-import es.grupo8.backend.dto.PartnerEntityResponseDto;
-import es.grupo8.backend.services.AdminService;
-import es.grupo8.backend.services.AuthService;
-import es.grupo8.backend.services.PartnerEntityService;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +19,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import es.grupo8.backend.dto.AdminDTO;
+import es.grupo8.backend.dto.PaginatedResponse;
+import es.grupo8.backend.dto.PartnerEntityRequestDto;
+import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.services.AdminService;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.PartnerEntityService;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AdminController {
@@ -38,7 +41,11 @@ public class AdminController {
     private PartnerEntityService partnerEntityService;
 
     @GetMapping("/campaigns")
-    public String campaigns() {
+    public String campaigns(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role)) {
+            return "redirect:/login";
+        }
         return "campaigns";
     }
 
@@ -173,10 +180,6 @@ public class AdminController {
         return "admin-users";
     }
 
-    @GetMapping("/responsible-store")
-    public String responsibleStore() {
-        return "responsible-store";
-    }
 
     @GetMapping("/admin-partner-entities")
     public String adminPartnerEntities(
@@ -282,4 +285,21 @@ public class AdminController {
 
         return "redirect:/admin-partner-entities";
     }
+
+    @GetMapping("/admin-incidents")
+    public String adminIncidents(HttpSession session, Model model) {
+        String role = (String) session.getAttribute("role");
+        if(!"ADMINISTRADOR".equals(role)){
+            return "redirect:/login";
+        }
+
+        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+
+        model.addAttribute("incidents", incidents);
+        model.addAttribute("pageTitle", "Bancosol | Todas las incidencias");
+
+        return "admin-incidents";
+    }
+
+    
 }

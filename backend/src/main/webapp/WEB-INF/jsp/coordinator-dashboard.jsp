@@ -1,15 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-<<<<<<< HEAD
-    String role = (String) session.getAttribute("role");
-    if (!"COORDINADOR".equals(role)) {
-=======
     String token  = (String) session.getAttribute("token");
     String role   = (String) session.getAttribute("role");
 
     if (token == null || !"COORDINADOR".equals(role)) {
->>>>>>> dev
         response.sendRedirect("/login");
         return;
     }
@@ -32,7 +27,11 @@
     <a class="brand" href="/coordinator-dashboard" aria-label="Bancosol home">
 =======
 <header class="topbar">
+<<<<<<< HEAD
     <a class="brand" href="/coordinator-dashboard" aria-label="Bancosol coordinador home">
+>>>>>>> dev
+=======
+    <a class="brand" href="/">
 >>>>>>> dev
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>

@@ -18,23 +18,13 @@
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
-<<<<<<< HEAD
-    <link rel="stylesheet" href="/css/coordinator.css">
-=======
     <link rel="stylesheet" href="/css/admin.css">
->>>>>>> dev
 </head>
 <body>
 <header class="topbar">
     <a class="brand" href="/coordinator" aria-label="Bancosol coordinador home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-<<<<<<< HEAD
-    <div class="topbar-actions">
-        <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
-        <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/logout" class="logout-link">Cerrar sesión</a>
-=======
     <div class="topbar-right">
         <div class="user-badge">
             <span class="dot"></span>
@@ -42,7 +32,6 @@
         </div>
         <button class="btn-edit" id="btn-edit">Editar perfil &#x270F;</button>
         <button class="btn-logout" id="btn-logout">Cerrar sesión &times;</button>
->>>>>>> dev
     </div>
 </header>
 
