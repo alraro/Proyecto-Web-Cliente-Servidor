@@ -213,10 +213,18 @@ public class ViewsController {
 		return "colaborator";
 	}
 
-	@GetMapping("/responsible-store")
-    public String responsibleStore() {
-        return "responsible-store";
-    }
+	/** Redirects to the frontend create-shift page, passing the session JWT via URL so the
+	 *  frontend can bootstrap localStorage auth when the user came from the SSR login flow. */
+	@GetMapping("/create-shift")
+	public String redirectToCreateShift(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/create-shift.html", session);
+	}
+
+	/** Redirects to the frontend shifts-calendar page with the same token-bridging mechanism. */
+	@GetMapping("/shifts-calendar")
+	public String redirectToShiftsCalendar(HttpSession session) {
+		return "redirect:" + buildFrontendUrl("/shifts-calendar.html", session);
+	}
 
 	private String resolveRolePath(String role) {
 		if ("ADMINISTRADOR".equals(role)) {
