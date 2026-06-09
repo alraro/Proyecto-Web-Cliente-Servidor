@@ -1,4 +1,4 @@
-package es.grupo8.backend.controllers;
+package es.grupo8.backend.controllers.rest;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,55 +16,103 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.security.CoordinatorGuard;
 import es.grupo8.backend.services.CoordinatorDashboardService;
 import lombok.AllArgsConstructor;
 
+/**
+ * REST controller for coordinator dashboard operations: volunteers, captains, shifts and entities.
+ * All endpoints require a valid coordinator JWT.
+ */
 @RestController
 @RequestMapping("/api/coordinator")
 @AllArgsConstructor
-public class CoordinatorDashboardController {
+public class CoordinatorDashboardRestController {
 
     private final CoordinatorGuard coordinatorGuard;
     private final CoordinatorDashboardService coordinatorDashboardService;
 
+    // ── Auth helper ───────────────────────────────────────────────────────────
+
+    /**
+     * Validates the Authorization header and asserts coordinator role.
+     *
+     * @param auth raw Authorization header value
+     * @throws AuthException 401 if token is missing/invalid, 403 if not a coordinator
+     */
+    private void checkCoordinator(String auth) {
+        if (coordinatorGuard.extractUserId(auth) == null) {
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        }
+        if (!coordinatorGuard.isCoordinator(auth)) {
+            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo los coordinadores pueden realizar esta acción.");
+        }
+    }
+
+    // ── Endpoints ─────────────────────────────────────────────────────────────
+
+    /**
+     * Returns the campaigns assigned to the authenticated coordinator.
+     *
+     * @param authHeader JWT Authorization header
+     * @return list of {@link es.grupo8.backend.dto.CampaignDTO}
+     */
     @GetMapping("/my-campaigns")
     public ResponseEntity<?> getMyCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getMyCampaigns(
                 coordinatorGuard.extractUserId(authHeader)));
     }
 
+    /**
+     * Returns the stores assigned to a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId optional campaign filter
+     * @return list of {@link es.grupo8.backend.dto.StoreDTO}
+     */
     @GetMapping("/my-stores")
     public ResponseEntity<?> getMyStores(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getMyStores(campaignId));
     }
 
+    /**
+     * Returns all volunteers.
+     *
+     * @param authHeader JWT Authorization header
+     * @return list of {@link es.grupo8.backend.dto.VoluntarioResponseDto}
+     */
     @GetMapping("/volunteers")
     public ResponseEntity<?> getVolunteers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getVolunteers());
     }
 
+    /**
+     * Creates a new volunteer.
+     *
+     * @param authHeader JWT Authorization header
+     * @param request    volunteer creation data
+     * @return created volunteer as {@link es.grupo8.backend.dto.VoluntarioResponseDto} with 201 status
+     */
     @PostMapping("/volunteers")
     public ResponseEntity<?> createVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
-
+        checkCoordinator(authHeader);
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.createVolunteer(
                         coordinatorGuard.extractUserId(authHeader),
@@ -75,18 +123,24 @@ public class CoordinatorDashboardController {
                         parseInteger(request.get("partnerEntityId"))));
     }
 
+    /**
+     * Updates an existing volunteer.
+     *
+     * @param authHeader JWT Authorization header
+     * @param id         volunteer identifier
+     * @param request    volunteer update data
+     * @return updated volunteer as {@link es.grupo8.backend.dto.VoluntarioResponseDto}
+     */
     @PutMapping("/volunteers/{id}")
     public ResponseEntity<?> updateVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
-
+        checkCoordinator(authHeader);
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
-
         return ResponseEntity.ok(coordinatorDashboardService.updateVolunteer(
                 coordinatorGuard.extractUserId(authHeader),
                 id,
@@ -98,17 +152,22 @@ public class CoordinatorDashboardController {
                 parseInteger(request.get("partnerEntityId"))));
     }
 
+    /**
+     * Assigns a volunteer to a shift.
+     *
+     * @param authHeader JWT Authorization header
+     * @param request    assignment data (volunteerId, campaignId, storeId, shiftDay, startTime, endTime)
+     * @return success message with 201 status
+     */
     @PostMapping("/volunteer-shifts")
     public ResponseEntity<?> assignVolunteerShift(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
-
+        checkCoordinator(authHeader);
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
-
         coordinatorDashboardService.assignVolunteerShift(
                 coordinatorGuard.extractUserId(authHeader),
                 parseInteger(request.get("volunteerId")),
@@ -117,31 +176,42 @@ public class CoordinatorDashboardController {
                 trimToNull(request.get("shiftDay")),
                 trimToNull(request.get("startTime")),
                 trimToNull(request.get("endTime")));
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Voluntario asignado al turno correctamente"));
     }
 
+    /**
+     * Returns captains filtered by campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId optional campaign filter
+     * @return list of {@link es.grupo8.backend.dto.UserDTO} for captains
+     */
     @GetMapping("/captains")
     public ResponseEntity<?> getCaptains(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getCaptains(campaignId));
     }
 
+    /**
+     * Registers a new captain user and assigns them to a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param request    captain registration data (name, email, password, campaignId)
+     * @return {@link es.grupo8.backend.dto.RegisterResultDTO} with 201 status
+     */
     @PostMapping("/captains/register")
     public ResponseEntity<?> registerCaptain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
-
+        checkCoordinator(authHeader);
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.registerCaptain(
                         coordinatorGuard.extractUserId(authHeader),
@@ -151,41 +221,57 @@ public class CoordinatorDashboardController {
                         parseInteger(request.get("campaignId"))));
     }
 
+    /**
+     * Returns all partner entities.
+     *
+     * @param authHeader JWT Authorization header
+     * @return list of {@link es.grupo8.backend.dto.PartnerEntityResponseDto}
+     */
     @GetMapping("/partner-entities")
     public ResponseEntity<?> getPartnerEntities(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getPartnerEntities());
     }
 
+    /**
+     * Returns partner entities that have volunteers assigned to a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId optional campaign filter
+     * @return list of {@link es.grupo8.backend.dto.CampaignEntityDTO}
+     */
     @GetMapping("/campaign-entities")
     public ResponseEntity<?> getCampaignEntities(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) return forbidden();
+        checkCoordinator(authHeader);
         return ResponseEntity.ok(coordinatorDashboardService.getCampaignEntities(campaignId));
     }
 
+    // ── Local exception handlers ──────────────────────────────────────────────
+
+    /** @param e validation error */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
     }
 
+    /** @param e entity not found */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
     }
 
+    /** @param e conflict */
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
     }
 
-    private ResponseEntity<Map<String, String>> forbidden() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acceso denegado"));
-    }
+    // ── Private helpers ───────────────────────────────────────────────────────
 
     private static String trimToNull(Object o) {
         if (o == null) return null;

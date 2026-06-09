@@ -3,9 +3,7 @@ package es.grupo8.backend.services;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -22,16 +20,33 @@ import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
 import es.grupo8.backend.dao.VolunteerShiftRepository;
+import es.grupo8.backend.dto.CampaignDTO;
+import es.grupo8.backend.dto.CampaignEntityDTO;
+import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.dto.RegisterResultDTO;
+import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.PartnerEntity;
+import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
 import es.grupo8.backend.entity.VolunteerShiftId;
+import es.grupo8.backend.mapper.CampaignEntityMapper;
+import es.grupo8.backend.mapper.CampaignMapper;
+import es.grupo8.backend.mapper.PartnerEntityMapper;
+import es.grupo8.backend.mapper.StoreMapper;
+import es.grupo8.backend.mapper.UserMapper;
+import es.grupo8.backend.mapper.VolunteerMapper;
 import lombok.AllArgsConstructor;
 
+/**
+ * Service for coordinator dashboard operations: campaigns, stores, volunteers, captains and partner entities.
+ */
 @Service
 @AllArgsConstructor
 public class CoordinatorDashboardService {
@@ -47,28 +62,62 @@ public class CoordinatorDashboardService {
     private final VolunteerShiftRepository volunteerShiftRepository;
     private final PartnerEntityRepository partnerEntityRepository;
 
-    public List<Map<String, Object>> getMyCampaigns(Integer userId) {
-        return coordinatorRepository.findCampaignsByUserId(userId).stream()
-                .map(this::campaignToMap)
-                .collect(Collectors.toList());
+    private final CampaignMapper campaignMapper;
+    private final StoreMapper storeMapper;
+    private final VolunteerMapper volunteerMapper;
+    private final UserMapper userMapper;
+    private final PartnerEntityMapper partnerEntityMapper;
+    private final CampaignEntityMapper campaignEntityMapper;
+
+    /**
+     * Returns the campaigns assigned to the given coordinator.
+     *
+     * @param userId coordinator user identifier
+     * @return list of campaign DTOs
+     */
+    public List<CampaignDTO> getMyCampaigns(Integer userId) {
+        return campaignMapper.toDTOList(coordinatorRepository.findCampaignsByUserId(userId));
     }
 
-    public List<Map<String, Object>> getMyStores(Integer campaignId) {
+    /**
+     * Returns the stores assigned to a campaign.
+     *
+     * @param campaignId required campaign filter
+     * @return list of store DTOs
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    public List<StoreDTO> getMyStores(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        return campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
-                .map(this::storeToMap)
+        List<Store> stores = campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
+                .map(CampaignStore::getIdStore)
                 .collect(Collectors.toList());
+        return storeMapper.toDTOList(stores);
     }
 
-    public List<Map<String, Object>> getVolunteers() {
-        return volunteerRepository.findAllByOrderByNameAsc().stream()
-                .map(this::volunteerToMap)
-                .collect(Collectors.toList());
+    /**
+     * Returns all volunteers ordered by name.
+     *
+     * @return list of volunteer DTOs
+     */
+    public List<VoluntarioResponseDto> getVolunteers() {
+        return volunteerMapper.toDTOList(volunteerRepository.findAllByOrderByNameAsc());
     }
 
-    public Map<String, Object> createVolunteer(Integer coordinatorId, String name, String phone,
+    /**
+     * Creates a new volunteer.
+     *
+     * @param coordinatorId   coordinator user identifier (for audit)
+     * @param name            required volunteer name
+     * @param phone           volunteer phone
+     * @param email           volunteer email
+     * @param address         volunteer address
+     * @param partnerEntityId optional partner entity identifier
+     * @return the created volunteer as a DTO
+     * @throws IllegalArgumentException if name is null or partnerEntityId not found
+     */
+    public VoluntarioResponseDto createVolunteer(Integer coordinatorId, String name, String phone,
             String email, String address, Integer partnerEntityId) {
         if (name == null) {
             throw new IllegalArgumentException("El nombre es obligatorio");
@@ -90,10 +139,25 @@ public class CoordinatorDashboardService {
         Volunteer saved = volunteerRepository.save(v);
         auditLog.info("ACTION=CREATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
                 coordinatorId, Instant.now(), saved.getId());
-        return volunteerToMap(saved);
+        return volunteerMapper.toDTO(saved);
     }
 
-    public Map<String, Object> updateVolunteer(Integer coordinatorId, Integer volunteerId,
+    /**
+     * Updates an existing volunteer.
+     *
+     * @param coordinatorId           coordinator user identifier (for audit)
+     * @param volunteerId             volunteer identifier
+     * @param name                    required volunteer name
+     * @param phone                   volunteer phone
+     * @param email                   volunteer email
+     * @param address                 volunteer address
+     * @param partnerEntityKeyPresent whether the partnerEntityId key was sent in the request
+     * @param partnerEntityId         new partner entity identifier (null to unlink)
+     * @return the updated volunteer as a DTO
+     * @throws NoSuchElementException   if volunteer not found
+     * @throws IllegalArgumentException if name is null or partnerEntityId not found
+     */
+    public VoluntarioResponseDto updateVolunteer(Integer coordinatorId, Integer volunteerId,
             String name, String phone, String email, String address,
             boolean partnerEntityKeyPresent, Integer partnerEntityId) {
 
@@ -122,9 +186,21 @@ public class CoordinatorDashboardService {
         Volunteer saved = volunteerRepository.save(v);
         auditLog.info("ACTION=UPDATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
                 coordinatorId, Instant.now(), saved.getId());
-        return volunteerToMap(saved);
+        return volunteerMapper.toDTO(saved);
     }
 
+    /**
+     * Assigns a volunteer to a shift in a campaign store.
+     *
+     * @param coordinatorId coordinator user identifier (for audit)
+     * @param volunteerId   required volunteer identifier
+     * @param campaignId    required campaign identifier
+     * @param storeId       required store identifier
+     * @param shiftDay      required shift date (YYYY-MM-DD)
+     * @param startTime     required shift start time (HH:mm)
+     * @param endTime       required shift end time (HH:mm)
+     * @throws IllegalArgumentException if any required field is null or invalid
+     */
     public void assignVolunteerShift(Integer coordinatorId, Integer volunteerId, Integer campaignId,
             Integer storeId, String shiftDay, String startTime, String endTime) {
 
@@ -181,22 +257,37 @@ public class CoordinatorDashboardService {
                 coordinatorId, Instant.now(), volunteerId, campaignId, storeId, day, start);
     }
 
-    public List<Map<String, Object>> getCaptains(Integer campaignId) {
+    /**
+     * Returns captains assigned to a campaign.
+     *
+     * @param campaignId required campaign filter
+     * @return list of user DTOs for captains
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    public List<UserDTO> getCaptains(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        return captainRepository.findByIdIdCampaign(campaignId).stream()
-                .map(c -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("userId", c.getIdUser().getIdUser());
-                    m.put("name",   c.getIdUser().getName());
-                    m.put("email",  c.getIdUser().getEmail());
-                    return m;
-                })
+        List<UserEntity> users = captainRepository.findByIdIdCampaign(campaignId).stream()
+                .filter(c -> c.getIdUser() != null)
+                .map(c -> c.getIdUser())
                 .collect(Collectors.toList());
+        return userMapper.toDTOList(users);
     }
 
-    public Map<String, Object> registerCaptain(Integer coordinatorId, String name, String email,
+    /**
+     * Submits a captain registration request for admin approval.
+     *
+     * @param coordinatorId coordinator user identifier (for audit)
+     * @param name          required captain name
+     * @param email         required captain email
+     * @param password      required captain password (min 6 chars)
+     * @param campaignId    required campaign identifier
+     * @return result DTO with confirmation message and request identifier
+     * @throws IllegalArgumentException if any required field is null or password too short
+     * @throws IllegalStateException    if email already exists or has a pending request
+     */
+    public RegisterResultDTO registerCaptain(Integer coordinatorId, String name, String email,
             String password, Integer campaignId) {
 
         if (name == null || email == null || password == null || campaignId == null) {
@@ -234,70 +325,35 @@ public class CoordinatorDashboardService {
         auditLog.info("ACTION=REQUEST_CAPTAIN coordinatorUserId={} timestamp={} campaignId={} requestId={}",
                 coordinatorId, Instant.now(), campaignId, saved.getId());
 
-        return Map.of("message", "Solicitud enviada. El administrador deberá aprobarla.",
-                      "requestId", saved.getId());
+        return new RegisterResultDTO("Solicitud enviada. El administrador deberá aprobarla.", saved.getId());
     }
 
-    public List<Map<String, Object>> getPartnerEntities() {
-        return partnerEntityRepository.findAll().stream()
-                .map(pe -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("id",    pe.getId());
-                    m.put("name",  pe.getName());
-                    m.put("phone", pe.getPhone());
-                    return m;
-                })
-                .collect(Collectors.toList());
+    /**
+     * Returns all partner entities.
+     *
+     * @return list of partner entity DTOs
+     */
+    public List<PartnerEntityResponseDto> getPartnerEntities() {
+        return partnerEntityMapper.toDTOList(partnerEntityRepository.findAll());
     }
 
-    public List<Map<String, Object>> getCampaignEntities(Integer campaignId) {
+    /**
+     * Returns partner entities that have volunteers assigned to a campaign,
+     * including the volunteer count per entity.
+     *
+     * @param campaignId required campaign filter
+     * @return list of campaign entity DTOs
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    public List<CampaignEntityDTO> getCampaignEntities(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
         return volunteerShiftRepository.findEntitiesWithVolunteersInCampaign(campaignId).stream()
                 .map(pe -> {
                     Long count = volunteerShiftRepository.countVolunteersInCampaignByEntity(campaignId, pe.getId());
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("id",             pe.getId());
-                    m.put("name",           pe.getName());
-                    m.put("phone",          pe.getPhone());
-                    m.put("volunteerCount", count != null ? count : 0L);
-                    return m;
+                    return campaignEntityMapper.toDTO(pe, count != null ? count : 0L);
                 })
                 .collect(Collectors.toList());
-    }
-
-    private Map<String, Object> campaignToMap(Campaign c) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",        c.getId());
-        m.put("name",      c.getName());
-        m.put("startDate", c.getStartDate() != null ? c.getStartDate().toString() : null);
-        m.put("endDate",   c.getEndDate()   != null ? c.getEndDate().toString()   : null);
-        m.put("typeName",  c.getIdType()    != null ? c.getIdType().getName()     : null);
-        return m;
-    }
-
-    private Map<String, Object> storeToMap(CampaignStore cs) {
-        var s = cs.getIdStore();
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",        s.getId());
-        m.put("name",      s.getName());
-        m.put("address",   s.getAddress());
-        m.put("chainName", s.getIdChain() != null ? s.getIdChain().getName() : null);
-        m.put("locality",  s.getPostalCode() != null && s.getPostalCode().getIdLocality() != null
-                ? s.getPostalCode().getIdLocality().getName() : null);
-        return m;
-    }
-
-    private Map<String, Object> volunteerToMap(Volunteer v) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",                v.getId());
-        m.put("name",              v.getName());
-        m.put("phone",             v.getPhone());
-        m.put("email",             v.getEmail());
-        m.put("address",           v.getAddress());
-        m.put("partnerEntityId",   v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getId()   : null);
-        m.put("partnerEntityName", v.getIdPartnerEntity() != null ? v.getIdPartnerEntity().getName() : null);
-        return m;
     }
 }

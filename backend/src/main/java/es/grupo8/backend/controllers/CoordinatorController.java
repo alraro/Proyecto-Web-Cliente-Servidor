@@ -1,178 +1,122 @@
 package es.grupo8.backend.controllers;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.dto.ShiftCalendarStoreDto;
-import es.grupo8.backend.dto.ShiftRequestDto;
-import es.grupo8.backend.dto.ShiftResponseDto;
-import es.grupo8.backend.dto.StoreSimpleDto;
+import es.grupo8.backend.dto.CampaignDTO;
+import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.security.CoordinatorGuard;
-import es.grupo8.backend.services.ShiftService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import es.grupo8.backend.services.CoordinatorDashboardService;
+import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 
-@RestController
-@RequestMapping("/api/shifts")
-@Tag(name = "Turnos de recogida", description = "API para gestionar turnos de recogida de alimentos")
-@SecurityRequirement(name = "bearerAuth")
+// Controlador MVC para las páginas del coordinador.
+// Carga los datos necesarios en el modelo para el renderizado inicial con JSTL.
+@Controller
+@AllArgsConstructor
 public class CoordinatorController {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
+    private final CoordinatorGuard coordinatorGuard;
+    private final CoordinatorDashboardService coordinatorDashboardService;
 
-    @Autowired
-    private ShiftService shiftService;
-
-    @Autowired
-    private CoordinatorGuard coordinatorGuard;
-
-    /**
-     * Create a new pickup shift for a campaign and store.
-     * Only accessible by Coordinator (RNF-03).
-     * Creates audit log on creation (RNF-15).
-     *
-     * @param authHeader JWT authorization header
-     * @param request    shift creation data
-     * @return the created shift DTO with 201 status
-     */
-    @Operation(summary = "Crear turno de recogida", description = "Crea un nuevo turno de recogida para una campaña y tienda. Solo accesible por Coordinadores.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Turno creado correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ShiftResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos o campaña/tienda no encontrada"),
-            @ApiResponse(responseCode = "403", description = "Acceso denegado. Solo para coordinadores."),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    @PostMapping
-    public ResponseEntity<?> createShift(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) ShiftRequestDto request) {
-
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
-            auditLog.warn("ACTION=CREATE_SHIFT_ATTEMPT userId={} timestamp={} reason=NOT_COORDINATOR",
-                    coordinatorGuard.extractUserId(authHeader), Instant.now());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden crear turnos."));
-        }
-
-        Integer userId = coordinatorGuard.extractUserId(authHeader);
-        ShiftResponseDto created = shiftService.createShift(userId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    // Devuelve true si el usuario en sesión es coordinador
+    private boolean isCoordinator(HttpSession session) {
+        Object token = session.getAttribute("token");
+        if (token == null) return false;
+        return coordinatorGuard.isCoordinator("Bearer " + token);
     }
 
-    /**
-     * Get shifts for a specific campaign, optionally filtered by store.
-     * Only accessible by Coordinator.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId required campaign identifier
-     * @param storeId    optional store identifier
-     * @return list of shift response DTOs
-     */
-    @GetMapping
-    public ResponseEntity<?> getShifts(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestParam(value = "campaignId", required = false) Integer campaignId,
-            @RequestParam(value = "storeId", required = false) Integer storeId) {
+    // Pantalla de bienvenida del coordinador
+    @GetMapping("/coordinator")
+    public String coordinator(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden ver turnos."));
-        }
-
-        List<ShiftResponseDto> shifts = shiftService.getShifts(campaignId, storeId);
-        return ResponseEntity.ok(shifts);
+        model.addAttribute("userName", session.getAttribute("nombre"));
+        return "coordinator";
     }
 
-    /**
-     * Returns stores assigned to a campaign so the coordinator can select one when creating a shift.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId the campaign identifier
-     * @return list of simple store DTOs sorted by name
-     */
-    @Operation(summary = "Tiendas de una campaña para el Coordinador",
-            description = "Devuelve las tiendas asignadas a una campaña para que el coordinador pueda seleccionarla al crear un turno.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tiendas de la campaña"),
-            @ApiResponse(responseCode = "404", description = "Campaña no encontrada")
-    })
-    @GetMapping("/campaign/{campaignId}/stores")
-    public ResponseEntity<?> getStoresForCampaign(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @PathVariable Integer campaignId) {
+    // Panel principal del coordinador con sus campañas
+    @GetMapping("/coordinator-dashboard")
+    public String coordinatorDashboard(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
 
-        List<StoreSimpleDto> stores = shiftService.getStoresForCampaign(campaignId);
-        return ResponseEntity.ok(stores);
+        Integer userId = (Integer) session.getAttribute("userID");
+        List<CampaignDTO> myCampaigns = coordinatorDashboardService.getMyCampaigns(userId);
+        model.addAttribute("userName", session.getAttribute("nombre"));
+        model.addAttribute("myCampaigns", myCampaigns);
+        return "coordinator-dashboard";
     }
 
-    /**
-     * Returns the shift calendar for a campaign grouped by store → day → time slot.
-     * Optimised for RNF-06 with only two database queries.
-     *
-     * @param authHeader JWT authorization header
-     * @param campaignId required campaign identifier
-     * @return list of calendar store DTOs
-     */
-    @Operation(summary = "Calendario de turnos por tienda, día y franja horaria",
-               description = "Devuelve los turnos agrupados por tienda → día → franja para el panel visual.")
-    @GetMapping("/calendar")
-    public ResponseEntity<?> getCalendar(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestParam(value = "campaignId", required = false) Integer campaignId) {
+    // Lista de campañas del coordinador
+    @GetMapping("/coordinator-campaigns")
+    public String coordinatorCampaigns(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden ver el calendario."));
-        }
-
-        List<ShiftCalendarStoreDto> calendar = shiftService.getCalendar(campaignId);
-        return ResponseEntity.ok(calendar);
+        Integer userId = (Integer) session.getAttribute("userID");
+        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
+        model.addAttribute("campaigns", campaigns);
+        return "coordinator-campaigns";
     }
 
-    /**
-     * Handles validation and business rule errors returning HTTP 400.
-     *
-     * @param e the exception thrown by the service
-     * @return error response with the exception message
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
+    // Tiendas asignadas al coordinador en sus campañas
+    @GetMapping("/coordinator-stores")
+    public String coordinatorStores(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
+
+        Integer userId = (Integer) session.getAttribute("userID");
+        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
+        model.addAttribute("campaigns", campaigns);
+        return "coordinator-stores";
     }
 
-    /**
-     * Handles entity-not-found errors returning HTTP 404.
-     *
-     * @param e the exception thrown by the service
-     * @return error response with the exception message
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", e.getMessage()));
+    // Capitanes asignados en las campañas del coordinador
+    @GetMapping("/coordinator-captains")
+    public String coordinatorCaptains(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
+
+        Integer userId = (Integer) session.getAttribute("userID");
+        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
+        List<UserDTO> captains = coordinatorDashboardService.getCaptains(null);
+        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("captains", captains);
+        return "coordinator-captains";
+    }
+
+    // Asignación de voluntarios a los turnos del coordinador
+    @GetMapping("/coordinator-volunteers")
+    public String coordinatorVolunteers(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
+
+        List<VoluntarioResponseDto> volunteers = coordinatorDashboardService.getVolunteers();
+        List<PartnerEntityResponseDto> partnerEntities = coordinatorDashboardService.getPartnerEntities();
+        model.addAttribute("volunteers", volunteers);
+        model.addAttribute("partnerEntities", partnerEntities);
+        return "coordinator-volunteers";
+    }
+
+    // Colaboradores de campaña del coordinador
+    @GetMapping("/coordinator-collaborators")
+    public String coordinatorCollaborators(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
+
+        Integer userId = (Integer) session.getAttribute("userID");
+        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
+        model.addAttribute("campaigns", campaigns);
+        return "coordinator-collaborators";
+    }
+
+    // Entidades colaboradoras con voluntarios asignados en las campañas
+    @GetMapping("/coordinator-entities")
+    public String coordinatorEntities(HttpSession session, Model model) {
+        if (!isCoordinator(session)) return "redirect:/login";
+
+        List<PartnerEntityResponseDto> partnerEntities = coordinatorDashboardService.getPartnerEntities();
+        model.addAttribute("partnerEntities", partnerEntities);
+        return "coordinator-entities";
     }
 }
