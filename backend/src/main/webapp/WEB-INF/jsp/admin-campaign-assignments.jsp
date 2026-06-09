@@ -8,15 +8,17 @@
     <link rel="stylesheet" href="/css/administrador.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-
-    <div class="topbar-actions">
-        <span id="user-name">Admin</span>
-        <a class="btn" href="/edit">Edit profile</a>
-        <button type="button" id="btn-logout" class="btn">Log out</button>
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
+        </div>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
 
@@ -100,7 +102,6 @@
         const userNameEl = document.getElementById("user-name");
         userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
 
-        const btnLogout = document.getElementById("btn-logout");
         const campaignSelect = document.getElementById("campaign-select");
         const btnLoad = document.getElementById("btn-load");
         const coordinatorsTbody = document.getElementById("coordinators-tbody");
@@ -109,11 +110,6 @@
         const captainSelect = document.getElementById("captain-select");
         const btnAssignCoordinator = document.getElementById("btn-assign-coordinator");
         const btnAssignCaptain = document.getElementById("btn-assign-captain");
-
-        btnLogout.addEventListener("click", () => {
-            localStorage.clear();
-            window.location.href = "/login";
-        });
 
         setAssignmentControls(false);
 

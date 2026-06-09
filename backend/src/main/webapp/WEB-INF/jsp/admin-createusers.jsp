@@ -27,8 +27,8 @@
 </head>
 <body>
 
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/admin" aria-label="Bancosol home">
+<header class="topbar">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -36,8 +36,8 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
-        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
 
