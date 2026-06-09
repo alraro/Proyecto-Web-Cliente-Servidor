@@ -13,8 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import es.grupo8.backend.dto.AuthResponseDTO;
 
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -219,11 +219,11 @@ public class ViewsController {
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinator";
+			return "/coordinator-dashboard";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/captain";
+			return "/captain-dashboard";
 		}
 
 		if ("COLABORADOR".equals(role)) {

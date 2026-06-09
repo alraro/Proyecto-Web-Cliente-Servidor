@@ -6,13 +6,9 @@
 *	- IA Generativa: 20%
 */
 package es.grupo8.backend.controllers.rest;
-import java.util.Map;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
@@ -34,7 +31,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody AuthResponseDTO request) {
+	// Devuelve un AuthResponseDTO y un Map<String, String>
+	public AuthResponseDTO login(@RequestBody AuthResponseDTO request) {
 
 		// Sacamos email y contraseña
 		String email = request.getEmail();
@@ -43,19 +41,19 @@ public class AuthController {
 		AuthResponseDTO dto = authService.login(email, password);
 		// Si no existe el usuario, fuera
 		if (dto == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "No existen los datos"));
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No existen los datos");
 		}
         if ("PENDIENTE".equals(dto.getRole())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "No tiene rol asignado."));
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tiene rol asignado.");
 		}
 
-        return ResponseEntity.ok(dto);
+        return dto;
 	}
     
 
     // Endpoint para registro
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody AuthResponseDTO request) {
+	public AuthResponseDTO register(@RequestBody AuthResponseDTO request) {
 
 		String nombre = request.getNombre();
 		String email = request.getEmail();
@@ -67,16 +65,13 @@ public class AuthController {
         try {
             AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+			return dto;
 
 		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 
-		} catch (IllegalStateException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
-
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "No se pudo crear la cuenta. Revisa email y codigo postal"));
+		} catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo crear la cuenta. Revisa los datos");
         }
 	}
 
@@ -84,31 +79,31 @@ public class AuthController {
 
     // Endpoint para obtener el perfil del usuario
 	@GetMapping("/profile")
-	public ResponseEntity<?> getProfile(@RequestHeader(value = "Authorization", required = false) String auth) {
+	public ProfileDTO getProfile(@RequestHeader(value = "Authorization", required = false) String auth) {
 
 		// Obtenemos el ID del usuario
 		Integer userId = authService.extractUserIdFromToken(auth);
 		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido o ausente"));
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido");
 		}
 
 		ProfileDTO dto = authService.getProfile(userId);
         if(dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
         }
 
-        return ResponseEntity.ok(dto);
+        return dto;
 	}
 	
 
 	// Endpoint para actualizar el perfil del usuario
 	@PutMapping("/profile")
-	public ResponseEntity<?> updateOwnProfile(@RequestHeader(value = "Authorization", required = false) String auth, 
+	public ProfileDTO updateOwnProfile(@RequestHeader(value = "Authorization", required = false) String auth, 
 											  @RequestBody ProfileDTO request) {
 
         Integer userId = authService.extractUserIdFromToken(auth);
         if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido o ausente"));
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido");
 		}
 
 		String email = request.getEmail();
@@ -120,51 +115,49 @@ public class AuthController {
 
 		ProfileDTO current = authService.getProfile(userId);
         if (current == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Usuario no encontrado"));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
         }
         if (authService.emailExistsForOther(email, current.getEmail())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Ya existe un usuario con ese email"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un usuario con ese email");
         }
 
 
         try {
             ProfileDTO dto = authService.updateProfile(userId, email, password, confirmPassword, telefono, domicilio, cp);
 
-            return ResponseEntity.ok(dto);
+            return dto;
 		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 			
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "No se pudo actualizar el perfil. Revisa email y codigo postal"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo actualizar el perfil. Revisa los datos");
         }
 	}
 
 	@PostMapping("/admin/users")
-	public ResponseEntity<?> createUser(@RequestHeader(value = "Authorization", required = false) String auth,
+	public AuthResponseDTO createUser(@RequestHeader(value = "Authorization", required = false) String auth,
 										@RequestBody AuthResponseDTO request){
 
-	Integer adminId = authService.extractUserIdFromToken(auth);
-	if(adminId == null) {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalido"));
-	}
+		Integer adminId = authService.extractUserIdFromToken(auth);
+		if(adminId == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido");
+		}
 
-	try {
-		AuthResponseDTO dto = authService.register(
-			request.getNombre(),
-			request.getEmail(),
-			request.getPassword(),
-			request.getPhone(),
-			request.getAddress(),
-			request.getPostalCode()
-		);
+		try {
+			AuthResponseDTO dto = authService.register(
+				request.getNombre(),
+				request.getEmail(),
+				request.getPassword(),
+				request.getPhone(),
+				request.getAddress(),
+				request.getPostalCode()
+			);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+			return dto;
 
-	} catch(Exception e) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
-	}
-	
-
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
 	} 
 
 

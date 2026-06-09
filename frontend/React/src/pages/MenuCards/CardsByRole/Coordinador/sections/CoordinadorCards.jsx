@@ -1,4 +1,4 @@
-const gestionCards = []
+const gestionCards = [];
 
 gestionCards.push({
     icon: "📋",
@@ -15,10 +15,10 @@ gestionCards.push({
 });
 
 gestionCards.push({
-    icon: "📢",
-    title: "Campanas",
-    description: "Visualiza las campanas asignadas a tu zona, con detalles de fechas, ubicacion y estado.",
-    link: "/capitan/campaigns"
-})
+    icon: "⏰",
+    title: "Crear turno",
+    description: "Crea un nuevo turno de recogida para una campaña y tienda.",
+    link: "/coordinator/create-shift"
+});
 
 export default gestionCards;

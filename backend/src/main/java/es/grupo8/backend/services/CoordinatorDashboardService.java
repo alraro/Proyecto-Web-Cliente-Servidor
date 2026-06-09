@@ -158,8 +158,7 @@ public class CoordinatorDashboardService {
      * @throws IllegalArgumentException if name is null or partnerEntityId not found
      */
     public VoluntarioResponseDto updateVolunteer(Integer coordinatorId, Integer volunteerId,
-            String name, String phone, String email, String address,
-            boolean partnerEntityKeyPresent, Integer partnerEntityId) {
+            String name, String phone, String email, String address, Integer partnerEntityId) {
 
         Volunteer v = volunteerRepository.findById(volunteerId)
                 .orElseThrow(() -> new NoSuchElementException("Voluntario no encontrado"));
@@ -172,15 +171,13 @@ public class CoordinatorDashboardService {
         v.setEmail(email);
         v.setAddress(address);
 
-        if (partnerEntityKeyPresent) {
-            if (partnerEntityId == null) {
-                v.setIdPartnerEntity(null);
-            } else {
-                PartnerEntity pe = partnerEntityRepository.findById(partnerEntityId)
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "Entidad colaboradora no encontrada con id=" + partnerEntityId));
-                v.setIdPartnerEntity(pe);
-            }
+        if (partnerEntityId == null) {
+            v.setIdPartnerEntity(null);
+        } else {
+            PartnerEntity pe = partnerEntityRepository.findById(partnerEntityId)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Entidad colaboradora no encontrada con id=" + partnerEntityId));
+            v.setIdPartnerEntity(pe);
         }
 
         Volunteer saved = volunteerRepository.save(v);

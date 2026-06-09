@@ -1,8 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
+<<<<<<< HEAD
     String role = (String) session.getAttribute("role");
     if (!"CAPITAN".equals(role)) {
+=======
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
+
+    if (token == null || !"CAPITAN".equals(role)) {
+>>>>>>> dev
         response.sendRedirect("/login");
         return;
     }
@@ -20,14 +27,35 @@
     <link rel="stylesheet" href="/css/captain-dashboard.css">
 </head>
 <body>
+<<<<<<< HEAD
 <header class="topbar" aria-label="Top navigation">
     <a class="brand" href="/captain-dashboard" aria-label="Bancosol home">
+=======
+<header class="topbar">
+    <a class="brand" href="/captain-dashboard" aria-label="Bancosol capitán home">
+>>>>>>> dev
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
         <div class="user-badge">
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Capitán" : nombre %></span>
+<<<<<<< HEAD
+=======
+        </div>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+    </div>
+</header>
+
+    <main class="page-wrapper">
+        <div class="welcome-bar">
+            <div>
+                <h2>Bienvenido, <span id="welcome-name"><%= nombre == null ? "Capitán" : nombre %></span> &#x1F44B;</h2>
+                <p>Desde aquí puedes consultar tus tiendas y reportar incidencias.</p>
+            </div>
+            <span class="role-pill">⚓ Capitán</span>
+>>>>>>> dev
         </div>
         <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
         <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
@@ -40,6 +68,7 @@
             <h2>Bienvenido, <span><%= nombre != null ? nombre : "Capitán" %></span> 👋</h2>
             <p>Desde aquí puedes consultar tus tiendas y reportar incidencias.</p>
         </div>
+<<<<<<< HEAD
         <span class="role-pill">⚓ Capitán</span>
     </div>
 
@@ -65,5 +94,8 @@
         </a>
     </div>
 </main>
+=======
+    </main>
+>>>>>>> dev
 </body>
 </html>

@@ -1,14 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String token = (String) session.getAttribute("token");
-    String role = (String) session.getAttribute("role");
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
 
     if (token == null || !"CAPITAN".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
 %>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,25 +18,79 @@
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="/css/captain-dashboard.css">
+=======
+    <link rel="stylesheet" href="/css/admin.css">
+>>>>>>> dev
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/index" aria-label="Bancosol admin home">
+    <a class="brand" href="/captain" aria-label="Bancosol capitán home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
+<<<<<<< HEAD
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         <a href="/edit" class="edit-link">Editar perfil</a>
         <a href="/logout" class="logout-link">Cerrar sesión</a>
+=======
+    <div class="topbar-right">
+        <div class="user-badge">
+            <span class="dot"></span>
+            <span id="user-name"><%= nombre == null ? "Capitán" : nombre %></span>
+        </div>
+        <button class="btn-edit" id="btn-edit">Editar perfil &#x270F;</button>
+        <button class="btn-logout" id="btn-logout">Cerrar sesión &times;</button>
+>>>>>>> dev
     </div>
 </header>
 
-<main class="page-shell">
-    <section class="card">
-        <h1>Panel de capitán</h1>
-        <p>Tu sesión se ha iniciado correctamente.</p>
-    </section>
+<main class="page-wrapper">
+    <div class="welcome-bar">
+        <div>
+            <h2>Bienvenido, <span id="welcome-name"><%= nombre == null ? "Capitán" : nombre %></span> &#x1F44B;</h2>
+            <p>Desde aquí puedes consultar tus tiendas, gestionar la asistencia y reportar incidencias.</p>
+        </div>
+        <span class="role-pill">&#x2693; Capitán</span>
+    </div>
+
+    <p class="section-title">Mi área de trabajo</p>
+    <div class="menu-grid">
+        <a class="menu-card" href="/captain-stores">
+            <div class="menu-card-icon icon-green">&#x1F3EC;</div>
+            <h3>Mis Tiendas</h3>
+            <p>Consulta las tiendas que tienes asignadas y los voluntarios de cada turno.</p>
+            <span class="menu-card-arrow">Ver tiendas →</span>
+        </a>
+        <a class="menu-card" href="/captain-attendance">
+            <div class="menu-card-icon icon-blue">&#x2705;</div>
+            <h3>Asistencia del Equipo</h3>
+            <p>Consulta los turnos de tu equipo y marca la asistencia de los voluntarios.</p>
+            <span class="menu-card-arrow">Ver turnos →</span>
+        </a>
+        <a class="menu-card" href="/captain-incidents">
+            <div class="menu-card-icon icon-orange">&#x26A0;&#xFE0F;</div>
+            <h3>Registrar Incidencia</h3>
+            <p>Notifica incidencias ocurridas durante la campaña en tus tiendas.</p>
+            <span class="menu-card-arrow">Reportar incidencia →</span>
+        </a>
+        <a class="menu-card" href="/captain-dashboard">
+            <div class="menu-card-icon icon-teal">&#x1F4CA;</div>
+            <h3>Dashboard</h3>
+            <p>Panel de resumen con el estado de tus tiendas y turnos activos.</p>
+            <span class="menu-card-arrow">Ver dashboard →</span>
+        </a>
+    </div>
 </main>
+
+<script>
+    document.getElementById("btn-edit").addEventListener("click", function () {
+        window.location.href = "/edit";
+    });
+    document.getElementById("btn-logout").addEventListener("click", function () {
+        window.location.href = "/logout";
+    });
+</script>
 </body>
 </html>

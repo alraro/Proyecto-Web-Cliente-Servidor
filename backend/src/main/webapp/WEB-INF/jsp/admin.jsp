@@ -36,8 +36,8 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
-        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
 
@@ -134,14 +134,5 @@
         </a>
     </div>
 </main>
-
-<script>
-    document.getElementById("btn-edit").addEventListener("click", function () {
-        window.location.href = "/edit";
-    });
-    document.getElementById("btn-logout").addEventListener("click", function () {
-        window.location.href = "/logout";
-    });
-</script>
 </body>
 </html>
