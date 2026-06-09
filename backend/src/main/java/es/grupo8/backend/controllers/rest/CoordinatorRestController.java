@@ -19,9 +19,9 @@ import es.grupo8.backend.dto.ShiftCalendarStoreDto;
 import es.grupo8.backend.dto.ShiftRequestDto;
 import es.grupo8.backend.dto.ShiftResponseDto;
 import es.grupo8.backend.dto.StoreSimpleDto;
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.CoordinatorGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.ShiftService;
+import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,25 +42,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CoordinatorRestController {
 
+    private final AuthService authService;
+    private final UserService userService;
     private final ShiftService shiftService;
-    private final CoordinatorGuard coordinatorGuard;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts coordinator role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not a coordinator
-     */
-    private void checkCoordinator(String auth) {
-        if (coordinatorGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!coordinatorGuard.isCoordinator(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo los coordinadores pueden realizar esta acción.");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -89,8 +73,8 @@ public class CoordinatorRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) ShiftRequestDto request) {
 
-        checkCoordinator(authHeader);
-        Integer userId = coordinatorGuard.extractUserId(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
+        Integer userId = authService.extractUserIdFromToken(authHeader);
         ShiftResponseDto created = shiftService.createShift(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -109,7 +93,7 @@ public class CoordinatorRestController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId", required = false) Integer storeId) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         List<ShiftResponseDto> shifts = shiftService.getShifts(campaignId, storeId);
         return ResponseEntity.ok(shifts);
     }
@@ -153,7 +137,7 @@ public class CoordinatorRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         List<ShiftCalendarStoreDto> calendar = shiftService.getCalendar(campaignId);
         return ResponseEntity.ok(calendar);
     }
@@ -169,5 +153,11 @@ public class CoordinatorRestController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to coordinators"));
     }
 }

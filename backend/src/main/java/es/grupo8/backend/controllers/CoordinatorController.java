@@ -6,117 +6,165 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
-import es.grupo8.backend.dto.UserDTO;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
-import es.grupo8.backend.security.CoordinatorGuard;
 import es.grupo8.backend.services.CoordinatorDashboardService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-// Controlador MVC para las páginas del coordinador.
-// Carga los datos necesarios en el modelo para el renderizado inicial con JSTL.
+/**
+ * MVC controller for coordinator views.
+ * Loads model data from CoordinatorDashboardService for server-side JSP rendering.
+ */
 @Controller
 @AllArgsConstructor
 public class CoordinatorController {
 
-    private final CoordinatorGuard coordinatorGuard;
     private final CoordinatorDashboardService coordinatorDashboardService;
 
-    // Devuelve true si el usuario en sesión es coordinador
-    private boolean isCoordinator(HttpSession session) {
-        Object token = session.getAttribute("token");
-        if (token == null) return false;
-        return coordinatorGuard.isCoordinator("Bearer " + token);
-    }
-
-    // Pantalla de bienvenida del coordinador
+    /**
+     * Serves the coordinator welcome page.
+     *
+     * @param session HTTP session carrying the user role
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator")
-    public String coordinator(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
-        model.addAttribute("userName", session.getAttribute("nombre"));
+    public String coordinator(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         return "coordinator";
     }
 
-    // Panel principal del coordinador con sus campañas
+    /**
+     * Serves the coordinator dashboard with the user's assigned campaigns.
+     *
+     * @param session HTTP session carrying role, userId and nombre
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-dashboard")
     public String coordinatorDashboard(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> myCampaigns = coordinatorDashboardService.getMyCampaigns(userId);
         model.addAttribute("userName", session.getAttribute("nombre"));
-        model.addAttribute("myCampaigns", myCampaigns);
+        model.addAttribute("myCampaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-dashboard";
     }
 
-    // Lista de campañas del coordinador
+    /**
+     * Serves the coordinator campaigns list.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-campaigns")
     public String coordinatorCampaigns(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-campaigns";
     }
 
-    // Tiendas asignadas al coordinador en sus campañas
+    /**
+     * Serves the coordinator stores page with campaign selector.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-stores")
     public String coordinatorStores(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-stores";
     }
 
-    // Capitanes asignados en las campañas del coordinador
+    /**
+     * Serves the coordinator captains page with campaign selector.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-captains")
     public String coordinatorCaptains(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
-        List<UserDTO> captains = coordinatorDashboardService.getCaptains(null);
-        model.addAttribute("campaigns", campaigns);
-        model.addAttribute("captains", captains);
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-captains";
     }
 
-    // Asignación de voluntarios a los turnos del coordinador
+    /**
+     * Serves the volunteer assignment page with campaigns, volunteers and partner entities.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-volunteers")
     public String coordinatorVolunteers(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
+        Integer userId = (Integer) session.getAttribute("userID");
         List<VoluntarioResponseDto> volunteers = coordinatorDashboardService.getVolunteers();
         List<PartnerEntityResponseDto> partnerEntities = coordinatorDashboardService.getPartnerEntities();
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         model.addAttribute("volunteers", volunteers);
         model.addAttribute("partnerEntities", partnerEntities);
         return "coordinator-volunteers";
     }
 
-    // Colaboradores de campaña del coordinador
+    /**
+     * Serves the collaborators management page.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-collaborators")
     public String coordinatorCollaborators(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = coordinatorDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-collaborators";
     }
 
-    // Entidades colaboradoras con voluntarios asignados en las campañas
+    /**
+     * Serves the partner entities page with campaign selector for AJAX filtering.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/coordinator-entities")
     public String coordinatorEntities(HttpSession session, Model model) {
-        if (!isCoordinator(session)) return "redirect:/login";
-
-        List<PartnerEntityResponseDto> partnerEntities = coordinatorDashboardService.getPartnerEntities();
-        model.addAttribute("partnerEntities", partnerEntities);
+        String role = (String) session.getAttribute("role");
+        if (!"COORDINADOR".equals(role)) {
+            return "redirect:/login";
+        }
+        Integer userId = (Integer) session.getAttribute("userID");
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
         return "coordinator-entities";
     }
 }

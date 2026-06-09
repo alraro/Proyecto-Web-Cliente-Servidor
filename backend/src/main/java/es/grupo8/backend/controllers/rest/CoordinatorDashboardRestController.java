@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.CoordinatorGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CoordinatorDashboardService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -30,25 +30,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CoordinatorDashboardRestController {
 
-    private final CoordinatorGuard coordinatorGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CoordinatorDashboardService coordinatorDashboardService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts coordinator role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not a coordinator
-     */
-    private void checkCoordinator(String auth) {
-        if (coordinatorGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!coordinatorGuard.isCoordinator(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado. Solo los coordinadores pueden realizar esta acción.");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -62,9 +46,9 @@ public class CoordinatorDashboardRestController {
     public ResponseEntity<?> getMyCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getMyCampaigns(
-                coordinatorGuard.extractUserId(authHeader)));
+                authService.extractUserIdFromToken(authHeader)));
     }
 
     /**
@@ -79,7 +63,7 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getMyStores(campaignId));
     }
 
@@ -93,7 +77,7 @@ public class CoordinatorDashboardRestController {
     public ResponseEntity<?> getVolunteers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getVolunteers());
     }
 
@@ -109,13 +93,14 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
+
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.createVolunteer(
-                        coordinatorGuard.extractUserId(authHeader),
+                        authService.extractUserIdFromToken(authHeader),
                         trimToNull(request.get("name")),
                         trimToNull(request.get("phone")),
                         trimToNull(request.get("email")),
@@ -137,12 +122,13 @@ public class CoordinatorDashboardRestController {
             @PathVariable Integer id,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
+
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
         return ResponseEntity.ok(coordinatorDashboardService.updateVolunteer(
-                coordinatorGuard.extractUserId(authHeader),
+                authService.extractUserIdFromToken(authHeader),
                 id,
                 trimToNull(request.get("name")),
                 trimToNull(request.get("phone")),
@@ -164,12 +150,13 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
+
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
         coordinatorDashboardService.assignVolunteerShift(
-                coordinatorGuard.extractUserId(authHeader),
+                authService.extractUserIdFromToken(authHeader),
                 parseInteger(request.get("volunteerId")),
                 parseInteger(request.get("campaignId")),
                 parseInteger(request.get("storeId")),
@@ -192,7 +179,7 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getCaptains(campaignId));
     }
 
@@ -208,13 +195,14 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
+
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.registerCaptain(
-                        coordinatorGuard.extractUserId(authHeader),
+                        authService.extractUserIdFromToken(authHeader),
                         trimToNull(request.get("name")),
                         trimToNull(request.get("email")),
                         trimToNull(request.get("password")),
@@ -231,7 +219,7 @@ public class CoordinatorDashboardRestController {
     public ResponseEntity<?> getPartnerEntities(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getPartnerEntities());
     }
 
@@ -247,7 +235,7 @@ public class CoordinatorDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCoordinator(authHeader);
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(coordinatorDashboardService.getCampaignEntities(campaignId));
     }
 
@@ -272,6 +260,10 @@ public class CoordinatorDashboardRestController {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to coordinators"));
+    }
 
     private static String trimToNull(Object o) {
         if (o == null) return null;

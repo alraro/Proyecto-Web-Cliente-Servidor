@@ -97,6 +97,16 @@
     		<artifactId>poi-ooxml</artifactId>
     		<version>5.3.0</version>
 		</dependency>
+
+		<!-- JSTL for JSP server-side rendering -->
+		<dependency>
+			<groupId>jakarta.servlet.jsp.jstl</groupId>
+			<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>jakarta.servlet.jsp.jstl</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.CaptainGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CaptainShiftService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -25,25 +25,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CaptainShiftRestController {
 
-    private final CaptainGuard captainGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CaptainShiftService captainShiftService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts captain role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not a captain
-     */
-    private void checkCaptain(String auth) {
-        if (captainGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!captainGuard.isUserCaptain(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -59,9 +43,9 @@ public class CaptainShiftRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainShiftService.getMyTeamShifts(
-                captainGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     // ── Local exception handlers ──────────────────────────────────────────────
@@ -70,5 +54,11 @@ public class CaptainShiftRestController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to captains"));
     }
 }

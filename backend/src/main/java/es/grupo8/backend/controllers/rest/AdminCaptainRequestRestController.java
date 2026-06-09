@@ -25,8 +25,8 @@ import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.UserEntity;
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -40,27 +40,11 @@ public class AdminCaptainRequestRestController {
 
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
-    private final AdminGuard               adminGuard;
-    private final CaptainRequestRepository captainRequestRepository;
-    private final UserRepository           userRepository;
-    private final CaptainRepository        captainRepository;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts admin role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not admin
-     */
-    private void checkAdmin(String auth) {
-        if (adminGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!adminGuard.isAdmin(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado");
-        }
-    }
+    private final AuthService               authService;
+    private final UserService               userService;
+    private final CaptainRequestRepository  captainRequestRepository;
+    private final UserRepository            userRepository;
+    private final CaptainRepository         captainRepository;
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -76,7 +60,7 @@ public class AdminCaptainRequestRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "status", defaultValue = "PENDIENTE") String status) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         List<CaptainRequest> requests = captainRequestRepository.findByStatus(status.toUpperCase());
         List<Map<String, Object>> result = requests.stream()
                 .map(this::requestToMap)
@@ -97,8 +81,8 @@ public class AdminCaptainRequestRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
 
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
@@ -151,8 +135,8 @@ public class AdminCaptainRequestRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
 
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
@@ -175,6 +159,10 @@ public class AdminCaptainRequestRestController {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
+    }
 
     /**
      * Converts a {@link CaptainRequest} entity to a plain map for the API response.

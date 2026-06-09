@@ -37,33 +37,6 @@ public class AdminController {
     @Autowired
     private PartnerEntityService partnerEntityService;
 
-    @GetMapping("/admin-coordinators")
-    public String adminCoordinators(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-coordinators";
-    }
-
-    @GetMapping("/admin-captains")
-    public String adminCaptains(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-captains";
-    }
-
-    @GetMapping("/admin-campaigns")
-    public String adminCampaigns(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-campaigns";
-    }
-
     @GetMapping("/campaigns")
     public String campaigns() {
         return "campaigns";

@@ -1,48 +1,74 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
+    String nombre = (String) session.getAttribute("nombre");
+    if (token == null || !"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+    @SuppressWarnings("unchecked")
+    List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Gestión de Coordinadores</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
-    <link rel="stylesheet" href="/css/administrador.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
 <header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/index" aria-label="Bancosol home">
+    <a class="brand" href="/admin" aria-label="Bancosol home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
-
     <div class="topbar-actions">
-        <span id="user-name">Admin</span>
+        <span id="user-name"><%= nombre != null ? nombre : "Admin" %></span>
         <a class="btn" href="/edit">Editar perfil</a>
-        <button type="button" id="btn-logout" class="btn">Cerrar sesión</button>
+        <a href="/logout" class="btn">Cerrar sesión</a>
     </div>
 </header>
 
-<main class="admin-page" aria-label="Coordinators management page">
-    <section class="page-header">
-        <a href="/admin" class="back-link">&larr; Volver al menú</a>
-        <h1>Gestión de Coordinadores</h1>
-        <p>Asigna coordinadores a campañas de recogida.</p>
-    </section>
-
-    <section class="card campaign-selector" aria-label="Campaign selector">
-        <label for="campaign-select">Campaña</label>
-        <div class="row-inline">
-            <select id="campaign-select">
-                <option value="">Selecciona una campaña...</option>
-            </select>
-            <button type="button" id="btn-load">Cargar coordinadores</button>
+<main class="page-wrapper" aria-label="Coordinators management page">
+    <div class="page-header">
+        <a href="/admin" class="back-link-inline">&larr; Volver al menú</a>
+        <div class="page-header-row">
+            <div>
+                <h1>Gestión de Coordinadores</h1>
+                <p>Asigna coordinadores a campañas de recogida.</p>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <div class="card" aria-label="Campaign selector">
+        <div class="card-body">
+            <label for="campaign-select">Campaña</label>
+            <div class="selector-row">
+                <select id="campaign-select">
+                    <option value="">Selecciona una campaña...</option>
+                    <% if (campaigns != null) {
+                        for (CampaignDTO camp : campaigns) { %>
+                    <option value="<%= camp.getId() %>"><%= camp.getName() %> (<%= camp.getStartDate() %> - <%= camp.getEndDate() %>)</option>
+                    <%  }
+                       } %>
+                </select>
+                <button type="button" id="btn-load" class="btn btn-secondary">Cargar coordinadores</button>
+            </div>
+        </div>
+    </div>
 
     <div id="global-message" hidden></div>
 
-    <section aria-label="Current coordinators">
-        <article class="card">
+    <div class="card" aria-label="Current coordinators">
+        <div class="card-head">
             <h2>Coordinadores asignados</h2>
+        </div>
+        <div class="table-wrap">
             <table>
                 <thead>
                 <tr>
@@ -53,40 +79,28 @@
                 </thead>
                 <tbody id="coordinators-tbody"></tbody>
             </table>
-        </article>
-    </section>
+        </div>
+    </div>
 
-    <section aria-label="Add coordinator">
-        <article class="card">
+    <div class="card" aria-label="Add coordinator">
+        <div class="card-head">
             <h2>Añadir coordinador</h2>
-            <div class="row-inline">
-                <select id="coordinator-select">
+        </div>
+        <div class="card-body">
+            <div class="selector-row">
+                <select id="coordinator-select" disabled>
                     <option value="">Selecciona un coordinador...</option>
                 </select>
-                <button type="button" id="btn-assign">Asignar</button>
+                <button type="button" id="btn-assign" class="btn btn-primary" disabled>Asignar</button>
             </div>
-        </article>
-    </section>
+        </div>
+    </div>
 </main>
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        const params = new URLSearchParams(window.location.search);
-        const tokenFromQuery = params.get("token");
-        const nameFromQuery = params.get("nombre");
-        if (tokenFromQuery) {
-            localStorage.setItem("token", tokenFromQuery);
-        }
-        if (nameFromQuery) {
-            localStorage.setItem("nombre", nameFromQuery);
-        }
+        const token = '<%= token %>';
 
-        const token = localStorage.getItem("token");
-
-        const userNameEl = document.getElementById("user-name");
-        userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
-
-        const btnLogout = document.getElementById("btn-logout");
         const campaignSelect = document.getElementById("campaign-select");
         const btnLoad = document.getElementById("btn-load");
         const globalMessage = document.getElementById("global-message");
@@ -94,40 +108,9 @@
         const coordinatorSelect = document.getElementById("coordinator-select");
         const btnAssign = document.getElementById("btn-assign");
 
-        btnLogout.addEventListener("click", () => {
-            localStorage.clear();
-            window.location.href = "/login";
-        });
-
-        coordinatorSelect.disabled = true;
-        btnAssign.disabled = true;
-
-        if (!token) {
-            showMessage("No se detecta una sesión válida. Vuelve al panel de administración e inténtalo de nuevo.", true);
-            return;
-        }
-
-        try {
-            const data = await fetchJson("/api/campaigns?size=200&sort=startDate,desc", {
-                method: "GET",
-                headers: authHeaders(token)
-            });
-            
-            // Extraemos el array, ya sea que venga directo o dentro de "content"
-            const campaignsArray = Array.isArray(data) ? data : (data.content || []);
-            
-            populateCampaignSelect(campaignsArray);
-        } catch (error) {
-            showMessage(error.message || "No se pudieron cargar las campañas", true);
-        }
-
         btnLoad.addEventListener("click", async () => {
             const campaignId = campaignSelect.value;
-            if (!campaignId) {
-                showMessage("Selecciona una campaña", true);
-                return;
-            }
-
+            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
             try {
                 await loadCampaignData(campaignId);
                 coordinatorSelect.disabled = false;
@@ -142,16 +125,8 @@
         btnAssign.addEventListener("click", async () => {
             const campaignId = campaignSelect.value;
             const userId = coordinatorSelect.value;
-
-            if (!campaignId) {
-                showMessage("Selecciona una campaña", true);
-                return;
-            }
-            if (!userId) {
-                showMessage("Selecciona un coordinador", true);
-                return;
-            }
-
+            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
+            if (!userId) { showMessage("Selecciona un coordinador", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/coordinators`, {
                     method: "POST",
@@ -167,17 +142,10 @@
 
         coordinatorsTbody.addEventListener("click", async (event) => {
             const button = event.target.closest("button[data-role='COORDINATOR']");
-            if (!button) {
-                return;
-            }
-
+            if (!button) return;
             const campaignId = campaignSelect.value;
             const userId = button.dataset.userid;
-            if (!campaignId || !userId) {
-                showMessage("Selección inválida", true);
-                return;
-            }
-
+            if (!campaignId || !userId) { showMessage("Selección inválida", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/coordinators/${userId}`, {
                     method: "DELETE",
@@ -191,84 +159,39 @@
         });
 
         function authHeaders(jwtToken) {
-            return {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${jwtToken}`
-            };
+            return { "Content-Type": "application/json", "Authorization": `Bearer ${jwtToken}` };
         }
 
-       async function loadCampaignData(campaignId) {
+        async function loadCampaignData(campaignId) {
             const [assignments, availableCoordinatorsData] = await Promise.all([
-                fetchJson(`/api/campaigns/${campaignId}/assignments`, {
-                    method: "GET",
-                    headers: authHeaders(token)
-                }),
-                fetchJson(`/api/campaigns/${campaignId}/available-users?role=COORDINATOR`, {
-                    method: "GET",
-                    headers: authHeaders(token)
-                })
+                fetchJson(`/api/campaigns/${campaignId}/assignments`, { method: "GET", headers: authHeaders(token) }),
+                fetchJson(`/api/campaigns/${campaignId}/available-users?role=COORDINATOR`, { method: "GET", headers: authHeaders(token) })
             ]);
-
-            // Extraemos el array, ya sea que venga directo o dentro de la propiedad "content" por la paginación de Spring
-            const availableCoordinators = Array.isArray(availableCoordinatorsData) 
-                ? availableCoordinatorsData 
-                : (availableCoordinatorsData.content || []);
-
+            const availableCoordinators = Array.isArray(availableCoordinatorsData)
+                ? availableCoordinatorsData : (availableCoordinatorsData.content || []);
             renderCoordinatorsTable(assignments?.coordinators || []);
-            
-            // Pasamos el array limpio al desplegable
             populateSelect(coordinatorSelect, availableCoordinators, "Selecciona un coordinador...");
         }
 
         async function fetchJson(url, options) {
-            try {
-                const response = await fetch(url, options);
-                const data = await response.json().catch(() => ({}));
-
-                if (response.status === 401 || response.status === 403) {
-                    throw new Error("Tu sesión no es válida o ha expirado.");
-                }
-
-                if (!response.ok) {
-                    throw new Error(data.message || `Error ${response.status}`);
-                }
-                return data;
-            } catch (error) {
-                if (error instanceof Error) {
-                    throw error;
-                }
-                throw new Error("Error inesperado de red");
-            }
-        }
-
-        function populateCampaignSelect(campaigns) {
-            campaignSelect.innerHTML = "<option value=''>Selecciona una campaña...</option>";
-            (campaigns || []).forEach((campaign) => {
-                const option = document.createElement("option");
-                option.value = String(campaign.id);
-                option.textContent = `${campaign.name} (${campaign.startDate} - ${campaign.endDate})`;
-                campaignSelect.appendChild(option);
-            });
+            const response = await fetch(url, options);
+            const data = await response.json().catch(() => ({}));
+            if (response.status === 401 || response.status === 403) throw new Error("Tu sesión no es válida o ha expirado.");
+            if (!response.ok) throw new Error(data.message || `Error ${response.status}`);
+            return data;
         }
 
         function renderCoordinatorsTable(coordinators) {
             coordinatorsTbody.innerHTML = "";
             if (!coordinators.length) {
-                const row = document.createElement("tr");
-                row.innerHTML = "<td colspan='3'>Sin coordinadores asignados</td>";
-                coordinatorsTbody.appendChild(row);
-                return;
+                coordinatorsTbody.innerHTML = "<tr><td colspan='3'>Sin coordinadores asignados</td></tr>"; return;
             }
-
             coordinators.forEach((coordinator) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${escapeHtml(coordinator.name || "")}</td>
                     <td>${escapeHtml(coordinator.email || "")}</td>
-                    <td>
-                        <button type="button" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button>
-                    </td>
-                `;
+                    <td><button type="button" data-userid="${coordinator.userId}" data-role="COORDINATOR">Eliminar</button></td>`;
                 coordinatorsTbody.appendChild(row);
             });
         }
@@ -288,20 +211,13 @@
             globalMessage.textContent = text;
             globalMessage.classList.remove("success", "error");
             globalMessage.classList.add(isError ? "error" : "success");
-
             window.clearTimeout(showMessage.hideTimer);
-            showMessage.hideTimer = window.setTimeout(() => {
-                globalMessage.hidden = true;
-            }, 4000);
+            showMessage.hideTimer = window.setTimeout(() => { globalMessage.hidden = true; }, 4000);
         }
 
         function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
-                .replace(/'/g, "&#39;");
+            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
         }
     });
 </script>

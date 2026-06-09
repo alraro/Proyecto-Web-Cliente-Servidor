@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.CaptainGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CaptainDashboardService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -27,25 +27,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CaptainDashboardRestController {
 
-    private final CaptainGuard captainGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CaptainDashboardService captainDashboardService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts captain role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not a captain
-     */
-    private void checkCaptain(String auth) {
-        if (captainGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!captainGuard.isUserCaptain(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Acceso denegado");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -59,8 +43,8 @@ public class CaptainDashboardRestController {
     public ResponseEntity<?> getMyCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkCaptain(authHeader);
-        return ResponseEntity.ok(captainDashboardService.getMyCampaigns(captainGuard.extractUserId(authHeader)));
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
+        return ResponseEntity.ok(captainDashboardService.getMyCampaigns(authService.extractUserIdFromToken(authHeader)));
     }
 
     /**
@@ -75,9 +59,9 @@ public class CaptainDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getMyStores(
-                captainGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     /**
@@ -94,9 +78,9 @@ public class CaptainDashboardRestController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getShifts(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     /**
@@ -113,9 +97,9 @@ public class CaptainDashboardRestController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getVolunteerShifts(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     /**
@@ -130,7 +114,8 @@ public class CaptainDashboardRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
+
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
         }
@@ -138,7 +123,7 @@ public class CaptainDashboardRestController {
         Integer campaignId  = parseInteger(request.get("campaignId"));
         Integer storeId     = parseInteger(request.get("storeId"));
         String  description = trimToNull(request.get("description"));
-        Integer userId      = captainGuard.extractUserId(authHeader);
+        Integer userId      = authService.extractUserIdFromToken(authHeader);
 
         Integer incidentId = captainDashboardService.createIncident(userId, campaignId, storeId, description);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -160,9 +145,9 @@ public class CaptainDashboardRestController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        checkCaptain(authHeader);
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getIncidents(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     // ── Local exception handlers ──────────────────────────────────────────────
@@ -174,6 +159,10 @@ public class CaptainDashboardRestController {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to captains"));
+    }
 
     private static String trimToNull(Object o) {
         if (o == null) return null;

@@ -14,20 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.GeographicZoneRepository;
 import es.grupo8.backend.dao.LocalityRepository;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.UserService;
 
 @RestController
 public class LocalityZoneController {
 
     @Autowired private LocalityRepository       localityRepository;
     @Autowired private GeographicZoneRepository zoneRepository;
-    @Autowired private AdminGuard               adminGuard;
+    @Autowired private AuthService              authService;
+    @Autowired private UserService              userService;
 
     @GetMapping("/api/localities")
     public ResponseEntity<?> getLocalities(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access restricted to administrators"));
         }
@@ -53,7 +55,7 @@ public class LocalityZoneController {
     public ResponseEntity<?> getZones(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access restricted to administrators"));
         }

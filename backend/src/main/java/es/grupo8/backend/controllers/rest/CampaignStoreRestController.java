@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignStoreService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -35,25 +35,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignStoreRestController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignStoreService campaignStoreService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts admin role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not admin
-     */
-    private void checkAdmin(String auth) {
-        if (adminGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!adminGuard.isAdmin(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Access restricted to administrators");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -69,9 +53,9 @@ public class CampaignStoreRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer campaignId) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignStoreService.getCampaignStores(
-                adminGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     /**
@@ -88,14 +72,15 @@ public class CampaignStoreRestController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+
         Integer storeId = valueAsInteger(request == null ? null : request.get("storeId"));
         if (storeId == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "storeId is required"));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 campaignStoreService.assignStoreToCampaign(
-                        adminGuard.extractUserId(authHeader), campaignId, storeId));
+                        authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     /**
@@ -112,9 +97,9 @@ public class CampaignStoreRestController {
             @PathVariable Integer campaignId,
             @PathVariable Integer storeId) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         campaignStoreService.removeStoreFromCampaign(
-                adminGuard.extractUserId(authHeader), campaignId, storeId);
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId);
         return ResponseEntity.ok(Map.of("message", "Tienda desasignada correctamente"));
     }
 
@@ -132,13 +117,14 @@ public class CampaignStoreRestController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+
         List<Integer> storeIds = valueAsIntegerList(request == null ? null : request.get("storeIds"));
         if (storeIds == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "storeIds list is required"));
         }
         return ResponseEntity.ok(campaignStoreService.replaceCampaignStores(
-                adminGuard.extractUserId(authHeader), campaignId, storeIds));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeIds));
     }
 
     // ── Local exception handlers ──────────────────────────────────────────────
@@ -156,6 +142,10 @@ public class CampaignStoreRestController {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
+    }
 
     private static Integer valueAsInteger(Object value) {
         if (value == null) return null;

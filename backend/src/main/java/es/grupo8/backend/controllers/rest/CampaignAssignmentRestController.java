@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignAssignmentService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -30,25 +30,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignAssignmentRestController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignAssignmentService campaignAssignmentService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts admin role.
-     *
-     * @param auth raw Authorization header value
-     * @throws AuthException 401 if token is missing/invalid, 403 if not admin
-     */
-    private void checkAdmin(String auth) {
-        if (adminGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!adminGuard.isAdmin(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Access restricted to administrators");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -62,8 +46,8 @@ public class CampaignAssignmentRestController {
     public ResponseEntity<?> getCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkAdmin(authHeader);
-        return ResponseEntity.ok(campaignAssignmentService.getCampaigns(adminGuard.extractUserId(authHeader)));
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        return ResponseEntity.ok(campaignAssignmentService.getCampaigns(authService.extractUserIdFromToken(authHeader)));
     }
 
     /**
@@ -78,9 +62,9 @@ public class CampaignAssignmentRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer campaignId) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignAssignmentService.getCampaignAssignments(
-                adminGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     /**
@@ -97,9 +81,9 @@ public class CampaignAssignmentRestController {
             @PathVariable Integer campaignId,
             @RequestParam(value = "role", required = false) String role) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignAssignmentService.getAvailableUsers(
-                adminGuard.extractUserId(authHeader), campaignId, role));
+                authService.extractUserIdFromToken(authHeader), campaignId, role));
     }
 
     /**
@@ -116,11 +100,11 @@ public class CampaignAssignmentRestController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         Integer userId = extractUserId(request);
         if (userId == null) return ResponseEntity.badRequest().body(Map.of("message", "userId is required"));
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                campaignAssignmentService.assignCoordinator(adminGuard.extractUserId(authHeader), campaignId, userId));
+                campaignAssignmentService.assignCoordinator(authService.extractUserIdFromToken(authHeader), campaignId, userId));
     }
 
     /**
@@ -137,8 +121,8 @@ public class CampaignAssignmentRestController {
             @PathVariable Integer campaignId,
             @PathVariable Integer userId) {
 
-        checkAdmin(authHeader);
-        campaignAssignmentService.unassignCoordinator(adminGuard.extractUserId(authHeader), campaignId, userId);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        campaignAssignmentService.unassignCoordinator(authService.extractUserIdFromToken(authHeader), campaignId, userId);
         return ResponseEntity.ok(Map.of("message", "Coordinator unassigned successfully"));
     }
 
@@ -156,11 +140,11 @@ public class CampaignAssignmentRestController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        checkAdmin(authHeader);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         Integer userId = extractUserId(request);
         if (userId == null) return ResponseEntity.badRequest().body(Map.of("message", "userId is required"));
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                campaignAssignmentService.assignCaptain(adminGuard.extractUserId(authHeader), campaignId, userId));
+                campaignAssignmentService.assignCaptain(authService.extractUserIdFromToken(authHeader), campaignId, userId));
     }
 
     /**
@@ -177,8 +161,8 @@ public class CampaignAssignmentRestController {
             @PathVariable Integer campaignId,
             @PathVariable Integer userId) {
 
-        checkAdmin(authHeader);
-        campaignAssignmentService.unassignCaptain(adminGuard.extractUserId(authHeader), campaignId, userId);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        campaignAssignmentService.unassignCaptain(authService.extractUserIdFromToken(authHeader), campaignId, userId);
         return ResponseEntity.ok(Map.of("message", "Captain unassigned successfully"));
     }
 
@@ -203,6 +187,10 @@ public class CampaignAssignmentRestController {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
+    }
 
     private static Integer extractUserId(Map<String, Object> request) {
         if (request == null) return null;

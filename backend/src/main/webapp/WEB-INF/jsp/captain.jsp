@@ -15,7 +15,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Capitán</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
-    <link rel="stylesheet" href="/css/administrador.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/captain-dashboard.css">
 </head>
 <body>
 <header class="topbar">
@@ -25,7 +27,7 @@
     <div class="topbar-actions">
         <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         <a href="/edit" class="edit-link">Editar perfil</a>
-        <a href="/login" class="logout-link">Cerrar sesión</a>    
+        <a href="/logout" class="logout-link">Cerrar sesión</a>
     </div>
 </header>
 

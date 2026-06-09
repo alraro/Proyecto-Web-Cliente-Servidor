@@ -1,84 +1,108 @@
 package es.grupo8.backend.controllers;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import es.grupo8.backend.dto.CampaignDTO;
-import es.grupo8.backend.security.CaptainGuard;
 import es.grupo8.backend.services.CaptainDashboardService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-// Controlador MVC para las páginas del capitán.
-// Carga los datos del servidor para el renderizado inicial con JSTL.
+/**
+ * MVC controller for captain views.
+ * Loads model data from CaptainDashboardService for server-side JSP rendering.
+ */
 @Controller
 @AllArgsConstructor
 public class CaptainController {
 
-    private final CaptainGuard captainGuard;
     private final CaptainDashboardService captainDashboardService;
 
-    // Devuelve true si el usuario en sesión es capitán
-    private boolean isCaptain(HttpSession session) {
-        Object token = session.getAttribute("token");
-        if (token == null) return false;
-        return captainGuard.isUserCaptain("Bearer " + token);
-    }
-
-    // Pantalla de bienvenida del capitán
+    /**
+     * Serves the captain welcome page.
+     *
+     * @param session HTTP session carrying the user role
+     * @return view name or redirect
+     */
     @GetMapping("/captain")
-    public String captain(HttpSession session, Model model) {
-        if (!isCaptain(session)) return "redirect:/login";
-
-        model.addAttribute("userName", session.getAttribute("nombre"));
+    public String captain(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (!"CAPITAN".equals(role)) {
+            return "redirect:/login";
+        }
         return "captain";
     }
 
-    // Panel principal del capitán con sus campañas
+    /**
+     * Serves the captain dashboard with the user's assigned campaigns.
+     *
+     * @param session HTTP session carrying role, userId and nombre
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/captain-dashboard")
     public String captainDashboard(HttpSession session, Model model) {
-        if (!isCaptain(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"CAPITAN".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = captainDashboardService.getMyCampaigns(userId);
         model.addAttribute("userName", session.getAttribute("nombre"));
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
         return "captain-dashboard";
     }
 
-    // Tiendas del capitán en sus campañas
+    /**
+     * Serves the captain stores page with campaign selector.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/captain-stores")
     public String captainStores(HttpSession session, Model model) {
-        if (!isCaptain(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"CAPITAN".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = captainDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
         return "captain-stores";
     }
 
-    // Incidencias registradas por el capitán
+    /**
+     * Serves the incidents page with campaign selector.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/captain-incidents")
     public String captainIncidents(HttpSession session, Model model) {
-        if (!isCaptain(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"CAPITAN".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = captainDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
         return "captain-incidents";
     }
 
-    // Control de asistencia de voluntarios
+    /**
+     * Serves the attendance tracking page with campaign selector.
+     *
+     * @param session HTTP session carrying role and userId
+     * @param model   Spring MVC model for the JSP
+     * @return view name or redirect
+     */
     @GetMapping("/captain-attendance")
     public String captainAttendance(HttpSession session, Model model) {
-        if (!isCaptain(session)) return "redirect:/login";
-
+        String role = (String) session.getAttribute("role");
+        if (!"CAPITAN".equals(role)) {
+            return "redirect:/login";
+        }
         Integer userId = (Integer) session.getAttribute("userID");
-        List<CampaignDTO> campaigns = captainDashboardService.getMyCampaigns(userId);
-        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
         return "captain-attendance";
     }
 }

@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CampaignRequestDto;
-import es.grupo8.backend.exceptions.AuthException;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignService;
+import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -44,25 +44,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignRestController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignService campaignService;
-
-    // ── Auth helper ───────────────────────────────────────────────────────────
-
-    /**
-     * Validates the Authorization header and asserts admin role.
-     * Throws {@link AuthException} on failure — caught by {@link es.grupo8.backend.exceptions.GlobalExceptionHandler}.
-     *
-     * @param auth the raw Authorization header value
-     */
-    private void checkAdmin(String auth) {
-        if (adminGuard.extractUserId(auth) == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!adminGuard.isAdmin(auth)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "Access restricted to administrators");
-        }
-    }
 
     // ── Endpoints ─────────────────────────────────────────────────────────────
 
@@ -176,8 +160,8 @@ public class CampaignRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) CampaignRequestDto request) {
 
-        checkAdmin(authHeader);
-        CampaignDTO created = campaignService.createCampaign(adminGuard.extractUserId(authHeader), request);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        CampaignDTO created = campaignService.createCampaign(authService.extractUserIdFromToken(authHeader), request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Campaign created successfully", "campaign", created));
     }
@@ -205,8 +189,8 @@ public class CampaignRestController {
             @PathVariable Integer id,
             @RequestBody(required = false) CampaignRequestDto request) {
 
-        checkAdmin(authHeader);
-        CampaignDTO updated = campaignService.updateCampaign(adminGuard.extractUserId(authHeader), id, request);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        CampaignDTO updated = campaignService.updateCampaign(authService.extractUserIdFromToken(authHeader), id, request);
         return ResponseEntity.ok(Map.of("message", "Campaign updated successfully", "campaign", updated));
     }
 
@@ -229,8 +213,8 @@ public class CampaignRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
-        campaignService.deleteCampaign(adminGuard.extractUserId(authHeader), id);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        campaignService.deleteCampaign(authService.extractUserIdFromToken(authHeader), id);
         return ResponseEntity.ok(Map.of("message", "Campaign deleted successfully"));
     }
 
@@ -252,5 +236,11 @@ public class CampaignRestController {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
     }
 }
