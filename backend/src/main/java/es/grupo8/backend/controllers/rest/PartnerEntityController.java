@@ -49,7 +49,7 @@ public class PartnerEntityController {
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<PartnerEntityResponseDto>> getPartnerEntities(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String sort,
@@ -63,7 +63,7 @@ public class PartnerEntityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PartnerEntityResponseDto> getPartnerEntityById(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer id) {
 
         checkAdminOrEntityManager(auth, id);
@@ -73,7 +73,7 @@ public class PartnerEntityController {
 
     @PostMapping
     public ResponseEntity<PartnerEntityResponseDto> createPartnerEntity(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestBody PartnerEntityRequestDto request) {
 
         checkAdmin(auth);
@@ -83,7 +83,7 @@ public class PartnerEntityController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PartnerEntityResponseDto> updatePartnerEntity(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer id,
             @RequestBody PartnerEntityRequestDto request) {
 
@@ -94,7 +94,7 @@ public class PartnerEntityController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePartnerEntity(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer id) {
 
         checkAdmin(auth);

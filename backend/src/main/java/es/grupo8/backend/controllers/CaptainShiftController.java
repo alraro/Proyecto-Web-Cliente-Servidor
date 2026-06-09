@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.security.CaptainGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CaptainShiftService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -20,7 +21,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CaptainShiftController {
 
-    private final CaptainGuard captainGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CaptainShiftService captainShiftService;
 
     @GetMapping("/my-team")
@@ -28,12 +30,12 @@ public class CaptainShiftController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) {
+        if (!userService.isCaptainFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acceso denegado"));
         }
 
         return ResponseEntity.ok(captainShiftService.getMyTeamShifts(
-                captainGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import GenericPageWrapper from "../generalModules/GenericPageWrapper";
 import SecurePage from "../generalModules/SecurePage";
+import { authHeaders } from "../auth/authUtils";
 
 const VOLUNTEER_FIELDS = [
 	{ name: "id", label: "ID", type: "text", readOnly: true },
@@ -61,7 +62,7 @@ function AdminVolunteers() {
 	useEffect(() => {
 		async function fetchPartnerEntities() {
 			try {
-				const response = await fetch(`${apiUrl}${partnerEntitiesEndpoint}`);
+				const response = await fetch(`${apiUrl}${partnerEntitiesEndpoint}`, { headers: authHeaders() });
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
@@ -83,7 +84,7 @@ function AdminVolunteers() {
 	useEffect(() => {
 		const fetchVolunteersData = async () => {
 			try {
-				const response = await fetch(`${fullURL}`);
+				const response = await fetch(`${fullURL}`, { headers: authHeaders() });
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
@@ -121,7 +122,7 @@ function AdminVolunteers() {
 		try {
 			const response = await fetch(`${apiUrl}${volunteersEndpoint}?entidadId=${entidadId}`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: authHeaders({ "Content-Type": "application/json" }),
 				body: JSON.stringify(formData),
 			});
 			if (!response.ok) {
@@ -141,7 +142,7 @@ function AdminVolunteers() {
 		try {
 			const response = await fetch(`${apiUrl}${volunteersEndpoint}/${formData.id}?entidadId=${entidadId}`, {
 				method: "PUT",
-				headers: { "Content-Type": "application/json" },
+				headers: authHeaders({ "Content-Type": "application/json" }),
 				body: JSON.stringify(formData),
 			});
 
@@ -161,6 +162,7 @@ function AdminVolunteers() {
 		try {
 			const response = await fetch(`${apiUrl}${volunteersEndpoint}/${volunteer.id}?entidadId=${entidadId}`, {
 				method: "DELETE",
+				headers: authHeaders(),
 			});
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);

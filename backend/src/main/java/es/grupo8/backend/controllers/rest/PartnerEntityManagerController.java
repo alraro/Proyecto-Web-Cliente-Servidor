@@ -40,7 +40,7 @@ public class PartnerEntityManagerController {
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<PartnerEntityManagerResponseDto>> getPartnerEntityManagers(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String sort,
@@ -54,7 +54,7 @@ public class PartnerEntityManagerController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<PartnerEntityManagerResponseDto> getPartnerEntityManagerByUserId(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer userId) {
 
         checkAuth(auth);
@@ -64,7 +64,7 @@ public class PartnerEntityManagerController {
 
     @PostMapping("/{userId}")
     public ResponseEntity<PartnerEntityManagerResponseDto> promoteUserToPartnerEntityManager(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer userId,
             @RequestBody(required = false) PartnerEntityManagerAssignRequestDto request) {
 
@@ -76,7 +76,7 @@ public class PartnerEntityManagerController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<PartnerEntityManagerResponseDto> updatePartnerEntityManager(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer userId,
             @RequestBody PartnerEntityManagerUpdateRequestDto request) {
 
@@ -88,7 +88,7 @@ public class PartnerEntityManagerController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> removePartnerEntityManagerRole(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @PathVariable Integer userId) {
 
         checkAuth(auth);

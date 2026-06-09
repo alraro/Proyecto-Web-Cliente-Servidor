@@ -4,6 +4,7 @@ import SecurePage from '../generalModules/SecurePage';
 import { useAuth } from '../auth/useAuthHook';
 import {useState, useEffect} from 'react';
 import { Link, useNavigate } from 'react-router';
+import { authHeaders } from '../auth/authUtils';
 
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, RadialLinearScale, Filler, ArcElement, Title, Tooltip, Legend} from "chart.js";
 import {Bar, Line} from 'react-chartjs-2';
@@ -29,7 +30,6 @@ function Dashboard() {
     const { usuario } = useAuth();
     const username = usuario?.nombre ?? 'Admin';    
     const role = usuario?.role ?? 'ADMINISTRADOR';
-    const token = sessionStorage.getItem('token');
 
     const [campaigns, setCampaigns] = useState([]);
     const [selectedCampaignId, setSelectedCampaignId] = useState('');
@@ -50,10 +50,7 @@ function Dashboard() {
         async function fetchCampaigns() {
             try {
                 const res = await fetch(`${ruta}/api/dashboard/campaigns`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: authHeaders({ 'Content-Type': 'application/json' })
                 });
 
                 if (res.ok) {
@@ -66,7 +63,7 @@ function Dashboard() {
             }
         }
         fetchCampaigns();
-    }, [token]);
+    }, []);
 
     // Cargamos las métricas a mostrar
     useEffect(() => {
@@ -75,10 +72,7 @@ function Dashboard() {
         async function fetchMetricas() {
             try {
 
-                const headers = {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                };
+                const headers = authHeaders({ 'Content-Type': 'application/json' });
 
                 const [chainfetch, localityfetch, zonefetch] = await Promise.all([
                     fetch(`${ruta}/api/dashboard/campaigns/${selectedCampaignId}/coverage/chain`, {headers}),
@@ -114,7 +108,7 @@ function Dashboard() {
 
         return () => clearInterval(timer);
 
-    }, [selectedCampaignId, refresh, token]);
+    }, [selectedCampaignId, refresh]);
 
 
     const totalStores = metrics.chainData ? metrics.chainData.reduce((s, c) => s + c.storesInCampaign, 0) : '-';

@@ -4,6 +4,7 @@ import GenericPageWrapper from "../generalModules/GenericPageWrapper";
 import GenericTable from "../generalModules/GenericTable";
 import GenericModal from "../generalModules/GenericModal";
 import SecurePage from "../generalModules/SecurePage";
+import { authHeaders } from "../auth/authUtils";
 
 const STORE_FIELDS = [
     { name: "id", label: "ID", type: "text", readOnly: true },
@@ -13,10 +14,6 @@ const STORE_FIELDS = [
 ];
 
 const apiUrl = "http://localhost:8080";
-
-function getAuthToken() {
-    return sessionStorage.getItem("token");
-}
 
 function mapStoreToTableRow(store) {
     return {
@@ -116,11 +113,10 @@ export default function AdminStores() {
     useEffect(() => {
         async function fetchInitialData() {
             try {
-                const token = getAuthToken();
                 const [storesResponse, chainsResponse, zonesResponse] = await Promise.all([
-                    fetch(`${apiUrl}/api/stores`, { headers: { Authorization: `Bearer ${token}` } }),
-                    fetch(`${apiUrl}/api/chains`, { headers: { Authorization: `Bearer ${token}` } }),
-                    fetch(`${apiUrl}/api/zones`, { headers: { Authorization: `Bearer ${token}` } }),
+                    fetch(`${apiUrl}/api/stores`, { headers: authHeaders() }),
+                    fetch(`${apiUrl}/api/chains`, { headers: authHeaders() }),
+                    fetch(`${apiUrl}/api/zones`, { headers: authHeaders() }),
                 ]);
 
                 if (!storesResponse.ok) {
@@ -153,9 +149,8 @@ export default function AdminStores() {
     useEffect(() => {
         async function fetchLocalities() {
             try {
-                const token = getAuthToken();
                 const url = filters.zoneId ? `${apiUrl}/api/localities?zoneId=${filters.zoneId}` : `${apiUrl}/api/localities`;
-                const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+                const response = await fetch(url, { headers: authHeaders() });
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -197,13 +192,9 @@ export default function AdminStores() {
 
     async function handleSaveStore(formData) {
         try {
-            const token = getAuthToken();
             const response = await fetch(`${apiUrl}/api/stores/${formData.id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: authHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({
                     name: formData.name,
                     address: formData.address,

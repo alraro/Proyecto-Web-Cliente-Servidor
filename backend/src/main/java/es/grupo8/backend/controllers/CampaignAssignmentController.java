@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignAssignmentService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -25,15 +26,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignAssignmentController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignAssignmentService campaignAssignmentService;
 
     @GetMapping("/admin-list")
     public ResponseEntity<?> getCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
-        return ResponseEntity.ok(campaignAssignmentService.getCampaigns(adminGuard.extractUserId(authHeader)));
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        return ResponseEntity.ok(campaignAssignmentService.getCampaigns(authService.extractUserIdFromToken(authHeader)));
     }
 
     @GetMapping("/{campaignId}/assignments")
@@ -41,9 +43,9 @@ public class CampaignAssignmentController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer campaignId) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignAssignmentService.getCampaignAssignments(
-                adminGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     @GetMapping("/{campaignId}/available-users")
@@ -52,9 +54,9 @@ public class CampaignAssignmentController {
             @PathVariable Integer campaignId,
             @RequestParam(value = "role", required = false) String role) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(campaignAssignmentService.getAvailableUsers(
-                adminGuard.extractUserId(authHeader), campaignId, role));
+                authService.extractUserIdFromToken(authHeader), campaignId, role));
     }
 
     @PostMapping("/{campaignId}/coordinators")
@@ -63,11 +65,11 @@ public class CampaignAssignmentController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         Integer userId = extractUserId(request);
         if (userId == null) return ResponseEntity.badRequest().body(Map.of("message", "userId is required"));
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                campaignAssignmentService.assignCoordinator(adminGuard.extractUserId(authHeader), campaignId, userId));
+                campaignAssignmentService.assignCoordinator(authService.extractUserIdFromToken(authHeader), campaignId, userId));
     }
 
     @DeleteMapping("/{campaignId}/coordinators/{userId}")
@@ -76,8 +78,8 @@ public class CampaignAssignmentController {
             @PathVariable Integer campaignId,
             @PathVariable Integer userId) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
-        campaignAssignmentService.unassignCoordinator(adminGuard.extractUserId(authHeader), campaignId, userId);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        campaignAssignmentService.unassignCoordinator(authService.extractUserIdFromToken(authHeader), campaignId, userId);
         return ResponseEntity.ok(Map.of("message", "Coordinator unassigned successfully"));
     }
 
@@ -87,11 +89,11 @@ public class CampaignAssignmentController {
             @PathVariable Integer campaignId,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
         Integer userId = extractUserId(request);
         if (userId == null) return ResponseEntity.badRequest().body(Map.of("message", "userId is required"));
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                campaignAssignmentService.assignCaptain(adminGuard.extractUserId(authHeader), campaignId, userId));
+                campaignAssignmentService.assignCaptain(authService.extractUserIdFromToken(authHeader), campaignId, userId));
     }
 
     @DeleteMapping("/{campaignId}/captains/{userId}")
@@ -100,8 +102,8 @@ public class CampaignAssignmentController {
             @PathVariable Integer campaignId,
             @PathVariable Integer userId) {
 
-        if (!adminGuard.isAdmin(authHeader)) return forbidden();
-        campaignAssignmentService.unassignCaptain(adminGuard.extractUserId(authHeader), campaignId, userId);
+        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        campaignAssignmentService.unassignCaptain(authService.extractUserIdFromToken(authHeader), campaignId, userId);
         return ResponseEntity.ok(Map.of("message", "Captain unassigned successfully"));
     }
 

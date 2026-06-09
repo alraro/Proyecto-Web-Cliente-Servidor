@@ -25,8 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CampaignRequestDto;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignService;
+import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -39,7 +40,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignController {
 
-    private final AdminGuard adminGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CampaignService campaignService;
 
     @GetMapping("/campaign-types")
@@ -124,12 +126,12 @@ public class CampaignController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) CampaignRequestDto request) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access restricted to administrators"));
         }
 
-        CampaignDTO created = campaignService.createCampaign(adminGuard.extractUserId(authHeader), request);
+        CampaignDTO created = campaignService.createCampaign(authService.extractUserIdFromToken(authHeader), request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Campaign created successfully", "campaign", created));
     }
@@ -148,12 +150,12 @@ public class CampaignController {
             @PathVariable Integer id,
             @RequestBody(required = false) CampaignRequestDto request) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access restricted to administrators"));
         }
 
-        CampaignDTO updated = campaignService.updateCampaign(adminGuard.extractUserId(authHeader), id, request);
+        CampaignDTO updated = campaignService.updateCampaign(authService.extractUserIdFromToken(authHeader), id, request);
         return ResponseEntity.ok(Map.of("message", "Campaign updated successfully", "campaign", updated));
     }
 
@@ -168,12 +170,12 @@ public class CampaignController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access restricted to administrators"));
         }
 
-        campaignService.deleteCampaign(adminGuard.extractUserId(authHeader), id);
+        campaignService.deleteCampaign(authService.extractUserIdFromToken(authHeader), id);
         return ResponseEntity.ok(Map.of("message", "Campaign deleted successfully"));
     }
 

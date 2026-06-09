@@ -26,7 +26,8 @@ import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.UserEntity;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.UserService;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -34,7 +35,8 @@ public class AdminCaptainRequestController {
 
     private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
-    @Autowired private AdminGuard               adminGuard;
+    @Autowired private AuthService              authService;
+    @Autowired private UserService              userService;
     @Autowired private CaptainRequestRepository captainRequestRepository;
     @Autowired private UserRepository           userRepository;
     @Autowired private CaptainRepository        captainRepository;
@@ -46,7 +48,7 @@ public class AdminCaptainRequestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "status", defaultValue = "PENDIENTE") String status) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return forbidden();
         }
 
@@ -66,11 +68,11 @@ public class AdminCaptainRequestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return forbidden();
         }
 
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
+        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
 
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
@@ -122,11 +124,11 @@ public class AdminCaptainRequestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!adminGuard.isAdmin(authHeader)) {
+        if (!userService.isAdminFromToken(authHeader)) {
             return forbidden();
         }
 
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
+        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
 
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
