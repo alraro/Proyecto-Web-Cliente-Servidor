@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +68,7 @@ class CoordinatorDashboardRestControllerTest {
     void assignVolunteerShift_notCoordinator_returnsForbidden() {
         when(userService.isCoordinatorFromToken("Bearer bad-token")).thenReturn(false);
 
-        ResponseEntity<?> response = controller.assignVolunteerShift("Bearer bad-token", Map.of());
+        ResponseEntity<?> response = controller.assignVolunteerShift("Bearer bad-token", null);
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }

@@ -32,8 +32,8 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Coordinador" : nombre %></span>
         </div>
-        <button class="btn-edit" id="btn-edit">Editar perfil 🖉</button>
-        <button class="btn-logout" id="btn-logout">Cerrar sesión ×</button>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
 
@@ -109,7 +109,7 @@
     </div>
 </main>
 <script>
-    const BEARER_TOKEN = '<%= token %>';
+    const BEARER_TOKEN = '<%= session.getAttribute("token") != null ? session.getAttribute("token") : "" %>';
     let editingId = null;
 
     function showMsg(text, type) {

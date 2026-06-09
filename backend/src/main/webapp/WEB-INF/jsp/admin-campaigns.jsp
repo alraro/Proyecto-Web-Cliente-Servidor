@@ -4,7 +4,7 @@
     String role = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
 
-    if (token == null || role == null || !"ADMINISTRADOR".equals(role)) {
+    if (role == null || !"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
@@ -17,7 +17,9 @@
     <title>Bancosol | Campañas</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
 
-    <link rel="stylesheet" href="/css/administrador.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/admin-campaigns.css">
 </head>
 <body>

@@ -4,7 +4,7 @@
     String token  = (String) session.getAttribute("token");
     String role   = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
-    if (token == null || !"ADMINISTRADOR".equals(role)) {
+    if (!"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }

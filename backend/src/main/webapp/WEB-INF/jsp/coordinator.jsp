@@ -1,10 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String token  = (String) session.getAttribute("token");
     String role   = (String) session.getAttribute("role");
 
-    if (token == null || !"COORDINADOR".equals(role)) {
+    if (!"COORDINADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
@@ -18,10 +17,10 @@
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/coordinator.css">
 </head>
 <body>
-<header class="topbar">
+<header class="topbar" aria-label="Top navigation">
     <a class="brand" href="/coordinator" aria-label="Bancosol coordinador home">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
@@ -30,8 +29,8 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Coordinador" : nombre %></span>
         </div>
-        <button class="btn-edit" id="btn-edit">Editar perfil &#x270F;</button>
-        <button class="btn-logout" id="btn-logout">Cerrar sesión &times;</button>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#x270F;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión &times;</a>
     </div>
 </header>
 
@@ -106,14 +105,5 @@
         </a>
     </div>
 </main>
-
-<script>
-    document.getElementById("btn-edit").addEventListener("click", function () {
-        window.location.href = "/edit";
-    });
-    document.getElementById("btn-logout").addEventListener("click", function () {
-        window.location.href = "/logout";
-    });
-</script>
 </body>
 </html>
