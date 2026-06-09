@@ -13,8 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import es.grupo8.backend.dto.AuthResponseDTO;
 
+import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -208,49 +208,6 @@ public class ViewsController {
 		return "redirect:" + resolveRolePath(role);
 	}
 
-	@GetMapping("/coordinator")
-	public String coordinator() {
-		return "coordinator";
-	}
-
-	@GetMapping("/coordinator-dashboard")
-	public String coordinatorDashboard() { return "coordinator-dashboard"; }
-
-	@GetMapping("/coordinator-campaigns")
-	public String coordinatorCampaigns() { return "coordinator-campaigns"; }
-
-	@GetMapping("/coordinator-stores")
-	public String coordinatorStores() { return "coordinator-stores"; }
-
-	@GetMapping("/coordinator-captains")
-	public String coordinatorCaptains() { return "coordinator-captains"; }
-
-	@GetMapping("/coordinator-volunteers")
-	public String coordinatorVolunteers() { return "coordinator-volunteers"; }
-
-	@GetMapping("/coordinator-collaborators")
-	public String coordinatorCollaborators() { return "coordinator-collaborators"; }
-
-	@GetMapping("/coordinator-entities")
-	public String coordinatorEntities() { return "coordinator-entities"; }
-
-	@GetMapping("/captain")
-	public String captain() {
-		return "captain";
-	}
-
-	@GetMapping("/captain-dashboard")
-	public String captainDashboard() { return "captain-dashboard"; }
-
-	@GetMapping("/captain-stores")
-	public String captainStores() { return "captain-stores"; }
-
-	@GetMapping("/captain-incidents")
-	public String captainIncidents() { return "captain-incidents"; }
-
-	@GetMapping("/captain-attendance")
-	public String captainAttendance() { return "captain-attendance"; }
-
 	@GetMapping("/collaborator")
 	public String collaborator() {
 		return "colaborator";
@@ -262,11 +219,11 @@ public class ViewsController {
 		}
 
 		if ("COORDINADOR".equals(role)) {
-			return "/coordinator";
+			return "/coordinator-dashboard";
 		}
 
 		if ("CAPITAN".equals(role)) {
-			return "/captain";
+			return "/captain-dashboard";
 		}
 
 		if ("COLABORADOR".equals(role)) {

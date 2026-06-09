@@ -9,6 +9,7 @@ import AdminStores from './pages/admin/AdminStores';
 import AdminCreateUser from './pages/admin/AdminCreateUser';
 import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Coordinator from './pages/coordinator/Coordinator';
+import CreateShift from './pages/coordinator/CreateShift';
 import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import ColaboradorEntity from './pages/colaborator/ColaboradorEntity';
@@ -47,6 +48,7 @@ function App() {
           {/* Coordinator routes */}
           <Route element={<RutaProtegida roles={['COORDINADOR']} />}>
             <Route path="/coordinator" element={<Coordinator />} />
+            <Route path="/coordinator/create-shift" element={<CreateShift />} />
           </Route>
 
           {/* Captain routes */}
