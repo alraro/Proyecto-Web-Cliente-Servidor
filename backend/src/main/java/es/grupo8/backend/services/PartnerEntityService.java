@@ -9,7 +9,6 @@ import es.grupo8.backend.mapper.PartnerEntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,78 +28,37 @@ public class PartnerEntityService {
 
         page = Math.max(0, page);
         size = Math.max(1, Math.min(size, 100));
+        int offset = page * size;
 
-        List<PartnerEntity> allEntities = partnerEntityRepository.findAll();
-
-        if (search != null && !search.trim().isEmpty()) {
-            String searchLower = search.trim().toLowerCase();
-            allEntities = allEntities.stream()
-                    .filter(e -> e.getName() != null && e.getName().toLowerCase().contains(searchLower))
-                    .toList();
+        String sortField = "id";
+        String sortDir = "asc";
+        if (sort != null && sort.contains(",")) {
+            String[] parts = sort.split(",");
+            sortField = parts[0].trim().toLowerCase();
+            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
         }
 
-        if (sort != null && !sort.trim().isEmpty()) {
-            allEntities = applySorting(allEntities, sort);
-        } else {
-            allEntities = allEntities.stream()
-                    .sorted(Comparator.comparing(PartnerEntity::getId))
-                    .toList();
-        }
+        List<PartnerEntity> entities = switch (sortField) {
+            case "name" -> sortDir.equals("asc")
+                    ? partnerEntityRepository.findAllByNameAsc(search, size, offset)
+                    : partnerEntityRepository.findAllByNameDesc(search, size, offset);
+            default -> sortDir.equals("asc")
+                    ? partnerEntityRepository.findAllByIdAsc(search, size, offset)
+                    : partnerEntityRepository.findAllByIdDesc(search, size, offset);
+        };
 
-        long totalElements = allEntities.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, (int) totalElements);
-
-        List<PartnerEntityResponseDto> pageContent;
-        if (startIndex >= allEntities.size()) {
-            pageContent = List.of();
-        } else {
-            pageContent = partnerEntityMapper.toDTOList(allEntities.subList(startIndex, endIndex));
-        }
+        long total = partnerEntityRepository.countWithSearch(search);
+        int totalPages = (int) Math.ceil((double) total / size);
 
         return new PaginatedResponse<>(
-                pageContent,
+                partnerEntityMapper.toDTOList(entities),
                 page,
                 size,
-                totalElements,
+                total,
                 totalPages,
                 page < totalPages - 1,
                 page > 0
         );
-    }
-
-    private List<PartnerEntity> applySorting(List<PartnerEntity> entities, String sort) {
-        try {
-            String[] parts = sort.split(",");
-            if (parts.length != 2) return entities;
-
-            String field = parts[0].trim().toLowerCase();
-            String direction = parts[1].trim().toLowerCase();
-
-            Comparator<PartnerEntity> comparator = getComparator(field);
-            if (comparator == null) return entities;
-
-            if ("desc".equals(direction)) {
-                comparator = comparator.reversed();
-            }
-
-            return entities.stream()
-                    .sorted(comparator)
-                    .toList();
-        } catch (Exception e) {
-            return entities;
-        }
-    }
-
-    private Comparator<PartnerEntity> getComparator(String field) {
-        return switch (field) {
-            case "name" -> Comparator.comparing(e -> e.getName() == null ? "" : e.getName());
-            case "phone" -> Comparator.comparing(e -> e.getPhone() == null ? "" : e.getPhone());
-            case "address" -> Comparator.comparing(e -> e.getAddress() == null ? "" : e.getAddress());
-            case "id" -> Comparator.comparing(PartnerEntity::getId);
-            default -> null;
-        };
     }
 
     public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
