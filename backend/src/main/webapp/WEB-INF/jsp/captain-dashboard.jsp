@@ -23,7 +23,7 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/captain-dashboard" aria-label="Bancosol capitán home">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
