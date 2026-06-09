@@ -4,15 +4,19 @@ import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityManagerAssignRequestDto;
 import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.dto.PartnerEntityManagerUpdateRequestDto;
+import es.grupo8.backend.dto.CampaignInfoDto;
+import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.PartnerEntityManagerService;
 import es.grupo8.backend.services.UserService;
+import es.grupo8.backend.services.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,6 +31,9 @@ public class PartnerEntityManagerController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private VolunteerService volunteerService;
 
     private void checkAuth(String auth) {
         Integer userId = authService.extractUserIdFromToken(auth);
@@ -56,6 +63,15 @@ public class PartnerEntityManagerController {
         Integer userId = checkPartnerEntityManager(auth);
         PartnerEntityManagerResponseDto response = partnerEntityManagerService.getPartnerEntityManagerByUserId(userId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/campaigns")
+    public ResponseEntity<List<CampaignInfoDto>> getMyCampaigns(
+            @RequestHeader(value = "Authorization", required = false) String auth) {
+
+        Integer userId = checkPartnerEntityManager(auth);
+        PartnerEntityManagerResponseDto manager = partnerEntityManagerService.getPartnerEntityManagerByUserId(userId);
+        return ResponseEntity.ok(volunteerService.getCampaignsByEntity(manager.partnerEntityId()));
     }
 
     @GetMapping

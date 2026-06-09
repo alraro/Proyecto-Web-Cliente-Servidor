@@ -14,4 +14,11 @@ gestionCards.push({
 	link: "/colaborator/volunteers"
 });
 
+gestionCards.push({
+	icon: "📅",
+	title: "Campañas",
+	description: "Ver las campañas en las que participa tu entidad.",
+	link: "/colaborator/campaigns"
+});
+
 export default gestionCards;
