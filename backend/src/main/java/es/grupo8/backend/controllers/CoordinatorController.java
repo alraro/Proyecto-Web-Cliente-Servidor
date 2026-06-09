@@ -23,8 +23,9 @@ import es.grupo8.backend.dto.ShiftCalendarStoreDto;
 import es.grupo8.backend.dto.ShiftRequestDto;
 import es.grupo8.backend.dto.ShiftResponseDto;
 import es.grupo8.backend.dto.StoreSimpleDto;
-import es.grupo8.backend.security.CoordinatorGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.ShiftService;
+import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,7 +46,10 @@ public class CoordinatorController {
     private ShiftService shiftService;
 
     @Autowired
-    private CoordinatorGuard coordinatorGuard;
+    private AuthService authService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * Create a new pickup shift for a campaign and store.
@@ -70,14 +74,14 @@ public class CoordinatorController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) ShiftRequestDto request) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
+        if (!userService.isCoordinatorFromToken(authHeader)) {
             auditLog.warn("ACTION=CREATE_SHIFT_ATTEMPT userId={} timestamp={} reason=NOT_COORDINATOR",
-                    coordinatorGuard.extractUserId(authHeader), Instant.now());
+                    authService.extractUserIdFromToken(authHeader), Instant.now());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden crear turnos."));
         }
 
-        Integer userId = coordinatorGuard.extractUserId(authHeader);
+        Integer userId = authService.extractUserIdFromToken(authHeader);
         ShiftResponseDto created = shiftService.createShift(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -97,7 +101,7 @@ public class CoordinatorController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId", required = false) Integer storeId) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
+        if (!userService.isCoordinatorFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden ver turnos."));
         }
@@ -143,7 +147,7 @@ public class CoordinatorController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!coordinatorGuard.isCoordinator(authHeader)) {
+        if (!userService.isCoordinatorFromToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden ver el calendario."));
         }

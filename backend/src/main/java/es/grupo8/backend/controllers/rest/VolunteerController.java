@@ -35,7 +35,7 @@ public class VolunteerController {
 
     @GetMapping
     public ResponseEntity<List<VoluntarioResponseDto>> listarVoluntarios(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestParam Integer entidadId) {
 
         checkAuth(auth, entidadId);
@@ -45,7 +45,7 @@ public class VolunteerController {
 
     @PostMapping
     public ResponseEntity<VoluntarioResponseDto> crearVoluntario(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestBody VoluntarioRequestDto request,
             @RequestParam Integer entidadId) {
 
@@ -56,7 +56,7 @@ public class VolunteerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VoluntarioResponseDto> editarVoluntario(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestBody VoluntarioRequestDto request,
             @RequestParam Integer entidadId,
             @PathVariable Integer id) {
@@ -68,7 +68,7 @@ public class VolunteerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarVoluntario(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader(value = "Authorization", required = false) String auth,
             @RequestParam Integer entidadId,
             @PathVariable Integer id) {
 

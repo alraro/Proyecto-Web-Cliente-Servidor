@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import GenericPageWrapper from "../generalModules/GenericPageWrapper";
 import GenericTable from "../generalModules/GenericTable";
 import SecurePage from "../generalModules/SecurePage";
+import { authHeaders } from "../auth/authUtils";
 
 const CHAIN_FIELDS = [
     { name: "id", label: "ID", type: "text", readOnly: true },
@@ -13,10 +14,6 @@ const CHAIN_FIELDS = [
 
 const apiUrl = "http://localhost:8080";
 const chainsEndpoint = "/api/chains";
-
-function getAuthToken() {
-    return sessionStorage.getItem("token");
-}
 
 function ChainModal({ title, fields, values, isOpen, onClose, onSubmit }) {
     const [formData, setFormData] = useState(() => ({ ...(values || {}) }));
@@ -103,9 +100,8 @@ export default function AdminChains() {
     useEffect(() => {
         async function fetchChains() {
             try {
-                const token = getAuthToken();
                 const response = await fetch(`${apiUrl}${chainsEndpoint}`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: authHeaders(),
                 });
 
                 if (!response.ok) {
@@ -153,13 +149,9 @@ export default function AdminChains() {
         const method = isEditing ? "PUT" : "POST";
 
         try {
-            const token = getAuthToken();
             const response = await fetch(endpoint, {
                 method,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: authHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({
                     name: formData.name,
                     code: formData.code,
@@ -193,10 +185,9 @@ export default function AdminChains() {
 
     async function handleDeleteChain(chain) {
         try {
-            const token = getAuthToken();
             const response = await fetch(`${apiUrl}${chainsEndpoint}/${chain.id}`, {
                 method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: authHeaders(),
             });
 
             if (!response.ok) {

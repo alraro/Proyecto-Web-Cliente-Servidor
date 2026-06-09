@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.grupo8.backend.security.CaptainGuard;
+import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CaptainDashboardService;
+import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -22,15 +23,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CaptainDashboardController {
 
-    private final CaptainGuard captainGuard;
+    private final AuthService authService;
+    private final UserService userService;
     private final CaptainDashboardService captainDashboardService;
 
     @GetMapping("/my-campaigns")
     public ResponseEntity<?> getMyCampaigns(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
-        return ResponseEntity.ok(captainDashboardService.getMyCampaigns(captainGuard.extractUserId(authHeader)));
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
+        return ResponseEntity.ok(captainDashboardService.getMyCampaigns(authService.extractUserIdFromToken(authHeader)));
     }
 
     @GetMapping("/my-stores")
@@ -38,9 +40,9 @@ public class CaptainDashboardController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "campaignId", required = false) Integer campaignId) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getMyStores(
-                captainGuard.extractUserId(authHeader), campaignId));
+                authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
     @GetMapping("/shifts")
@@ -49,9 +51,9 @@ public class CaptainDashboardController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getShifts(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     @GetMapping("/volunteer-shifts")
@@ -60,9 +62,9 @@ public class CaptainDashboardController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getVolunteerShifts(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     @PostMapping("/incidents")
@@ -70,7 +72,7 @@ public class CaptainDashboardController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> request) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
 
         if (request == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "El cuerpo de la petición es obligatorio"));
@@ -79,7 +81,7 @@ public class CaptainDashboardController {
         Integer campaignId  = parseInteger(request.get("campaignId"));
         Integer storeId     = parseInteger(request.get("storeId"));
         String  description = trimToNull(request.get("description"));
-        Integer userId      = captainGuard.extractUserId(authHeader);
+        Integer userId      = authService.extractUserIdFromToken(authHeader);
 
         Integer incidentId = captainDashboardService.createIncident(userId, campaignId, storeId, description);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -93,9 +95,9 @@ public class CaptainDashboardController {
             @RequestParam(value = "campaignId", required = false) Integer campaignId,
             @RequestParam(value = "storeId",    required = false) Integer storeId) {
 
-        if (!captainGuard.isUserCaptain(authHeader)) return forbidden();
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(captainDashboardService.getIncidents(
-                captainGuard.extractUserId(authHeader), campaignId, storeId));
+                authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

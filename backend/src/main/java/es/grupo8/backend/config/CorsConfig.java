@@ -1,4 +1,4 @@
-package es.grupo8.backend.security;
+package es.grupo8.backend.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
