@@ -30,6 +30,9 @@ public class UserService {
     @Autowired private PasswordService passwordService;
     @Autowired private UserMapper userMapper;
 
+    @Autowired
+    private AuthService authService;
+
     public PaginatedResponse<UserDTO> getAllUsers(
             int page, int size, String sort, String search, String role) {
 
@@ -151,5 +154,65 @@ public class UserService {
         String role = req.getRole().trim().toUpperCase();
         if (!List.of("ADMIN", "COORDINATOR", "CAPTAIN", "PARTNER_ENTITY_MANAGER").contains(role))
             throw new IllegalArgumentException("Rol no válido. Los roles válidos son: ADMIN, COORDINATOR, CAPTAIN, PARTNER_ENTITY_MANAGER.");
+    }
+
+    public boolean isAdmin(Integer userId) {
+        try {
+            return userRepository.isAdmin(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isAdminFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isAdmin(userId);
+    }
+
+    public boolean isCoordinator(Integer userId) {
+        try {
+            return userRepository.isCoordinator(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isCoordinatorFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isCoordinator(userId);
+    }
+
+    public boolean isCaptain(Integer userId) {
+        try {
+            return userRepository.isCaptain(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isCaptainFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isCaptain(userId);
+    }
+
+    public boolean isPartnerEntityManager(Integer userId) {
+        try {
+            return userRepository.isPartnerEntityManager(userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPartnerEntityManagerFromToken(String token) {
+        Integer userId = authService.extractUserIdFromToken(token);
+        return isPartnerEntityManager(userId);
+    }
+
+    public boolean isManagerOfEntity(Integer userId, Integer entityId) {
+        try {
+            return userRepository.isPartnerEntityManagerOfEntity(userId, entityId);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

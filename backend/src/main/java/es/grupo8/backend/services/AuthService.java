@@ -66,8 +66,8 @@ public class AuthService {
 
     // Login
     public AuthResponseDTO login(String emailParam, String passwordParam) {
-        String email = utils.normalizeEmail(emailParam);
-        String password = utils.trimToNull(passwordParam);
+        String email = UtilsService.normalizeEmail(emailParam);
+        String password = UtilsService.trimToNull(passwordParam);
 
         if(email == null || password == null) return null;
 
@@ -75,10 +75,10 @@ public class AuthService {
         if (user == null) return null;
 
         String stored = user.getPassword();
-        if(!utils.matchesPassword(password, stored)) return null;
+        if(!UtilsService.matchesPassword(password, stored)) return null;
 
-        if(utils.needsMigration(stored)) {
-            user.setPassword(utils.hashPassword(password));
+        if(UtilsService.needsMigration(stored)) {
+            user.setPassword(UtilsService.hashPassword(password));
             userRepository.save(user);
         }
 
@@ -100,12 +100,12 @@ public class AuthService {
 
         UserEntity user = new UserEntity();
 
-        user.setName(utils.trimToNull(nombreParam));
-        user.setEmail(utils.normalizeEmail(emailParam));
-        user.setPhone(utils.trimToNull(telefonoParam));
-        user.setPassword(utils.hashPassword(utils.trimToNull(passwordParam)));
-        user.setAddress(utils.trimToNull(domicilioParam));
-        user.setPostalCode(utils.trimToNull(cpParam));
+        user.setName(UtilsService.trimToNull(nombreParam));
+        user.setEmail(UtilsService.normalizeEmail(emailParam));
+        user.setPhone(UtilsService.trimToNull(telefonoParam));
+        user.setPassword(UtilsService.hashPassword(UtilsService.trimToNull(passwordParam)));
+        user.setAddress(UtilsService.trimToNull(domicilioParam));
+        user.setPostalCode(UtilsService.trimToNull(cpParam));
 		
 		// Comprobamos datos obligatorios como nombre, email y contraseña
 		if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
@@ -113,17 +113,17 @@ public class AuthService {
 		}
 
 		// Validamos formato de email
-		if (!utils.isValidEmail(user.getEmail())) {
+		if (!UtilsService.isValidEmail(user.getEmail())) {
 			throw new IllegalArgumentException("El email no tiene un formato valido");
 		}
 
 		// Validamos formato telefono
-		if (user.getPhone() != null && !utils.isValidPhone(user.getPhone())) {
+		if (user.getPhone() != null && !UtilsService.isValidPhone(user.getPhone())) {
 			throw new IllegalArgumentException("El telefono no tiene un formato valido");
 		}
 
 		// Validamos formato código postal
-		if (user.getPostalCode() != null && !utils.isValidPostalCode(user.getPostalCode())) {
+		if (user.getPostalCode() != null && !UtilsService.isValidPostalCode(user.getPostalCode())) {
 			throw new IllegalArgumentException("El codigo postal no es valido");
 		}
 
@@ -160,13 +160,13 @@ public class AuthService {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if(user == null) return null;
 
-        user.setEmail(utils.normalizeEmail(emailParam));
-        user.setPhone(utils.trimToNull(telefonoParam));
-        user.setAddress(utils.trimToNull(domicilioParam));
-        user.setPostalCode(utils.trimToNull(cpParam));
+        user.setEmail(UtilsService.normalizeEmail(emailParam));
+        user.setPhone(UtilsService.trimToNull(telefonoParam));
+        user.setAddress(UtilsService.trimToNull(domicilioParam));
+        user.setPostalCode(UtilsService.trimToNull(cpParam));
 
-		String newPassword = utils.trimToNull(passwordParam);
-		String newConfirm = utils.trimToNull(confirmPasswordParam);
+		String newPassword = UtilsService.trimToNull(passwordParam);
+		String newConfirm = UtilsService.trimToNull(confirmPasswordParam);
 
 		if (newPassword != null) {
 			if (newPassword.length() < 6) {
@@ -176,22 +176,22 @@ public class AuthService {
 				throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
 			}
 
-			user.setPassword(utils.hashPassword(newPassword));
+			user.setPassword(UtilsService.hashPassword(newPassword));
 		}
 
 		if (user.getEmail() == null) {
 			throw new IllegalArgumentException("El email es obligatorio");
 		}
 
-		if (!utils.isValidEmail(user.getEmail())) {
+		if (!UtilsService.isValidEmail(user.getEmail())) {
 			throw new IllegalArgumentException("El email no tiene un formato valido");
 		}
 
-		if (user.getPhone() != null && !utils.isValidPhone(user.getPhone())) {
+		if (user.getPhone() != null && !UtilsService.isValidPhone(user.getPhone())) {
 			throw new IllegalArgumentException("El telefono no tiene un formato valido");
 		}
 
-		if (user.getPostalCode() != null && !utils.isValidPostalCode(user.getPostalCode())) {
+		if (user.getPostalCode() != null && !UtilsService.isValidPostalCode(user.getPostalCode())) {
 			throw new IllegalArgumentException("El codigo postal no es valido");
 		}
 

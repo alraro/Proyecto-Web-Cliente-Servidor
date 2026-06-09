@@ -5,38 +5,33 @@ import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.entity.PartnerEntity;
+import es.grupo8.backend.mapper.PartnerEntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 public class PartnerEntityService {
 
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9()\\-\\s]{7,20}$");
-
     @Autowired
     private PartnerEntityRepository partnerEntityRepository;
 
-    /**
-     * Obtiene todas las entidades partner con paginación, ordenamiento y búsqueda.
-     */
+    @Autowired
+    private PartnerEntityMapper partnerEntityMapper;
+
     public PaginatedResponse<PartnerEntityResponseDto> getAllPartnerEntities(
             int page,
             int size,
             String sort,
             String search) {
 
-        // Validar parámetros
         page = Math.max(0, page);
-        size = Math.max(1, Math.min(size, 100)); // máximo 100 por página
+        size = Math.max(1, Math.min(size, 100));
 
-        // Obtener todos y filtrar
         List<PartnerEntity> allEntities = partnerEntityRepository.findAll();
 
-        // Aplicar búsqueda
         if (search != null && !search.trim().isEmpty()) {
             String searchLower = search.trim().toLowerCase();
             allEntities = allEntities.stream()
@@ -44,49 +39,37 @@ public class PartnerEntityService {
                     .toList();
         }
 
-        // Aplicar ordenamiento (por defecto por ID si no se especifica)
         if (sort != null && !sort.trim().isEmpty()) {
             allEntities = applySorting(allEntities, sort);
         } else {
-            // Ordenar por ID por defecto
             allEntities = allEntities.stream()
                     .sorted(Comparator.comparing(PartnerEntity::getId))
                     .toList();
         }
 
-        // Calcular paginación
         long totalElements = allEntities.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
         int startIndex = page * size;
         int endIndex = Math.min(startIndex + size, (int) totalElements);
 
-        // Extraer página
         List<PartnerEntityResponseDto> pageContent;
         if (startIndex >= allEntities.size()) {
             pageContent = List.of();
         } else {
-            pageContent = allEntities.subList(startIndex, endIndex)
-                    .stream()
-                    .map(this::toDto)
-                    .toList();
+            pageContent = partnerEntityMapper.toDTOList(allEntities.subList(startIndex, endIndex));
         }
 
-        // Armar respuesta
         return new PaginatedResponse<>(
                 pageContent,
                 page,
                 size,
                 totalElements,
                 totalPages,
-                page < totalPages - 1,  // hasNext
-                page > 0                 // hasPrevious
+                page < totalPages - 1,
+                page > 0
         );
     }
 
-    /**
-     * Aplica ordenamiento a la lista.
-     * Formato esperado: "name,asc" o "name,desc"
-     */
     private List<PartnerEntity> applySorting(List<PartnerEntity> entities, String sort) {
         try {
             String[] parts = sort.split(",");
@@ -106,13 +89,10 @@ public class PartnerEntityService {
                     .sorted(comparator)
                     .toList();
         } catch (Exception e) {
-            return entities; // Si hay error, devuelve sin ordenamiento
+            return entities;
         }
     }
 
-    /**
-     * Devuelve un comparador según el campo.
-     */
     private Comparator<PartnerEntity> getComparator(String field) {
         return switch (field) {
             case "name" -> Comparator.comparing(e -> e.getName() == null ? "" : e.getName());
@@ -123,59 +103,39 @@ public class PartnerEntityService {
         };
     }
 
-    /**
-     * Convierte una entidad JPA a DTO de respuesta.
-     */
-    private PartnerEntityResponseDto toDto(PartnerEntity entity) {
-        return new PartnerEntityResponseDto(
-                entity.getId(),
-                entity.getName(),
-                entity.getAddress(),
-                entity.getPhone()
-        );
-    }
-
-    public PartnerEntityResponseDto getPartnerEntityById(Integer id) throws RuntimeException {
+    public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
         PartnerEntity entity = partnerEntityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
-        return toDto(entity);
+        return partnerEntityMapper.toDTO(entity);
     }
 
-    public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) throws RuntimeException {
+    public PartnerEntityResponseDto createPartnerEntity(PartnerEntityRequestDto request) {
         validateRequest(request);
 
         PartnerEntity entity = new PartnerEntity();
         entity.setName(request.getName().trim());
-        entity.setAddress(trimToNull(request.getAddress()));
-        entity.setPhone(normalizePhone(request.getPhone()));
+        entity.setAddress(UtilsService.trimToNull(request.getAddress()));
+        entity.setPhone(UtilsService.normalizePhone(request.getPhone()));
 
-        try {
-            PartnerEntity savedEntity = partnerEntityRepository.save(entity);
-            return toDto(savedEntity);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid data provided for creating partner entity, entity is Null: " + e.getMessage());
-        }
+        PartnerEntity savedEntity = partnerEntityRepository.save(entity);
+        return partnerEntityMapper.toDTO(savedEntity);
     }
 
-    public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) throws RuntimeException {
+    public PartnerEntityResponseDto updatePartnerEntity(Integer id, PartnerEntityRequestDto request) {
         validateRequest(request);
 
         PartnerEntity entity = partnerEntityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
 
         entity.setName(request.getName().trim());
-        entity.setAddress(trimToNull(request.getAddress()));
-        entity.setPhone(normalizePhone(request.getPhone()));
+        entity.setAddress(UtilsService.trimToNull(request.getAddress()));
+        entity.setPhone(UtilsService.normalizePhone(request.getPhone()));
 
-        try {
-            PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
-            return toDto(updatedEntity);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid data provided for updating partner entity, entity is Null: " + e.getMessage());
-        }
+        PartnerEntity updatedEntity = partnerEntityRepository.save(entity);
+        return partnerEntityMapper.toDTO(updatedEntity);
     }
 
-    public void deletePartnerEntity(Integer id) throws RuntimeException {
+    public void deletePartnerEntity(Integer id) {
         if (!partnerEntityRepository.existsById(id)) {
             throw new RuntimeException("Partner entity not found with ID: " + id);
         }
@@ -195,9 +155,9 @@ public class PartnerEntityService {
             throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
         }
 
-        String phone = normalizePhone(request.getPhone());
+        String phone = UtilsService.normalizePhone(request.getPhone());
         if (phone != null) {
-            if (!PHONE_PATTERN.matcher(phone).matches()) {
+            if (!UtilsService.PHONE_PATTERN.matcher(phone).matches()) {
                 throw new IllegalArgumentException("El teléfono tiene un formato inválido.");
             }
 
@@ -206,19 +166,5 @@ public class PartnerEntityService {
                 throw new IllegalArgumentException("El teléfono debe tener entre 7 y 15 dígitos.");
             }
         }
-    }
-
-    private String trimToNull(String value) {
-        if (value == null) return null;
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
-
-    private String normalizePhone(String phone) {
-        String trimmed = trimToNull(phone);
-        if (trimmed == null) {
-            return null;
-        }
-        return trimmed.replaceAll("\\s+", " ");
     }
 }
