@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.grupo8.backend.dto.CaptainRequestDto;
+import es.grupo8.backend.dto.CoordinatorVolunteerShiftRequestDto;
+import es.grupo8.backend.dto.VolunteerRequestDto;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CoordinatorDashboardService;
 import es.grupo8.backend.services.UserService;
@@ -59,7 +62,7 @@ public class CoordinatorDashboardController {
     @PostMapping("/volunteers")
     public ResponseEntity<?> createVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) Map<String, Object> request) {
+            @RequestBody(required = false) VolunteerRequestDto request) {
 
         if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
 
@@ -70,18 +73,18 @@ public class CoordinatorDashboardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.createVolunteer(
                         authService.extractUserIdFromToken(authHeader),
-                        trimToNull(request.get("name")),
-                        trimToNull(request.get("phone")),
-                        trimToNull(request.get("email")),
-                        trimToNull(request.get("address")),
-                        parseInteger(request.get("partnerEntityId"))));
+                        request.getName(),
+                        request.getPhone(),
+                        request.getEmail(),
+                        request.getAddress(),
+                        request.getPartnerEntityId()));
     }
 
     @PutMapping("/volunteers/{id}")
     public ResponseEntity<?> updateVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
-            @RequestBody(required = false) Map<String, Object> request) {
+            @RequestBody(required = false) VolunteerRequestDto request) {
 
         if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
 
@@ -92,18 +95,17 @@ public class CoordinatorDashboardController {
         return ResponseEntity.ok(coordinatorDashboardService.updateVolunteer(
                 authService.extractUserIdFromToken(authHeader),
                 id,
-                trimToNull(request.get("name")),
-                trimToNull(request.get("phone")),
-                trimToNull(request.get("email")),
-                trimToNull(request.get("address")),
-                request.containsKey("partnerEntityId"),
-                parseInteger(request.get("partnerEntityId"))));
+                request.getName(),
+                request.getPhone(),
+                request.getEmail(),
+                request.getAddress(),
+                request.getPartnerEntityId()));
     }
 
     @PostMapping("/volunteer-shifts")
     public ResponseEntity<?> assignVolunteerShift(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) Map<String, Object> request) {
+            @RequestBody(required = false) CoordinatorVolunteerShiftRequestDto request) {
 
         if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
 
@@ -113,12 +115,12 @@ public class CoordinatorDashboardController {
 
         coordinatorDashboardService.assignVolunteerShift(
                 authService.extractUserIdFromToken(authHeader),
-                parseInteger(request.get("volunteerId")),
-                parseInteger(request.get("campaignId")),
-                parseInteger(request.get("storeId")),
-                trimToNull(request.get("shiftDay")),
-                trimToNull(request.get("startTime")),
-                trimToNull(request.get("endTime")));
+                request.getVolunteerId(),
+                request.getCampaignId(),
+                request.getStoreId(),
+                request.getShiftDay(),
+                request.getStartTime(),
+                request.getEndTime());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Voluntario asignado al turno correctamente"));
@@ -136,7 +138,7 @@ public class CoordinatorDashboardController {
     @PostMapping("/captains/register")
     public ResponseEntity<?> registerCaptain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) Map<String, Object> request) {
+            @RequestBody(required = false) CaptainRequestDto request) {
 
         if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
 
@@ -147,10 +149,10 @@ public class CoordinatorDashboardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 coordinatorDashboardService.registerCaptain(
                         authService.extractUserIdFromToken(authHeader),
-                        trimToNull(request.get("name")),
-                        trimToNull(request.get("email")),
-                        trimToNull(request.get("password")),
-                        parseInteger(request.get("campaignId"))));
+                        request.getName(),
+                        request.getEmail(),
+                        request.getPassword(),
+                        request.getIdCampaign()));
     }
 
     @GetMapping("/partner-entities")
@@ -187,16 +189,5 @@ public class CoordinatorDashboardController {
 
     private ResponseEntity<Map<String, String>> forbidden() {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Acceso denegado"));
-    }
-
-    private static String trimToNull(Object o) {
-        if (o == null) return null;
-        String s = o.toString().trim();
-        return s.isEmpty() ? null : s;
-    }
-
-    private static Integer parseInteger(Object o) {
-        if (o == null) return null;
-        try { return Integer.valueOf(o.toString()); } catch (NumberFormatException e) { return null; }
     }
 }
