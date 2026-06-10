@@ -26,10 +26,6 @@ import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.ShiftService;
 import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -48,14 +44,6 @@ public class CoordinatorController {
     private final UserService userService;
 
     @Operation(summary = "Crear turno de recogida", description = "Crea un nuevo turno de recogida para una campaña y tienda. Solo accesible por Coordinadores.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Turno creado correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ShiftResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos o campaña/tienda no encontrada"),
-            @ApiResponse(responseCode = "403", description = "Acceso denegado. Solo para coordinadores."),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
     @PostMapping
     public ResponseEntity<?> createShift(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -90,10 +78,6 @@ public class CoordinatorController {
 
     @Operation(summary = "Tiendas de una campaña para el Coordinador",
             description = "Devuelve las tiendas asignadas a una campaña para que el coordinador pueda seleccionarla al crear un turno.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tiendas de la campaña"),
-            @ApiResponse(responseCode = "404", description = "Campaña no encontrada")
-    })
     @GetMapping("/campaign/{campaignId}/stores")
     public ResponseEntity<?> getStoresForCampaign(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
