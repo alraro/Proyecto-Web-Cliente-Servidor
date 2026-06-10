@@ -1,3 +1,10 @@
+/**
+ * Mapeador entre la entidad CampaignType y su DTO.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dto.CampaignTypeResponseDto;

@@ -1,11 +1,13 @@
-/*
-* Repository para la gestión de datos de las campañas en las tiendas.
-*
-* Autores:
-*	- Hugo Herrero González: 50%
-*       - Alejandra Ortiz Robles: 10%
-*       - Fernando Luis Pinilla Molina: 40%
-*/
+/**
+ * Repositorio JPA de la relación campaña-tienda.
+ *
+ * Autores:
+ * - Hugo Herrero González: 55%
+ * - Fernando Luis Pinilla Molina: 15%
+ * - Alfonso Ramos Rojas: 10%
+ * - Alejandra Ortiz: 5%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.dao;
  
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
+import es.grupo8.backend.entity.Store;
  
 public interface CampaignStoreRepository extends JpaRepository<CampaignStore, CampaignStoreId> {
  
@@ -25,6 +28,10 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
     List<CampaignStore> findByIdStore_Id(Integer storeId);
 
         List<CampaignStore> findByIdCampaign_Id(Integer campaignId);
+
+        /** Returns the stores assigned to a campaign directly (avoids in-memory mapping). */
+        @Query("SELECT cs.idStore FROM CampaignStore cs WHERE cs.id.idCampaign = :campaignId")
+        List<Store> findStoresByCampaignId(@Param("campaignId") Integer campaignId);
 
         boolean existsByIdCampaign_IdAndIdStore_Id(Integer campaignId, Integer storeId);
 

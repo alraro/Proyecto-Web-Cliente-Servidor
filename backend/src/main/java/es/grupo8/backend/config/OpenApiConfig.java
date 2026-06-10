@@ -1,3 +1,10 @@
+/**
+ * Configuración de OpenAPI/Swagger para la documentación de la API.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.config;
 
 import java.util.List;

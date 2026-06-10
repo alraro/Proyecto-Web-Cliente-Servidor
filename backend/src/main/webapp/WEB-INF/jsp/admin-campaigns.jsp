@@ -1,10 +1,18 @@
+<%--
+  Vista CRUD de gestión de campañas (admin).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 65%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 30%
+--%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%
     String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
 
-    if (token == null || role == null || !"ADMINISTRADOR".equals(role)) {
+    if (role == null || !"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
@@ -17,7 +25,9 @@
     <title>Bancosol | Campañas</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
 
-    <link rel="stylesheet" href="/css/administrador.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/css/admin-campaigns.css">
 </head>
 <body>
@@ -137,10 +147,6 @@
     document.addEventListener("DOMContentLoaded", async () => {
         const token = '<%= token %>';
         const nombre = '<%= nombre == null ? "Admin" : nombre %>';
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
 
         const authOpts = { headers: { Authorization: "Bearer " + token } };
 
@@ -278,8 +284,9 @@
             if (chainId) params.append("chainId", chainId);
             if (zoneId) params.append("zoneId", zoneId);
             if (localityId) params.append("localityId", localityId);
+            params.append("size", "100");
 
-            const url = params.toString() ? `/api/stores?${params.toString()}` : "/api/stores";
+            const url = `/api/stores?${params.toString()}`;
             allFilteredStores = await fetchArray(url, authOpts);
             renderAvailableList();
         }
@@ -367,7 +374,7 @@
                 const campaignId = Number(campaign.id);
                 const campaignName = escapeHtml(campaign.name || "");
                 const campaignNameForJs = escapeJsString(campaign.name || "");
-                const typeName = escapeHtml((campaign.type && campaign.type.name) ? campaign.type.name : "-");
+                const typeName = escapeHtml(campaign.typeName || "-");
 
                 row.innerHTML = `
                     <td>${campaignName}</td>
@@ -410,7 +417,7 @@
                 currentCampaignId = campaignId;
                 modalTitle.textContent = "Editar campaña";
                 nameInput.value = campaign.name || "";
-                typeSelect.value = (campaign.type && campaign.type.id != null) ? String(campaign.type.id) : "";
+                typeSelect.value = campaign.typeId != null ? String(campaign.typeId) : "";
                 startInput.value = campaign.startDate || "";
                 endInput.value = campaign.endDate || "";
 
@@ -444,6 +451,9 @@
                 }
                 if (data && Array.isArray(data.value)) {
                     return data.value;
+                }
+                if (data && Array.isArray(data.content)) {
+                    return data.content;
                 }
                 return [];
             } catch (error) {

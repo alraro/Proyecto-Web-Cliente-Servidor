@@ -1,3 +1,11 @@
+/**
+ * Servicio de lógica de negocio de turnos.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 70%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.services;
 
 import java.time.LocalDate;

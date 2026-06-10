@@ -1,26 +1,42 @@
+/**
+ * Servicio del panel del capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.IncidentRepository;
 import es.grupo8.backend.dao.ShiftRepository;
 import es.grupo8.backend.dao.VolunteerShiftRepository;
+import es.grupo8.backend.dto.CampaignDTO;
+import es.grupo8.backend.dto.IncidentDTO;
+import es.grupo8.backend.dto.ShiftResponseDto;
+import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.VolunteerShiftDTO;
 import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.entity.Shift;
 import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.entity.UserEntity;
-import es.grupo8.backend.entity.VolunteerShift;
+import es.grupo8.backend.mapper.CampaignMapper;
+import es.grupo8.backend.mapper.IncidentMapper;
+import es.grupo8.backend.mapper.ShiftMapper;
+import es.grupo8.backend.mapper.StoreMapper;
+import es.grupo8.backend.mapper.VolunteerShiftMapper;
 import lombok.AllArgsConstructor;
 
+/**
+ * Service for captain dashboard operations: campaigns, stores, shifts, volunteer shifts and incidents.
+ */
 @Service
 @AllArgsConstructor
 public class CaptainDashboardService {
@@ -31,42 +47,87 @@ public class CaptainDashboardService {
     private final VolunteerShiftRepository volunteerShiftRepository;
     private final IncidentRepository incidentRepository;
 
-    public List<Map<String, Object>> getMyCampaigns(Integer userId) {
-        return captainRepository.findCampaignsByUserId(userId).stream()
-                .map(this::campaignToMap)
-                .collect(Collectors.toList());
+    private final CampaignMapper campaignMapper;
+    private final StoreMapper storeMapper;
+    private final ShiftMapper shiftMapper;
+    private final VolunteerShiftMapper volunteerShiftMapper;
+    private final IncidentMapper incidentMapper;
+
+    /**
+     * Returns the campaigns assigned to the given captain.
+     *
+     * @param userId captain user identifier
+     * @return list of campaign DTOs
+     */
+    @Transactional(readOnly = true)
+    public List<CampaignDTO> getMyCampaigns(Integer userId) {
+        return campaignMapper.toDTOList(captainRepository.findCampaignsByUserId(userId));
     }
 
-    public List<Map<String, Object>> getMyStores(Integer userId, Integer campaignId) {
+    /**
+     * Returns the stores assigned to the captain for a given campaign.
+     *
+     * @param userId     captain user identifier
+     * @param campaignId required campaign filter
+     * @return list of store DTOs
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    @Transactional(readOnly = true)
+    public List<StoreDTO> getMyStores(Integer userId, Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        return campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
-                .map(this::storeToMap)
-                .collect(Collectors.toList());
+        return storeMapper.toDTOList(campaignStoreRepository.findStoresByCampaignId(campaignId));
     }
 
-    public List<Map<String, Object>> getShifts(Integer userId, Integer campaignId, Integer storeId) {
+    /**
+     * Returns shifts for the campaign, optionally filtered by store.
+     *
+     * @param userId     captain user identifier
+     * @param campaignId required campaign filter
+     * @param storeId    optional store filter
+     * @return list of shift DTOs
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    @Transactional(readOnly = true)
+    public List<ShiftResponseDto> getShifts(Integer userId, Integer campaignId, Integer storeId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
         List<Shift> shifts = (storeId != null)
                 ? shiftRepository.findByCampaignAndStore(campaignId, storeId)
                 : shiftRepository.findByIdCampaign(campaignId);
-        return shifts.stream().map(this::shiftToMap).collect(Collectors.toList());
+        return shiftMapper.toDTOList(shifts);
     }
 
-    public List<Map<String, Object>> getVolunteerShifts(Integer userId, Integer campaignId, Integer storeId) {
-        if (campaignId == null || storeId == null) {
-            throw new IllegalArgumentException("campaignId y storeId son obligatorios");
+    /**
+     * Returns volunteer-shift assignments filtered by campaign and optionally by store.
+     *
+     * @param userId     captain user identifier
+     * @param campaignId required campaign filter
+     * @param storeId    optional store filter; when null, returns all shifts for the campaign
+     * @return list of volunteer-shift DTOs
+     * @throws IllegalArgumentException if campaignId is null
+     */
+    @Transactional(readOnly = true)
+    public List<VolunteerShiftDTO> getVolunteerShifts(Integer userId, Integer campaignId, Integer storeId) {
+        if (campaignId == null) {
+            throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        return volunteerShiftRepository.findAll().stream()
-                .filter(vs -> vs.getId().getIdCampaign().equals(campaignId)
-                           && vs.getId().getIdStore().equals(storeId))
-                .map(this::volunteerShiftToMap)
-                .collect(Collectors.toList());
+        return volunteerShiftMapper.toDTOList(
+                volunteerShiftRepository.findByCampaignAndOptionalStore(campaignId, storeId));
     }
 
+    /**
+     * Creates an incident report for the given campaign store.
+     *
+     * @param userId      captain user identifier
+     * @param campaignId  required campaign identifier
+     * @param storeId     required store identifier
+     * @param description required incident description
+     * @return identifier of the created incident
+     * @throws IllegalArgumentException if any required field is null
+     */
     public Integer createIncident(Integer userId, Integer campaignId, Integer storeId, String description) {
         if (campaignId == null || storeId == null || description == null) {
             throw new IllegalArgumentException("Campos obligatorios: campaignId, storeId, description");
@@ -91,67 +152,21 @@ public class CaptainDashboardService {
         return saved.getId();
     }
 
-    public List<Map<String, Object>> getIncidents(Integer userId, Integer campaignId, Integer storeId) {
+    /**
+     * Returns incidents for the given campaign store.
+     *
+     * @param userId     captain user identifier
+     * @param campaignId required campaign filter
+     * @param storeId    required store filter
+     * @return list of incident DTOs
+     * @throws IllegalArgumentException if campaignId or storeId is null
+     */
+    @Transactional(readOnly = true)
+    public List<IncidentDTO> getIncidents(Integer userId, Integer campaignId, Integer storeId) {
         if (campaignId == null || storeId == null) {
             throw new IllegalArgumentException("campaignId y storeId son obligatorios");
         }
-        return incidentRepository.findByCampaignAndStore(campaignId, storeId).stream()
-                .map(i -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("id",           i.getId());
-                    m.put("description",  i.getDescription());
-                    m.put("createdAt",    i.getCreatedAt() != null ? i.getCreatedAt().toString() : null);
-                    m.put("campaignName", i.getIdCampaign() != null ? i.getIdCampaign().getName() : null);
-                    m.put("storeName",    i.getIdStore()    != null ? i.getIdStore().getName()    : null);
-                    return m;
-                })
-                .collect(Collectors.toList());
-    }
-
-    private Map<String, Object> campaignToMap(Campaign c) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",        c.getId());
-        m.put("name",      c.getName());
-        m.put("startDate", c.getStartDate() != null ? c.getStartDate().toString() : null);
-        m.put("endDate",   c.getEndDate()   != null ? c.getEndDate().toString()   : null);
-        m.put("typeName",  c.getIdType()    != null ? c.getIdType().getName()     : null);
-        return m;
-    }
-
-    private Map<String, Object> storeToMap(CampaignStore cs) {
-        var s = cs.getIdStore();
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",        s.getId());
-        m.put("name",      s.getName());
-        m.put("address",   s.getAddress());
-        m.put("chainName", s.getIdChain() != null ? s.getIdChain().getName() : null);
-        m.put("locality",  s.getPostalCode() != null && s.getPostalCode().getIdLocality() != null
-                ? s.getPostalCode().getIdLocality().getName() : null);
-        return m;
-    }
-
-    private Map<String, Object> shiftToMap(Shift s) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("shiftId",          s.getId());
-        m.put("campaignId",       s.getIdCampaign().getId());
-        m.put("storeId",          s.getIdStore().getId());
-        m.put("day",              s.getShiftDay()  != null ? s.getShiftDay().toString()  : null);
-        m.put("startTime",        s.getStartTime() != null ? s.getStartTime().toString() : null);
-        m.put("endTime",          s.getEndTime()   != null ? s.getEndTime().toString()   : null);
-        m.put("volunteersNeeded", s.getVolunteersNeeded());
-        m.put("observations",     s.getObservations() != null ? s.getObservations() : "");
-        return m;
-    }
-
-    private Map<String, Object> volunteerShiftToMap(VolunteerShift vs) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("volunteerId",   vs.getIdVolunteer().getId());
-        m.put("volunteerName", vs.getIdVolunteer().getName());
-        m.put("phone",         vs.getIdVolunteer().getPhone());
-        m.put("shiftDay",      vs.getId().getShiftDay()   != null ? vs.getId().getShiftDay().toString()   : null);
-        m.put("startTime",     vs.getId().getStartTime()  != null ? vs.getId().getStartTime().toString()  : null);
-        m.put("endTime",       vs.getEndTime()            != null ? vs.getEndTime().toString()             : null);
-        m.put("attendance",    vs.getAttendance());
-        return m;
+        return incidentMapper.toDTOList(
+                incidentRepository.findByCampaignAndStore(campaignId, storeId));
     }
 }

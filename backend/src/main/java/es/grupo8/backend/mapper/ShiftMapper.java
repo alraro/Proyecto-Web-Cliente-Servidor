@@ -1,3 +1,11 @@
+/**
+ * Mapeador entre la entidad Shift y su DTO.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 80%
+ * - Fernando Luis Pinilla Molina: 10%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import org.springframework.stereotype.Component;

@@ -1,11 +1,35 @@
+<%--
+  Vista de asignación de coordinadores y capitanes a campañas (admin).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 65%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 30%
+--%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%
+    String token  = (String) session.getAttribute("token");
+    String role   = (String) session.getAttribute("role");
+    String nombre = (String) session.getAttribute("nombre");
+    if (!"ADMINISTRADOR".equals(role)) {
+        response.sendRedirect("/login");
+        return;
+    }
+    @SuppressWarnings("unchecked")
+    List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bancosol | Asignación a Campañas</title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
-    <link rel="stylesheet" href="/css/administrador.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/assignment.css">
 </head>
 <body>
 <header class="topbar">
@@ -22,82 +46,108 @@
     </div>
 </header>
 
-<main class="admin-page" aria-label="Campaign assignments page">
-    <section class="page-header">
-        <a href="/admin" class="back-link">&larr; Back to menu</a>
-        <h1>Asignación a Campañas</h1>
-        <p>Asigna coordinadores y capitanes a cada campaña de recogida.</p>
-    </section>
-
-    <section class="card campaign-selector" aria-label="Campaign selector">
-        <label for="campaign-select">Campaña</label>
-        <option value="">Selecciona una campaña...</option>
-        <button type="button" id="btn-load">Cargar asignaciones</button>
+<main class="page-wrapper" aria-label="Campaign assignments page">
+    <div class="page-header">
+        <a href="/admin" class="back-link-inline">&larr; Volver al menú</a>
+        <div class="page-header-row">
+            <div>
+                <h1>Asignación a Campañas</h1>
+                <p>Asigna coordinadores y capitanes a cada campaña de recogida.</p>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <div class="card" aria-label="Campaign selector">
+        <div class="card-body">
+            <label for="campaign-select">Campaña</label>
+            <div class="selector-row">
+                <select id="campaign-select">
+                    <option value="">Selecciona una campaña...</option>
+                    <% if (campaigns != null) {
+                        for (CampaignDTO camp : campaigns) { %>
+                    <option value="<%= camp.getId() %>"><%= camp.getName() %> (<%= camp.getStartDate() %> - <%= camp.getEndDate() %>)</option>
+                    <%  }
+                       } %>
+                </select>
+                <button type="button" id="btn-load" class="btn btn-secondary">Cargar asignaciones</button>
+            </div>
+        </div>
+    </div>
 
     <div id="global-message" hidden></div>
 
-    <section class="grid-two" aria-label="Current assignments">
-        <article class="card">
-            <h2>Assigned Coordinators</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody id="coordinators-tbody"></tbody>
-            </table>
-        </article>
-
-        <article class="card">
-            <h2>Assigned Captains</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody id="captains-tbody"></tbody>
-            </table>
-        </article>
-    </section>
-
-    <section class="grid-two" aria-label="Add assignments">
-        <article class="card">
-            <h2>Add Coordinator</h2>
-            <div class="row-inline">
-                <select id="coordinator-select">
-                    <option value="">Select a coordinator...</option>
-                </select>
-                <button type="button" id="btn-assign-coordinator">Assign</button>
+    <div class="two-col-grid" aria-label="Current assignments">
+        <div class="card">
+            <div class="card-head">
+                <h2>Coordinadores asignados</h2>
             </div>
-        </article>
-
-        <article class="card">
-            <h2>Add Captain</h2>
-            <div class="row-inline">
-                <select id="captain-select">
-                    <option value="">Select a captain...</option>
-                </select>
-                <button type="button" id="btn-assign-captain">Assign</button>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody id="coordinators-tbody"></tbody>
+                </table>
             </div>
-        </article>
-    </section>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h2>Capitanes asignados</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody id="captains-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="two-col-grid" aria-label="Add assignments">
+        <div class="card">
+            <div class="card-head">
+                <h2>Añadir coordinador</h2>
+            </div>
+            <div class="card-body">
+                <div class="selector-row">
+                    <select id="coordinator-select" disabled>
+                        <option value="">Selecciona un coordinador...</option>
+                    </select>
+                    <button type="button" id="btn-assign-coordinator" class="btn btn-primary" disabled>Asignar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h2>Añadir capitán</h2>
+            </div>
+            <div class="card-body">
+                <div class="selector-row">
+                    <select id="captain-select" disabled>
+                        <option value="">Selecciona un capitán...</option>
+                    </select>
+                    <button type="button" id="btn-assign-captain" class="btn btn-primary" disabled>Asignar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            window.location.href = "/login";
-            return;
-        }
+        const token = '<%= token %>';
 
         const userNameEl = document.getElementById("user-name");
         userNameEl.textContent = localStorage.getItem("nombre") || "Admin";
@@ -113,211 +163,121 @@
 
         setAssignmentControls(false);
 
-        try {
-            const campaigns = await fetchJson("/api/campaigns", {
-                method: "GET",
-                headers: authHeaders(token)
-            });
-            populateCampaignSelect(campaigns);
-        } catch (error) {
-            showMessage(error.message || "Unable to load campaigns", true);
-        }
-
         btnLoad.addEventListener("click", async () => {
             const campaignId = campaignSelect.value;
-            if (!campaignId) {
-                showMessage("Please select a campaign", true);
-                return;
-            }
-
+            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
             try {
                 await loadCampaignData(campaignId);
                 setAssignmentControls(true);
-                showMessage("Assignments loaded", false);
+                showMessage("Asignaciones cargadas", false);
             } catch (error) {
                 setAssignmentControls(false);
-                showMessage(error.message || "Unable to load assignments", true);
+                showMessage(error.message || "No se pudieron cargar las asignaciones", true);
             }
         });
 
         btnAssignCoordinator.addEventListener("click", async () => {
             const campaignId = campaignSelect.value;
             const userId = coordinatorSelect.value;
-            if (!campaignId) {
-                showMessage("Please select a campaign", true);
-                return;
-            }
-            if (!userId) {
-                showMessage("Please select a coordinator", true);
-                return;
-            }
-
+            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
+            if (!userId) { showMessage("Selecciona un coordinador", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/coordinators`, {
-                    method: "POST",
-                    headers: authHeaders(token),
+                    method: "POST", headers: authHeaders(token),
                     body: JSON.stringify({ userId: Number(userId) })
                 });
-                showMessage("Coordinator assigned successfully", false);
+                showMessage("Coordinador asignado correctamente", false);
                 await loadCampaignData(campaignId);
             } catch (error) {
-                showMessage(error.message || "Unable to assign coordinator", true);
+                showMessage(error.message || "No se pudo asignar el coordinador", true);
             }
         });
 
         btnAssignCaptain.addEventListener("click", async () => {
             const campaignId = campaignSelect.value;
             const userId = captainSelect.value;
-            if (!campaignId) {
-                showMessage("Please select a campaign", true);
-                return;
-            }
-            if (!userId) {
-                showMessage("Please select a captain", true);
-                return;
-            }
-
+            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
+            if (!userId) { showMessage("Selecciona un capitán", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/captains`, {
-                    method: "POST",
-                    headers: authHeaders(token),
+                    method: "POST", headers: authHeaders(token),
                     body: JSON.stringify({ userId: Number(userId) })
                 });
-                showMessage("Captain assigned successfully", false);
+                showMessage("Capitán asignado correctamente", false);
                 await loadCampaignData(campaignId);
             } catch (error) {
-                showMessage(error.message || "Unable to assign captain", true);
+                showMessage(error.message || "No se pudo asignar el capitán", true);
             }
         });
 
         coordinatorsTbody.addEventListener("click", async (event) => {
             const button = event.target.closest("button[data-role='COORDINATOR']");
-            if (!button) {
-                return;
-            }
-
+            if (!button) return;
             const campaignId = campaignSelect.value;
             const userId = button.dataset.userid;
-            if (!campaignId || !userId) {
-                showMessage("Invalid selection", true);
-                return;
-            }
-
+            if (!campaignId || !userId) { showMessage("Selección inválida", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/coordinators/${userId}`, {
-                    method: "DELETE",
-                    headers: authHeaders(token)
+                    method: "DELETE", headers: authHeaders(token)
                 });
-                showMessage("Coordinator unassigned successfully", false);
+                showMessage("Coordinador desasignado correctamente", false);
                 await loadCampaignData(campaignId);
             } catch (error) {
-                showMessage(error.message || "Unable to unassign coordinator", true);
+                showMessage(error.message || "No se pudo desasignar el coordinador", true);
             }
         });
 
         captainsTbody.addEventListener("click", async (event) => {
             const button = event.target.closest("button[data-role='CAPTAIN']");
-            if (!button) {
-                return;
-            }
-
+            if (!button) return;
             const campaignId = campaignSelect.value;
             const userId = button.dataset.userid;
-            if (!campaignId || !userId) {
-                showMessage("Invalid selection", true);
-                return;
-            }
-
+            if (!campaignId || !userId) { showMessage("Selección inválida", true); return; }
             try {
                 await fetchJson(`/api/campaigns/${campaignId}/captains/${userId}`, {
-                    method: "DELETE",
-                    headers: authHeaders(token)
+                    method: "DELETE", headers: authHeaders(token)
                 });
-                showMessage("Captain unassigned successfully", false);
+                showMessage("Capitán desasignado correctamente", false);
                 await loadCampaignData(campaignId);
             } catch (error) {
-                showMessage(error.message || "Unable to unassign captain", true);
+                showMessage(error.message || "No se pudo desasignar el capitán", true);
             }
         });
 
         function authHeaders(jwtToken) {
-            return {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${jwtToken}`
-            };
+            return { "Content-Type": "application/json", "Authorization": `Bearer ${jwtToken}` };
         }
 
         async function loadCampaignData(campaignId) {
             const [assignments, availableCoordinators, availableCaptains] = await Promise.all([
-                fetchJson(`/api/campaigns/${campaignId}/assignments`, {
-                    method: "GET",
-                    headers: authHeaders(token)
-                }),
-                fetchJson(`/api/campaigns/${campaignId}/available-users?role=COORDINATOR`, {
-                    method: "GET",
-                    headers: authHeaders(token)
-                }),
-                fetchJson(`/api/campaigns/${campaignId}/available-users?role=CAPTAIN`, {
-                    method: "GET",
-                    headers: authHeaders(token)
-                })
+                fetchJson(`/api/campaigns/${campaignId}/assignments`, { method: "GET", headers: authHeaders(token) }),
+                fetchJson(`/api/campaigns/${campaignId}/available-users?role=COORDINATOR`, { method: "GET", headers: authHeaders(token) }),
+                fetchJson(`/api/campaigns/${campaignId}/available-users?role=CAPTAIN`, { method: "GET", headers: authHeaders(token) })
             ]);
-
-            renderAssignments(assignments);
-            populateUserSelect(coordinatorSelect, availableCoordinators, "Select a coordinator...");
-            populateUserSelect(captainSelect, availableCaptains, "Select a captain...");
+            renderTable(coordinatorsTbody, assignments?.coordinators || [], "COORDINATOR");
+            renderTable(captainsTbody, assignments?.captains || [], "CAPTAIN");
+            populateUserSelect(coordinatorSelect, availableCoordinators, "Selecciona un coordinador...");
+            populateUserSelect(captainSelect, availableCaptains, "Selecciona un capitán...");
         }
 
         async function fetchJson(url, options) {
-            try {
-                const response = await fetch(url, options);
-                const data = await response.json().catch(() => ({}));
-
-                if (!response.ok) {
-                    throw new Error(data.message || `Request failed with status ${response.status}`);
-                }
-                return data;
-            } catch (error) {
-                if (error instanceof Error) {
-                    throw error;
-                }
-                throw new Error("Unexpected request error");
-            }
-        }
-
-        function populateCampaignSelect(campaigns) {
-            campaignSelect.innerHTML = "<option value=''>Select a campaign...</option>";
-            (campaigns || []).forEach((campaign) => {
-                const option = document.createElement("option");
-                option.value = String(campaign.id);
-                option.textContent = `${campaign.name} (${campaign.startDate} - ${campaign.endDate})`;
-                campaignSelect.appendChild(option);
-            });
-        }
-
-        function renderAssignments(assignments) {
-            renderTable(coordinatorsTbody, assignments?.coordinators || [], "COORDINATOR");
-            renderTable(captainsTbody, assignments?.captains || [], "CAPTAIN");
+            const response = await fetch(url, options);
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.message || `Error ${response.status}`);
+            return data;
         }
 
         function renderTable(tbody, users, role) {
             tbody.innerHTML = "";
             if (!users.length) {
-                const row = document.createElement("tr");
-                row.innerHTML = "<td colspan='3'>No assignments</td>";
-                tbody.appendChild(row);
-                return;
+                tbody.innerHTML = "<tr><td colspan='3'>Sin asignaciones</td></tr>"; return;
             }
-
             users.forEach((user) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${escapeHtml(user.name || "")}</td>
                     <td>${escapeHtml(user.email || "")}</td>
-                    <td>
-                        <button type="button" data-userid="${user.userId}" data-role="${role}">Remove</button>
-                    </td>
-                `;
+                    <td><button type="button" data-userid="${user.userId}" data-role="${role}">Eliminar</button></td>`;
                 tbody.appendChild(row);
             });
         }
@@ -340,25 +300,18 @@
         }
 
         function showMessage(text, isError) {
-            const messageEl = document.getElementById("global-message");
-            messageEl.hidden = false;
-            messageEl.textContent = text;
-            messageEl.classList.remove("success", "error");
-            messageEl.classList.add(isError ? "error" : "success");
-
+            const el = document.getElementById("global-message");
+            el.hidden = false;
+            el.textContent = text;
+            el.classList.remove("success", "error");
+            el.classList.add(isError ? "error" : "success");
             window.clearTimeout(showMessage.hideTimer);
-            showMessage.hideTimer = window.setTimeout(() => {
-                messageEl.hidden = true;
-            }, 4000);
+            showMessage.hideTimer = window.setTimeout(() => { el.hidden = true; }, 4000);
         }
 
         function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
-                .replace(/'/g, "&#39;");
+            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
         }
     });
 </script>

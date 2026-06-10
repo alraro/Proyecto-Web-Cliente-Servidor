@@ -1,13 +1,18 @@
+/**
+ * Servicio de asignación de coordinadores y capitanes a campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 75%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.services;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,49 +20,89 @@ import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
 import es.grupo8.backend.dao.UserRepository;
+import es.grupo8.backend.dto.AssignmentResultDTO;
+import es.grupo8.backend.dto.CampaignAssignmentsDTO;
+import es.grupo8.backend.dto.CampaignDTO;
+import es.grupo8.backend.dto.UserDTO;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
 import es.grupo8.backend.entity.Coordinator;
 import es.grupo8.backend.entity.CoordinatorId;
 import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.mapper.CampaignAssignmentsMapper;
+import es.grupo8.backend.mapper.CampaignMapper;
+import es.grupo8.backend.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 
-// RF-14: admin management of coordinator and captain assignments to campaigns.
+/**
+ * Service for admin management of coordinator and captain assignments to campaigns (RF-14).
+ */
 @Service
 @AllArgsConstructor
 public class CampaignAssignmentService {
+
+    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
     private final CoordinatorRepository coordinatorRepository;
     private final CaptainRepository captainRepository;
 
-    public List<Map<String, Object>> getCampaigns(Integer adminUserId) {
-        List<Map<String, Object>> result = campaignRepository.findAll().stream()
-                .map(this::toCampaignMap)
-                .collect(Collectors.toList());
+    private final CampaignMapper campaignMapper;
+    private final UserMapper userMapper;
+    private final CampaignAssignmentsMapper campaignAssignmentsMapper;
+
+    /**
+     * Returns all campaigns as a typed list for the admin assignment view.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @return list of campaign DTOs
+     */
+    @Transactional(readOnly = true)
+    public List<CampaignDTO> getCampaigns(Integer adminUserId) {
+        List<CampaignDTO> result = campaignMapper.toDTOList(campaignRepository.findAll());
+        auditLog.info("ACTION=LIST_CAMPAIGNS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), null, null);
         return result;
     }
 
-    public Map<String, Object> getCampaignAssignments(Integer adminUserId, Integer campaignId) {
+    /**
+     * Returns the coordinator and captain assignments for a campaign.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @return typed DTO with campaign info and coordinator/captain lists
+     * @throws NoSuchElementException if campaign not found
+     */
+    @Transactional(readOnly = true)
+    public CampaignAssignmentsDTO getCampaignAssignments(Integer adminUserId, Integer campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
 
-        List<Map<String, Object>> coordinators = usersFromCoordinators(
-                coordinatorRepository.findByIdIdCampaign(campaignId));
-        List<Map<String, Object>> captains = usersFromCaptains(
-                captainRepository.findByIdIdCampaign(campaignId));
+        List<UserDTO> coordinators = userMapper.toDTOList(
+                coordinatorRepository.findUsersByCampaignId(campaignId));
+        List<UserDTO> captains = userMapper.toDTOList(
+                captainRepository.findUsersByCampaignId(campaignId));
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("campaignId", campaign.getId());
-        response.put("campaignName", campaign.getName());
-        response.put("coordinators", coordinators);
-        response.put("captains", captains);
-        return response;
+        auditLog.info("ACTION=GET_CAMPAIGN_ASSIGNMENTS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, null);
+
+        return campaignAssignmentsMapper.toDTO(campaign, coordinators, captains);
     }
 
-    public List<Map<String, Object>> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
+    /**
+     * Returns users eligible to be assigned to a campaign in the given role.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @param role        required role filter (COORDINATOR or CAPTAIN)
+     * @return list of available user DTOs
+     * @throws NoSuchElementException   if campaign not found
+     * @throws IllegalArgumentException if role is invalid
+     */
+    @Transactional(readOnly = true)
+    public List<UserDTO> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
         if (!campaignRepository.existsById(campaignId)) {
             throw new NoSuchElementException("Campaign not found");
         }
@@ -65,14 +110,27 @@ public class CampaignAssignmentService {
             throw new IllegalArgumentException("Invalid role. Use COORDINATOR or CAPTAIN");
         }
 
-        List<Map<String, Object>> result = "COORDINATOR".equalsIgnoreCase(role)
-                ? getAvailableCoordinatorUsers(campaignId)
-                : getAvailableCaptainUsers(campaignId);
+        List<UserDTO> result = "COORDINATOR".equalsIgnoreCase(role)
+                ? userMapper.toDTOList(userRepository.findAvailableCoordinators(campaignId))
+                : userMapper.toDTOList(userRepository.findAvailableCaptains(campaignId));
 
+        auditLog.info("ACTION=LIST_AVAILABLE_USERS_FOR_CAMPAIGN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, null);
         return result;
     }
 
-    public Map<String, Object> assignCoordinator(Integer adminUserId, Integer campaignId, Integer userId) {
+    /**
+     * Assigns a coordinator to a campaign.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @param userId      coordinator user identifier
+     * @return typed assignment result DTO
+     * @throws NoSuchElementException   if campaign or user not found
+     * @throws IllegalArgumentException if user is not a coordinator
+     * @throws IllegalStateException    if user is already assigned
+     */
+    public AssignmentResultDTO assignCoordinator(Integer adminUserId, Integer campaignId, Integer userId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
         UserEntity user = userRepository.findById(userId)
@@ -95,14 +153,20 @@ public class CampaignAssignmentService {
         coordinator.setIdCampaign(campaign);
         coordinatorRepository.save(coordinator);
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "Coordinator assigned successfully");
-        response.put("campaignId", campaignId);
-        response.put("userId", userId);
-        response.put("userName", user.getName());
-        return response;
+        auditLog.info("ACTION=ASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, userId);
+
+        return new AssignmentResultDTO("Coordinator assigned successfully", campaignId, userId, user.getName());
     }
 
+    /**
+     * Removes a coordinator from a campaign.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @param userId      coordinator user identifier
+     * @throws NoSuchElementException if campaign or assignment not found
+     */
     @Transactional
     public void unassignCoordinator(Integer adminUserId, Integer campaignId, Integer userId) {
         if (!campaignRepository.existsById(campaignId)) {
@@ -112,9 +176,22 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
+        auditLog.info("ACTION=UNASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, userId);
     }
 
-    public Map<String, Object> assignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
+    /**
+     * Assigns a captain to a campaign.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @param userId      captain user identifier
+     * @return typed assignment result DTO
+     * @throws NoSuchElementException   if campaign or user not found
+     * @throws IllegalArgumentException if user is not a captain
+     * @throws IllegalStateException    if user is already assigned
+     */
+    public AssignmentResultDTO assignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
         UserEntity user = userRepository.findById(userId)
@@ -137,14 +214,20 @@ public class CampaignAssignmentService {
         captain.setIdCampaign(campaign);
         captainRepository.save(captain);
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "Captain assigned successfully");
-        response.put("campaignId", campaignId);
-        response.put("userId", userId);
-        response.put("userName", user.getName());
-        return response;
+        auditLog.info("ACTION=ASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, userId);
+
+        return new AssignmentResultDTO("Captain assigned successfully", campaignId, userId, user.getName());
     }
 
+    /**
+     * Removes a captain from a campaign.
+     *
+     * @param adminUserId admin user identifier (for audit)
+     * @param campaignId  target campaign identifier
+     * @param userId      captain user identifier
+     * @throws NoSuchElementException if campaign or assignment not found
+     */
     @Transactional
     public void unassignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
         if (!campaignRepository.existsById(campaignId)) {
@@ -154,69 +237,8 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         captainRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
+        auditLog.info("ACTION=UNASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
+                adminUserId, Instant.now(), campaignId, userId);
     }
 
-    private Map<String, Object> toCampaignMap(Campaign campaign) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", campaign.getId());
-        map.put("name", campaign.getName());
-        map.put("startDate", campaign.getStartDate() == null ? null : campaign.getStartDate().toString());
-        map.put("endDate", campaign.getEndDate() == null ? null : campaign.getEndDate().toString());
-        map.put("type", campaign.getIdType() == null ? null : campaign.getIdType().getName());
-        return map;
-    }
-
-    private List<Map<String, Object>> getAvailableCoordinatorUsers(Integer campaignId) {
-        Set<Integer> assignedIds = coordinatorRepository.findByIdIdCampaign(campaignId).stream()
-                .filter(c -> c.getId() != null && c.getId().getIdUser() != null)
-                .map(c -> c.getId().getIdUser())
-                .collect(Collectors.toSet());
-
-        return userRepository.findAllCoordinators().stream()
-                .filter(user -> user != null && user.getIdUser() != null)
-                .filter(user -> !assignedIds.contains(user.getIdUser()))
-                .map(this::toUserMap)
-                .collect(Collectors.toList());
-    }
-
-    private List<Map<String, Object>> getAvailableCaptainUsers(Integer campaignId) {
-        Set<Integer> assignedIds = captainRepository.findByIdIdCampaign(campaignId).stream()
-                .filter(c -> c.getId() != null && c.getId().getIdUser() != null)
-                .map(c -> c.getId().getIdUser())
-                .collect(Collectors.toSet());
-
-        return userRepository.findAllCaptains().stream()
-                .filter(user -> user != null && user.getIdUser() != null)
-                .filter(user -> !assignedIds.contains(user.getIdUser()))
-                .map(this::toUserMap)
-                .collect(Collectors.toList());
-    }
-
-    private List<Map<String, Object>> usersFromCoordinators(List<Coordinator> assignments) {
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Coordinator assignment : assignments) {
-            if (assignment == null || assignment.getId() == null || assignment.getId().getIdUser() == null) continue;
-            Integer userId = assignment.getId().getIdUser();
-            userRepository.findById(userId).ifPresent(user -> result.add(toUserMap(user)));
-        }
-        return result;
-    }
-
-    private List<Map<String, Object>> usersFromCaptains(List<Captain> assignments) {
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Captain assignment : assignments) {
-            if (assignment == null || assignment.getId() == null || assignment.getId().getIdUser() == null) continue;
-            Integer userId = assignment.getId().getIdUser();
-            userRepository.findById(userId).ifPresent(user -> result.add(toUserMap(user)));
-        }
-        return result;
-    }
-
-    private Map<String, Object> toUserMap(UserEntity user) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("userId", user.getIdUser());
-        map.put("name", user.getName());
-        map.put("email", user.getEmail());
-        return map;
-    }
 }

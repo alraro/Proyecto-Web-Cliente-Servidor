@@ -1,3 +1,10 @@
+/**
+ * Servicio de gestión de las tiendas de una campaña.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
 import java.util.ArrayList;
