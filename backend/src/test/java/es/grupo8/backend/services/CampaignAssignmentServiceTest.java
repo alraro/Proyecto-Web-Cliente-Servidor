@@ -28,7 +28,7 @@ import es.grupo8.backend.dao.CaptainRepository;
 import es.grupo8.backend.dao.CoordinatorRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dto.CampaignAssignmentsDTO;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.mapper.CampaignAssignmentsMapper;
@@ -59,8 +59,10 @@ class CampaignAssignmentServiceTest {
         campaign.setId(1);
         List<UserEntity> coordEntities = List.of(new UserEntity());
         List<UserEntity> capEntities = List.of(new UserEntity(), new UserEntity());
-        List<UserDTO> coordDtos = List.of(new UserDTO());
-        List<UserDTO> capDtos = List.of(new UserDTO(), new UserDTO());
+        List<UserResponseDto> coordDtos = List.of(new UserResponseDto(1, List.of(), "name", "email", null, null, null));
+        List<UserResponseDto> capDtos = List.of(
+                new UserResponseDto(2, List.of(), "cap1", "cap1@bancosol.info", null, null, null),
+                new UserResponseDto(3, List.of(), "cap2", "cap2@bancosol.info", null, null, null));
         CampaignAssignmentsDTO expected = new CampaignAssignmentsDTO();
 
         when(campaignRepository.findById(1)).thenReturn(Optional.of(campaign));
@@ -88,12 +90,12 @@ class CampaignAssignmentServiceTest {
     @Test
     void getAvailableUsers_coordinator_usesJpql() {
         List<UserEntity> entities = List.of(new UserEntity());
-        List<UserDTO> dtos = List.of(new UserDTO());
+        List<UserResponseDto> dtos = List.of(new UserResponseDto(4, List.of(), "coord", "coord@bancosol.info", null, null, null));
         when(campaignRepository.existsById(1)).thenReturn(true);
         when(userRepository.findAvailableCoordinators(1)).thenReturn(entities);
         when(userMapper.toDTOList(entities)).thenReturn(dtos);
 
-        List<UserDTO> result = service.getAvailableUsers(99, 1, "COORDINATOR");
+        List<UserResponseDto> result = service.getAvailableUsers(99, 1, "COORDINATOR");
 
         assertSame(dtos, result);
         verify(userRepository).findAvailableCoordinators(1);
@@ -104,12 +106,12 @@ class CampaignAssignmentServiceTest {
     @Test
     void getAvailableUsers_captain_usesJpql() {
         List<UserEntity> entities = List.of(new UserEntity());
-        List<UserDTO> dtos = List.of(new UserDTO());
+        List<UserResponseDto> dtos = List.of(new UserResponseDto(5, List.of(), "captain", "cap@bancosol.info", null, null, null));
         when(campaignRepository.existsById(2)).thenReturn(true);
         when(userRepository.findAvailableCaptains(2)).thenReturn(entities);
         when(userMapper.toDTOList(entities)).thenReturn(dtos);
 
-        List<UserDTO> result = service.getAvailableUsers(99, 2, "CAPTAIN");
+        List<UserResponseDto> result = service.getAvailableUsers(99, 2, "CAPTAIN");
 
         assertSame(dtos, result);
         verify(userRepository).findAvailableCaptains(2);

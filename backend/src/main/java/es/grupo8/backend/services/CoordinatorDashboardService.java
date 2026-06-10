@@ -33,8 +33,8 @@ import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.CampaignEntityDTO;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.dto.RegisterResultDTO;
-import es.grupo8.backend.dto.StoreDTO;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
@@ -96,7 +96,7 @@ public class CoordinatorDashboardService {
      * @throws IllegalArgumentException if campaignId is null
      */
     @Transactional(readOnly = true)
-    public List<StoreDTO> getMyStores(Integer campaignId) {
+    public List<StoreResponseDto> getMyStores(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
@@ -268,7 +268,7 @@ public class CoordinatorDashboardService {
      * @return list of user DTOs for captains
      * @throws IllegalArgumentException if campaignId is null
      */
-    public List<UserDTO> getCaptains(Integer campaignId) {
+    public List<UserResponseDto> getCaptains(Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
