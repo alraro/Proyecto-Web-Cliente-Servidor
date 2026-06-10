@@ -1,3 +1,10 @@
+<%--
+  Vista de aprobación de solicitudes de capitán (admin).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 80%
+  - IA Generativa: 20%
+--%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List, es.grupo8.backend.entity.CaptainRequest" %>
 <%

@@ -1,8 +1,11 @@
-/*
-*
-* Autores:
-*	- Hugo Herrero González: 100%
-*/
+/**
+ * DTO para exportar datos de entidades colaboradoras.
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.dto;
 import lombok.Data;
 

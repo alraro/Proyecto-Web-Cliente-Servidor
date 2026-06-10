@@ -1,3 +1,11 @@
+<%--
+  Vista de gestión y alta de capitanes (coordinador).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 75%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 20%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
 <%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
 <%

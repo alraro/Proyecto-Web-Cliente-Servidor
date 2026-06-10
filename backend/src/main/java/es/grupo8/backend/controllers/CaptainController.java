@@ -1,3 +1,10 @@
+/**
+ * Controlador MVC de las vistas del capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
 import org.springframework.stereotype.Controller;

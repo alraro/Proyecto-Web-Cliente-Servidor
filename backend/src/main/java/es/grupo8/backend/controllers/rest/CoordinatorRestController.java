@@ -1,3 +1,10 @@
+/**
+ * Controlador REST de operaciones de turnos del coordinador.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.List;

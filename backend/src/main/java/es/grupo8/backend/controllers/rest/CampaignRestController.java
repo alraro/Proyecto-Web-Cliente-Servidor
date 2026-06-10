@@ -1,3 +1,10 @@
+/**
+ * Controlador REST para gestionar campañas y sus tipos.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 75%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.Arrays;

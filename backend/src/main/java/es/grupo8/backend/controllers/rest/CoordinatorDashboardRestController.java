@@ -1,3 +1,12 @@
+/**
+ * Controlador REST del panel del coordinador (voluntarios, capitanes, turnos, entidades).
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 65%
+ * - Alejandro Calvo Aguilar: 5%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.Map;

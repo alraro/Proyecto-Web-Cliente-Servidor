@@ -1,3 +1,11 @@
+/**
+ * Servicio de exportación de datos.
+ *
+ * Autores:
+ * - Hugo Herrero González: 70%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 25%
+ */
 /*
 *   Participación en el proyecto:
 *  - Hugo Herrero González: 70%

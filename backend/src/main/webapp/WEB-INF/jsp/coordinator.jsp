@@ -1,3 +1,12 @@
+<%--
+  Vista de bienvenida del coordinador.
+
+  Autores:
+  - Alejandro Calvo Aguilar: 55%
+  - Hugo Herrero González: 20%
+  - Fernando Luis Pinilla Molina: 5%
+  - IA Generativa: 20%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");

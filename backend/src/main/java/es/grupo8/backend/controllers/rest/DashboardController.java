@@ -1,10 +1,11 @@
-/*
-* RestController para la cobertura por tipos del dashboard.
-*
-* Autores:
-*	- Hugo Herrero González: 70%
-*	- IA Generativa: 30%
-*/
+/**
+ * Controlador REST del panel principal (resumen y métricas).
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.List;

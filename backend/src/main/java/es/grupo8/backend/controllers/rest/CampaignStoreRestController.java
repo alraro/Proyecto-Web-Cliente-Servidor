@@ -1,3 +1,12 @@
+/**
+ * Controlador REST para gestionar las tiendas de una campaña.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 70%
+ * - Alejandra Ortiz: 5%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.ArrayList;

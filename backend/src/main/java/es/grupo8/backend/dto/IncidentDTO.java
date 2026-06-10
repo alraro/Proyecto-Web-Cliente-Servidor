@@ -1,3 +1,10 @@
+/**
+ * DTO para transferir datos de incidencias.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dto;
 
 /**

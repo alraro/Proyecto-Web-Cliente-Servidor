@@ -1,3 +1,10 @@
+/**
+ * DTO con el resultado de un registro.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 95%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.dto;
 
 /**

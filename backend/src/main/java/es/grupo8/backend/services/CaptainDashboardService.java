@@ -1,8 +1,14 @@
+/**
+ * Servicio del panel del capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,10 +82,7 @@ public class CaptainDashboardService {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        List<Store> stores = campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
-                .map(cs -> cs.getIdStore())
-                .collect(Collectors.toList());
-        return storeMapper.toDTOList(stores);
+        return storeMapper.toDTOList(campaignStoreRepository.findStoresByCampaignId(campaignId));
     }
 
     /**
@@ -116,11 +119,8 @@ public class CaptainDashboardService {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        List<es.grupo8.backend.entity.VolunteerShift> filtered = volunteerShiftRepository.findAll().stream()
-                .filter(vs -> vs.getId().getIdCampaign().equals(campaignId)
-                           && (storeId == null || vs.getId().getIdStore().equals(storeId)))
-                .collect(Collectors.toList());
-        return volunteerShiftMapper.toDTOList(filtered);
+        return volunteerShiftMapper.toDTOList(
+                volunteerShiftRepository.findByCampaignAndOptionalStore(campaignId, storeId));
     }
 
     /**

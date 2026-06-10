@@ -1,3 +1,10 @@
+/**
+ * DTO para transferir turnos de voluntarios.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dto;
 
 import java.time.LocalDate;

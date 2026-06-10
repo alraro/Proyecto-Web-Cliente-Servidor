@@ -1,3 +1,11 @@
+/**
+ * Controlador REST para asignar coordinadores y capitanes a campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 70%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.Map;

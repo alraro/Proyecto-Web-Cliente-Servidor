@@ -1,3 +1,12 @@
+<%--
+  Vista de bienvenida del capitán.
+
+  Autores:
+  - Alejandro Calvo Aguilar: 45%
+  - Hugo Herrero González: 30%
+  - Fernando Luis Pinilla Molina: 10%
+  - IA Generativa: 15%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");

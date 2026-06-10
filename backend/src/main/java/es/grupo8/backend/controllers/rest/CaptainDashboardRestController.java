@@ -1,3 +1,11 @@
+/**
+ * Controlador REST del panel del capitán (campañas, tiendas, turnos, incidencias).
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 75%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import java.util.Map;

@@ -1,3 +1,10 @@
+/**
+ * Manejador global de excepciones para los controladores REST.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.exceptions;
 
 import java.util.Map;

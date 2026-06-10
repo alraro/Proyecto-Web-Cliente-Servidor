@@ -1,10 +1,15 @@
+/**
+ * Servicio de asignación de coordinadores y capitanes a campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 75%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.services;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,10 +80,10 @@ public class CampaignAssignmentService {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
 
-        List<UserDTO> coordinators = usersFromCoordinators(
-                coordinatorRepository.findByIdIdCampaign(campaignId));
-        List<UserDTO> captains = usersFromCaptains(
-                captainRepository.findByIdIdCampaign(campaignId));
+        List<UserDTO> coordinators = userMapper.toDTOList(
+                coordinatorRepository.findUsersByCampaignId(campaignId));
+        List<UserDTO> captains = userMapper.toDTOList(
+                captainRepository.findUsersByCampaignId(campaignId));
 
         auditLog.info("ACTION=GET_CAMPAIGN_ASSIGNMENTS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
                 adminUserId, Instant.now(), campaignId, null);
@@ -106,8 +111,8 @@ public class CampaignAssignmentService {
         }
 
         List<UserDTO> result = "COORDINATOR".equalsIgnoreCase(role)
-                ? getAvailableCoordinatorUsers(campaignId)
-                : getAvailableCaptainUsers(campaignId);
+                ? userMapper.toDTOList(userRepository.findAvailableCoordinators(campaignId))
+                : userMapper.toDTOList(userRepository.findAvailableCaptains(campaignId));
 
         auditLog.info("ACTION=LIST_AVAILABLE_USERS_FOR_CAMPAIGN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
                 adminUserId, Instant.now(), campaignId, null);
@@ -236,49 +241,4 @@ public class CampaignAssignmentService {
                 adminUserId, Instant.now(), campaignId, userId);
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
-    private List<UserDTO> usersFromCoordinators(List<Coordinator> assignments) {
-        List<UserEntity> users = assignments.stream()
-                .filter(a -> a != null && a.getId() != null && a.getId().getIdUser() != null)
-                .map(a -> userRepository.findById(a.getId().getIdUser()).orElse(null))
-                .filter(u -> u != null)
-                .collect(Collectors.toList());
-        return userMapper.toDTOList(users);
-    }
-
-    private List<UserDTO> usersFromCaptains(List<Captain> assignments) {
-        List<UserEntity> users = assignments.stream()
-                .filter(a -> a != null && a.getId() != null && a.getId().getIdUser() != null)
-                .map(a -> userRepository.findById(a.getId().getIdUser()).orElse(null))
-                .filter(u -> u != null)
-                .collect(Collectors.toList());
-        return userMapper.toDTOList(users);
-    }
-
-    private List<UserDTO> getAvailableCoordinatorUsers(Integer campaignId) {
-        Set<Integer> assignedIds = coordinatorRepository.findByIdIdCampaign(campaignId).stream()
-                .filter(c -> c.getId() != null && c.getId().getIdUser() != null)
-                .map(c -> c.getId().getIdUser())
-                .collect(Collectors.toSet());
-
-        List<UserEntity> available = userRepository.findAllCoordinators().stream()
-                .filter(user -> user != null && user.getIdUser() != null)
-                .filter(user -> !assignedIds.contains(user.getIdUser()))
-                .collect(Collectors.toList());
-        return userMapper.toDTOList(available);
-    }
-
-    private List<UserDTO> getAvailableCaptainUsers(Integer campaignId) {
-        Set<Integer> assignedIds = captainRepository.findByIdIdCampaign(campaignId).stream()
-                .filter(c -> c.getId() != null && c.getId().getIdUser() != null)
-                .map(c -> c.getId().getIdUser())
-                .collect(Collectors.toSet());
-
-        List<UserEntity> available = userRepository.findAllCaptains().stream()
-                .filter(user -> user != null && user.getIdUser() != null)
-                .filter(user -> !assignedIds.contains(user.getIdUser()))
-                .collect(Collectors.toList());
-        return userMapper.toDTOList(available);
-    }
 }

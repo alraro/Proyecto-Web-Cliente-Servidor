@@ -1,3 +1,12 @@
+<%--
+  Panel principal del capitán.
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 75%
+  - Alejandro Calvo Aguilar: 5%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 15%
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");

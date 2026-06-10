@@ -1,3 +1,11 @@
+/**
+ * Controlador MVC de las vistas del coordinador.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 65%
+ * - Alejandro Calvo Aguilar: 15%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
 import java.util.List;

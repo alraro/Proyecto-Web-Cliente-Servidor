@@ -1,3 +1,10 @@
+/**
+ * Pruebas unitarias del controlador REST del panel del coordinador.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.controllers.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

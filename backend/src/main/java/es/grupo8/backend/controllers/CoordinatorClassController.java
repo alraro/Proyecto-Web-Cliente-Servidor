@@ -1,3 +1,11 @@
+/**
+ * Controlador MVC de vistas de turnos del coordinador.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 10%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.controllers;
 
 import org.springframework.stereotype.Controller;

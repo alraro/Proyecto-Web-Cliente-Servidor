@@ -1,10 +1,11 @@
 /**
- * Controlador REST para gestionar usuarios.
+ * Controlador REST para gestionar usuarios y sus roles.
  *
  * Autores:
- * - Alfonso Ramos: 40%
- * - Alejandra Ortiz: 40%
- * - IA Generativa: 20%
+ * - Alejandra Ortiz: 65%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 25%
  */
 package es.grupo8.backend.controllers.rest;
 

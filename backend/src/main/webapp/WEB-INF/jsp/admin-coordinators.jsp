@@ -1,3 +1,11 @@
+<%--
+  Vista de gestión de coordinadores por campaña (admin).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 70%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 25%
+--%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
 <%

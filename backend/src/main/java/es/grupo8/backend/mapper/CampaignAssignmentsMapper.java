@@ -1,3 +1,10 @@
+/**
+ * Mapeador entre campaña con asignaciones y su DTO.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import java.util.List;

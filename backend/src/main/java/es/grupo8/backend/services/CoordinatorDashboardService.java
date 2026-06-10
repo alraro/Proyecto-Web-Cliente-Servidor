@@ -1,3 +1,11 @@
+/**
+ * Servicio del panel del coordinador.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 65%
+ * - Alejandro Calvo Aguilar: 5%
+ * - IA Generativa: 30%
+ */
 package es.grupo8.backend.services;
 
 import java.time.Instant;
@@ -32,7 +40,6 @@ import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.PartnerEntity;
-import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
@@ -93,10 +100,7 @@ public class CoordinatorDashboardService {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        List<Store> stores = campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
-                .map(CampaignStore::getIdStore)
-                .collect(Collectors.toList());
-        return storeMapper.toDTOList(stores);
+        return storeMapper.toDTOList(campaignStoreRepository.findStoresByCampaignId(campaignId));
     }
 
     /**
@@ -268,11 +272,7 @@ public class CoordinatorDashboardService {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
-        List<UserEntity> users = captainRepository.findByIdIdCampaign(campaignId).stream()
-                .filter(c -> c.getIdUser() != null)
-                .map(c -> c.getIdUser())
-                .collect(Collectors.toList());
-        return userMapper.toDTOList(users);
+        return userMapper.toDTOList(captainRepository.findUsersByCampaignId(campaignId));
     }
 
     /**

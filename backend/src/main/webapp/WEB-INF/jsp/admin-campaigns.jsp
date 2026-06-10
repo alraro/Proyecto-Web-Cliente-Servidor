@@ -1,3 +1,11 @@
+<%--
+  Vista CRUD de gestión de campañas (admin).
+
+  Autores:
+  - Fernando Luis Pinilla Molina: 65%
+  - Hugo Herrero González: 5%
+  - IA Generativa: 30%
+--%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%
     String token = (String) session.getAttribute("token");
