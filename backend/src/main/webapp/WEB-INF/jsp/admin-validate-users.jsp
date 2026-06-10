@@ -81,8 +81,6 @@
     var token = '<%= token == null ? "" : token %>';
     var usersCache = [];
 
-    if (!token) { window.location.href = "/login"; return; }
-
     function authHeaders() {
         return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
     }
@@ -175,7 +173,7 @@
 
         fetch("/api/users/pending", { headers: authHeaders() })
             .then(function (r) {
-                if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                if (r.status === 401 || r.status === 403) { return null; }
                 if (!r.ok) throw new Error();
                 return r.json();
             })

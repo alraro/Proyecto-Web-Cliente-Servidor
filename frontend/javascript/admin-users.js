@@ -10,23 +10,6 @@ let btnExport = null;
 let currentUserId = null;
 let usersCache = [];
 
-// Ayudas de autenticacion
-function getToken() {
-    return localStorage.getItem('token');
-}
-
-function authHeaders() {
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getToken()
-    };
-}
-
-function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
-}
-
 // Escapar HTML para uso seguro en atributos
 function escHtml(value) {
     return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -144,12 +127,7 @@ async function loadUsers() {
 }
 
 function findUserById(userId) {
-    for (let i = 0; i < usersCache.length; i++) {
-        if (String(usersCache[i].idUser) === String(userId)) {
-            return usersCache[i];
-        }
-    }
-    return null;
+    return usersCache.find(u => String(u.idUser) === String(userId)) || null;
 }
 
 function openEditModal(userId) {

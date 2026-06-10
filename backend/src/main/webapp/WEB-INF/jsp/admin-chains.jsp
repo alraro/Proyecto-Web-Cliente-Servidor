@@ -110,8 +110,6 @@
     (function () {
         var token = '<%= token == null ? "" : token %>';
 
-        if (!token) { window.location.href = "/login"; return; }
-
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
         }
@@ -185,7 +183,7 @@
         function loadChains() {
             fetch("/api/chains", { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                    if (r.status === 401 || r.status === 403) { return null; }
                     if (!r.ok) throw new Error();
                     return r.json();
                 })
@@ -241,7 +239,16 @@
             if (e.target === document.getElementById("modal-backdrop")) closeModal();
         });
         document.getElementById("btn-export-chains").addEventListener("click", function () {
-            window.location.href = "/api/export/chains";
+            fetch("/api/export/chains", { headers: authHeaders() })
+                .then(function (r) { return r.blob(); })
+                .then(function (blob) {
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    a.href = url;
+                    a.download = "chains_export.xlsx";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
         });
 
         document.getElementById("btn-guardar").addEventListener("click", function () {

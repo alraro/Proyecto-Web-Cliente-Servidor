@@ -140,8 +140,6 @@
     (function () {
         var token = '<%= token == null ? "" : token %>';
 
-        if (!token) { window.location.href = "/login"; return; }
-
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
         }
@@ -262,7 +260,7 @@
 
             fetch("/api/stores?" + params, { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                    if (r.status === 401 || r.status === 403) { return null; }
                     if (!r.ok) throw new Error();
                     return r.json();
                 })
@@ -292,7 +290,16 @@
         document.getElementById("btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
         document.getElementById("page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
         document.getElementById("btn-export-stores").addEventListener("click", function () {
-            window.location.href = "/api/export/stores";
+            fetch("/api/export/stores", { headers: authHeaders() })
+                .then(function (r) { return r.blob(); })
+                .then(function (blob) {
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    a.href = url;
+                    a.download = "stores_export.xlsx";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
         });
 
         document.getElementById("stores-tbody").addEventListener("click", function (e) {
