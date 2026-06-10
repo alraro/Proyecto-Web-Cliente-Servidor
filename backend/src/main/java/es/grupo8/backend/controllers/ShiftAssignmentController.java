@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,7 @@ import es.grupo8.backend.dto.CaptainShiftAssignRequestDto;
 import es.grupo8.backend.dto.VolunteerShiftAssignRequestDto;
 import es.grupo8.backend.exception.ShiftConflictException;
 import es.grupo8.backend.services.ShiftAssignmentService;
+import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,6 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @SecurityRequirement(name = "bearerAuth")
 public class ShiftAssignmentController {
 
+    @Autowired private UserService userService;
     @Autowired private ShiftAssignmentService shiftAssignmentService;
 
     @Operation(summary = "Listar voluntarios asignados al turno")
@@ -40,7 +43,10 @@ public class ShiftAssignmentController {
         @ApiResponse(responseCode = "404", description = "Turno no encontrado")
     })
     @GetMapping("/volunteers")
-    public ResponseEntity<?> getVolunteers(@PathVariable Integer shiftId) {
+    public ResponseEntity<?> getVolunteers(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer shiftId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(shiftAssignmentService.getVolunteers(shiftId));
     }
 
@@ -54,8 +60,10 @@ public class ShiftAssignmentController {
     })
     @PostMapping("/volunteers")
     public ResponseEntity<?> assignVolunteer(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer shiftId,
             @RequestBody(required = false) VolunteerShiftAssignRequestDto request) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(shiftAssignmentService.assignVolunteer(shiftId, request));
     }
@@ -67,8 +75,10 @@ public class ShiftAssignmentController {
     })
     @DeleteMapping("/volunteers/{volunteerId}")
     public ResponseEntity<?> unassignVolunteer(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer shiftId,
             @PathVariable Integer volunteerId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         shiftAssignmentService.unassignVolunteer(shiftId, volunteerId);
         return ResponseEntity.ok(Map.of("message", "Voluntario desasignado correctamente"));
     }
@@ -79,7 +89,10 @@ public class ShiftAssignmentController {
         @ApiResponse(responseCode = "404", description = "Turno no encontrado")
     })
     @GetMapping("/captains")
-    public ResponseEntity<?> getCaptains(@PathVariable Integer shiftId) {
+    public ResponseEntity<?> getCaptains(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer shiftId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(shiftAssignmentService.getCaptains(shiftId));
     }
 
@@ -93,8 +106,10 @@ public class ShiftAssignmentController {
     })
     @PostMapping("/captains")
     public ResponseEntity<?> assignCaptain(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer shiftId,
             @RequestBody(required = false) CaptainShiftAssignRequestDto request) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(shiftAssignmentService.assignCaptain(shiftId, request));
     }
@@ -106,8 +121,10 @@ public class ShiftAssignmentController {
     })
     @DeleteMapping("/captains/{userId}")
     public ResponseEntity<?> unassignCaptain(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer shiftId,
             @PathVariable Integer userId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         shiftAssignmentService.unassignCaptain(shiftId, userId);
         return ResponseEntity.ok(Map.of("message", "Capitán desasignado correctamente"));
     }
@@ -120,21 +137,34 @@ public class ShiftAssignmentController {
     })
     @PutMapping("/attendance")
     public ResponseEntity<?> updateAttendance(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer shiftId,
             @RequestBody(required = false) AttendanceRequestDto request) {
+        if (!userService.isCaptainFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(shiftAssignmentService.updateAttendance(shiftId, request));
     }
 
     @Operation(summary = "Voluntarios disponibles para asignar al turno")
     @GetMapping("/available-volunteers")
-    public ResponseEntity<?> getAvailableVolunteers(@PathVariable Integer shiftId) {
+    public ResponseEntity<?> getAvailableVolunteers(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer shiftId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(shiftAssignmentService.getAvailableVolunteers(shiftId));
     }
 
     @Operation(summary = "Capitanes disponibles para asignar al turno")
     @GetMapping("/available-captains")
-    public ResponseEntity<?> getAvailableCaptains(@PathVariable Integer shiftId) {
+    public ResponseEntity<?> getAvailableCaptains(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer shiftId) {
+        if (!userService.isCoordinatorFromToken(authHeader)) return forbidden();
         return ResponseEntity.ok(shiftAssignmentService.getAvailableCaptains(shiftId));
+    }
+
+    private ResponseEntity<Map<String, String>> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("message", "Acceso denegado."));
     }
 
     @ExceptionHandler(ShiftConflictException.class)
