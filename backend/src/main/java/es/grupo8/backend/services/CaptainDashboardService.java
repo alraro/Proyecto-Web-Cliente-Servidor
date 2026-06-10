@@ -1,13 +1,10 @@
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import es.grupo8.backend.dao.CampaignStoreRepository;
@@ -27,8 +24,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class CaptainDashboardService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CaptainRepository captainRepository;
     private final CampaignStoreRepository campaignStoreRepository;
@@ -93,10 +88,6 @@ public class CaptainDashboardService {
         incident.setDescription(description);
 
         Incident saved = incidentRepository.save(incident);
-
-        auditLog.info("ACTION=CREATE_INCIDENT userId={} timestamp={} incidentId={} campaignId={} storeId={}",
-                userId, Instant.now(), saved.getId(), campaignId, storeId);
-
         return saved.getId();
     }
 

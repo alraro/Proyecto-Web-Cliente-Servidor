@@ -1,6 +1,5 @@
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -9,8 +8,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +32,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class CoordinatorDashboardService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CoordinatorRepository coordinatorRepository;
     private final CaptainRepository captainRepository;
@@ -88,8 +83,6 @@ public class CoordinatorDashboardService {
         }
 
         Volunteer saved = volunteerRepository.save(v);
-        auditLog.info("ACTION=CREATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
-                coordinatorId, Instant.now(), saved.getId());
         return volunteerToMap(saved);
     }
 
@@ -117,8 +110,6 @@ public class CoordinatorDashboardService {
         }
 
         Volunteer saved = volunteerRepository.save(v);
-        auditLog.info("ACTION=UPDATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
-                coordinatorId, Instant.now(), saved.getId());
         return volunteerToMap(saved);
     }
 
@@ -174,8 +165,6 @@ public class CoordinatorDashboardService {
 
         volunteerShiftRepository.save(vs);
 
-        auditLog.info("ACTION=ASSIGN_VOLUNTEER_SHIFT userId={} timestamp={} volunteerId={} campaignId={} storeId={} day={} start={}",
-                coordinatorId, Instant.now(), volunteerId, campaignId, storeId, day, start);
     }
 
     public List<Map<String, Object>> getCaptains(Integer campaignId) {
@@ -227,9 +216,6 @@ public class CoordinatorDashboardService {
         req.setStatus("PENDIENTE");
 
         CaptainRequest saved = captainRequestRepository.save(req);
-
-        auditLog.info("ACTION=REQUEST_CAPTAIN coordinatorUserId={} timestamp={} campaignId={} requestId={}",
-                coordinatorId, Instant.now(), campaignId, saved.getId());
 
         return Map.of("message", "Solicitud enviada. El administrador deberá aprobarla.",
                       "requestId", saved.getId());

@@ -150,7 +150,7 @@
         }
 
         function showToast(msg, type) {
-            var container = document.getElementById("toast-container");
+            var container = document.querySelector("#toast-container");
             var toast = document.createElement("div");
             toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
             toast.textContent = msg;
@@ -168,14 +168,14 @@
             ]).then(function (res) {
                 allChains = res[0]; allLocalities = res[1]; allZones = res[2];
 
-                var fz = document.getElementById("filter-zone");
+                var fz = document.querySelector("#filter-zone");
                 allZones.forEach(function (z) {
                     var o = document.createElement("option"); o.value = z.id; o.textContent = z.name; fz.appendChild(o);
                 });
                 populateLocalities("");
 
-                var fc = document.getElementById("filter-chain");
-                var fch = document.getElementById("input-chain");
+                var fc = document.querySelector("#filter-chain");
+                var fch = document.querySelector("#input-chain");
                 allChains.forEach(function (c) {
                     [fc, fch].forEach(function (sel) {
                         var o = document.createElement("option"); o.value = c.id; o.textContent = c.name; sel.appendChild(o);
@@ -184,13 +184,13 @@
             });
         }
 
-        document.getElementById("filter-zone").addEventListener("change", function () {
-            document.getElementById("filter-locality").value = "";
+        document.querySelector("#filter-zone").addEventListener("change", function () {
+            document.querySelector("#filter-locality").value = "";
             populateLocalities(this.value);
         });
 
         function populateLocalities(zoneId) {
-            var sel = document.getElementById("filter-locality");
+            var sel = document.querySelector("#filter-locality");
             var prev = sel.value;
             sel.innerHTML = '<option value="">Todas las localidades</option>';
             var lista = zoneId ? allLocalities.filter(function (l) { return String(l.zoneId) === String(zoneId); }) : allLocalities;
@@ -203,7 +203,7 @@
         var currentPage = 0, pageSize = 20, totalPages = 1;
 
         function renderTable(stores) {
-            var tbody = document.getElementById("stores-tbody");
+            var tbody = document.querySelector("#stores-tbody");
             tbody.innerHTML = "";
             if (!stores.length) {
                 tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td></tr>';
@@ -250,9 +250,9 @@
         function loadStores(page) {
             page = page || 0;
             var params = new URLSearchParams();
-            var chainId = document.getElementById("filter-chain").value;
-            var locId   = document.getElementById("filter-locality").value;
-            var zoneId  = document.getElementById("filter-zone").value;
+            var chainId = document.querySelector("#filter-chain").value;
+            var locId   = document.querySelector("#filter-locality").value;
+            var zoneId  = document.querySelector("#filter-zone").value;
             if (chainId) params.append("chainId", chainId);
             if (locId)   params.append("localityId", locId);
             if (zoneId)  params.append("zoneId", zoneId);
@@ -267,29 +267,29 @@
                 .then(function (d) {
                     if (!d) return;
                     currentPage = page; totalPages = d.totalPages || 1;
-                    document.getElementById("current-page").textContent = currentPage + 1;
-                    document.getElementById("total-pages").textContent  = totalPages;
-                    document.getElementById("btn-prev-page").disabled = currentPage === 0;
-                    document.getElementById("btn-next-page").disabled = currentPage >= totalPages - 1;
+                    document.querySelector("#current-page").textContent = currentPage + 1;
+                    document.querySelector("#total-pages").textContent  = totalPages;
+                    document.querySelector("#btn-prev-page").disabled = currentPage === 0;
+                    document.querySelector("#btn-next-page").disabled = currentPage >= totalPages - 1;
                     renderTable(d.content || []);
                 })
                 .catch(function () {
-                    document.getElementById("stores-tbody").innerHTML =
+                    document.querySelector("#stores-tbody").innerHTML =
                         '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
                 });
         }
 
-        document.getElementById("btn-apply-filters").addEventListener("click", function () { loadStores(0); });
-        document.getElementById("btn-clear-filters").addEventListener("click", function () {
-            document.getElementById("filter-zone").value = "";
-            document.getElementById("filter-locality").value = "";
-            document.getElementById("filter-chain").value = "";
+        document.querySelector("#btn-apply-filters").addEventListener("click", function () { loadStores(0); });
+        document.querySelector("#btn-clear-filters").addEventListener("click", function () {
+            document.querySelector("#filter-zone").value = "";
+            document.querySelector("#filter-locality").value = "";
+            document.querySelector("#filter-chain").value = "";
             populateLocalities(""); loadStores(0);
         });
-        document.getElementById("btn-prev-page").addEventListener("click", function () { if (currentPage > 0) loadStores(currentPage - 1); });
-        document.getElementById("btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
-        document.getElementById("page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
-        document.getElementById("btn-export-stores").addEventListener("click", function () {
+        document.querySelector("#btn-prev-page").addEventListener("click", function () { if (currentPage > 0) loadStores(currentPage - 1); });
+        document.querySelector("#btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
+        document.querySelector("#page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
+        document.querySelector("#btn-export-stores").addEventListener("click", function () {
             fetch("/api/export/stores", { headers: authHeaders() })
                 .then(function (r) { return r.blob(); })
                 .then(function (blob) {
@@ -302,7 +302,7 @@
                 });
         });
 
-        document.getElementById("stores-tbody").addEventListener("click", function (e) {
+        document.querySelector("#stores-tbody").addEventListener("click", function (e) {
             var btn = e.target.closest("button");
             if (!btn) return;
             var id = parseInt(btn.getAttribute("data-store-id"));
@@ -313,17 +313,17 @@
         var editingId = null;
 
         function openModal(titulo) {
-            document.getElementById("modal-title").textContent = titulo;
-            document.getElementById("modal-error").textContent = "";
-            document.getElementById("modal-backdrop").classList.add("open");
-            document.getElementById("input-nombre").focus();
+            document.querySelector("#modal-title").textContent = titulo;
+            document.querySelector("#modal-error").textContent = "";
+            document.querySelector("#modal-backdrop").classList.add("open");
+            document.querySelector("#input-nombre").focus();
         }
 
         function closeModal() {
-            document.getElementById("modal-backdrop").classList.remove("open");
-            ["input-nombre","input-domicilio","input-cp"].forEach(function (id) { document.getElementById(id).value = ""; });
-            document.getElementById("input-chain").value = "";
-            document.getElementById("modal-error").textContent = "";
+            document.querySelector("#modal-backdrop").classList.remove("open");
+            ["input-nombre","input-domicilio","input-cp"].forEach(function (id) { document.querySelector("#" + id).value = ""; });
+            document.querySelector("#input-chain").value = "";
+            document.querySelector("#modal-error").textContent = "";
             editingId = null;
         }
 
@@ -332,27 +332,27 @@
                 .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
                 .then(function (s) {
                     editingId = s.id;
-                    document.getElementById("input-nombre").value    = s.name || "";
-                    document.getElementById("input-domicilio").value = s.address || "";
-                    document.getElementById("input-cp").value        = s.postalCode || "";
-                    document.getElementById("input-chain").value     = s.chainId || "";
+                    document.querySelector("#input-nombre").value    = s.name || "";
+                    document.querySelector("#input-domicilio").value = s.address || "";
+                    document.querySelector("#input-cp").value        = s.postalCode || "";
+                    document.querySelector("#input-chain").value     = s.chainId || "";
                     openModal("Editar tienda");
                 })
                 .catch(function () { showToast("Error al cargar la tienda.", "error"); });
         }
 
-        document.getElementById("btn-nueva-tienda").addEventListener("click", function () { editingId = null; openModal("Nueva tienda"); });
-        document.getElementById("btn-modal-cancel").addEventListener("click", closeModal);
-        document.getElementById("modal-backdrop").addEventListener("click", function (e) {
-            if (e.target === document.getElementById("modal-backdrop")) closeModal();
+        document.querySelector("#btn-nueva-tienda").addEventListener("click", function () { editingId = null; openModal("Nueva tienda"); });
+        document.querySelector("#btn-modal-cancel").addEventListener("click", closeModal);
+        document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
+            if (e.target === document.querySelector("#modal-backdrop")) closeModal();
         });
 
-        document.getElementById("btn-modal-save").addEventListener("click", function () {
-            var nombre  = document.getElementById("input-nombre").value.trim();
-            var dom     = document.getElementById("input-domicilio").value.trim();
-            var cp      = document.getElementById("input-cp").value.trim();
-            var chainId = document.getElementById("input-chain").value;
-            var errEl   = document.getElementById("modal-error");
+        document.querySelector("#btn-modal-save").addEventListener("click", function () {
+            var nombre  = document.querySelector("#input-nombre").value.trim();
+            var dom     = document.querySelector("#input-domicilio").value.trim();
+            var cp      = document.querySelector("#input-cp").value.trim();
+            var chainId = document.querySelector("#input-chain").value;
+            var errEl   = document.querySelector("#modal-error");
 
             if (!nombre) { errEl.textContent = "El nombre es obligatorio."; return; }
             if (nombre.length > 255) { errEl.textContent = "El nombre no puede superar 255 caracteres."; return; }

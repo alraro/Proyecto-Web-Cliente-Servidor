@@ -9,8 +9,27 @@ package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.UserSpecifications;
+import es.grupo8.backend.dao.AdminRepository;
+import es.grupo8.backend.dao.CampaignRepository;
+import es.grupo8.backend.dao.CaptainRepository;
+import es.grupo8.backend.dao.CoordinatorRepository;
+import es.grupo8.backend.dao.PartnerEntityManagerRepository;
+import es.grupo8.backend.dao.PartnerEntityRepository;
+import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dto.PaginatedResponse;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.UserRequestDto;
+import es.grupo8.backend.dto.UserResponseDto;
+import es.grupo8.backend.dto.UserRoleRequestDto;
+import es.grupo8.backend.dto.UserRoleResponseDto;
+import es.grupo8.backend.entity.AdminEntity;
+import es.grupo8.backend.entity.Campaign;
+import es.grupo8.backend.entity.Captain;
+import es.grupo8.backend.entity.CaptainId;
+import es.grupo8.backend.entity.Coordinator;
+import es.grupo8.backend.entity.CoordinatorId;
+import es.grupo8.backend.entity.PartnerEntity;
+import es.grupo8.backend.entity.PartnerEntityManager;
+import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +40,40 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     @Autowired private UserRepository userRepository;
+    @Autowired private AdminRepository adminRepository;
+    @Autowired private CampaignRepository campaignRepository;
+    @Autowired private CaptainRepository captainRepository;
+    @Autowired private CoordinatorRepository coordinatorRepository;
+    @Autowired private PartnerEntityRepository partnerEntityRepository;
+    @Autowired private PartnerEntityManagerRepository partnerEntityManagerRepository;
+    @Autowired private StoreRepository storeRepository;
     @Autowired private PasswordService passwordService;
     @Autowired private UserMapper userMapper;
 
     @Autowired
     private AuthService authService;
 
-    public PaginatedResponse<UserDTO> getAllUsers(
+    public List<UserResponseDto> getAllUsersOrdered() {
+        return userMapper.toDTOList(userRepository.findAllByOrderByIdUserAsc());
+    }
+
+    public List<UserResponseDto> getPendingUsersOrdered() {
+        return userRepository.findAllByOrderByIdUserAsc().stream()
+                .filter(user -> "PENDIENTE".equals(userMapper.resolveRole(user.getIdUser())))
+                .map(userMapper::toDTO)
+                .toList();
+    }
+
+    public PaginatedResponse<UserResponseDto> getAllUsers(
             int page, int size, String sort, String search, String role) {
 
         page = Math.max(0, page);
@@ -56,7 +96,7 @@ public class UserService {
         Pageable pageable = PageRequest.of(page, size, sortObj);
         Page<UserEntity> userPage = userRepository.findAll(spec, pageable);
 
-        List<UserDTO> content = userPage.getContent().stream()
+        List<UserResponseDto> content = userPage.getContent().stream()
                 .map(userMapper::toDTO)
                 .toList();
 
@@ -65,12 +105,12 @@ public class UserService {
                 userPage.hasNext(), userPage.hasPrevious());
     }
 
-    public UserDTO getUserById(Integer userId) {
+    public UserResponseDto getUserById(Integer userId) {
         return userMapper.toDTO(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId)));
     }
 
-    public UserDTO createUser(UserDTO request) {
+    public UserResponseDto createUser(UserRequestDto request) {
         validateCreate(request);
 
         if (userRepository.existsByEmail(request.getEmail().toLowerCase()))
@@ -89,7 +129,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado tras la creación")));
     }
 
-    public UserDTO updateUser(Integer userId, UserDTO request) {
+    public UserResponseDto updateUser(Integer userId, UserRequestDto request) {
         if (request == null) throw new IllegalArgumentException("La petición no es válida.");
 
         UserEntity user = userRepository.findById(userId)
@@ -128,13 +168,138 @@ public class UserService {
         return userMapper.toDTO(userRepository.save(user));
     }
 
+    public UserRoleResponseDto assignRole(Integer userId, UserRoleRequestDto request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String role = normalizeRole(request == null ? null : request.getRole());
+        if (role == null) {
+            throw new IllegalArgumentException("El rol es obligatorio");
+        }
+
+        removeExistingRoles(userId);
+        assignNewRole(user, role);
+
+        return new UserRoleResponseDto("Rol asignado", userId, role);
+    }
+
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId))
             throw new RuntimeException("Usuario no encontrado con ID: " + userId);
         userRepository.deleteById(userId);
     }
 
-    private void validateCreate(UserDTO req) {
+    private String normalizeRole(String rawRole) {
+        if (rawRole == null || rawRole.isBlank()) {
+            return null;
+        }
+        return Normalizer.normalize(rawRole.trim().toUpperCase(Locale.ROOT), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+    }
+
+    private void removeExistingRoles(Integer userId) {
+        adminRepository.findById(userId).ifPresent(adminRepository::delete);
+
+        coordinatorRepository.findAll().stream()
+                .filter(coordinator -> coordinator.getId().getIdUser().equals(userId))
+                .forEach(coordinator -> coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(
+                        coordinator.getId().getIdUser(),
+                        coordinator.getId().getIdCampaign()));
+
+        captainRepository.findAll().stream()
+                .filter(captain -> captain.getId().getIdUser().equals(userId))
+                .forEach(captain -> captainRepository.deleteByIdIdUserAndIdIdCampaign(
+                        captain.getId().getIdUser(),
+                        captain.getId().getIdCampaign()));
+
+        partnerEntityManagerRepository.findById(userId).ifPresent(partnerEntityManagerRepository::delete);
+
+        storeRepository.findByIdResponsible_IdUser(userId).ifPresent(store -> {
+            store.setIdResponsible(null);
+            storeRepository.save(store);
+        });
+    }
+
+    private void assignNewRole(UserEntity user, String role) {
+        switch (role) {
+            case "ADMINISTRADOR" -> assignAdmin(user);
+            case "COORDINADOR" -> assignCoordinator(user);
+            case "CAPITAN" -> assignCaptain(user);
+            case "COLABORADOR" -> assignPartnerEntityManager(user);
+            case "RESPONSABLE_TIENDA" -> assignResponsibleStore(user);
+            default -> throw new IllegalArgumentException("Rol no soportado: " + role);
+        }
+    }
+
+    private void assignAdmin(UserEntity user) {
+        if (!adminRepository.existsByIdUser(user.getIdUser())) {
+            AdminEntity admin = new AdminEntity();
+            admin.setIdUser(user.getIdUser());
+            adminRepository.save(admin);
+        }
+    }
+
+    private void assignCoordinator(UserEntity user) {
+        Campaign campaign = getFirstCampaign();
+        Integer campaignId = campaign.getId();
+        if (!coordinatorRepository.existsByIdIdUserAndIdIdCampaign(user.getIdUser(), campaignId)) {
+            CoordinatorId coordinatorId = new CoordinatorId();
+            coordinatorId.setIdUser(user.getIdUser());
+            coordinatorId.setIdCampaign(campaignId);
+
+            Coordinator coordinator = new Coordinator();
+            coordinator.setId(coordinatorId);
+            coordinator.setIdUser(user);
+            coordinator.setIdCampaign(campaign);
+            coordinatorRepository.save(coordinator);
+        }
+    }
+
+    private void assignCaptain(UserEntity user) {
+        Campaign campaign = getFirstCampaign();
+        Integer campaignId = campaign.getId();
+        if (!captainRepository.existsByIdIdUserAndIdIdCampaign(user.getIdUser(), campaignId)) {
+            CaptainId captainId = new CaptainId();
+            captainId.setIdUser(user.getIdUser());
+            captainId.setIdCampaign(campaignId);
+
+            Captain captain = new Captain();
+            captain.setId(captainId);
+            captain.setIdUser(user);
+            captain.setIdCampaign(campaign);
+            captainRepository.save(captain);
+        }
+    }
+
+    private void assignPartnerEntityManager(UserEntity user) {
+        PartnerEntity partnerEntity = partnerEntityRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No hay entidades colaboradoras disponibles para asignar este rol."));
+
+        if (!partnerEntityManagerRepository.existsById(user.getIdUser())) {
+            PartnerEntityManager manager = new PartnerEntityManager();
+            manager.setUserAccounts(user);
+            manager.setIdPartnerEntity(partnerEntity);
+            partnerEntityManagerRepository.save(manager);
+        }
+    }
+
+    private void assignResponsibleStore(UserEntity user) {
+        Store store = storeRepository.findAllByOrderByIdAsc().stream()
+                .filter(candidate -> candidate.getIdResponsible() == null)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No hay tiendas sin responsable disponibles."));
+
+        store.setIdResponsible(user);
+        storeRepository.save(store);
+    }
+
+    private Campaign getFirstCampaign() {
+        Optional<Campaign> campaign = campaignRepository.findAll().stream().findFirst();
+        return campaign.orElseThrow(() -> new IllegalArgumentException("No hay campañas disponibles para asignar este rol."));
+    }
+
+    private void validateCreate(UserRequestDto req) {
         if (req == null) throw new IllegalArgumentException("La petición no es válida.");
 
         String name = req.getName() != null ? req.getName().trim() : "";
@@ -151,7 +316,7 @@ public class UserService {
         if (req.getRole() == null || req.getRole().trim().isEmpty())
             throw new IllegalArgumentException("El rol es obligatorio.");
 
-        String role = req.getRole().trim().toUpperCase();
+        String role = req.getRole().trim().toUpperCase(Locale.ROOT);
         if (!List.of("ADMIN", "COORDINATOR", "CAPTAIN", "PARTNER_ENTITY_MANAGER").contains(role))
             throw new IllegalArgumentException("Rol no válido. Los roles válidos son: ADMIN, COORDINATOR, CAPTAIN, PARTNER_ENTITY_MANAGER.");
     }

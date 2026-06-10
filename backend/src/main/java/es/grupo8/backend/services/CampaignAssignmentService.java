@@ -1,6 +1,5 @@
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +28,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignAssignmentService {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
     private final CoordinatorRepository coordinatorRepository;
@@ -42,8 +37,6 @@ public class CampaignAssignmentService {
         List<Map<String, Object>> result = campaignRepository.findAll().stream()
                 .map(this::toCampaignMap)
                 .collect(Collectors.toList());
-        auditLog.info("ACTION=LIST_CAMPAIGNS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), null, null);
         return result;
     }
 
@@ -55,9 +48,6 @@ public class CampaignAssignmentService {
                 coordinatorRepository.findByIdIdCampaign(campaignId));
         List<Map<String, Object>> captains = usersFromCaptains(
                 captainRepository.findByIdIdCampaign(campaignId));
-
-        auditLog.info("ACTION=GET_CAMPAIGN_ASSIGNMENTS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, null);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("campaignId", campaign.getId());
@@ -79,8 +69,6 @@ public class CampaignAssignmentService {
                 ? getAvailableCoordinatorUsers(campaignId)
                 : getAvailableCaptainUsers(campaignId);
 
-        auditLog.info("ACTION=LIST_AVAILABLE_USERS_FOR_CAMPAIGN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, null);
         return result;
     }
 
@@ -107,9 +95,6 @@ public class CampaignAssignmentService {
         coordinator.setIdCampaign(campaign);
         coordinatorRepository.save(coordinator);
 
-        auditLog.info("ACTION=ASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
-
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "Coordinator assigned successfully");
         response.put("campaignId", campaignId);
@@ -127,8 +112,6 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
-        auditLog.info("ACTION=UNASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
     }
 
     public Map<String, Object> assignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
@@ -154,9 +137,6 @@ public class CampaignAssignmentService {
         captain.setIdCampaign(campaign);
         captainRepository.save(captain);
 
-        auditLog.info("ACTION=ASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
-
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "Captain assigned successfully");
         response.put("campaignId", campaignId);
@@ -174,8 +154,6 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         captainRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
-        auditLog.info("ACTION=UNASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
     }
 
     private Map<String, Object> toCampaignMap(Campaign campaign) {

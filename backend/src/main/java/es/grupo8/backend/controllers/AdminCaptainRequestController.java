@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +24,12 @@ import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.UserEntity;
-import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.UserService;
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminCaptainRequestController {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
-    @Autowired private AuthService              authService;
     @Autowired private UserService              userService;
     @Autowired private CaptainRequestRepository captainRequestRepository;
     @Autowired private UserRepository           userRepository;
@@ -72,8 +66,6 @@ public class AdminCaptainRequestController {
             return forbidden();
         }
 
-        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
-
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -108,9 +100,6 @@ public class AdminCaptainRequestController {
         req.setResolvedAt(Instant.now());
         captainRequestRepository.save(req);
 
-        auditLog.info("ACTION=APPROVE_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={} newUserId={}",
-                adminUserId, Instant.now(), id, savedUser.getIdUser());
-
         return ResponseEntity.ok(Map.of(
                 "message", "Capitán aprobado y creado correctamente.",
                 "userId",  savedUser.getIdUser()
@@ -128,8 +117,6 @@ public class AdminCaptainRequestController {
             return forbidden();
         }
 
-        Integer adminUserId = authService.extractUserIdFromToken(authHeader);
-
         CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
         if (req == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -144,9 +131,6 @@ public class AdminCaptainRequestController {
         req.setStatus("RECHAZADA");
         req.setResolvedAt(Instant.now());
         captainRequestRepository.save(req);
-
-        auditLog.info("ACTION=REJECT_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={}",
-                adminUserId, Instant.now(), id);
 
         return ResponseEntity.ok(Map.of("message", "Solicitud rechazada."));
     }

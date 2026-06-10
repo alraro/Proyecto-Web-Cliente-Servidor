@@ -1,11 +1,8 @@
 package es.grupo8.backend.controllers;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,8 +34,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CoordinatorController {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
     private final ShiftService shiftService;
     private final AuthService authService;
     private final UserService userService;
@@ -50,8 +45,6 @@ public class CoordinatorController {
             @RequestBody(required = false) ShiftRequestDto request) {
 
         if (!userService.isCoordinatorFromToken(authHeader)) {
-            auditLog.warn("ACTION=CREATE_SHIFT_ATTEMPT userId={} timestamp={} reason=NOT_COORDINATOR",
-                    authService.extractUserIdFromToken(authHeader), Instant.now());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Acceso denegado. Solo los coordinadores pueden crear turnos."));
         }

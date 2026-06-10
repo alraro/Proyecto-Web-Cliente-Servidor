@@ -12,6 +12,8 @@ import es.grupo8.backend.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaSpecificationExecutor<UserEntity> {
 
+    List<UserEntity> findAllByOrderByIdUserAsc();
+
     Optional<UserEntity> findByEmail(String email);
 
     boolean existsByEmail(String email);

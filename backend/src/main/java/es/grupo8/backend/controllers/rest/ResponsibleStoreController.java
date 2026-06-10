@@ -6,11 +6,8 @@
  */
 package es.grupo8.backend.controllers.rest;
 
-import java.time.Instant;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +27,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ResponsibleStoreController {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
     private final ResponsibleStoreService responsibleStoreService;
     private final AuthService authService;
 
@@ -50,8 +45,6 @@ public class ResponsibleStoreController {
         checkAuth(authHeader);
         Integer userId = authService.extractUserIdFromToken(authHeader);
         Map<String, Object> detail = responsibleStoreService.getStoreDetail(id, userId);
-        auditLog.info("ACTION=VIEW_STORE_DETAIL userId={} timestamp={} storeId={}",
-                userId, Instant.now(), id);
         return ResponseEntity.ok(detail);
     }
 
