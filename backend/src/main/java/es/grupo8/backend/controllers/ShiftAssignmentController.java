@@ -2,7 +2,6 @@ package es.grupo8.backend.controllers;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +22,7 @@ import es.grupo8.backend.exception.ShiftConflictException;
 import es.grupo8.backend.services.ShiftAssignmentService;
 import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,10 +32,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/shifts/{shiftId}")
 @Tag(name = "Asignación a turnos", description = "Asignar y desasignar voluntarios y capitanes a turnos concretos")
 @SecurityRequirement(name = "bearerAuth")
+@AllArgsConstructor
 public class ShiftAssignmentController {
 
-    @Autowired private UserService userService;
-    @Autowired private ShiftAssignmentService shiftAssignmentService;
+    private final UserService userService;
+    private final ShiftAssignmentService shiftAssignmentService;
 
     @Operation(summary = "Listar voluntarios asignados al turno")
     @ApiResponses({
