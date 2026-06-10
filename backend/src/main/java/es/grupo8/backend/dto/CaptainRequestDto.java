@@ -10,5 +10,5 @@ public class CaptainRequestDto {
     private String name;
     private String email;
     private String password;
-    private Integer idCampaign;
+    private Integer campaignId;
 }

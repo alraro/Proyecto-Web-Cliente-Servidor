@@ -276,8 +276,9 @@
             if (chainId) params.append("chainId", chainId);
             if (zoneId) params.append("zoneId", zoneId);
             if (localityId) params.append("localityId", localityId);
+            params.append("size", "100");
 
-            const url = params.toString() ? `/api/stores?${params.toString()}` : "/api/stores";
+            const url = `/api/stores?${params.toString()}`;
             allFilteredStores = await fetchArray(url, authOpts);
             renderAvailableList();
         }
@@ -442,6 +443,9 @@
                 }
                 if (data && Array.isArray(data.value)) {
                     return data.value;
+                }
+                if (data && Array.isArray(data.content)) {
+                    return data.content;
                 }
                 return [];
             } catch (error) {

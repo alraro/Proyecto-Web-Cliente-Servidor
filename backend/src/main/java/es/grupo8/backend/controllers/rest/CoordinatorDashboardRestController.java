@@ -202,7 +202,7 @@ public class CoordinatorDashboardRestController {
                         request.getName(),
                         request.getEmail(),
                         request.getPassword(),
-                        request.getIdCampaign()));
+                        request.getCampaignId()));
     }
 
     /**

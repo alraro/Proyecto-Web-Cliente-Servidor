@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
 <%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
@@ -66,10 +66,32 @@
                        } %>
                 </select>
             </div>
+            <button type="button" id="btn-load" class="btn btn-secondary">Ver equipo</button>
         </div>
     </div>
 
-    <div id="shifts-container"></div>
+    <div class="card">
+        <div class="card-head">
+            <h2>Turnos y asistencia</h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tienda</th>
+                        <th>Día</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Voluntario</th>
+                        <th>Asistencia</th>
+                    </tr>
+                </thead>
+                <tbody id="shifts-tbody">
+                    <tr><td colspan="6" class="table-empty">Selecciona una campaña para ver el equipo.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </main>
 <script>
     const BEARER_TOKEN = '<%= session.getAttribute("token") != null ? session.getAttribute("token") : "" %>';
@@ -82,46 +104,53 @@
         setTimeout(() => el.setAttribute('hidden', ''), 4000);
     }
 
-    document.getElementById('campaign-select').addEventListener('change', async () => {
+    document.getElementById('btn-load').addEventListener('click', async () => {
         const campaignId = document.getElementById('campaign-select').value;
-        const container = document.getElementById('shifts-container');
-        container.innerHTML = '';
-        if (!campaignId) return;
-        container.innerHTML = '<p class="table-empty">Cargando turnos...</p>';
+        if (!campaignId) { showMsg('Selecciona una campaña primero.', 'error'); return; }
+        const tbody = document.getElementById('shifts-tbody');
+        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
         try {
-            const res = await fetch('/api/captain/volunteer-shifts?campaignId=' + campaignId, {
+            const res = await fetch('/api/shifts/my-team?campaignId=' + campaignId, {
                 headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
             });
-            if (!res.ok) { container.innerHTML = '<p class="table-empty">Error al cargar los turnos.</p>'; return; }
+            if (!res.ok) { showMsg('Error al cargar los turnos.', 'error'); return; }
             const shifts = await res.json();
             if (!shifts.length) {
-                container.innerHTML = '<p class="table-empty">No hay turnos registrados para esta campaña.</p>';
+                tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay turnos asignados para esta campaña.</td></tr>';
                 return;
             }
-            container.innerHTML = `
-                <div class="card">
-                    <div class="card-head"><h2>Turnos de voluntarios</h2></div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr><th>Voluntario</th><th>Día</th><th>Hora inicio</th><th>Hora fin</th><th>Asistencia</th></tr>
-                            </thead>
-                            <tbody>
-                                ${shifts.map(s =>
-                                    `<tr>
-                                        <td>${s.volunteerName || '-'}</td>
-                                        <td>${s.shiftDay || '-'}</td>
-                                        <td>${s.startTime || '-'}</td>
-                                        <td>${s.endTime || '-'}</td>
-                                        <td>${s.attendance === true ? '✅' : s.attendance === false ? '❌' : '-'}</td>
-                                    </tr>`
-                                ).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
-        } catch (e) {
-            container.innerHTML = '<p class="table-empty">Error de conexión.</p>';
+            const rows = [];
+            shifts.forEach(function(shift) {
+                const volunteers = Array.isArray(shift.volunteers) ? shift.volunteers : [];
+                if (!volunteers.length) {
+                    rows.push(
+                        '<tr>' +
+                        '<td>' + (shift.storeName || '-') + '</td>' +
+                        '<td>' + (shift.day || '-') + '</td>' +
+                        '<td>' + (shift.startTime || '-') + '</td>' +
+                        '<td>' + (shift.endTime || '-') + '</td>' +
+                        '<td><em>Sin voluntarios</em></td>' +
+                        '<td>—</td>' +
+                        '</tr>'
+                    );
+                } else {
+                    volunteers.forEach(function(v) {
+                        rows.push(
+                            '<tr>' +
+                            '<td>' + (shift.storeName || '-') + '</td>' +
+                            '<td>' + (shift.day || '-') + '</td>' +
+                            '<td>' + (shift.startTime || '-') + '</td>' +
+                            '<td>' + (shift.endTime || '-') + '</td>' +
+                            '<td>' + (v.volunteerName || '-') + '</td>' +
+                            '<td><input type="checkbox"' + (v.attendance ? ' checked' : '') + ' disabled></td>' +
+                            '</tr>'
+                        );
+                    });
+                }
+            });
+            tbody.innerHTML = rows.join('');
+        } catch (err) {
+            showMsg('Error de conexión.', 'error');
         }
     });
 </script>

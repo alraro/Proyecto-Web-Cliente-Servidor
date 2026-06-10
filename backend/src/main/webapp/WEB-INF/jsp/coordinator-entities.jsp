@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
 <%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
@@ -111,15 +111,17 @@
             });
             if (!res.ok) { showMsg('Error al cargar las entidades.', 'error'); return; }
             const entities = await res.json();
-            tbody.innerHTML = entities.length
-                ? entities.map(e =>
-                    `<tr>
-                        <td>${e.name || '-'}</td>
-                        <td>${e.phone || '-'}</td>
-                        <td>${e.volunteerCount ?? '-'}</td>
-                    </tr>`
-                ).join('')
-                : '<tr><td colspan="3" class="table-empty">No hay entidades con voluntarios en esta campaña.</td></tr>';
+            if (!entities.length) {
+                tbody.innerHTML = '<tr><td colspan="3" class="table-empty">No hay entidades con voluntarios en esta campaña.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = entities.map(e =>
+                '<tr>' +
+                '<td>' + (e.name || '-') + '</td>' +
+                '<td>' + (e.phone || '-') + '</td>' +
+                '<td>' + (e.volunteerCount != null ? e.volunteerCount : 0) + '</td>' +
+                '</tr>'
+            ).join('');
         } catch (err) {
             showMsg('Error de conexión.', 'error');
         }

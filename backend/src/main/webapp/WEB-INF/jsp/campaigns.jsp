@@ -94,10 +94,6 @@
         const userNameEl = document.getElementById('user-name');
         userNameEl.textContent = nombre || 'Admin';
 
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            window.location.href = '/logout';
-        });
-
         const STATUS = {
             ACTIVE: { label: 'Activa',  css: 'badge-active' },
             FUTURE: { label: 'Futura',  css: 'badge-future' },
@@ -123,7 +119,7 @@
                 if (currentStatus) url += '&status=' + encodeURIComponent(currentStatus);
 
                 const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
-                if (res.status === 401) { window.location.href = '/login'; return; }
+                if (res.status === 401) throw new Error('Tu sesión ha expirado. Vuelve a iniciar sesión.');
                 if (!res.ok) throw new Error('No se pudieron cargar las campañas.');
 
                 const data = await res.json();
@@ -167,7 +163,7 @@
                 tr.appendChild(tdName);
 
                 const tdType = document.createElement('td');
-                tdType.textContent = (c.type && c.type.name) ? c.type.name : '—';
+                tdType.textContent = c.typeName || '—';
                 tr.appendChild(tdType);
 
                 const tdStart = document.createElement('td');
