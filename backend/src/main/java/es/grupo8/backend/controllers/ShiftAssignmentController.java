@@ -22,11 +22,9 @@ import es.grupo8.backend.exception.ShiftConflictException;
 import es.grupo8.backend.services.ShiftAssignmentService;
 import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/shifts/{shiftId}")
@@ -39,10 +37,6 @@ public class ShiftAssignmentController {
     private final ShiftAssignmentService shiftAssignmentService;
 
     @Operation(summary = "Listar voluntarios asignados al turno")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de voluntarios"),
-        @ApiResponse(responseCode = "404", description = "Turno no encontrado")
-    })
     @GetMapping("/volunteers")
     public ResponseEntity<?> getVolunteers(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -53,12 +47,6 @@ public class ShiftAssignmentController {
 
     @Operation(summary = "Asignar voluntario al turno",
                description = "Valida aforo máximo (RF-28) y solapamiento de horarios (RF-28) antes de asignar.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Voluntario asignado"),
-        @ApiResponse(responseCode = "400", description = "Aforo completo o solapamiento detectado"),
-        @ApiResponse(responseCode = "404", description = "Turno o voluntario no encontrado"),
-        @ApiResponse(responseCode = "409", description = "Voluntario ya asignado a este turno")
-    })
     @PostMapping("/volunteers")
     public ResponseEntity<?> assignVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -70,10 +58,6 @@ public class ShiftAssignmentController {
     }
 
     @Operation(summary = "Desasignar voluntario del turno")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Voluntario desasignado"),
-        @ApiResponse(responseCode = "404", description = "Turno o asignación no encontrada")
-    })
     @DeleteMapping("/volunteers/{volunteerId}")
     public ResponseEntity<?> unassignVolunteer(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -85,10 +69,6 @@ public class ShiftAssignmentController {
     }
 
     @Operation(summary = "Listar capitanes asignados al turno")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de capitanes"),
-        @ApiResponse(responseCode = "404", description = "Turno no encontrado")
-    })
     @GetMapping("/captains")
     public ResponseEntity<?> getCaptains(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -99,12 +79,6 @@ public class ShiftAssignmentController {
 
     @Operation(summary = "Asignar capitán al turno",
                description = "Valida solapamiento de horarios (RF-28) antes de asignar.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Capitán asignado"),
-        @ApiResponse(responseCode = "400", description = "Solapamiento detectado"),
-        @ApiResponse(responseCode = "404", description = "Turno o usuario no encontrado"),
-        @ApiResponse(responseCode = "409", description = "Capitán ya asignado a este turno")
-    })
     @PostMapping("/captains")
     public ResponseEntity<?> assignCaptain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -116,10 +90,6 @@ public class ShiftAssignmentController {
     }
 
     @Operation(summary = "Desasignar capitán del turno")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Capitán desasignado"),
-        @ApiResponse(responseCode = "404", description = "Turno o asignación no encontrada")
-    })
     @DeleteMapping("/captains/{userId}")
     public ResponseEntity<?> unassignCaptain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -131,11 +101,6 @@ public class ShiftAssignmentController {
     }
 
     @Operation(summary = "Registrar asistencia de un voluntario en un turno")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Asistencia actualizada"),
-        @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
-        @ApiResponse(responseCode = "404", description = "Turno o asignación no encontrada")
-    })
     @PutMapping("/attendance")
     public ResponseEntity<?> updateAttendance(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
