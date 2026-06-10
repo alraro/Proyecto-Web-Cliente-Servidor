@@ -1,47 +1,37 @@
-/**
- * Mapeador entre UserDTO y UserEntity.
- *
- * Autores:
- * - Alejandra Ortiz: 70%
- * - Alfonso Ramos: 30%
- */
 package es.grupo8.backend.mapper;
- 
+
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
- 
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class UserMapper extends MapperDTO<UserDTO, UserEntity> {
+public class UserMapper extends MapperDTO<UserResponseDto, UserEntity> {
 
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
 
     @Override
-    public UserDTO toDTO(UserEntity entity) {
-        UserDTO dto = new UserDTO();
-        dto.setIdUser(entity.getIdUser());
-        dto.setName(entity.getName());
-        dto.setEmail(entity.getEmail());
-        dto.setPhone(entity.getPhone());
-        dto.setAddress(entity.getAddress());
-        dto.setPostalCode(entity.getPostalCode());
-        dto.setRoles(resolveRoles(entity.getIdUser()));
-        // password nunca se mapea a la respuesta
-        return dto;
+    public UserResponseDto toDTO(UserEntity entity) {
+        if (entity == null) return null;
+
+        return new UserResponseDto(
+                entity.getIdUser(),
+                resolveRoles(entity.getIdUser()),
+                entity.getName(),
+                entity.getEmail(),
+                entity.getPhone(),
+                entity.getAddress(),
+                entity.getPostalCode()
+        );
     }
 
-    /**
-     * Devuelve todos los roles del usuario como lista.
-     * Si no tiene ninguno → ["PENDIENTE"].
-     */
     public List<String> resolveRoles(Integer userId) {
         List<String> roles = new ArrayList<>();
         if (userRepository.isAdmin(userId)) roles.add("ADMINISTRADOR");
@@ -53,10 +43,6 @@ public class UserMapper extends MapperDTO<UserDTO, UserEntity> {
         return roles;
     }
 
-    /**
-     * Devuelve el rol principal (el primero) como String simple.
-     * Útil para el filtrado de pendientes.
-     */
     public String resolveRole(Integer userId) {
         List<String> roles = resolveRoles(userId);
         return roles.get(0);

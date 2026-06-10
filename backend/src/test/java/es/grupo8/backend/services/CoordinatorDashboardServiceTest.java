@@ -30,8 +30,8 @@ import es.grupo8.backend.dao.PartnerEntityRepository;
 import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dao.VolunteerRepository;
 import es.grupo8.backend.dao.VolunteerShiftRepository;
-import es.grupo8.backend.dto.StoreDTO;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.mapper.CampaignEntityMapper;
@@ -69,11 +69,11 @@ class CoordinatorDashboardServiceTest {
     @Test
     void getCaptains_usesJpql() {
         List<UserEntity> entities = new ArrayList<>();
-        List<UserDTO> dtos = new ArrayList<>();
+        List<UserResponseDto> dtos = new ArrayList<>();
         when(captainRepository.findUsersByCampaignId(1)).thenReturn(entities);
         when(userMapper.toDTOList(entities)).thenReturn(dtos);
 
-        List<UserDTO> result = service.getCaptains(1);
+        List<UserResponseDto> result = service.getCaptains(1);
 
         assertSame(dtos, result);
         verify(captainRepository).findUsersByCampaignId(1);
@@ -90,11 +90,11 @@ class CoordinatorDashboardServiceTest {
     @Test
     void getMyStores_usesJpql() {
         List<Store> stores = new ArrayList<>();
-        List<StoreDTO> dtos = new ArrayList<>();
+        List<StoreResponseDto> dtos = new ArrayList<>();
         when(campaignStoreRepository.findStoresByCampaignId(3)).thenReturn(stores);
         when(storeMapper.toDTOList(stores)).thenReturn(dtos);
 
-        List<StoreDTO> result = service.getMyStores(3);
+        List<StoreResponseDto> result = service.getMyStores(3);
 
         assertSame(dtos, result);
         verify(campaignStoreRepository).findStoresByCampaignId(3);

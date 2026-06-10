@@ -7,11 +7,8 @@
  */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +20,7 @@ import es.grupo8.backend.dao.VolunteerShiftRepository;
 import es.grupo8.backend.dto.CampaignDTO;
 import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.dto.ShiftResponseDto;
-import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.dto.VolunteerShiftDTO;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Incident;
@@ -43,8 +40,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class CaptainDashboardService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CaptainRepository captainRepository;
     private final CampaignStoreRepository campaignStoreRepository;
@@ -78,7 +73,7 @@ public class CaptainDashboardService {
      * @throws IllegalArgumentException if campaignId is null
      */
     @Transactional(readOnly = true)
-    public List<StoreDTO> getMyStores(Integer userId, Integer campaignId) {
+    public List<StoreResponseDto> getMyStores(Integer userId, Integer campaignId) {
         if (campaignId == null) {
             throw new IllegalArgumentException("campaignId es obligatorio");
         }
@@ -154,10 +149,6 @@ public class CaptainDashboardService {
         incident.setDescription(description);
 
         Incident saved = incidentRepository.save(incident);
-
-        auditLog.info("ACTION=CREATE_INCIDENT userId={} timestamp={} incidentId={} campaignId={} storeId={}",
-                userId, Instant.now(), saved.getId(), campaignId, storeId);
-
         return saved.getId();
     }
 

@@ -23,8 +23,8 @@ public class CampaignAssignmentsDTO {
     private String campaignName;
 
     /** Users assigned as coordinators. */
-    private List<UserDTO> coordinators;
+    private List<UserResponseDto> coordinators;
 
     /** Users assigned as captains. */
-    private List<UserDTO> captains;
+    private List<UserResponseDto> captains;
 }

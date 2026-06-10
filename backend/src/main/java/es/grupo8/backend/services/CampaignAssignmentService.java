@@ -23,7 +23,7 @@ import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dto.AssignmentResultDTO;
 import es.grupo8.backend.dto.CampaignAssignmentsDTO;
 import es.grupo8.backend.dto.CampaignDTO;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
@@ -80,9 +80,9 @@ public class CampaignAssignmentService {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
 
-        List<UserDTO> coordinators = userMapper.toDTOList(
+        List<UserResponseDto> coordinators = userMapper.toDTOList(
                 coordinatorRepository.findUsersByCampaignId(campaignId));
-        List<UserDTO> captains = userMapper.toDTOList(
+        List<UserResponseDto> captains = userMapper.toDTOList(
                 captainRepository.findUsersByCampaignId(campaignId));
 
         auditLog.info("ACTION=GET_CAMPAIGN_ASSIGNMENTS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
@@ -102,7 +102,7 @@ public class CampaignAssignmentService {
      * @throws IllegalArgumentException if role is invalid
      */
     @Transactional(readOnly = true)
-    public List<UserDTO> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
+    public List<UserResponseDto> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
         if (!campaignRepository.existsById(campaignId)) {
             throw new NoSuchElementException("Campaign not found");
         }
@@ -110,7 +110,7 @@ public class CampaignAssignmentService {
             throw new IllegalArgumentException("Invalid role. Use COORDINATOR or CAPTAIN");
         }
 
-        List<UserDTO> result = "COORDINATOR".equalsIgnoreCase(role)
+        List<UserResponseDto> result = "COORDINATOR".equalsIgnoreCase(role)
                 ? userMapper.toDTOList(userRepository.findAvailableCoordinators(campaignId))
                 : userMapper.toDTOList(userRepository.findAvailableCaptains(campaignId));
 

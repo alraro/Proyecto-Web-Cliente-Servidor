@@ -84,10 +84,10 @@
         var token = '<%= token == null ? "" : token %>';
         var storeId = '<%= session.getAttribute("storeId") == null ? "" : session.getAttribute("storeId") %>';
 
-        document.getElementById("btn-edit").addEventListener("click", function () {
+        document.querySelector("#btn-edit").addEventListener("click", function () {
             window.location.href = "/edit";
         });
-        document.getElementById("btn-logout").addEventListener("click", function () {
+        document.querySelector("#btn-logout").addEventListener("click", function () {
             window.location.href = "/logout";
         });
 
@@ -98,14 +98,14 @@
         }
 
         function showError(msg) {
-            var el = document.getElementById("error-msg");
+            var el = document.querySelector("#error-msg");
             el.textContent = msg;
             el.classList.remove("hidden");
         }
 
         function renderStoreInfo(store) {
-            document.getElementById("store-title").textContent = store.name || "Tienda";
-            document.getElementById("card-tienda").classList.remove("hidden");
+            document.querySelector("#store-title").textContent = store.name || "Tienda";
+            document.querySelector("#card-tienda").classList.remove("hidden");
 
             var fields = [
                 { label: "Nombre",        value: store.name       },
@@ -116,7 +116,7 @@
                 { label: "Cadena",        value: store.chainName  }
             ];
 
-            var infoGrid = document.getElementById("info-grid");
+            var infoGrid = document.querySelector("#info-grid");
             infoGrid.innerHTML = "";
             fields.forEach(function (f) {
                 var item = document.createElement("div");
@@ -135,8 +135,8 @@
         }
 
         function renderShifts(shifts) {
-            document.getElementById("card-turnos").classList.remove("hidden");
-            var tbody = document.getElementById("shifts-tbody");
+            document.querySelector("#card-turnos").classList.remove("hidden");
+            var tbody = document.querySelector("#shifts-tbody");
 
             if (!shifts || !shifts.length) {
                 tbody.innerHTML = "";
