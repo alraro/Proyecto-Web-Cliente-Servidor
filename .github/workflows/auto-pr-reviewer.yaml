@@ -48,6 +48,7 @@ jobs:
       - name: Act on decision
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const { data: comments } = await github.rest.issues.listComments({
               ...context.repo,
@@ -62,6 +63,11 @@ jobs:
                          : 'REQUEST_REVIEW';
 
             if (decision === 'REJECT') {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: '❌ **PR rechazada automáticamente.** Los cambios presentan problemas que requieren corrección antes de continuar.'
+              });
               await github.rest.pulls.update({
                 ...context.repo,
                 pull_number: context.issue.number,
@@ -71,14 +77,42 @@ jobs:
               const titleMatch = lastComment.match(/## Merge Title: (.+)/);
               const descMatch = lastComment.match(/## Merge Description: (.+)/s);
 
-              await github.rest.pulls.merge({
+              // Aprobar formalmente la PR
+              await github.rest.pulls.createReview({
                 ...context.repo,
                 pull_number: context.issue.number,
-                merge_method: 'squash',
-                commit_title: (titleMatch?.[1] || '').trim() || 'Automated merge',
-                commit_message: (descMatch?.[1] || '').trim() || 'Merged automatically by OpenCode reviewer'
+                event: 'APPROVE',
+                body: '✅ Aprobado automáticamente por OpenCode.'
               });
+
+              // Intentar merge
+              try {
+                await github.rest.pulls.merge({
+                  ...context.repo,
+                  pull_number: context.issue.number,
+                  merge_method: 'squash',
+                  commit_title: (titleMatch?.[1] || '').trim() || 'Automated merge',
+                  commit_message: (descMatch?.[1] || '').trim() || 'Merged automatically by OpenCode reviewer'
+                });
+              } catch (mergeError) {
+                // Si el merge falla (protección de rama), asignar revisores
+                await github.rest.issues.createComment({
+                  ...context.repo,
+                  issue_number: context.issue.number,
+                  body: 'No se pudo mergear automáticamente. Se asignan revisores humanos.'
+                });
+                await github.rest.pulls.requestReviewers({
+                  ...context.repo,
+                  pull_number: context.issue.number,
+                  reviewers: ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101']
+                });
+              }
             } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: '⏳ **PR pendiente de revisión humana.** Se han asignado revisores para su evaluación.'
+              });
               await github.rest.pulls.requestReviewers({
                 ...context.repo,
                 pull_number: context.issue.number,
