@@ -1,3 +1,11 @@
+/*
+ * Estilos de los filtros de listados.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 15%
+ */
 .filters-bar {
     display: flex;
     flex-wrap: wrap;

@@ -1,8 +1,11 @@
 /**
- * Base generica para mapeo DTO-entidad.
+ * Clase base genérica para los mapeadores entre entidades y DTOs.
  *
  * Autores:
- * - Alejandra Ortiz: 100%
+ * - Hugo Herrero González: 50%
+ * - Fernando Luis Pinilla Molina: 25%
+ * - Alejandra Ortiz: 15%
+ * - IA Generativa: 10%
  */
 package es.grupo8.backend.mapper;
 import java.util.Set;

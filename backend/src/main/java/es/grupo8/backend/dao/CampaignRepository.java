@@ -1,3 +1,11 @@
+/**
+ * Repositorio JPA de acceso a datos de campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 70%
+ * - Alfonso Ramos Rojas: 20%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import java.time.LocalDate;

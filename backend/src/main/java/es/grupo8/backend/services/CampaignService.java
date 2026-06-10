@@ -1,3 +1,10 @@
+/**
+ * Servicio de lógica de negocio de campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
 import java.time.Instant;

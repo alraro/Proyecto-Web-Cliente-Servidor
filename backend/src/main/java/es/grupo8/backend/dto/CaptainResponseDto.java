@@ -1,3 +1,10 @@
+/**
+ * DTO de salida con datos de un capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 95%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.dto;
 
 import lombok.Data;

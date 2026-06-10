@@ -1,3 +1,10 @@
+/**
+ * Entidad JPA de solicitud de alta de capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.entity;
 
 import java.time.Instant;

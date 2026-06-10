@@ -1,28 +1,12 @@
+/**
+ * Controlador MVC auxiliar del módulo de capitán.
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.controllers;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
-@Controller
 public class CaptainClassController {
-
-	@GetMapping("/captain-dashboard")
-	public String captainDashboard() {
-		return "captain-dashboard";
-	}
-
-	@GetMapping("/captain-stores")
-	public String captainStores() {
-		return "captain-stores";
-	}
-
-	@GetMapping("/captain-incidents")
-	public String captainIncidents() {
-		return "captain-incidents";
-	}
-
-	@GetMapping("/captain-attendance")
-	public String captainAttendance() {
-		return "captain-attendance";
-	}
 }

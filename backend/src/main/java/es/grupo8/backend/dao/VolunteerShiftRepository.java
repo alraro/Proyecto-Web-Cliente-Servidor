@@ -1,3 +1,12 @@
+/**
+ * Repositorio JPA de turnos de voluntarios.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 50%
+ * - Fernando Luis Pinilla Molina: 20%
+ * - Alfonso Ramos Rojas: 15%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.dao;
 
 import java.time.LocalDate;
@@ -16,6 +25,14 @@ import es.grupo8.backend.entity.VolunteerShiftId;
 
 @Repository
 public interface VolunteerShiftRepository extends JpaRepository<VolunteerShift, VolunteerShiftId> {
+
+    /** Volunteer shifts of a campaign, optionally narrowed to a single store (storeId null = all stores). */
+    @Query("SELECT vs FROM VolunteerShift vs " +
+           "WHERE vs.id.idCampaign = :campaignId " +
+           "AND (:storeId IS NULL OR vs.id.idStore = :storeId)")
+    List<VolunteerShift> findByCampaignAndOptionalStore(
+            @Param("campaignId") Integer campaignId,
+            @Param("storeId") Integer storeId);
 
     @Query("SELECT vs FROM VolunteerShift vs " +
            "WHERE vs.id.idCampaign = :campaignId " +

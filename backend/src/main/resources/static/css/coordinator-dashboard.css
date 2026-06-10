@@ -1,3 +1,11 @@
+/*
+ * Estilos del panel del coordinador.
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 5%
+ */
 /* Coordinator dashboard — page-specific overrides */
 
 .icon-teal { background: var(--color-teal-bg); color: var(--color-teal); }

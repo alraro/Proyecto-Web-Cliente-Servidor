@@ -1,3 +1,11 @@
+/**
+ * Controlador MVC para la asignación de turnos.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 75%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
 import java.util.Map;
