@@ -9,6 +9,8 @@
  */
 package es.grupo8.backend.controllers;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.ResponsibleStoreService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -26,6 +29,9 @@ public class ViewsController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private ResponsibleStoreService responsibleStoreService;
 
     // Pagina de inicio, sirve tanto el / como el index, es lo mismo
 	@GetMapping({"/", "/index"})
@@ -216,7 +222,24 @@ public class ViewsController {
 	}
 
 	@GetMapping("/responsible-store")
-    public String responsibleStore() {
+    public String responsibleStore(HttpSession session, Model model) {
+        String role = (String) session.getAttribute("role");
+        if (!"RESPONSABLE_TIENDA".equals(role)) {
+            return "redirect:/login";
+        }
+        Integer storeId = (Integer) session.getAttribute("storeId");
+        Integer userId = (Integer) session.getAttribute("userID");
+        if (storeId != null && userId != null) {
+            try {
+                Map<String, Object> detail = responsibleStoreService.getStoreDetail(storeId, userId);
+                model.addAttribute("store", detail);
+                model.addAttribute("scheduledShifts", detail.get("scheduledShifts"));
+            } catch (Exception e) {
+                model.addAttribute("storeError", "No se pudo cargar la información de la tienda.");
+            }
+        } else {
+            model.addAttribute("storeError", "No tienes ninguna tienda asignada. Contacta con el administrador.");
+        }
         return "responsible-store";
     }
 

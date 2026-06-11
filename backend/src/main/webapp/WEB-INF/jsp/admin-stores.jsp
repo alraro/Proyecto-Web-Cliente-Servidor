@@ -1,20 +1,54 @@
 <%--
-    Pagina de administracion de tiendas.
+    Pagina de administracion de tiendas (SSR).
 
     Autores:
     - Alejandra Ortiz: 80%
     - IA Generativa: 20%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="es.grupo8.backend.dto.StoreResponseDto, es.grupo8.backend.dto.ChainResponseDto, es.grupo8.backend.entity.GeographicZone, es.grupo8.backend.entity.Locality, java.util.List" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
 
-    if (token == null || !"ADMINISTRADOR".equals(role)) {
+    if (!"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
+
+    List<StoreResponseDto> stores = (List<StoreResponseDto>) request.getAttribute("stores");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer currentSize = (Integer) request.getAttribute("currentSize");
+    Integer selectedChainId = (Integer) request.getAttribute("selectedChainId");
+    Integer selectedLocalityId = (Integer) request.getAttribute("selectedLocalityId");
+    Integer selectedZoneId = (Integer) request.getAttribute("selectedZoneId");
+
+    List<ChainResponseDto> chains = (List<ChainResponseDto>) request.getAttribute("chains");
+    List<GeographicZone> zones = (List<GeographicZone>) request.getAttribute("zones");
+    List<Locality> localities = (List<Locality>) request.getAttribute("localities");
+
+    Boolean showForm = (Boolean) request.getAttribute("showForm");
+    Boolean isCreating = (Boolean) request.getAttribute("isCreating");
+    StoreResponseDto editEntity = (StoreResponseDto) request.getAttribute("editEntity");
+
+    if (stores == null) stores = List.of();
+    if (currentPage == null) currentPage = 0;
+    if (totalPages == null) totalPages = 1;
+    if (currentSize == null) currentSize = 20;
+    if (chains == null) chains = List.of();
+    if (zones == null) zones = List.of();
+    if (localities == null) localities = List.of();
+    if (showForm == null) showForm = false;
+    if (isCreating == null) isCreating = false;
+
+    String flashSuccess = (String) request.getAttribute("success");
+    String flashError = (String) request.getAttribute("error");
+
+    String baseFilterUrl = "/admin-stores?size=" + currentSize;
+    if (selectedChainId != null) baseFilterUrl += "&chainId=" + selectedChainId;
+    if (selectedLocalityId != null) baseFilterUrl += "&localityId=" + selectedLocalityId;
+    if (selectedZoneId != null) baseFilterUrl += "&zoneId=" + selectedZoneId;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +60,6 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/admin-stores.css">
 </head>
 <body>
 
@@ -39,34 +72,111 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper" aria-label="Stores management page">
     <div class="page-header">
-        <a href="/admin" class="back-link-inline">← Volver al panel</a>
+        <a href="/admin" class="back-link-inline">&larr; Volver al panel</a>
         <h1>Tiendas</h1>
-        <p>Gestión de tiendas asociadas a cadenas de supermercados.</p>
+        <p>Gestion de tiendas asociadas a cadenas de supermercados.</p>
     </div>
+
+    <% if (flashSuccess != null) { %>
+    <div class="toast toast-success" id="flash-message"><%= flashSuccess %></div>
+    <% } else if (flashError != null) { %>
+    <div class="toast toast-error" id="flash-message"><%= flashError %></div>
+    <% } %>
+
+    <% if (showForm) { %>
+    <div class="card">
+        <div class="card-header">
+            <h2><%= isCreating ? "Nueva tienda" : "Editar tienda" %></h2>
+        </div>
+        <form method="POST" action="/admin-stores/guardar">
+            <% if (!isCreating && editEntity != null) { %>
+            <input type="hidden" name="id" value="<%= editEntity.id() %>">
+            <% } %>
+            <div class="form-group">
+                <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
+                <input type="text" id="input-nombre" name="nombre" maxlength="255" required
+                       placeholder="Nombre de la tienda"
+                       value="<%= editEntity != null ? editEntity.name() : "" %>">
+            </div>
+            <div class="form-group">
+                <label for="input-domicilio">Domicilio</label>
+                <input type="text" id="input-domicilio" name="domicilio" maxlength="500"
+                       placeholder="Calle, numero..."
+                       value="<%= editEntity != null && editEntity.address() != null ? editEntity.address() : "" %>">
+            </div>
+            <div class="form-group">
+                <label for="input-cp">Codigo postal</label>
+                <input type="text" id="input-cp" name="cp" maxlength="5"
+                       placeholder="Ej: 28001"
+                       value="<%= editEntity != null && editEntity.postalCode() != null ? editEntity.postalCode() : "" %>">
+            </div>
+            <div class="form-group">
+                <label for="input-chain">Cadena</label>
+                <select id="input-chain" name="chainId">
+                    <option value="">Sin cadena asignada</option>
+                    <% for (ChainResponseDto c : chains) { %>
+                    <option value="<%= c.id() %>"
+                        <%= editEntity != null && editEntity.chainId() != null && editEntity.chainId().equals(c.id()) ? "selected" : "" %>>
+                        <%= c.name() %>
+                    </option>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="/admin-stores" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    <% } %>
 
     <div class="card">
         <div class="card-header">
             <h2>Listado de tiendas</h2>
             <div class="card-actions">
-                <button id="btn-export-stores" class="btn btn-secondary">Exportar datos</button>
-                <button class="btn btn-primary" id="btn-nueva-tienda">+ Nueva tienda</button>
+                <a href="/admin-stores?crear=1" class="btn btn-primary">+ Nueva tienda</a>
             </div>
         </div>
 
-        <div class="filters-bar">
-            <select id="filter-zone"><option value="">Todas las zonas</option></select>
-            <select id="filter-locality"><option value="">Todas las localidades</option></select>
-            <select id="filter-chain"><option value="">Todas las cadenas</option></select>
-            <button type="button" id="btn-apply-filters">Filtrar</button>
-            <button type="button" class="btn-clear" id="btn-clear-filters">Limpiar</button>
-        </div>
+        <form method="GET" action="/admin-stores" class="filters-bar">
+            <select id="filter-zone" name="zoneId">
+                <option value="">Todas las zonas</option>
+                <% for (GeographicZone z : zones) { %>
+                <option value="<%= z.getId() %>"
+                    <%= selectedZoneId != null && selectedZoneId.equals(z.getId()) ? "selected" : "" %>>
+                    <%= z.getName() %>
+                </option>
+                <% } %>
+            </select>
+            <select id="filter-locality" name="localityId">
+                <option value="">Todas las localidades</option>
+                <% for (Locality l : localities) { %>
+                <option value="<%= l.getId() %>"
+                    <%= selectedLocalityId != null && selectedLocalityId.equals(l.getId()) ? "selected" : "" %>
+                    data-zone="<%= l.getIdZone() != null ? l.getIdZone().getId() : "" %>">
+                    <%= l.getName() %>
+                </option>
+                <% } %>
+            </select>
+            <select name="chainId">
+                <option value="">Todas las cadenas</option>
+                <% for (ChainResponseDto c : chains) { %>
+                <option value="<%= c.id() %>"
+                    <%= selectedChainId != null && selectedChainId.equals(c.id()) ? "selected" : "" %>>
+                    <%= c.name() %>
+                </option>
+                <% } %>
+            </select>
+            <button type="submit" class="btn">Filtrar</button>
+            <a href="/admin-stores" class="btn-clear">Limpiar</a>
+        </form>
 
         <div class="table-wrap">
             <table>
@@ -82,304 +192,84 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="stores-tbody">
-                    <tr><td colspan="8" class="table-empty">Cargando tiendas...</td></tr>
+                <tbody>
+                    <% if (stores.isEmpty()) { %>
+                    <tr>
+                        <td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td>
+                    </tr>
+                    <% } else { %>
+                        <% for (StoreResponseDto s : stores) { %>
+                        <tr>
+                            <td><%= s.id() %></td>
+                            <td><strong><%= s.name() %></strong></td>
+                            <td><%= s.address() != null ? s.address() : "&mdash;" %></td>
+                            <td><%= s.locality() != null ? s.locality() : "&mdash;" %></td>
+                            <td><%= s.postalCode() != null ? s.postalCode() : "&mdash;" %></td>
+                            <td><%= s.zone() != null ? s.zone() : "&mdash;" %></td>
+                            <td><%= s.chainName() != null ? s.chainName() : "&mdash;" %></td>
+                            <td>
+                                <div class="td-actions">
+                                    <a href="/admin-stores?editar=<%= s.id() %><%= selectedZoneId != null ? "&zoneId=" + selectedZoneId : "" %><%= selectedLocalityId != null ? "&localityId=" + selectedLocalityId : "" %><%= selectedChainId != null ? "&chainId=" + selectedChainId : "" %>" class="btn btn-edit btn-sm">Editar</a>
+                                    <form method="POST" action="/admin-stores/eliminar/<%= s.id() %>"
+                                          style="display:inline"
+                                          onsubmit="return confirm('&iquest;Eliminar la tienda &quot;<%= s.name() %>&quot;? Esta acci&oacute;n no se puede deshacer.')">
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% } %>
+                    <% } %>
                 </tbody>
             </table>
         </div>
 
         <div class="pagination">
-            <button type="button" id="btn-prev-page">← Anterior</button>
+            <% if (currentPage > 0) { %>
+            <a href="<%= baseFilterUrl %>&page=<%= currentPage - 1 %>" class="btn btn-secondary">&larr; Anterior</a>
+            <% } else { %>
+            <button class="btn btn-secondary" disabled>&larr; Anterior</button>
+            <% } %>
             <span class="pagination-info">
-                Página <span id="current-page">1</span> de <span id="total-pages">1</span>
+                Pagina <%= currentPage + 1 %> de <%= totalPages %>
             </span>
-            <button type="button" id="btn-next-page">Siguiente →</button>
-            <select class="pagination-select" id="page-size-select">
-                <option value="20">20 por página</option>
-                <option value="50">50 por página</option>
-                <option value="100">100 por página</option>
+            <select class="pagination-select" id="page-size-select"
+                    onchange="window.location.href='<%= baseFilterUrl %>&page=0&size=' + this.value">
+                <option value="20" <%= currentSize == 20 ? "selected" : "" %>>20 por pagina</option>
+                <option value="50" <%= currentSize == 50 ? "selected" : "" %>>50 por pagina</option>
+                <option value="100" <%= currentSize == 100 ? "selected" : "" %>>100 por pagina</option>
             </select>
+            <% if (currentPage + 1 < totalPages) { %>
+            <a href="<%= baseFilterUrl %>&page=<%= currentPage + 1 %>" class="btn btn-secondary">Siguiente &rarr;</a>
+            <% } else { %>
+            <button class="btn btn-secondary" disabled>Siguiente &rarr;</button>
+            <% } %>
         </div>
     </div>
 </main>
 
-<div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal modal-store" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h3 id="modal-title">Nueva tienda</h3>
-
-        <div class="form-group">
-            <label for="input-nombre">Nombre <span class="required-asterisk">*</span></label>
-            <input type="text" id="input-nombre" placeholder="Nombre de la tienda" maxlength="255">
-        </div>
-        <div class="form-group">
-            <label for="input-domicilio">Domicilio</label>
-            <input type="text" id="input-domicilio" placeholder="Calle, número..." maxlength="500">
-        </div>
-        <div class="form-group">
-            <label for="input-cp">Código postal</label>
-            <input type="text" id="input-cp" placeholder="Ej: 28001" maxlength="5">
-        </div>
-        <div class="form-group">
-            <label for="input-chain">Cadena</label>
-            <select id="input-chain">
-                <option value="">Sin cadena asignada</option>
-            </select>
-        </div>
-
-        <p class="form-message" id="modal-error"></p>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
-            <button class="btn btn-primary" id="btn-modal-save">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<div class="toast-container" id="toast-container"></div>
-
 <script>
     (function () {
-        var token = '<%= token == null ? "" : token %>';
-
-        function authHeaders() {
-            return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
+        var msg = document.getElementById("flash-message");
+        if (msg) {
+            setTimeout(function () { msg.style.opacity = "0"; }, 3000);
+            setTimeout(function () { msg.remove(); }, 3500);
         }
 
-        function escHtml(v) {
-            return String(v == null ? "" : v)
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function showToast(msg, type) {
-            var container = document.querySelector("#toast-container");
-            var toast = document.createElement("div");
-            toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
-            toast.textContent = msg;
-            container.appendChild(toast);
-            setTimeout(function () { toast.remove(); }, 3500);
-        }
-
-        var allChains = [], allLocalities = [], allZones = [];
-
-        function loadAuxData() {
-            return Promise.all([
-                fetch("/api/chains",     { headers: authHeaders() }).then(function (r) { return r.ok ? r.json() : []; }),
-                fetch("/api/localities", { headers: authHeaders() }).then(function (r) { return r.ok ? r.json() : []; }),
-                fetch("/api/zones",      { headers: authHeaders() }).then(function (r) { return r.ok ? r.json() : []; })
-            ]).then(function (res) {
-                allChains = res[0]; allLocalities = res[1]; allZones = res[2];
-
-                var fz = document.querySelector("#filter-zone");
-                allZones.forEach(function (z) {
-                    var o = document.createElement("option"); o.value = z.id; o.textContent = z.name; fz.appendChild(o);
-                });
-                populateLocalities("");
-
-                var fc = document.querySelector("#filter-chain");
-                var fch = document.querySelector("#input-chain");
-                allChains.forEach(function (c) {
-                    [fc, fch].forEach(function (sel) {
-                        var o = document.createElement("option"); o.value = c.id; o.textContent = c.name; sel.appendChild(o);
-                    });
+        var zoneSelect = document.getElementById("filter-zone");
+        var locSelect = document.getElementById("filter-locality");
+        if (zoneSelect && locSelect) {
+            zoneSelect.addEventListener("change", function () {
+                var zoneId = this.value;
+                locSelect.value = "";
+                Array.from(locSelect.options).forEach(function (o) {
+                    if (o.value === "") return;
+                    var oz = o.getAttribute("data-zone");
+                    o.style.display = (!zoneId || oz === zoneId) ? "" : "none";
                 });
             });
+            zoneSelect.dispatchEvent(new Event("change"));
         }
-
-        document.querySelector("#filter-zone").addEventListener("change", function () {
-            document.querySelector("#filter-locality").value = "";
-            populateLocalities(this.value);
-        });
-
-        function populateLocalities(zoneId) {
-            var sel = document.querySelector("#filter-locality");
-            var prev = sel.value;
-            sel.innerHTML = '<option value="">Todas las localidades</option>';
-            var lista = zoneId ? allLocalities.filter(function (l) { return String(l.zoneId) === String(zoneId); }) : allLocalities;
-            lista.forEach(function (l) {
-                var o = document.createElement("option"); o.value = l.id; o.textContent = l.name; sel.appendChild(o);
-            });
-            if (prev && lista.some(function (l) { return String(l.id) === String(prev); })) sel.value = prev;
-        }
-
-        var currentPage = 0, pageSize = 20, totalPages = 1;
-
-        function renderTable(stores) {
-            var tbody = document.querySelector("#stores-tbody");
-            tbody.innerHTML = "";
-            if (!stores.length) {
-                tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No hay tiendas que coincidan con los filtros.</td></tr>';
-                return;
-            }
-            stores.forEach(function (s) {
-                var tr = document.createElement("tr");
-
-                var td1 = document.createElement("td"); td1.textContent = s.id; tr.appendChild(td1);
-
-                var td2 = document.createElement("td");
-                var strong = document.createElement("strong"); strong.textContent = escHtml(s.name);
-                td2.appendChild(strong); tr.appendChild(td2);
-
-                var td3 = document.createElement("td"); td3.textContent = escHtml(s.address || "\u2014"); tr.appendChild(td3);
-                var td4 = document.createElement("td"); td4.textContent = escHtml(s.locality || "\u2014"); tr.appendChild(td4);
-                var td5 = document.createElement("td"); td5.textContent = escHtml(s.postalCode || "\u2014"); tr.appendChild(td5);
-                var td6 = document.createElement("td"); td6.textContent = escHtml(s.zone || "\u2014"); tr.appendChild(td6);
-                var td7 = document.createElement("td"); td7.textContent = escHtml(s.chainName || "\u2014"); tr.appendChild(td7);
-
-                var td8 = document.createElement("td");
-                var div = document.createElement("div"); div.className = "td-actions";
-
-                var btnEdit = document.createElement("button");
-                btnEdit.className = "btn btn-edit btn-sm";
-                btnEdit.setAttribute("data-action", "edit");
-                btnEdit.setAttribute("data-store-id", s.id);
-                btnEdit.textContent = "Editar";
-                div.appendChild(btnEdit);
-
-                var btnDelete = document.createElement("button");
-                btnDelete.className = "btn btn-danger btn-sm";
-                btnDelete.setAttribute("data-action", "delete");
-                btnDelete.setAttribute("data-store-id", s.id);
-                btnDelete.setAttribute("data-store-name", escHtml(s.name));
-                btnDelete.textContent = "Eliminar";
-                div.appendChild(btnDelete);
-
-                td8.appendChild(div); tr.appendChild(td8);
-                tbody.appendChild(tr);
-            });
-        }
-
-        function loadStores(page) {
-            page = page || 0;
-            var params = new URLSearchParams();
-            var chainId = document.querySelector("#filter-chain").value;
-            var locId   = document.querySelector("#filter-locality").value;
-            var zoneId  = document.querySelector("#filter-zone").value;
-            if (chainId) params.append("chainId", chainId);
-            if (locId)   params.append("localityId", locId);
-            if (zoneId)  params.append("zoneId", zoneId);
-            params.append("page", page); params.append("size", pageSize);
-
-            fetch("/api/stores?" + params, { headers: authHeaders() })
-                .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { return null; }
-                    if (!r.ok) throw new Error();
-                    return r.json();
-                })
-                .then(function (d) {
-                    if (!d) return;
-                    currentPage = page; totalPages = d.totalPages || 1;
-                    document.querySelector("#current-page").textContent = currentPage + 1;
-                    document.querySelector("#total-pages").textContent  = totalPages;
-                    document.querySelector("#btn-prev-page").disabled = currentPage === 0;
-                    document.querySelector("#btn-next-page").disabled = currentPage >= totalPages - 1;
-                    renderTable(d.content || []);
-                })
-                .catch(function () {
-                    document.querySelector("#stores-tbody").innerHTML =
-                        '<tr><td colspan="8" class="table-empty">No se puede conectar con el servidor.</td></tr>';
-                });
-        }
-
-        document.querySelector("#btn-apply-filters").addEventListener("click", function () { loadStores(0); });
-        document.querySelector("#btn-clear-filters").addEventListener("click", function () {
-            document.querySelector("#filter-zone").value = "";
-            document.querySelector("#filter-locality").value = "";
-            document.querySelector("#filter-chain").value = "";
-            populateLocalities(""); loadStores(0);
-        });
-        document.querySelector("#btn-prev-page").addEventListener("click", function () { if (currentPage > 0) loadStores(currentPage - 1); });
-        document.querySelector("#btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
-        document.querySelector("#page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
-        document.querySelector("#btn-export-stores").addEventListener("click", function () {
-            fetch("/api/export/stores", { headers: authHeaders() })
-                .then(function (r) { return r.blob(); })
-                .then(function (blob) {
-                    var url = URL.createObjectURL(blob);
-                    var a = document.createElement("a");
-                    a.href = url;
-                    a.download = "stores_export.xlsx";
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-        });
-
-        document.querySelector("#stores-tbody").addEventListener("click", function (e) {
-            var btn = e.target.closest("button");
-            if (!btn) return;
-            var id = parseInt(btn.getAttribute("data-store-id"));
-            if (btn.getAttribute("data-action") === "edit")   openEdit(id);
-            if (btn.getAttribute("data-action") === "delete") deleteStore(id, btn.getAttribute("data-store-name"));
-        });
-
-        var editingId = null;
-
-        function openModal(titulo) {
-            document.querySelector("#modal-title").textContent = titulo;
-            document.querySelector("#modal-error").textContent = "";
-            document.querySelector("#modal-backdrop").classList.add("open");
-            document.querySelector("#input-nombre").focus();
-        }
-
-        function closeModal() {
-            document.querySelector("#modal-backdrop").classList.remove("open");
-            ["input-nombre","input-domicilio","input-cp"].forEach(function (id) { document.querySelector("#" + id).value = ""; });
-            document.querySelector("#input-chain").value = "";
-            document.querySelector("#modal-error").textContent = "";
-            editingId = null;
-        }
-
-        function openEdit(id) {
-            fetch("/api/stores/" + id, { headers: authHeaders() })
-                .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-                .then(function (s) {
-                    editingId = s.id;
-                    document.querySelector("#input-nombre").value    = s.name || "";
-                    document.querySelector("#input-domicilio").value = s.address || "";
-                    document.querySelector("#input-cp").value        = s.postalCode || "";
-                    document.querySelector("#input-chain").value     = s.chainId || "";
-                    openModal("Editar tienda");
-                })
-                .catch(function () { showToast("Error al cargar la tienda.", "error"); });
-        }
-
-        document.querySelector("#btn-nueva-tienda").addEventListener("click", function () { editingId = null; openModal("Nueva tienda"); });
-        document.querySelector("#btn-modal-cancel").addEventListener("click", closeModal);
-        document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
-            if (e.target === document.querySelector("#modal-backdrop")) closeModal();
-        });
-
-        document.querySelector("#btn-modal-save").addEventListener("click", function () {
-            var nombre  = document.querySelector("#input-nombre").value.trim();
-            var dom     = document.querySelector("#input-domicilio").value.trim();
-            var cp      = document.querySelector("#input-cp").value.trim();
-            var chainId = document.querySelector("#input-chain").value;
-            var errEl   = document.querySelector("#modal-error");
-
-            if (!nombre) { errEl.textContent = "El nombre es obligatorio."; return; }
-            if (nombre.length > 255) { errEl.textContent = "El nombre no puede superar 255 caracteres."; return; }
-            if (cp && !/^\d{5}$/.test(cp)) { errEl.textContent = "El código postal debe tener exactamente 5 dígitos."; return; }
-
-            var url = editingId ? "/api/stores/" + editingId : "/api/stores";
-            fetch(url, { method: editingId ? "PUT" : "POST", headers: authHeaders(),
-                body: JSON.stringify({ name: nombre, address: dom || null, postalCode: cp || null, chainId: chainId ? parseInt(chainId) : null }) })
-                .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
-                .then(function (r) {
-                    if (!r.ok) { errEl.textContent = r.data.message || "Error al guardar."; return; }
-                    closeModal(); showToast(editingId ? "Tienda actualizada." : "Tienda creada."); loadStores(currentPage);
-                })
-                .catch(function () { errEl.textContent = "Error de conexión."; });
-        });
-
-        function deleteStore(id, nombre) {
-            if (!confirm("¿Eliminar la tienda \"" + nombre + "\"?\nEsta acción no se puede deshacer.")) return;
-            fetch("/api/stores/" + id, { method: "DELETE", headers: authHeaders() })
-                .then(function (r) {
-                    if (!r.ok) r.json().then(function (d) { showToast(d.message || "Error al eliminar.", "error"); });
-                    else { showToast("Tienda eliminada."); loadStores(currentPage); }
-                })
-                .catch(function () { showToast("Error de conexión.", "error"); });
-        }
-
-        loadAuxData().then(function () { loadStores(0); });
     }());
 </script>
 </body>
