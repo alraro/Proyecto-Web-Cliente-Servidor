@@ -47,6 +47,7 @@
         <div class="card-header">
             <h2>Listado de usuarios</h2>
             <div class="card-actions">
+                <a href="/api/export/users" class="btn btn-secondary">Exportar datos</a>
                 <button type="button" id="btn-refresh" class="btn btn-edit btn-sm">↻ Actualizar</button>
             </div>
         </div>

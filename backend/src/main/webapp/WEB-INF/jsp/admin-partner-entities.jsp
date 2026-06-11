@@ -123,7 +123,7 @@
         <div class="card-header">
             <h2>Listado de entidades colaboradoras</h2>
             <div class="card-actions">
-                <button class="btn btn-secondary" disabled title="Próximamente">Exportar datos</button>
+                <a href="/api/export/partner-entities" class="btn btn-secondary">Exportar datos</a>
                 <a href="/admin-partner-entities?crear=1" class="btn btn-primary">+ Nueva entidad</a>
             </div>
         </div>

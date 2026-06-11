@@ -54,7 +54,7 @@
         <div class="card-header">
             <h2>Listado de cadenas</h2>
             <div class="card-actions">
-                <button id="btn-export-chains" class="btn btn-secondary">Exportar datos</button>
+                <a href="/api/export/chains" class="btn btn-secondary">Exportar datos</a>
                 <button class="btn btn-primary" id="btn-nueva">+ Nueva cadena</button>
             </div>
         </div>
@@ -237,18 +237,6 @@
         document.querySelector("#btn-cancelar").addEventListener("click", closeModal);
         document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
             if (e.target === document.querySelector("#modal-backdrop")) closeModal();
-        });
-        document.querySelector("#btn-export-chains").addEventListener("click", function () {
-            fetch("/api/export/chains", { headers: authHeaders() })
-                .then(function (r) { return r.blob(); })
-                .then(function (blob) {
-                    var url = URL.createObjectURL(blob);
-                    var a = document.createElement("a");
-                    a.href = url;
-                    a.download = "chains_export.xlsx";
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
         });
 
         document.querySelector("#btn-guardar").addEventListener("click", function () {

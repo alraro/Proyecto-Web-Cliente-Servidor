@@ -55,7 +55,7 @@
         <div class="card-header">
             <h2>Listado de tiendas</h2>
             <div class="card-actions">
-                <button id="btn-export-stores" class="btn btn-secondary">Exportar datos</button>
+                <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>
                 <button class="btn btn-primary" id="btn-nueva-tienda">+ Nueva tienda</button>
             </div>
         </div>
@@ -289,18 +289,6 @@
         document.querySelector("#btn-prev-page").addEventListener("click", function () { if (currentPage > 0) loadStores(currentPage - 1); });
         document.querySelector("#btn-next-page").addEventListener("click", function () { if (currentPage < totalPages - 1) loadStores(currentPage + 1); });
         document.querySelector("#page-size-select").addEventListener("change", function () { pageSize = parseInt(this.value); loadStores(0); });
-        document.querySelector("#btn-export-stores").addEventListener("click", function () {
-            fetch("/api/export/stores", { headers: authHeaders() })
-                .then(function (r) { return r.blob(); })
-                .then(function (blob) {
-                    var url = URL.createObjectURL(blob);
-                    var a = document.createElement("a");
-                    a.href = url;
-                    a.download = "stores_export.xlsx";
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-        });
 
         document.querySelector("#stores-tbody").addEventListener("click", function (e) {
             var btn = e.target.closest("button");
