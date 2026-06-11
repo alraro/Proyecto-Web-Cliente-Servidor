@@ -82,6 +82,7 @@
         <div class="card-header">
             <h2>Listado de usuarios</h2>
             <div class="card-actions">
+                <a href="/api/export/users" class="btn btn-secondary">Exportar datos</a>              
                 <a href="/admin-users" class="btn btn-edit btn-sm">&#8635; Actualizar</a>
             </div>
         </div>
