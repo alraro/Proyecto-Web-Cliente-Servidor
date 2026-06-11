@@ -1,5 +1,6 @@
 
 async function exportarExcel(resource) {
+    const API_BASE = 'http://localhost:8080';
     const btn = document.querySelector('.btn-export');
     const textoOriginal = btn.textContent;
 
