@@ -12,6 +12,7 @@ package es.grupo8.backend.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,14 +25,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import es.grupo8.backend.dao.GeographicZoneRepository;
+import es.grupo8.backend.dao.LocalityRepository;
 import es.grupo8.backend.dto.AdminDTO;
+import es.grupo8.backend.dto.ChainRequestDto;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.dto.StoreRequestDto;
+import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.dto.UserResponseDto;
+import es.grupo8.backend.dto.UserRoleRequestDto;
+import es.grupo8.backend.entity.GeographicZone;
+import es.grupo8.backend.entity.Locality;
 import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignService;
+import es.grupo8.backend.services.ChainService;
 import es.grupo8.backend.services.PartnerEntityService;
+import es.grupo8.backend.services.StoreService;
+import es.grupo8.backend.services.UserService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -48,6 +61,21 @@ public class AdminController {
 
     @Autowired
     private CampaignService campaignService;
+
+    @Autowired
+    private ChainService chainService;
+
+    @Autowired
+    private StoreService storeService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private LocalityRepository localityRepository;
+
+    @Autowired
+    private GeographicZoneRepository geographicZoneRepository;
 
     // Read-only campaigns list. The data comes through the model (SSR) so the JSP renders it server-side
     // instead of fetching it with JavaScript.
@@ -158,39 +186,331 @@ public class AdminController {
     }
 
     @GetMapping("/admin-chains")
-    public String adminChains(HttpSession session) {
+    public String adminChains(
+            HttpSession session,
+            @RequestParam(required = false) Integer crear,
+            @RequestParam(required = false) Integer editar,
+            Model model) {
+
         String role = (String) session.getAttribute("role");
         if (!"ADMINISTRADOR".equals(role)) {
             return "redirect:/login";
         }
+
+        model.addAttribute("chains", chainService.findAll());
+
+        if (crear != null) {
+            model.addAttribute("showForm", true);
+            model.addAttribute("isCreating", true);
+        } else if (editar != null) {
+            try {
+                model.addAttribute("editEntity", chainService.findById(editar));
+                model.addAttribute("showForm", true);
+            } catch (RuntimeException ignored) {
+            }
+        }
+
         return "admin-chains";
     }
 
-    @GetMapping("/admin-stores")
-    public String adminStores(HttpSession session) {
+    @PostMapping("/admin-chains/guardar")
+    public String saveChain(
+            HttpSession session,
+            @RequestParam(required = false) Integer id,
+            @RequestParam String nombre,
+            @RequestParam String codigo,
+            @RequestParam(required = false, defaultValue = "false") boolean participacion,
+            RedirectAttributes attr) {
+
         String role = (String) session.getAttribute("role");
         if (!"ADMINISTRADOR".equals(role)) {
             return "redirect:/login";
         }
+
+        ChainRequestDto dto = new ChainRequestDto();
+        dto.setName(nombre);
+        dto.setCode(codigo);
+        dto.setParticipation(participacion);
+
+        try {
+            if (id == null) {
+                chainService.create(dto);
+                attr.addFlashAttribute("success", "Cadena creada correctamente.");
+            } else {
+                chainService.update(id, dto);
+                attr.addFlashAttribute("success", "Cadena actualizada correctamente.");
+            }
+        } catch (IllegalArgumentException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-chains";
+    }
+
+    @PostMapping("/admin-chains/eliminar/{id}")
+    public String deleteChain(
+            HttpSession session,
+            @PathVariable Integer id,
+            RedirectAttributes attr) {
+
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role)) {
+            return "redirect:/login";
+        }
+
+        try {
+            chainService.delete(id);
+            attr.addFlashAttribute("success", "Cadena eliminada.");
+        } catch (RuntimeException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-chains";
+    }
+
+    @GetMapping("/admin-stores")
+    public String adminStores(
+            HttpSession session,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) Integer chainId,
+            @RequestParam(required = false) Integer localityId,
+            @RequestParam(required = false) Integer zoneId,
+            @RequestParam(required = false) Integer crear,
+            @RequestParam(required = false) Integer editar,
+            Model model) {
+
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role)) {
+            return "redirect:/login";
+        }
+
+        PaginatedResponse<StoreResponseDto> response =
+                storeService.findAll(chainId, localityId, zoneId, page, size);
+
+        model.addAttribute("stores", response.content());
+        model.addAttribute("currentPage", response.page());
+        model.addAttribute("totalPages", response.totalPages());
+        model.addAttribute("currentSize", size);
+        model.addAttribute("selectedChainId", chainId);
+        model.addAttribute("selectedLocalityId", localityId);
+        model.addAttribute("selectedZoneId", zoneId);
+
+        model.addAttribute("chains", chainService.findAll());
+
+        List<GeographicZone> allZones = geographicZoneRepository.findAll();
+        model.addAttribute("zones", allZones);
+
+        List<Locality> allLocalities = localityRepository.findAll();
+        if (zoneId != null) {
+            allLocalities = allLocalities.stream()
+                    .filter(l -> l.getIdZone() != null && zoneId.equals(l.getIdZone().getId()))
+                    .collect(Collectors.toList());
+        }
+        model.addAttribute("localities", allLocalities);
+
+        if (crear != null) {
+            model.addAttribute("showForm", true);
+            model.addAttribute("isCreating", true);
+        } else if (editar != null) {
+            try {
+                model.addAttribute("editEntity", storeService.findById(editar));
+                model.addAttribute("showForm", true);
+            } catch (RuntimeException ignored) {
+            }
+        }
+
         return "admin-stores";
     }
 
-    @GetMapping("/admin-validate-users")
-    public String adminValidateUsers(HttpSession session) {
+    @PostMapping("/admin-stores/guardar")
+    public String saveStore(
+            HttpSession session,
+            @RequestParam(required = false) Integer id,
+            @RequestParam String nombre,
+            @RequestParam(required = false) String domicilio,
+            @RequestParam(required = false) String cp,
+            @RequestParam(required = false) Integer chainId,
+            RedirectAttributes attr) {
+
         String role = (String) session.getAttribute("role");
         if (!"ADMINISTRADOR".equals(role)) {
             return "redirect:/login";
         }
+
+        StoreRequestDto dto = new StoreRequestDto();
+        dto.setName(nombre);
+        dto.setAddress(domicilio);
+        dto.setPostalCode(cp);
+        dto.setChainId(chainId);
+
+        try {
+            if (id == null) {
+                storeService.create(dto);
+                attr.addFlashAttribute("success", "Tienda creada correctamente.");
+            } else {
+                storeService.update(id, dto);
+                attr.addFlashAttribute("success", "Tienda actualizada correctamente.");
+            }
+        } catch (IllegalArgumentException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-stores";
+    }
+
+    @PostMapping("/admin-stores/eliminar/{id}")
+    public String deleteStore(
+            HttpSession session,
+            @PathVariable Integer id,
+            RedirectAttributes attr) {
+
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role)) {
+            return "redirect:/login";
+        }
+
+        try {
+            storeService.delete(id);
+            attr.addFlashAttribute("success", "Tienda eliminada.");
+        } catch (RuntimeException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-stores";
+    }
+
+    @GetMapping("/admin-validate-users")
+    public String adminValidateUsers(HttpSession session, Model model) {
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role)) {
+            return "redirect:/login";
+        }
+        model.addAttribute("pendingUsers", userService.getPendingUsersOrdered());
         return "admin-validate-users";
     }
 
-    @GetMapping("/admin-users")
-    public String adminUsers(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
+    @PostMapping("/admin-validate-users/aprobar/{id}")
+    public String approveUser(
+            HttpSession session,
+            @PathVariable Integer id,
+            @RequestParam String role,
+            RedirectAttributes attr) {
+
+        String sessionRole = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(sessionRole)) {
             return "redirect:/login";
         }
+
+        try {
+            UserRoleRequestDto dto = new UserRoleRequestDto();
+            dto.setRole(role);
+            userService.assignRole(id, dto);
+            attr.addFlashAttribute("success", "Usuario aprobado correctamente.");
+        } catch (Exception e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-validate-users";
+    }
+
+    @PostMapping("/admin-validate-users/rechazar/{id}")
+    public String rejectUser(
+            HttpSession session,
+            @PathVariable Integer id,
+            RedirectAttributes attr) {
+
+        String sessionRole = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(sessionRole)) {
+            return "redirect:/login";
+        }
+
+        try {
+            userService.deleteUser(id);
+            attr.addFlashAttribute("success", "Usuario rechazado y eliminado.");
+        } catch (RuntimeException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-validate-users";
+    }
+
+    @GetMapping("/admin-users")
+    public String adminUsers(
+            HttpSession session,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String role,
+            Model model) {
+
+        String sessionRole = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(sessionRole)) {
+            return "redirect:/login";
+        }
+
+        PaginatedResponse<UserResponseDto> response =
+                userService.getAllUsers(page, size, sort, search, role);
+
+        model.addAttribute("users", response.content());
+        model.addAttribute("currentPage", response.page());
+        model.addAttribute("totalPages", response.totalPages());
+        model.addAttribute("currentSize", size);
+        model.addAttribute("currentSearch", search);
+        model.addAttribute("currentRole", role);
+
+        if (sort == null) sort = "id,asc";
+        String[] parts = sort.split(",");
+        model.addAttribute("sortField", parts[0]);
+        model.addAttribute("sortOrder", parts.length > 1 ? parts[1] : "asc");
+
         return "admin-users";
+    }
+
+    @PostMapping("/admin-users/asignar-rol")
+    public String assignUserRole(
+            HttpSession session,
+            @RequestParam Integer userId,
+            @RequestParam String role,
+            RedirectAttributes attr) {
+
+        String sessionRole = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(sessionRole)) {
+            return "redirect:/login";
+        }
+
+        try {
+            UserRoleRequestDto dto = new UserRoleRequestDto();
+            dto.setRole(role);
+            userService.assignRole(userId, dto);
+            attr.addFlashAttribute("success", "Rol asignado correctamente.");
+        } catch (Exception e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-users";
+    }
+
+    @PostMapping("/admin-users/eliminar/{id}")
+    public String deleteUser(
+            HttpSession session,
+            @PathVariable Integer id,
+            RedirectAttributes attr) {
+
+        String sessionRole = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(sessionRole)) {
+            return "redirect:/login";
+        }
+
+        try {
+            userService.deleteUser(id);
+            attr.addFlashAttribute("success", "Usuario eliminado correctamente.");
+        } catch (RuntimeException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin-users";
     }
 
 
