@@ -138,10 +138,6 @@
             <h3>Incidencias</h3>
             <p>Visualiza todas las incidencias reportadas por capitanes.</p>
             <span class="menu-card-arrow">Ver incidencias &rarr;</span>
-    <p>Visualiza todas las incidencias reportadas por capitanes.</p>
-            <span class="menu-card-arrow">Ver incidencias →</span>
-isualiza todas las incidencias reportadas por capitanes.</p>
-            <span class="menu-card-arrow">Ver incidencias →</span>
         </a>
     </div>
 </main>

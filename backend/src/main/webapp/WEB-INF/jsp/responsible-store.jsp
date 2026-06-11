@@ -98,6 +98,7 @@
                 <thead>
                     <tr>
                         <th>Campana</th>
+                        <th>Voluntario</th>
                         <th>Hora fin</th>
                         <th>Asistencia</th>
                         <th>Notas</th>
@@ -106,12 +107,13 @@
                 <tbody>
                     <% if (scheduledShifts == null || scheduledShifts.isEmpty()) { %>
                     <tr>
-                        <td colspan="4" class="table-empty">No hay turnos programados.</td>
+                        <td colspan="5" class="table-empty">No hay turnos programados.</td>
                     </tr>
                     <% } else { %>
                         <% for (Map<String, Object> s : scheduledShifts) { %>
                         <tr>
                             <td><%= s.get("campaignName") != null ? s.get("campaignName") : "&mdash;" %></td>
+                            <td><%= s.get("volunteerName") != null ? s.get("volunteerName") : "&mdash;" %></td>
                             <td><%= s.get("endTime") != null ? s.get("endTime") : "&mdash;" %></td>
                             <td>
                                 <% Boolean attendance = (Boolean) s.get("attendance"); %>

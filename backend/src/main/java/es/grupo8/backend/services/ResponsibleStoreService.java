@@ -96,11 +96,9 @@ public class ResponsibleStoreService {
                 shift.put("attendance",   vs.getAttendance());
                 shift.put("notes",        vs.getNotes());
 
-                // Voluntario: se descomenta cuando la entidad Volunteer esté completa
-                // if (vs.getIdVolunteer() != null && vs.getIdVolunteer().getIdUser() != null) {
-                //     shift.put("volunteerId",   vs.getIdVolunteer().getIdUser().getIdUser());
-                //     shift.put("volunteerName", vs.getIdVolunteer().getIdUser().getName());
-                // }
+                if (vs.getIdVolunteer() != null) {
+                    shift.put("volunteerName", vs.getIdVolunteer().getName());
+                }
 
                 result.add(shift);
             }
