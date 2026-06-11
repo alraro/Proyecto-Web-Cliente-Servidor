@@ -7,17 +7,15 @@
  */
 package es.grupo8.backend.controllers.rest;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import es.grupo8.backend.dto.ChainDTO;
+import es.grupo8.backend.dto.ChainRequestDto;
+import es.grupo8.backend.dto.ChainResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.ChainService;
@@ -28,8 +26,6 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/chains")
 @AllArgsConstructor
 public class ChainController {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final ChainService chainService;
     private final AuthService authService;
@@ -46,18 +42,16 @@ public class ChainController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChainDTO>> getChains(
+    public ResponseEntity<List<ChainResponseDto>> getChains(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         checkAdmin(authHeader);
-        List<ChainDTO> chains = chainService.findAll();
-        auditLog.info("ACTION=LIST_CHAINS userId={} timestamp={} total={}",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), chains.size());
+        List<ChainResponseDto> chains = chainService.findAll();
         return ResponseEntity.ok(chains);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ChainDTO> getChain(
+    public ResponseEntity<ChainResponseDto> getChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
@@ -66,45 +60,51 @@ public class ChainController {
     }
 
     @PostMapping
-    public ResponseEntity<ChainDTO> createChain(
+    public ResponseEntity<ChainResponseDto> createChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) ChainDTO req) {
+            @RequestBody(required = false) ChainRequestDto req) {
 
         checkAdmin(authHeader);
-        ChainDTO created = chainService.create(req);
-        auditLog.info("ACTION=CREATE_CHAIN userId={} timestamp={} chainId={} name='{}' code='{}'",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), created.getId(), created.getName(), created.getCode());
+        ChainResponseDto created = chainService.create(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ChainDTO> updateChain(
+    public ResponseEntity<ChainResponseDto> updateChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
-            @RequestBody(required = false) ChainDTO req) {
+            @RequestBody(required = false) ChainRequestDto req) {
 
         checkAdmin(authHeader);
-        ChainDTO updated = chainService.update(id, req);
-        auditLog.info("ACTION=UPDATE_CHAIN userId={} timestamp={} chainId={} name='{}' code='{}'",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), updated.getId(), updated.getName(), updated.getCode());
+        ChainResponseDto updated = chainService.update(id, req);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteChain(
+    public ResponseEntity<Void> deleteChain(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
         checkAdmin(authHeader);
         chainService.delete(id);
-        auditLog.info("ACTION=DELETE_CHAIN userId={} timestamp={} chainId={}",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), id);
-        return ResponseEntity.ok(Map.of("message", "Chain deleted successfully"));
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
         return ResponseEntity.status(e.getStatus())
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("message", e.getMessage()));
     }
 }

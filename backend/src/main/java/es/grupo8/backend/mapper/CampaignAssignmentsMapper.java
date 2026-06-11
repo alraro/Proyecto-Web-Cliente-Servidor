@@ -10,7 +10,7 @@ package es.grupo8.backend.mapper;
 import java.util.List;
 
 import es.grupo8.backend.dto.CampaignAssignmentsDTO;
-import es.grupo8.backend.dto.UserDTO;
+import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class CampaignAssignmentsMapper extends MapperDTO<CampaignAssignmentsDTO,
      * @param captains     users assigned as captains
      * @return populated DTO
      */
-    public CampaignAssignmentsDTO toDTO(Campaign campaign, List<UserDTO> coordinators, List<UserDTO> captains) {
+    public CampaignAssignmentsDTO toDTO(Campaign campaign, List<UserResponseDto> coordinators, List<UserResponseDto> captains) {
         if (campaign == null) return null;
         CampaignAssignmentsDTO dto = new CampaignAssignmentsDTO();
         dto.setCampaignId(campaign.getId());

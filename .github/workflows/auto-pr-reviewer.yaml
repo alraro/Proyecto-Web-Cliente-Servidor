@@ -71,15 +71,11 @@ jobs:
                          : 'REQUEST_REVIEW';
 
             if (decision === 'REJECT') {
-              await github.rest.issues.createComment({
-                ...context.repo,
-                issue_number: context.issue.number,
-                body: '❌ **PR rechazada automáticamente.** Los cambios presentan problemas que requieren corrección antes de continuar.'
-              });
-              await github.rest.pulls.update({
+              await github.rest.pulls.createReview({
                 ...context.repo,
                 pull_number: context.issue.number,
-                state: 'closed'
+                event: 'REQUEST_CHANGES',
+                body: '❌ **Se requieren cambios.** Los problemas detectados deben corregirse antes de continuar. Corrige y haz push para re-evaluar automáticamente.'
               });
             } else if (decision === 'APPROVE') {
               const titleMatch = lastComment.match(/## Merge Title: (.+)/);

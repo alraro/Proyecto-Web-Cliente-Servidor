@@ -1,50 +1,57 @@
-/**
- * Mapeador entre StoreDTO y Store.
- *
- * Autores:
- * - Alejandra Ortiz: 80%
- * - IA Generativa: 20%
- */
 package es.grupo8.backend.mapper;
 
-import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.entity.ChainEntity;
 import es.grupo8.backend.entity.Locality;
 import es.grupo8.backend.entity.PostalCode;
 import org.springframework.stereotype.Component;
 
-// Recorre el código postal → la localidad → la zona geográfica para completar los campos calculados.
-
 @Component
-public class StoreMapper extends MapperDTO<StoreDTO, es.grupo8.backend.entity.Store> {
+public class StoreMapper extends MapperDTO<StoreResponseDto, es.grupo8.backend.entity.Store> {
 
     @Override
-    public StoreDTO toDTO(es.grupo8.backend.entity.Store store) {
-        StoreDTO dto = new StoreDTO();
-        dto.setId(store.getId());
-        dto.setName(store.getName());
-        dto.setAddress(store.getAddress());
+    public StoreResponseDto toDTO(es.grupo8.backend.entity.Store store) {
+        if (store == null) return null;
 
-        PostalCode pc = store.getPostalCode();
-        if (pc != null) {
-            dto.setPostalCode(pc.getPostalCode());
-            Locality locality = pc.getIdLocality();
+        String postalCodeValue = null;
+        String localityName = null;
+        Integer localityId = null;
+        String zoneName = null;
+        Integer zoneId = null;
+        Integer chainId = null;
+        String chainName = null;
+
+        PostalCode postalCode = store.getPostalCode();
+        if (postalCode != null) {
+            postalCodeValue = postalCode.getPostalCode();
+            Locality locality = postalCode.getIdLocality();
             if (locality != null) {
-                dto.setLocality(locality.getName());
-                dto.setLocalityId(locality.getId());
+                localityName = locality.getName();
+                localityId = locality.getId();
                 if (locality.getIdZone() != null) {
-                    dto.setZone(locality.getIdZone().getName());
-                    dto.setZoneId(locality.getIdZone().getId());
+                    zoneName = locality.getIdZone().getName();
+                    zoneId = locality.getIdZone().getId();
                 }
             }
         }
 
         ChainEntity chain = store.getIdChain();
         if (chain != null) {
-            dto.setChainId(chain.getIdChain());
-            dto.setChainName(chain.getName());
+            chainId = chain.getIdChain();
+            chainName = chain.getName();
         }
 
-        return dto;
+        return new StoreResponseDto(
+                store.getId(),
+                store.getName(),
+                store.getAddress(),
+                postalCodeValue,
+                chainId,
+                localityName,
+                localityId,
+                zoneName,
+                zoneId,
+                chainName
+        );
     }
 }

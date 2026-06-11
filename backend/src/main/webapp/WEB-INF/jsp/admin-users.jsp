@@ -113,7 +113,7 @@
     }
 
     function showToast(msg, type) {
-        var c = document.getElementById("toast-container");
+        var c = document.querySelector("#toast-container");
         var t = document.createElement("div");
         t.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
         t.textContent = msg;
@@ -130,10 +130,10 @@
         return span;
     }
 
-    function renderRow(u) {
+    function renderRow(u, displayId) {
         var tr = document.createElement("tr");
 
-        var td1 = document.createElement("td"); td1.textContent = u.idUser; tr.appendChild(td1);
+        var td1 = document.createElement("td"); td1.textContent = displayId; tr.appendChild(td1);
 
         var td2 = document.createElement("td");
         var strong = document.createElement("strong"); strong.textContent = escHtml(u.name);
@@ -167,7 +167,7 @@
     }
 
     function loadUsers() {
-        var tbody = document.getElementById("users-tbody");
+        var tbody = document.querySelector("#users-tbody");
         tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
 
         fetch("/api/users", { headers: authHeaders() })
@@ -184,36 +184,36 @@
                     tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay usuarios registrados.</td></tr>';
                     return;
                 }
-                data.forEach(function (u) { tbody.appendChild(renderRow(u)); });
+                data.forEach(function (u, index) { tbody.appendChild(renderRow(u, index + 1)); });
             })
             .catch(function () {
-                document.getElementById("users-tbody").innerHTML =
+                document.querySelector("#users-tbody").innerHTML =
                     '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
             });
     }
 
     function openModal(userId) {
         currentUserId = userId;
-        document.getElementById("input-role").value = "";
-        document.getElementById("modal-error").textContent = "";
-        document.getElementById("modal-backdrop").classList.add("open");
+        document.querySelector("#input-role").value = "";
+        document.querySelector("#modal-error").textContent = "";
+        document.querySelector("#modal-backdrop").classList.add("open");
     }
 
     function closeModal() {
         currentUserId = null;
-        document.getElementById("input-role").value = "";
-        document.getElementById("modal-error").textContent = "";
-        document.getElementById("modal-backdrop").classList.remove("open");
+        document.querySelector("#input-role").value = "";
+        document.querySelector("#modal-error").textContent = "";
+        document.querySelector("#modal-backdrop").classList.remove("open");
     }
 
     function saveRole() {
         if (!currentUserId) return;
-        var role = document.getElementById("input-role").value;
+        var role = document.querySelector("#input-role").value;
         if (!role) {
-            document.getElementById("modal-error").textContent = "Selecciona un rol válido.";
+            document.querySelector("#modal-error").textContent = "Selecciona un rol válido.";
             return;
         }
-        var btn = document.getElementById("btn-guardar");
+        var btn = document.querySelector("#btn-guardar");
         btn.disabled = true;
         fetch("/api/users/" + currentUserId + "/role", {
             method: "POST",
@@ -226,7 +226,7 @@
         .then(function (r) {
             btn.disabled = false;
             if (!r.ok) {
-                document.getElementById("modal-error").textContent = r.data.message || "Error al asignar rol.";
+                document.querySelector("#modal-error").textContent = r.data.message || "Error al asignar rol.";
                 return;
             }
             showToast("Rol actualizado correctamente.");
@@ -235,7 +235,7 @@
         })
         .catch(function () {
             btn.disabled = false;
-            document.getElementById("modal-error").textContent = "Error de conexión.";
+            document.querySelector("#modal-error").textContent = "Error de conexión.";
         });
     }
 
@@ -249,13 +249,13 @@
             .catch(function () { showToast("Error de conexión.", "error"); });
     }
 
-    document.getElementById("btn-refresh").addEventListener("click", loadUsers);
-    document.getElementById("btn-cancelar").addEventListener("click", closeModal);
-    document.getElementById("btn-guardar").addEventListener("click", saveRole);
-    document.getElementById("modal-backdrop").addEventListener("click", function (e) {
+    document.querySelector("#btn-refresh").addEventListener("click", loadUsers);
+    document.querySelector("#btn-cancelar").addEventListener("click", closeModal);
+    document.querySelector("#btn-guardar").addEventListener("click", saveRole);
+    document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
         if (e.target === this) closeModal();
     });
-    document.getElementById("users-tbody").addEventListener("click", function (e) {
+    document.querySelector("#users-tbody").addEventListener("click", function (e) {
         var btn = e.target.closest("button");
         if (!btn) return;
         var id = btn.getAttribute("data-user-id");

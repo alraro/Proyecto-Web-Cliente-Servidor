@@ -90,7 +90,6 @@ export default function AdminChains() {
     };
 
     const [chainsData, setChainsData] = useState([]);
-    const [chainsDisplay, setChainsDisplay] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filterString, setFilterString] = useState("");
     const [selectedChain, setSelectedChain] = useState(null);
@@ -112,10 +111,6 @@ export default function AdminChains() {
                 const rawData = Array.isArray(data) ? data : [];
 
                 setChainsData(rawData);
-                setChainsDisplay(rawData.map((chain) => ({
-                    ...chain,
-                    participation: chain.participation ? "✓ Sí" : "— No",
-                })));
             } catch (error) {
                 console.error("Error fetching chains data:", error);
             } finally {
@@ -169,11 +164,6 @@ export default function AdminChains() {
                     ? prev.map((chain) => (chain.id === savedChain.id ? savedChain : chain))
                     : [...prev, savedChain];
 
-                setChainsDisplay(next.map((chain) => ({
-                    ...chain,
-                    participation: chain.participation ? "✓ Sí" : "— No",
-                })));
-
                 return next;
             });
 
@@ -195,19 +185,19 @@ export default function AdminChains() {
             }
 
             setChainsData((prev) => {
-                const next = prev.filter((item) => item.id !== chain.id);
-                setChainsDisplay(next.map((item) => ({
-                    ...item,
-                    participation: item.participation ? "✓ Sí" : "— No",
-                })));
-                return next;
+                return prev.filter((item) => item.id !== chain.id);
             });
         } catch (error) {
             console.error("Error deleting chain:", error);
         }
     }
 
-    const filteredChains = chainsDisplay.filter((chain) => {
+    const displayChains = chainsData.map((chain) => ({
+        ...chain,
+        participation: chain.participation ? "✓ Sí" : "— No",
+    }));
+
+    const filteredChains = displayChains.filter((chain) => {
         const search = filterString.toLowerCase();
         return chain.name.toLowerCase().includes(search) || chain.code.toLowerCase().includes(search);
     });

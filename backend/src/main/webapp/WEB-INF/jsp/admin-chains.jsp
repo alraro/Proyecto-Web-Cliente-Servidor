@@ -110,8 +110,6 @@
     (function () {
         var token = '<%= token == null ? "" : token %>';
 
-        if (!token) { window.location.href = "/login"; return; }
-
         function authHeaders() {
             return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
         }
@@ -122,7 +120,7 @@
         }
 
         function showToast(msg, type) {
-            var container = document.getElementById("toast-container");
+            var container = document.querySelector("#toast-container");
             var toast = document.createElement("div");
             toast.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
             toast.textContent = msg;
@@ -131,7 +129,7 @@
         }
 
         function renderTable(chains) {
-            var tbody = document.getElementById("chains-tbody");
+            var tbody = document.querySelector("#chains-tbody");
             tbody.innerHTML = "";
             if (!chains.length) {
                 tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No hay cadenas registradas.</td></tr>';
@@ -185,13 +183,13 @@
         function loadChains() {
             fetch("/api/chains", { headers: authHeaders() })
                 .then(function (r) {
-                    if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                    if (r.status === 401 || r.status === 403) { return null; }
                     if (!r.ok) throw new Error();
                     return r.json();
                 })
                 .then(function (d) { if (d) renderTable(d); })
                 .catch(function () {
-                    document.getElementById("chains-tbody").innerHTML =
+                    document.querySelector("#chains-tbody").innerHTML =
                         '<tr><td colspan="5" class="table-empty">No se puede conectar con el servidor.</td></tr>';
                 });
         }
@@ -199,18 +197,18 @@
         var editingId = null;
 
         function openModal(titulo) {
-            document.getElementById("modal-title").textContent = titulo;
-            document.getElementById("modal-error").textContent = "";
-            document.getElementById("modal-backdrop").classList.add("open");
-            document.getElementById("input-nombre").focus();
+            document.querySelector("#modal-title").textContent = titulo;
+            document.querySelector("#modal-error").textContent = "";
+            document.querySelector("#modal-backdrop").classList.add("open");
+            document.querySelector("#input-nombre").focus();
         }
 
         function closeModal() {
-            document.getElementById("modal-backdrop").classList.remove("open");
-            document.getElementById("input-nombre").value = "";
-            document.getElementById("input-codigo").value = "";
-            document.getElementById("input-participacion").checked = false;
-            document.getElementById("modal-error").textContent = "";
+            document.querySelector("#modal-backdrop").classList.remove("open");
+            document.querySelector("#input-nombre").value = "";
+            document.querySelector("#input-codigo").value = "";
+            document.querySelector("#input-participacion").checked = false;
+            document.querySelector("#modal-error").textContent = "";
             editingId = null;
         }
 
@@ -219,15 +217,15 @@
                 .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
                 .then(function (c) {
                     editingId = c.id;
-                    document.getElementById("input-nombre").value = c.name;
-                    document.getElementById("input-codigo").value = c.code;
-                    document.getElementById("input-participacion").checked = !!c.participation;
+                    document.querySelector("#input-nombre").value = c.name;
+                    document.querySelector("#input-codigo").value = c.code;
+                    document.querySelector("#input-participacion").checked = !!c.participation;
                     openModal("Editar cadena");
                 })
                 .catch(function () { showToast("Error al cargar la cadena.", "error"); });
         }
 
-        document.getElementById("chains-tbody").addEventListener("click", function (e) {
+        document.querySelector("#chains-tbody").addEventListener("click", function (e) {
             var btn = e.target.closest("button");
             if (!btn) return;
             var id = parseInt(btn.getAttribute("data-chain-id"));
@@ -235,20 +233,29 @@
             if (btn.getAttribute("data-action") === "delete") deleteChain(id, btn.getAttribute("data-chain-name"));
         });
 
-        document.getElementById("btn-nueva").addEventListener("click", function () { editingId = null; openModal("Nueva cadena"); });
-        document.getElementById("btn-cancelar").addEventListener("click", closeModal);
-        document.getElementById("modal-backdrop").addEventListener("click", function (e) {
-            if (e.target === document.getElementById("modal-backdrop")) closeModal();
+        document.querySelector("#btn-nueva").addEventListener("click", function () { editingId = null; openModal("Nueva cadena"); });
+        document.querySelector("#btn-cancelar").addEventListener("click", closeModal);
+        document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
+            if (e.target === document.querySelector("#modal-backdrop")) closeModal();
         });
-        document.getElementById("btn-export-chains").addEventListener("click", function () {
-            window.location.href = "/api/export/chains";
+        document.querySelector("#btn-export-chains").addEventListener("click", function () {
+            fetch("/api/export/chains", { headers: authHeaders() })
+                .then(function (r) { return r.blob(); })
+                .then(function (blob) {
+                    var url = URL.createObjectURL(blob);
+                    var a = document.createElement("a");
+                    a.href = url;
+                    a.download = "chains_export.xlsx";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
         });
 
-        document.getElementById("btn-guardar").addEventListener("click", function () {
-            var nombre = document.getElementById("input-nombre").value.trim();
-            var codigo = document.getElementById("input-codigo").value.trim();
-            var part   = document.getElementById("input-participacion").checked;
-            var errEl  = document.getElementById("modal-error");
+        document.querySelector("#btn-guardar").addEventListener("click", function () {
+            var nombre = document.querySelector("#input-nombre").value.trim();
+            var codigo = document.querySelector("#input-codigo").value.trim();
+            var part   = document.querySelector("#input-participacion").checked;
+            var errEl  = document.querySelector("#modal-error");
 
             if (!nombre) { errEl.textContent = "El nombre es obligatorio."; return; }
             if (!codigo) { errEl.textContent = "El código es obligatorio."; return; }

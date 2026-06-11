@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.dao.GeographicZoneRepository;
 import es.grupo8.backend.dao.LocalityRepository;
-import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.UserService;
 
 @RestController
@@ -22,7 +21,6 @@ public class LocalityZoneController {
 
     @Autowired private LocalityRepository       localityRepository;
     @Autowired private GeographicZoneRepository zoneRepository;
-    @Autowired private AuthService              authService;
     @Autowired private UserService              userService;
 
     @GetMapping("/api/localities")
