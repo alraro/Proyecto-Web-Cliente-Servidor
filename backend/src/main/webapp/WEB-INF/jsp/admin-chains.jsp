@@ -107,6 +107,7 @@
         <div class="card-header">
             <h2>Listado de cadenas</h2>
             <div class="card-actions">
+                <a href="/api/export/chains" class="btn btn-secondary">Exportar datos</a>
                 <a href="/admin-chains?crear=1" class="btn btn-primary">+ Nueva cadena</a>
             </div>
         </div>
