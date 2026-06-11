@@ -1,12 +1,41 @@
+<%--
+    Pagina de administracion de usuarios (SSR).
+
+    Autores:
+    - Grupo 8
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="es.grupo8.backend.dto.UserResponseDto, java.util.List" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String token  = (String) session.getAttribute("token");
-    String role   = (String) session.getAttribute("role");
+    String role = (String) session.getAttribute("role");
 
-    if (token == null || !"ADMINISTRADOR".equals(role)) {
+    if (!"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
+    }
+
+    List<UserResponseDto> users = (List<UserResponseDto>) request.getAttribute("users");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer currentSize = (Integer) request.getAttribute("currentSize");
+    String currentSearch = (String) request.getAttribute("currentSearch");
+    String currentRole = (String) request.getAttribute("currentRole");
+
+    if (users == null) users = List.of();
+    if (currentPage == null) currentPage = 0;
+    if (totalPages == null) totalPages = 1;
+    if (currentSize == null) currentSize = 20;
+
+    String flashSuccess = (String) request.getAttribute("success");
+    String flashError = (String) request.getAttribute("error");
+
+    String baseFilterUrl = "/admin-users?size=" + currentSize;
+    if (currentSearch != null && !currentSearch.isEmpty()) {
+        baseFilterUrl += "&search=" + java.net.URLEncoder.encode(currentSearch, "UTF-8");
+    }
+    if (currentRole != null && !currentRole.isEmpty()) {
+        baseFilterUrl += "&role=" + java.net.URLEncoder.encode(currentRole, "UTF-8");
     }
 %>
 <!DOCTYPE html>
@@ -31,26 +60,48 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper" aria-label="Users management page">
     <div class="page-header">
-        <a href="/admin" class="back-link-inline">← Volver al panel</a>
+        <a href="/admin" class="back-link-inline">&larr; Volver al panel</a>
         <h1>Usuarios</h1>
         <p>Gestiona los usuarios registrados en la plataforma.</p>
     </div>
+
+    <% if (flashSuccess != null) { %>
+    <div class="toast toast-success" id="flash-message"><%= flashSuccess %></div>
+    <% } else if (flashError != null) { %>
+    <div class="toast toast-error" id="flash-message"><%= flashError %></div>
+    <% } %>
 
     <div class="card">
         <div class="card-header">
             <h2>Listado de usuarios</h2>
             <div class="card-actions">
-                <a href="/api/export/users" class="btn btn-secondary">Exportar datos</a>
-                <button type="button" id="btn-refresh" class="btn btn-edit btn-sm">↻ Actualizar</button>
+                <a href="/api/export/users" class="btn btn-secondary">Exportar datos</a>              
+                <a href="/admin-users" class="btn btn-edit btn-sm">&#8635; Actualizar</a>
             </div>
         </div>
+
+        <form method="GET" action="/admin-users" class="filters-bar">
+            <input type="text" name="search" placeholder="Buscar por nombre o email..."
+                   value="<%= currentSearch != null ? currentSearch : "" %>" class="filter-search">
+            <select name="role">
+                <option value="">Todos los roles</option>
+                <option value="ADMINISTRADOR" <%= "ADMINISTRADOR".equals(currentRole) ? "selected" : "" %>>Administrador</option>
+                <option value="COORDINADOR" <%= "COORDINADOR".equals(currentRole) ? "selected" : "" %>>Coordinador</option>
+                <option value="CAPITAN" <%= "CAPITAN".equals(currentRole) ? "selected" : "" %>>Capitan</option>
+                <option value="COLABORADOR" <%= "COLABORADOR".equals(currentRole) ? "selected" : "" %>>Colaborador</option>
+                <option value="RESPONSABLE_TIENDA" <%= "RESPONSABLE_TIENDA".equals(currentRole) ? "selected" : "" %>>Responsable de Tienda</option>
+            </select>
+            <button type="submit" class="btn">Filtrar</button>
+            <a href="/admin-users" class="btn-clear">Limpiar</a>
+        </form>
+
         <div class="table-wrap">
             <table>
                 <thead>
@@ -58,214 +109,92 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
-                        <th>Teléfono</th>
+                        <th>Telefono</th>
                         <th>Rol actual</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="users-tbody">
-                    <tr><td colspan="6" class="table-empty">Cargando...</td></tr>
+                <tbody>
+                    <% if (users.isEmpty()) { %>
+                    <tr>
+                        <td colspan="6" class="table-empty">
+                            <%= (currentSearch != null && !currentSearch.isEmpty()) ? "No hay usuarios que coincidan con la busqueda." : "No hay usuarios registrados." %>
+                        </td>
+                    </tr>
+                    <% } else { %>
+                        <% int displayId = currentPage * currentSize + 1; %>
+                        <% for (UserResponseDto u : users) { %>
+                        <tr>
+                            <td><%= displayId++ %></td>
+                            <td><strong><%= u.name() %></strong></td>
+                            <td><%= u.email() != null ? u.email() : "&mdash;" %></td>
+                            <td><%= u.phone() != null ? u.phone() : "&mdash;" %></td>
+                            <td>
+                                <% if (u.roles() != null && !u.roles().isEmpty()) { %>
+                                    <span class="badge badge-yes"><%= String.join(", ", u.roles()) %></span>
+                                <% } else { %>
+                                    <span class="badge badge-no">PENDIENTE</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <div class="td-actions" style="gap:0.25rem; flex-wrap:wrap;">
+                                    <form method="POST" action="/admin-users/asignar-rol" style="display:flex; gap:0.25rem; align-items:center;">
+                                        <input type="hidden" name="userId" value="<%= u.idUser() %>">
+                                        <select name="role" required style="font-size:0.8rem; padding:0.2rem;">
+                                            <option value="ADMINISTRADOR">Administrador</option>
+                                            <option value="COORDINADOR">Coordinador</option>
+                                            <option value="CAPITAN">Capitan</option>
+                                            <option value="COLABORADOR">Colaborador</option>
+                                            <option value="RESPONSABLE_TIENDA">Resp. Tienda</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="font-size:0.75rem;">Rol</button>
+                                    </form>
+                                    <form method="POST" action="/admin-users/eliminar/<%= u.idUser() %>"
+                                          style="display:inline"
+                                          onsubmit="return confirm('&iquest;Eliminar al usuario &quot;<%= u.name() %>&quot;? Esta acci&oacute;n no se puede deshacer.')">
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% } %>
+                    <% } %>
                 </tbody>
             </table>
+        </div>
+
+        <div class="pagination">
+            <% if (currentPage > 0) { %>
+            <a href="<%= baseFilterUrl %>&page=<%= currentPage - 1 %>" class="btn btn-secondary">&larr; Anterior</a>
+            <% } else { %>
+            <button class="btn btn-secondary" disabled>&larr; Anterior</button>
+            <% } %>
+            <span class="pagination-info">
+                Pagina <%= currentPage + 1 %> de <%= totalPages %>
+            </span>
+            <select class="pagination-select" id="page-size-select"
+                    onchange="window.location.href='<%= baseFilterUrl %>&page=0&size=' + this.value">
+                <option value="20" <%= currentSize == 20 ? "selected" : "" %>>20 por pagina</option>
+                <option value="50" <%= currentSize == 50 ? "selected" : "" %>>50 por pagina</option>
+                <option value="100" <%= currentSize == 100 ? "selected" : "" %>>100 por pagina</option>
+            </select>
+            <% if (currentPage + 1 < totalPages) { %>
+            <a href="<%= baseFilterUrl %>&page=<%= currentPage + 1 %>" class="btn btn-secondary">Siguiente &rarr;</a>
+            <% } else { %>
+            <button class="btn btn-secondary" disabled>Siguiente &rarr;</button>
+            <% } %>
         </div>
     </div>
 </main>
 
-<!-- Modal cambiar rol -->
-<div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h3 id="modal-title">Cambiar rol de usuario</h3>
-        <div class="form-group">
-            <label for="input-role">Nuevo rol <span class="required-asterisk">*</span></label>
-            <select id="input-role">
-                <option value="">Seleccionar rol...</option>
-                <option value="ADMINISTRADOR">Administrador</option>
-                <option value="COORDINADOR">Coordinador</option>
-                <option value="CAPITAN">Capitán</option>
-                <option value="COLABORADOR">Colaborador</option>
-                <option value="RESPONSABLE_TIENDA">Responsable de Tienda</option>
-            </select>
-        </div>
-        <p class="form-message" id="modal-error"></p>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="btn-cancelar">Cancelar</button>
-            <button class="btn btn-primary" id="btn-guardar">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<div class="toast-container" id="toast-container"></div>
-
 <script>
-(function () {
-    var token = '<%= token == null ? "" : token %>';
-    var currentUserId = null;
-    var usersCache = [];
-
-    if (!token) { window.location.href = "/login"; return; }
-
-    function authHeaders() {
-        return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
-    }
-
-    function escHtml(v) {
-        return String(v == null ? "" : v)
-            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    function showToast(msg, type) {
-        var c = document.querySelector("#toast-container");
-        var t = document.createElement("div");
-        t.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
-        t.textContent = msg;
-        c.appendChild(t);
-        setTimeout(function () { t.remove(); }, 3500);
-    }
-
-    function createRoleBadge(roles) {
-        var span = document.createElement("span");
-        var label = (roles && roles.length > 0) ? roles.join(", ") : "PENDIENTE";
-        var isPending = label === "PENDIENTE";
-        span.className = isPending ? "badge badge-no" : "badge badge-yes";
-        span.textContent = label;
-        return span;
-    }
-
-    function renderRow(u, displayId) {
-        var tr = document.createElement("tr");
-
-        var td1 = document.createElement("td"); td1.textContent = displayId; tr.appendChild(td1);
-
-        var td2 = document.createElement("td");
-        var strong = document.createElement("strong"); strong.textContent = escHtml(u.name);
-        td2.appendChild(strong); tr.appendChild(td2);
-
-        var td3 = document.createElement("td"); td3.textContent = escHtml(u.email || "\u2014"); tr.appendChild(td3);
-        var td4 = document.createElement("td"); td4.textContent = escHtml(u.phone || "\u2014"); tr.appendChild(td4);
-
-        var td5 = document.createElement("td"); td5.appendChild(createRoleBadge(u.roles)); tr.appendChild(td5);
-
-        var td6 = document.createElement("td");
-        var div = document.createElement("div"); div.className = "td-actions";
-
-        var btnEdit = document.createElement("button");
-        btnEdit.className = "btn btn-primary btn-sm";
-        btnEdit.setAttribute("data-action", "edit");
-        btnEdit.setAttribute("data-user-id", u.idUser);
-        btnEdit.textContent = "Editar";
-        div.appendChild(btnEdit);
-
-        var btnDel = document.createElement("button");
-        btnDel.className = "btn btn-danger btn-sm";
-        btnDel.setAttribute("data-action", "delete");
-        btnDel.setAttribute("data-user-id", u.idUser);
-        btnDel.setAttribute("data-user-name", escHtml(u.name));
-        btnDel.textContent = "Eliminar";
-        div.appendChild(btnDel);
-
-        td6.appendChild(div); tr.appendChild(td6);
-        return tr;
-    }
-
-    function loadUsers() {
-        var tbody = document.querySelector("#users-tbody");
-        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
-
-        fetch("/api/users", { headers: authHeaders() })
-            .then(function (r) {
-                if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
-                if (!r.ok) throw new Error();
-                return r.json();
-            })
-            .then(function (data) {
-                if (!data) return;
-                usersCache = data;
-                tbody.innerHTML = "";
-                if (!data.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay usuarios registrados.</td></tr>';
-                    return;
-                }
-                data.forEach(function (u, index) { tbody.appendChild(renderRow(u, index + 1)); });
-            })
-            .catch(function () {
-                document.querySelector("#users-tbody").innerHTML =
-                    '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
-            });
-    }
-
-    function openModal(userId) {
-        currentUserId = userId;
-        document.querySelector("#input-role").value = "";
-        document.querySelector("#modal-error").textContent = "";
-        document.querySelector("#modal-backdrop").classList.add("open");
-    }
-
-    function closeModal() {
-        currentUserId = null;
-        document.querySelector("#input-role").value = "";
-        document.querySelector("#modal-error").textContent = "";
-        document.querySelector("#modal-backdrop").classList.remove("open");
-    }
-
-    function saveRole() {
-        if (!currentUserId) return;
-        var role = document.querySelector("#input-role").value;
-        if (!role) {
-            document.querySelector("#modal-error").textContent = "Selecciona un rol válido.";
-            return;
+    (function () {
+        var msg = document.getElementById("flash-message");
+        if (msg) {
+            setTimeout(function () { msg.style.opacity = "0"; }, 3000);
+            setTimeout(function () { msg.remove(); }, 3500);
         }
-        var btn = document.querySelector("#btn-guardar");
-        btn.disabled = true;
-        fetch("/api/users/" + currentUserId + "/role", {
-            method: "POST",
-            headers: authHeaders(),
-            body: JSON.stringify({ role: role })
-        })
-        .then(function (r) {
-            return r.json().then(function (d) { return { ok: r.ok, data: d }; });
-        })
-        .then(function (r) {
-            btn.disabled = false;
-            if (!r.ok) {
-                document.querySelector("#modal-error").textContent = r.data.message || "Error al asignar rol.";
-                return;
-            }
-            showToast("Rol actualizado correctamente.");
-            closeModal();
-            loadUsers();
-        })
-        .catch(function () {
-            btn.disabled = false;
-            document.querySelector("#modal-error").textContent = "Error de conexión.";
-        });
-    }
-
-    function deleteUser(userId, userName) {
-        if (!confirm("¿Eliminar al usuario \"" + userName + "\"?\nEsta acción no se puede deshacer.")) return;
-        fetch("/api/users/" + userId, { method: "DELETE", headers: authHeaders() })
-            .then(function (r) {
-                if (!r.ok) r.json().then(function (d) { showToast(d.message || "Error al eliminar.", "error"); });
-                else { showToast("Usuario eliminado correctamente."); loadUsers(); }
-            })
-            .catch(function () { showToast("Error de conexión.", "error"); });
-    }
-
-    document.querySelector("#btn-refresh").addEventListener("click", loadUsers);
-    document.querySelector("#btn-cancelar").addEventListener("click", closeModal);
-    document.querySelector("#btn-guardar").addEventListener("click", saveRole);
-    document.querySelector("#modal-backdrop").addEventListener("click", function (e) {
-        if (e.target === this) closeModal();
-    });
-    document.querySelector("#users-tbody").addEventListener("click", function (e) {
-        var btn = e.target.closest("button");
-        if (!btn) return;
-        var id = btn.getAttribute("data-user-id");
-        if (btn.getAttribute("data-action") === "edit") openModal(id);
-        if (btn.getAttribute("data-action") === "delete") deleteUser(id, btn.getAttribute("data-user-name"));
-    });
-
-    loadUsers();
-}());
+    }());
 </script>
 </body>
 </html>

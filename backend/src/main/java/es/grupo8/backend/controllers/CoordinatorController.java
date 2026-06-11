@@ -18,16 +18,6 @@ import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.services.CoordinatorDashboardService;
 import jakarta.servlet.http.HttpSession;
-import es.grupo8.backend.dto.ShiftCalendarStoreDto;
-import es.grupo8.backend.dto.ShiftRequestDto;
-import es.grupo8.backend.dto.ShiftResponseDto;
-import es.grupo8.backend.dto.StoreSimpleDto;
-import es.grupo8.backend.services.AuthService;
-import es.grupo8.backend.services.ShiftService;
-import es.grupo8.backend.services.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 /**

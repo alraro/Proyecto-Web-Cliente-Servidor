@@ -70,14 +70,7 @@ jobs:
                          : lastComment.includes('## Decisión: REJECT') ? 'REJECT'
                          : 'REQUEST_REVIEW';
 
-            if (decision === 'REJECT') {
-              await github.rest.pulls.createReview({
-                ...context.repo,
-                pull_number: context.issue.number,
-                event: 'REQUEST_CHANGES',
-                body: '❌ **Se requieren cambios.** Los problemas detectados deben corregirse antes de continuar. Corrige y haz push para re-evaluar automáticamente.'
-              });
-            } else if (decision === 'APPROVE') {
+            if (decision === 'APPROVE') {
               const titleMatch = lastComment.match(/## Merge Title: (.+)/);
               const descMatch = lastComment.match(/## Merge Description: (.+)/s);
 
@@ -109,10 +102,14 @@ jobs:
                 });
               }
             } else {
+              const message = decision === 'REJECT'
+                ? '❌ **Posibles problemas detectados.** Se asignan revisores humanos para evaluar los cambios.'
+                : '⏳ **PR pendiente de revisión humana.** Se han asignado revisores para su evaluación.';
+
               await github.rest.issues.createComment({
                 ...context.repo,
                 issue_number: context.issue.number,
-                body: '⏳ **PR pendiente de revisión humana.** Se han asignado revisores para su evaluación.'
+                body: message
               });
               await github.rest.pulls.requestReviewers({
                 ...context.repo,
