@@ -1,21 +1,25 @@
+/**
+ * Servicio de gestión de las tiendas de una campaña.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.CampaignStoreRepository;
 import es.grupo8.backend.dao.StoreRepository;
-import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
@@ -28,8 +32,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CampaignStoreService {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
-
     private final CampaignRepository campaignRepository;
     private final StoreRepository storeRepository;
     private final CampaignStoreRepository campaignStoreRepository;
@@ -39,15 +41,12 @@ public class CampaignStoreService {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
 
-        List<StoreDTO> stores = new ArrayList<>();
+        List<StoreResponseDto> stores = new ArrayList<>();
         for (CampaignStore cs : campaignStoreRepository.findByIdCampaign_Id(campaignId)) {
             if (cs != null && cs.getIdStore() != null) {
                 stores.add(storeMapper.toDTO(cs.getIdStore()));
             }
         }
-
-        auditLog.info("ACTION=GET_CAMPAIGN_STORES adminUserId={} timestamp={} campaignId={}",
-                adminUserId, Instant.now(), campaignId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("campaignId", campaign.getId());
@@ -77,9 +76,6 @@ public class CampaignStoreService {
         cs.setIdStore(store);
         campaignStoreRepository.save(cs);
 
-        auditLog.info("ACTION=ASSIGN_STORE_TO_CAMPAIGN adminUserId={} timestamp={} campaignId={} storeId={}",
-                adminUserId, Instant.now(), campaignId, storeId);
-
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "Tienda asignada correctamente");
         response.put("campaignId", campaignId);
@@ -97,8 +93,6 @@ public class CampaignStoreService {
             throw new NoSuchElementException("Esta tienda no está asignada a la campaña");
         }
         campaignStoreRepository.deleteByIdCampaign_IdAndIdStore_Id(campaignId, storeId);
-        auditLog.info("ACTION=REMOVE_STORE_FROM_CAMPAIGN adminUserId={} timestamp={} campaignId={} storeId={}",
-                adminUserId, Instant.now(), campaignId, storeId);
     }
 
     @Transactional
@@ -125,9 +119,6 @@ public class CampaignStoreService {
             cs.setIdStore(store);
             campaignStoreRepository.save(cs);
         }
-
-        auditLog.info("ACTION=BULK_UPDATE_CAMPAIGN_STORES adminUserId={} timestamp={} campaignId={} storeIds={}",
-                adminUserId, Instant.now(), campaignId, storeIds.toString());
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "Tiendas de la campaña actualizadas correctamente");

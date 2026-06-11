@@ -1,6 +1,13 @@
+/**
+ * Servicio de lógica de negocio de turnos.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 70%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 25%
+ */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -12,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +40,6 @@ import es.grupo8.backend.mapper.ShiftMapper;
 
 @Service
 public class ShiftService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     @Autowired
     private ShiftRepository shiftRepository;
@@ -60,7 +63,7 @@ public class ShiftService {
      * Creates a new pickup shift for a given campaign and store.
      * Validates all fields, date ranges and campaign-store association before persisting.
      *
-     * @param userId  id of the coordinator creating the shift (for audit)
+     * @param userId  id of the coordinator creating the shift
      * @param request DTO with shift creation data
      * @return the created shift as a response DTO
      * @throws IllegalArgumentException if any input field is invalid or the association does not exist
@@ -107,11 +110,7 @@ public class ShiftService {
         shift.setObservations(request.getObservations());
         shift.setCreatedBy(userId);
 
-        ShiftResponseDto result = shiftMapper.toDTO(shiftRepository.save(shift));
-        auditLog.info("ACTION=CREATE_SHIFT userId={} timestamp={} shiftId={} campaignId={} storeId={} day={} startTime={} endTime={}",
-                userId, Instant.now(), result.getShiftId(), result.getCampaignId(),
-                result.getStoreId(), result.getDay(), result.getStartTime(), result.getEndTime());
-        return result;
+        return shiftMapper.toDTO(shiftRepository.save(shift));
     }
 
     /**

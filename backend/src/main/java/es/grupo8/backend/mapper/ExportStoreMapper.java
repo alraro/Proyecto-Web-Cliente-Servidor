@@ -1,3 +1,11 @@
+/**
+ * Mapeador para la exportación de tiendas.
+ *
+ * Autores:
+ * - Hugo Herrero González: 85%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import org.springframework.stereotype.Component;

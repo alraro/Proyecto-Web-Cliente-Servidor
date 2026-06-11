@@ -1066,7 +1066,7 @@ INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
   (15, 'Captain Test', 'capitan@bancosol.info', '600000002', 'changeme'),
   (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme'),
-  (21, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
+  (17, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
 
 INSERT INTO volunteers (id_volunteer, name, phone, email, address, id_partner_entity)
 VALUES
@@ -1104,7 +1104,7 @@ VALUES
 INSERT INTO volunteer_shifts (id_volunteer, id_campaign, id_store, shift_day, start_time, end_time, attendance, notes)
 VALUES (1, 1, 48, '2026-05-10', '09:00', '13:00', false, 'Turno de prueba');
 
-UPDATE stores SET id_responsible = 21 WHERE id_store = 1;  
+UPDATE stores SET id_responsible = 17 WHERE id_store = 1;  
 
 INSERT INTO administrators (id_user) VALUES (14);
 

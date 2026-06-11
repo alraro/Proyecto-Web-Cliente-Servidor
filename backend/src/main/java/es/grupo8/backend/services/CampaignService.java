@@ -1,13 +1,17 @@
+/**
+ * Servicio de lógica de negocio de campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +37,6 @@ import es.grupo8.backend.mapper.CampaignTypeMapper;
  */
 @Service
 public class CampaignService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     @Autowired private CampaignRepository campaignRepository;
     @Autowired private CampaignTypeRepository campaignTypeRepository;
@@ -103,10 +105,7 @@ public class CampaignService {
         campaign.setIdType(type);
         campaign.setStartDate(request.getStartDate());
         campaign.setEndDate(request.getEndDate());
-        CampaignDTO result = campaignMapper.toDTO(campaignRepository.save(campaign));
-        auditLog.info("ACTION=CREATE_CAMPAIGN adminUserId={} timestamp={} campaignId={} campaignName={}",
-                adminUserId, Instant.now(), result.getId(), result.getName());
-        return result;
+        return campaignMapper.toDTO(campaignRepository.save(campaign));
     }
 
     /**
@@ -128,10 +127,7 @@ public class CampaignService {
         campaign.setIdType(type);
         campaign.setStartDate(request.getStartDate());
         campaign.setEndDate(request.getEndDate());
-        CampaignDTO result = campaignMapper.toDTO(campaignRepository.save(campaign));
-        auditLog.info("ACTION=UPDATE_CAMPAIGN adminUserId={} timestamp={} campaignId={} campaignName={}",
-                adminUserId, Instant.now(), result.getId(), result.getName());
-        return result;
+        return campaignMapper.toDTO(campaignRepository.save(campaign));
     }
 
     /**
@@ -142,15 +138,13 @@ public class CampaignService {
      */
     @Transactional
     public void deleteCampaign(Integer adminUserId, Integer id) {
-        Campaign campaign = campaignRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
-        String name = campaign.getName();
+        campaignRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
+
         coordinatorRepository.deleteAllByIdIdCampaign(id);
         captainRepository.deleteAllByIdIdCampaign(id);
         campaignStoreRepository.deleteByCampaignId(id);
         campaignRepository.deleteById(id);
-        auditLog.info("ACTION=DELETE_CAMPAIGN adminUserId={} timestamp={} campaignId={} campaignName={}",
-                adminUserId, Instant.now(), id, name);
     }
 
     private void validateStatus(String status) {

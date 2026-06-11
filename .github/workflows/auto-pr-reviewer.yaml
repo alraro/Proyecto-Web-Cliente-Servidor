@@ -1,0 +1,122 @@
+name: Auto PR Reviewer
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Generate bot token
+        id: bot-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Review with OpenCode
+        id: review
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
+        with:
+          model: opencode-go/deepseek-v4-flash
+          use_github_token: true
+          prompt: |
+            Revisa este Pull Request. Debes analizar los cambios y tomar UNA de estas tres decisiones:
+
+            1. **APPROVE** — Si los cambios son pequeños, inofensivos, solo CSS/documentación/comentarios, o siguen perfectamente los patrones del proyecto sin riesgo de romper nada.
+
+            2. **REJECT** — Si hay cambios que claramente rompen funcionalidad existente, tocan código de otros módulos sin justificación, eliminan endpoints sin deprecación, modifican la BD de forma peligrosa, o hay errores de seguridad/autenticación.
+
+            3. **REQUEST_REVIEW** — Si no estás seguro, los cambios son grandes, tocan lógica de negocio sin tests, o mezclan varias funcionalidades.
+
+            Incluye un análisis breve de los cambios, qué cosas están potencialmente o categóricamente mal, y qué partes tienen dudas. Si hay problemas, sé específico.
+
+            Al final de tu análisis, debes incluir EXACTAMENTE estas líneas para que la automatización pueda actuar:
+
+            ## Decisión: [APPROVE|REJECT|REQUEST_REVIEW]
+
+            ## Merge Title: (título del commit, solo si APPROVE)
+            ## Merge Description: (descripción del commit, solo si APPROVE)
+
+      - name: Act on decision
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.bot-token.outputs.token }}
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number: context.issue.number,
+              per_page: 1,
+              direction: 'desc'
+            });
+
+            const lastComment = comments[0]?.body || '';
+
+            const decision = lastComment.includes('## Decisión: APPROVE') ? 'APPROVE'
+                         : lastComment.includes('## Decisión: REJECT') ? 'REJECT'
+                         : 'REQUEST_REVIEW';
+
+            if (decision === 'REJECT') {
+              await github.rest.pulls.createReview({
+                ...context.repo,
+                pull_number: context.issue.number,
+                event: 'REQUEST_CHANGES',
+                body: '❌ **Se requieren cambios.** Los problemas detectados deben corregirse antes de continuar. Corrige y haz push para re-evaluar automáticamente.'
+              });
+            } else if (decision === 'APPROVE') {
+              const titleMatch = lastComment.match(/## Merge Title: (.+)/);
+              const descMatch = lastComment.match(/## Merge Description: (.+)/s);
+
+              await github.rest.pulls.createReview({
+                ...context.repo,
+                pull_number: context.issue.number,
+                event: 'APPROVE',
+                body: '✅ Aprobado automáticamente por OpenCode.'
+              });
+
+              try {
+                await github.rest.pulls.merge({
+                  ...context.repo,
+                  pull_number: context.issue.number,
+                  merge_method: 'squash',
+                  commit_title: (titleMatch?.[1] || '').trim() || 'Automated merge',
+                  commit_message: (descMatch?.[1] || '').trim() || 'Merged automatically by OpenCode reviewer'
+                });
+              } catch (mergeError) {
+                await github.rest.issues.createComment({
+                  ...context.repo,
+                  issue_number: context.issue.number,
+                  body: 'No se pudo mergear automáticamente. Se asignan revisores humanos.'
+                });
+                await github.rest.pulls.requestReviewers({
+                  ...context.repo,
+                  pull_number: context.issue.number,
+                  reviewers: ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101']
+                });
+              }
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: '⏳ **PR pendiente de revisión humana.** Se han asignado revisores para su evaluación.'
+              });
+              await github.rest.pulls.requestReviewers({
+                ...context.repo,
+                pull_number: context.issue.number,
+                reviewers: ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101']
+              });
+            }

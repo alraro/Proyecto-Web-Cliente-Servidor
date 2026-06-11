@@ -1,3 +1,10 @@
+/**
+ * Servicio de consulta de turnos del equipo del capitán.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.services;
 
 import java.util.HashMap;

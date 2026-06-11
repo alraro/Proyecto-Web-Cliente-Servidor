@@ -5,7 +5,6 @@ import es.grupo8.backend.dto.PartnerEntityManagerAssignRequestDto;
 import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.dto.PartnerEntityManagerUpdateRequestDto;
 import es.grupo8.backend.dto.CampaignInfoDto;
-import es.grupo8.backend.dto.PartnerEntityManagerResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.PartnerEntityManagerService;

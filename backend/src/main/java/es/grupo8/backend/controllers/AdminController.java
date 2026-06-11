@@ -1,16 +1,21 @@
-/*
-* Autores:
-*  - Hugo Herrero González: 80%
-*  - Alfonso Ramos Rojas: 20%
-*
-*/
-
+/**
+ * Controlador MVC del panel y vistas del administrador.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 30%
+ * - Hugo Herrero González: 30%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 30%
+ */
 package es.grupo8.backend.controllers;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +30,7 @@ import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
+import es.grupo8.backend.services.CampaignService;
 import es.grupo8.backend.services.PartnerEntityService;
 import jakarta.servlet.http.HttpSession;
 
@@ -40,39 +46,19 @@ public class AdminController {
     @Autowired
     private PartnerEntityService partnerEntityService;
 
-    @GetMapping("/admin-coordinators")
-    public String adminCoordinators(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-coordinators";
-    }
+    @Autowired
+    private CampaignService campaignService;
 
-    @GetMapping("/admin-captains")
-    public String adminCaptains(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-captains";
-    }
-
-    @GetMapping("/admin-campaigns")
-    public String adminCampaigns(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-        return "admin-campaigns";
-    }
-
+    // Read-only campaigns list. The data comes through the model (SSR) so the JSP renders it server-side
+    // instead of fetching it with JavaScript.
     @GetMapping("/campaigns")
-    public String campaigns(HttpSession session) {
+    public String campaigns(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");
         if (!"ADMINISTRADOR".equals(role)) {
             return "redirect:/login";
         }
+        model.addAttribute("campaigns", campaignService.getCampaigns(
+                null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "startDate"))).getContent());
         return "campaigns";
     }
 

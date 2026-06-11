@@ -1,4 +1,13 @@
-package es.grupo8.backend.controllers;
+/**
+ * Controlador REST para gestionar las tiendas de una campaña.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 70%
+ * - Alejandra Ortiz: 5%
+ * - Alfonso Ramos Rojas: 5%
+ * - IA Generativa: 20%
+ */
+package es.grupo8.backend.controllers.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +32,7 @@ import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 /**
- * RF-12: administration of campaign-store assignments.
+ * REST controller for RF-12: administration of campaign-store assignments.
  *
  * Endpoints:
  * GET    /api/campaigns/{campaignId}/stores
@@ -33,12 +42,21 @@ import lombok.AllArgsConstructor;
  */
 @RestController
 @AllArgsConstructor
-public class CampaignStoreController {
+public class CampaignStoreRestController {
 
     private final AuthService authService;
     private final UserService userService;
     private final CampaignStoreService campaignStoreService;
 
+    // ── Endpoints ─────────────────────────────────────────────────────────────
+
+    /**
+     * Returns all stores assigned to a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId campaign identifier
+     * @return list of campaign-store DTOs
+     */
     @GetMapping("/api/campaigns/{campaignId}/stores")
     public ResponseEntity<?> getCampaignStores(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -49,6 +67,14 @@ public class CampaignStoreController {
                 authService.extractUserIdFromToken(authHeader), campaignId));
     }
 
+    /**
+     * Assigns a single store to a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId campaign identifier
+     * @param request    body containing storeId
+     * @return assignment DTO with 201 status
+     */
     @PostMapping("/api/campaigns/{campaignId}/stores")
     public ResponseEntity<?> assignStoreToCampaign(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -61,12 +87,19 @@ public class CampaignStoreController {
         if (storeId == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "storeId is required"));
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 campaignStoreService.assignStoreToCampaign(
                         authService.extractUserIdFromToken(authHeader), campaignId, storeId));
     }
 
+    /**
+     * Removes a store from a campaign.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId campaign identifier
+     * @param storeId    store identifier
+     * @return success message
+     */
     @DeleteMapping("/api/campaigns/{campaignId}/stores/{storeId}")
     public ResponseEntity<?> removeStoreFromCampaign(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -79,6 +112,14 @@ public class CampaignStoreController {
         return ResponseEntity.ok(Map.of("message", "Tienda desasignada correctamente"));
     }
 
+    /**
+     * Replaces the full set of stores for a campaign in a single atomic operation.
+     *
+     * @param authHeader JWT Authorization header
+     * @param campaignId campaign identifier
+     * @param request    body containing storeIds list
+     * @return updated list of campaign-store DTOs
+     */
     @PutMapping("/api/campaigns/{campaignId}/stores")
     public ResponseEntity<?> replaceCampaignStores(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -91,24 +132,28 @@ public class CampaignStoreController {
         if (storeIds == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "storeIds list is required"));
         }
-
         return ResponseEntity.ok(campaignStoreService.replaceCampaignStores(
                 authService.extractUserIdFromToken(authHeader), campaignId, storeIds));
     }
 
+    // ── Local exception handlers ──────────────────────────────────────────────
+
+    /** @param e entity not found */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
     }
 
+    /** @param e conflict / already assigned */
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
     }
 
-    private static ResponseEntity<?> forbidden() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Access restricted to administrators"));
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private ResponseEntity<?> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
     }
 
     private static Integer valueAsInteger(Object value) {

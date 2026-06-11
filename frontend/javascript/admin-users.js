@@ -9,23 +9,13 @@ let btnRefresh = null;
 let btnExport = null;
 let currentUserId = null;
 let usersCache = [];
-
-// Ayudas de autenticacion
-function getToken() {
-    return localStorage.getItem('token');
-}
-
-function authHeaders() {
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getToken()
-    };
-}
-
-function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
-}
+const ROLE_OPTIONS = [
+    'ADMINISTRADOR',
+    'COORDINADOR',
+    'CAPITAN',
+    'COLABORADOR',
+    'RESPONSABLE_TIENDA'
+];
 
 // Escapar HTML para uso seguro en atributos
 function escHtml(value) {
@@ -43,11 +33,11 @@ function createRoleBadge(role) {
 }
 
 // Renderizar una fila de usuario con DOM
-function renderUserRow(user) {
+function renderUserRow(user, displayId) {
     const tr = document.createElement('tr');
 
     const tdId = document.createElement('td');
-    tdId.textContent = user.idUser;
+    tdId.textContent = displayId;
     tr.appendChild(tdId);
 
     const tdName = document.createElement('td');
@@ -128,8 +118,8 @@ async function loadUsers() {
 
         usersCache = data;
 
-        data.forEach(function (user) {
-            usersTbody.appendChild(renderUserRow(user));
+        data.forEach(function (user, index) {
+            usersTbody.appendChild(renderUserRow(user, index + 1));
         });
     } catch (error) {
         usersTbody.innerHTML = '';
@@ -144,16 +134,35 @@ async function loadUsers() {
 }
 
 function findUserById(userId) {
-    for (let i = 0; i < usersCache.length; i++) {
-        if (String(usersCache[i].idUser) === String(userId)) {
-            return usersCache[i];
-        }
-    }
-    return null;
+    return usersCache.find(u => String(u.idUser) === String(userId)) || null;
+}
+
+function populateRoleOptions(user) {
+    const currentRoles = (user.roles || []).filter(role => role && role !== 'PENDIENTE');
+
+    inputRole.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Seleccionar rol...';
+    inputRole.appendChild(defaultOption);
+
+    ROLE_OPTIONS
+        .filter(role => !currentRoles.includes(role))
+        .forEach(role => {
+            const option = document.createElement('option');
+            option.value = role;
+            option.textContent = role;
+            inputRole.appendChild(option);
+        });
 }
 
 function openEditModal(userId) {
+    const user = findUserById(userId);
+    if (!user) return;
+
     currentUserId = userId;
+    populateRoleOptions(user);
     inputRole.value = '';
     modalError.textContent = '';
     modalBackdrop.classList.add('open');

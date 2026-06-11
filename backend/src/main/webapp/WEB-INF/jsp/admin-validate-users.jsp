@@ -81,8 +81,6 @@
     var token = '<%= token == null ? "" : token %>';
     var usersCache = [];
 
-    if (!token) { window.location.href = "/login"; return; }
-
     function authHeaders() {
         return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
     }
@@ -93,7 +91,7 @@
     }
 
     function showToast(msg, type) {
-        var c = document.getElementById("toast-container");
+        var c = document.querySelector("#toast-container");
         var t = document.createElement("div");
         t.className = "toast " + (type === "error" ? "toast-error" : "toast-success");
         t.textContent = msg;
@@ -170,17 +168,17 @@
     }
 
     function loadPending() {
-        var tbody = document.getElementById("pending-tbody");
+        var tbody = document.querySelector("#pending-tbody");
         tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
 
         fetch("/api/users/pending", { headers: authHeaders() })
             .then(function (r) {
-                if (r.status === 401 || r.status === 403) { window.location.href = "/login"; return null; }
+                if (r.status === 401 || r.status === 403) { return null; }
                 if (!r.ok) throw new Error();
                 return r.json();
             })
             .then(function (data) {
-                var badge = document.getElementById("badge-pending");
+                var badge = document.querySelector("#badge-pending");
                 if (!data) return;
                 usersCache = data;
                 if (data.length > 0) {
@@ -198,13 +196,13 @@
                 data.forEach(function (u) { tbody.appendChild(renderRow(u)); });
             })
             .catch(function () {
-                document.getElementById("pending-tbody").innerHTML =
+                document.querySelector("#pending-tbody").innerHTML =
                     '<tr><td colspan="6" class="table-empty">Error al conectar con el servidor.</td></tr>';
             });
     }
 
     function approveUser(userId) {
-        var role = document.getElementById("role-" + userId).value;
+        var role = document.querySelector("#role-" + userId).value;
         if (!role) {
             showToast("Selecciona un rol antes de aprobar.", "error");
             return;
@@ -258,8 +256,8 @@
             });
     }
 
-    document.getElementById("btn-refresh-pending").addEventListener("click", loadPending);
-    document.getElementById("pending-tbody").addEventListener("click", function (e) {
+    document.querySelector("#btn-refresh-pending").addEventListener("click", loadPending);
+    document.querySelector("#pending-tbody").addEventListener("click", function (e) {
         var btn = e.target.closest("button");
         if (!btn) return;
 

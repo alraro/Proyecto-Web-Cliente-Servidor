@@ -7,16 +7,15 @@
  */
 package es.grupo8.backend.controllers.rest;
 
-import java.time.Instant;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import es.grupo8.backend.dto.StoreDTO;
+import es.grupo8.backend.dto.PaginatedResponse;
+import es.grupo8.backend.dto.StoreRequestDto;
+import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.StoreService;
@@ -27,8 +26,6 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/stores")
 @AllArgsConstructor
 public class StoreController {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final StoreService storeService;
     private final AuthService authService;
@@ -55,7 +52,7 @@ public class StoreController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getStores(
+    public ResponseEntity<PaginatedResponse<StoreResponseDto>> getStores(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Integer chainId,
             @RequestParam(required = false) Integer localityId,
@@ -65,14 +62,12 @@ public class StoreController {
 
         checkAdminOrCoordinator(authHeader);
 
-        Map<String, Object> result = storeService.findAll(chainId, localityId, zoneId, page, size);
-        auditLog.info("ACTION=LIST_STORES userId={} timestamp={} total={}",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), result.get("totalElements"));
+        PaginatedResponse<StoreResponseDto> result = storeService.findAll(chainId, localityId, zoneId, page, size);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StoreDTO> getStore(
+    public ResponseEntity<StoreResponseDto> getStore(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
@@ -81,45 +76,51 @@ public class StoreController {
     }
 
     @PostMapping
-    public ResponseEntity<StoreDTO> createStore(
+    public ResponseEntity<StoreResponseDto> createStore(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody(required = false) StoreDTO req) {
+            @RequestBody(required = false) StoreRequestDto req) {
 
         checkAdmin(authHeader);
-        StoreDTO created = storeService.create(req);
-        auditLog.info("ACTION=CREATE_STORE userId={} timestamp={} storeId={} name='{}'",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), created.getId(), created.getName());
+        StoreResponseDto created = storeService.create(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StoreDTO> updateStore(
+    public ResponseEntity<StoreResponseDto> updateStore(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id,
-            @RequestBody(required = false) StoreDTO req) {
+            @RequestBody(required = false) StoreRequestDto req) {
 
         checkAdmin(authHeader);
-        StoreDTO updated = storeService.update(id, req);
-        auditLog.info("ACTION=UPDATE_STORE userId={} timestamp={} storeId={} name='{}'",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), updated.getId(), updated.getName());
+        StoreResponseDto updated = storeService.update(id, req);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteStore(
+    public ResponseEntity<Void> deleteStore(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
         checkAdmin(authHeader);
         storeService.delete(id);
-        auditLog.info("ACTION=DELETE_STORE userId={} timestamp={} storeId={}",
-                authService.extractUserIdFromToken(authHeader), Instant.now(), id);
-        return ResponseEntity.ok(Map.of("message", "Store deleted successfully"));
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
         return ResponseEntity.status(e.getStatus())
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("message", e.getMessage()));
     }
 }

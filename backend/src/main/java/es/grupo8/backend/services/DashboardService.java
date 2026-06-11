@@ -1,9 +1,11 @@
-/*
-* Service para la gestión de datos del dashboard.
-*
-* Autores:
-*	- Hugo Herrero González: 100%
-*/
+/**
+ * Servicio del panel principal con resúmenes y métricas.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.services;
 
 import java.util.List;

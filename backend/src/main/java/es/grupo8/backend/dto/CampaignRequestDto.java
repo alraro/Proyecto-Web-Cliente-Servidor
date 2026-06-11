@@ -1,3 +1,11 @@
+/**
+ * DTO de entrada para crear o editar una campaña.
+ *
+ * Autores:
+ * - Hugo Herrero González: 65%
+ * - Fernando Luis Pinilla Molina: 30%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.dto;
 
 import lombok.Data;

@@ -8,13 +8,12 @@
 package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.ChainRepository;
-import es.grupo8.backend.dto.ChainDTO;
+import es.grupo8.backend.dto.ChainRequestDto;
+import es.grupo8.backend.dto.ChainResponseDto;
 import es.grupo8.backend.entity.ChainEntity;
 import es.grupo8.backend.mapper.ChainMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,20 +24,20 @@ public class ChainService {
     private final ChainRepository chainRepository;
     private final ChainMapper chainMapper;
 
-    public List<ChainDTO> findAll() {
+    public List<ChainResponseDto> findAll() {
         return chainMapper.toDTOList(chainRepository.findAllByOrderByIdChainAsc());
     }
 
-    public ChainDTO findById(Integer id) {
+    public ChainResponseDto findById(Integer id) {
         ChainEntity entity = chainRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chain not found"));
+                .orElseThrow(() -> new RuntimeException("Chain not found"));
         return chainMapper.toDTO(entity);
     }
 
-    public ChainDTO create(ChainDTO request) {
+    public ChainResponseDto create(ChainRequestDto request) {
         validate(request);
         if (chainRepository.existsByCode(request.getCode().trim())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A chain with that code already exists");
+            throw new IllegalArgumentException("A chain with that code already exists");
         }
         ChainEntity entity = new ChainEntity();
         entity.setName(request.getName().trim());
@@ -47,14 +46,14 @@ public class ChainService {
         return chainMapper.toDTO(chainRepository.save(entity));
     }
 
-    public ChainDTO update(Integer id, ChainDTO request) {
+    public ChainResponseDto update(Integer id, ChainRequestDto request) {
         validate(request);
         ChainEntity entity = chainRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chain not found"));
+                .orElseThrow(() -> new RuntimeException("Chain not found"));
 
         String newCode = request.getCode().trim();
         if (!newCode.equals(entity.getCode()) && chainRepository.existsByCode(newCode)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A chain with that code already exists");
+            throw new IllegalArgumentException("A chain with that code already exists");
         }
         entity.setName(request.getName().trim());
         entity.setCode(newCode);
@@ -64,21 +63,20 @@ public class ChainService {
 
     public void delete(Integer id) {
         if (!chainRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chain not found");
+            throw new RuntimeException("Chain not found");
         }
         chainRepository.deleteById(id);
     }
 
-    private void validate(ChainDTO req) {
+    private void validate(ChainRequestDto req) {
         if (req == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
+            throw new IllegalArgumentException("Request body is required");
         String name = req.getName() == null ? "" : req.getName().trim();
         String code = req.getCode() == null ? "" : req.getCode().trim();
-        if (name.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
-        if (name.length() > 255) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name cannot exceed 255 characters");
-        if (code.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Code is required");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name is required");
+        if (name.length() > 255) throw new IllegalArgumentException("Name cannot exceed 255 characters");
+        if (code.isEmpty()) throw new IllegalArgumentException("Code is required");
         if (!code.matches("^[A-Za-z0-9_\\-]+$") || code.length() > 50)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Code can only contain letters, numbers, hyphens and underscores (max 50 characters)");
+            throw new IllegalArgumentException("Code can only contain letters, numbers, hyphens and underscores (max 50 characters)");
     }
 }

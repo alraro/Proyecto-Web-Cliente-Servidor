@@ -14,6 +14,32 @@ const STORE_FIELDS = [
 ];
 
 const apiUrl = "http://localhost:8080";
+const STORE_PAGE_SIZE = 100;
+
+async function fetchAllStores() {
+    const firstResponse = await fetch(`${apiUrl}/api/stores?page=0&size=${STORE_PAGE_SIZE}`, { headers: authHeaders() });
+
+    if (!firstResponse.ok) {
+        throw new Error(`HTTP error! status: ${firstResponse.status}`);
+    }
+
+    const firstPage = await firstResponse.json();
+    const stores = Array.isArray(firstPage.content) ? [...firstPage.content] : [];
+    const totalPages = Number(firstPage.totalPages) || 0;
+
+    for (let page = 1; page < totalPages; page += 1) {
+        const response = await fetch(`${apiUrl}/api/stores?page=${page}&size=${STORE_PAGE_SIZE}`, { headers: authHeaders() });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        stores.push(...(Array.isArray(data.content) ? data.content : []));
+    }
+
+    return stores;
+}
 
 function mapStoreToTableRow(store) {
     return {
@@ -113,15 +139,12 @@ export default function AdminStores() {
     useEffect(() => {
         async function fetchInitialData() {
             try {
-                const [storesResponse, chainsResponse, zonesResponse] = await Promise.all([
-                    fetch(`${apiUrl}/api/stores`, { headers: authHeaders() }),
+                const [stores, chainsResponse, zonesResponse] = await Promise.all([
+                    fetchAllStores(),
                     fetch(`${apiUrl}/api/chains`, { headers: authHeaders() }),
                     fetch(`${apiUrl}/api/zones`, { headers: authHeaders() }),
                 ]);
 
-                if (!storesResponse.ok) {
-                    throw new Error(`HTTP error! status: ${storesResponse.status}`);
-                }
                 if (!chainsResponse.ok) {
                     throw new Error(`HTTP error! status: ${chainsResponse.status}`);
                 }
@@ -129,11 +152,10 @@ export default function AdminStores() {
                     throw new Error(`HTTP error! status: ${zonesResponse.status}`);
                 }
 
-                const storesJson = await storesResponse.json();
                 const chainsJson = await chainsResponse.json();
                 const zonesJson = await zonesResponse.json();
 
-                setStoresData(Array.isArray(storesJson.content) ? storesJson.content : []);
+                setStoresData(stores);
                 setChainsData(Array.isArray(chainsJson) ? chainsJson : []);
                 setZonesData(Array.isArray(zonesJson) ? zonesJson : []);
             } catch (error) {
