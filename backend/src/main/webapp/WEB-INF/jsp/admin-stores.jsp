@@ -141,7 +141,7 @@
         <div class="card-header">
             <h2>Listado de tiendas</h2>
             <div class="card-actions">
-                <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>
+                <a href="/api/export/stores" class="btn btn-secondary">Exportar datos</a>                
                 <a href="/admin-stores?crear=1" class="btn btn-primary">+ Nueva tienda</a>
             </div>
         </div>
