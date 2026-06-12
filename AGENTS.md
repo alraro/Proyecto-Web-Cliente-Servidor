@@ -53,7 +53,7 @@
 
 ### Convenciones Generales
 
-- **Idioma:** Todo el código, comentarios y documentación deben estar en inglés. Prohibido el uso de otros idiomas en el código, comentarios o documentación.
+- **Idioma:** El código nuevo debe priorizar nombres y comentarios en inglés. Se permite español en mensajes de error al usuario y JSPs.
 
 ### Backend
 
@@ -69,17 +69,17 @@
   @GetMapping("/admin-partner-entities")
   ```
   - Prohibido rutas dinámicas sin patrón claro (ej: `/api/*`).
-  - Los endpoints REST devuelven `ResponseEntity<T>`, nunca `ResponseEntity<?>`.
+  - Los endpoints REST devuelven `ResponseEntity<T>` cuando sea posible. Se permite `<?>` en controllers legacy.
 - **Servicios** (`services/`): Responsabilidad única. Prohibido mezclar lógica de negocio con acceso a datos o lógica de endpoints.
 - **DTOs** (`dto/`): Obligatorio para comunicación entre capas y con el frontend. Prohibido exponer entidades JPA directamente en la API.
-- **Controllers REST** (`controllers/rest/`): Delgados — solo reciben la petición, llaman al service y devuelven la respuesta. La autenticación se delega a `checkAuth()` (ver sección 12).
+- **Controllers REST** (`controllers/rest/`): Delgados — solo reciben la petición, llaman al service y devuelven la respuesta. Siempre que sea posible, usar `checkAuth()` para autenticación (ver sección 12). Los controllers legacy pueden mantener su patrón actual.
 - **Controllers SSR** (`controllers/`): Cargan datos en `Model` y devuelven el nombre del JSP. Autenticación por sesión HTTP.
 - **Repositorios** (`dao/`): Solo métodos para interactuar con BD. Prohibido lógica de negocio o validaciones.
-- **Tests:** Obligatorios para services y controllers. Prohibido depender de BD o servicios externos (usar mocks).
+- **Tests:** Se recomienda escribir tests para services y controllers nuevos. El código legacy no requiere tests nuevos a menos que se modifique su lógica.
 - **Estructura General:** Cada módulo tiene sus entities, repositories, services, controllers y DTOs. Prohibido mezclar funcionalidades en un mismo módulo.
-- **Manejo de Errores:** Usar excepciones personalizadas (`AuthException` en `exceptions/`, etc.). Prohibido usar `Exception` genérica para errores comunes.
+- **Manejo de Errores:** Usar excepciones personalizadas (AuthException en exceptions/, etc.). Evitar RuntimeException genérica en código nuevo. Se permite en código legacy.
 - **Logging:** Solo por consola durante desarrollo, con mensajes claros y consistentes.
-- **Paginación y filtrado:** Obligatorio usar `PaginatedResponse` (`dto/PaginatedResponse.java`) para listas paginadas. El filtrado y ordenación debe hacerse en BD con `Pageable` siempre que sea posible, no en memoria.
+- **Paginación y filtrado:** Obligatorio usar `PaginatedResponse` (`dto/PaginatedResponse.java`) para listas paginadas. El filtrado y ordenación debe hacerse a nivel de base de datos siempre que sea posible, no en memoria.
 
 ### Frontend
 
@@ -135,7 +135,7 @@ En esta etapa del proyecto hay bastantes funcionalidades y endpoints implementad
 ## 11. Patrones de Código Establecidos
 
 ### Backend — Autenticación en Controllers REST
-- **Patrón `checkAuth()`**: Método privado en cada controller que valida el token JWT y el rol antes de ejecutar la lógica del endpoint. Lanza `AuthException` con el `HttpStatus` correspondiente (401 si token inválido, 403 si no tiene permisos).
+- **Patrón `checkAuth()`**: Método privado recomendado en controllers REST nuevos para validar el token JWT y el rol. Lanza `AuthException` con el `HttpStatus` correspondiente (401 si token inválido, 403 si no tiene permisos).
   ```java
   private void checkAdmin(String auth) {
       Integer userId = authService.extractUserIdFromToken(auth);
@@ -153,7 +153,7 @@ En esta etapa del proyecto hay bastantes funcionalidades y endpoints implementad
       return ResponseEntity.status(e.getStatus()).body(Map.of("message", e.getMessage()));
   }
   ```
-- **Tipado estricto**: Los endpoints deben devolver tipos concretos (`ResponseEntity<T>`), no `ResponseEntity<?>`. El uso de `AuthException` permite esto porque los casos de error se manejan en el `@ExceptionHandler`.
+- **Tipado estricto**: Priorizar tipos concretos (`ResponseEntity<T>`) cuando sea posible. El uso de `AuthException` permite esto porque los casos de error se manejan en el `@ExceptionHandler`.
 - **Clase `AuthException`**: Ubicada en `exceptions/AuthException.java`. Extiende `RuntimeException` y contiene `HttpStatus` para que el handler sepa qué código devolver.
 - **Dos variantes de `checkAuth()` según el endpoint**:
   - `checkAdmin(auth)` — solo administradores (para listar, crear, eliminar)
