@@ -6,8 +6,8 @@
   - Hugo Herrero González: 5%
   - IA Generativa: 20%
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, java.util.Map, es.grupo8.backend.dto.CampaignDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String role = (String) session.getAttribute("role");
@@ -17,6 +17,12 @@
     }
     @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+    if (campaigns == null) campaigns = List.of();
+
+    Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> teamShifts = (List<Map<String, Object>>) request.getAttribute("teamShifts");
+    if (teamShifts == null) teamShifts = List.of();
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,8 +37,9 @@
     <link rel="stylesheet" href="/css/captain-attendance.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/captain-dashboard" aria-label="Bancosol home">
+
+<header class="topbar">
+    <a class="brand" href="/captain-dashboard">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -40,46 +47,44 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Capitán" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper">
     <div class="page-header">
-        <a href="/captain-dashboard" class="back-link-inline">← Volver al panel</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Asistencia del Equipo</h1>
-                <p>Consulta los turnos de tu equipo de voluntarios.</p>
-            </div>
-        </div>
+        <a href="/captain-dashboard" class="back-link-inline">&larr; Volver al panel</a>
+        <h1>Asistencia del Equipo</h1>
+        <p>Consulta los turnos de tu equipo de voluntarios.</p>
     </div>
 
-    <div id="global-message" hidden></div>
-
     <div class="card">
-        <div class="card-head">
+        <div class="card-header">
             <h2>Selecciona una campaña</h2>
         </div>
         <div class="card-body">
-            <div class="form-group">
+            <form method="GET" action="/captain-attendance">
                 <label for="campaign-select">Campaña</label>
-                <select id="campaign-select">
-                    <option value="">Selecciona una campaña...</option>
-                    <% if (campaigns != null) {
-                        for (CampaignDTO camp : campaigns) { %>
-                    <option value="<%= camp.getId() %>"><%= camp.getName() %></option>
-                    <%  }
-                       } %>
-                </select>
-            </div>
-            <button type="button" id="btn-load" class="btn btn-secondary">Ver equipo</button>
+                <div class="selector-row">
+                    <select id="campaign-select" name="campaignId">
+                        <option value="">Selecciona una campaña...</option>
+                        <% for (CampaignDTO camp : campaigns) { %>
+                        <option value="<%= camp.getId() %>"
+                            <%= selectedCampaignId != null && selectedCampaignId.equals(camp.getId()) ? "selected" : "" %>>
+                            <%= camp.getName() %>
+                        </option>
+                        <% } %>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Ver equipo</button>
+                </div>
+            </form>
         </div>
     </div>
 
+    <% if (selectedCampaignId != null) { %>
     <div class="card">
-        <div class="card-head">
+        <div class="card-header">
             <h2>Turnos y asistencia</h2>
         </div>
         <div class="table-wrap">
@@ -94,73 +99,48 @@
                         <th>Asistencia</th>
                     </tr>
                 </thead>
-                <tbody id="shifts-tbody">
-                    <tr><td colspan="6" class="table-empty">Selecciona una campaña para ver el equipo.</td></tr>
+                <tbody>
+                    <% if (teamShifts.isEmpty()) { %>
+                    <tr>
+                        <td colspan="6" class="table-empty">No hay turnos asignados para esta campaña.</td>
+                    </tr>
+                    <% } else { %>
+                        <% for (Map<String, Object> shift : teamShifts) {
+                            String storeName = shift.get("storeName") != null ? shift.get("storeName").toString() : "-";
+                            String day       = shift.get("day")       != null ? shift.get("day").toString()       : "-";
+                            String startTime = shift.get("startTime") != null ? shift.get("startTime").toString() : "-";
+                            String endTime   = shift.get("endTime")   != null ? shift.get("endTime").toString()   : "-";
+                            @SuppressWarnings("unchecked")
+                            List<Map<String, Object>> volunteers = (List<Map<String, Object>>) shift.get("volunteers");
+                            if (volunteers == null || volunteers.isEmpty()) { %>
+                        <tr>
+                            <td><%= storeName %></td>
+                            <td><%= day %></td>
+                            <td><%= startTime %></td>
+                            <td><%= endTime %></td>
+                            <td><em>Sin voluntarios</em></td>
+                            <td>&mdash;</td>
+                        </tr>
+                        <%  } else {
+                                for (Map<String, Object> v : volunteers) {
+                                    boolean attended = Boolean.TRUE.equals(v.get("attendance")); %>
+                        <tr>
+                            <td><%= storeName %></td>
+                            <td><%= day %></td>
+                            <td><%= startTime %></td>
+                            <td><%= endTime %></td>
+                            <td><%= v.get("volunteerName") != null ? v.get("volunteerName") : "-" %></td>
+                            <td><input type="checkbox" <%= attended ? "checked" : "" %> disabled></td>
+                        </tr>
+                        <%      }
+                            }
+                        } %>
+                    <% } %>
                 </tbody>
             </table>
         </div>
     </div>
+    <% } %>
 </main>
-<script>
-    const BEARER_TOKEN = '<%= session.getAttribute("token") != null ? session.getAttribute("token") : "" %>';
-
-    function showMsg(text, type) {
-        const el = document.getElementById('global-message');
-        el.textContent = text;
-        el.className = 'global-message ' + type;
-        el.removeAttribute('hidden');
-        setTimeout(() => el.setAttribute('hidden', ''), 4000);
-    }
-
-    document.getElementById('btn-load').addEventListener('click', async () => {
-        const campaignId = document.getElementById('campaign-select').value;
-        if (!campaignId) { showMsg('Selecciona una campaña primero.', 'error'); return; }
-        const tbody = document.getElementById('shifts-tbody');
-        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Cargando...</td></tr>';
-        try {
-            const res = await fetch('/api/shifts/my-team?campaignId=' + campaignId, {
-                headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
-            });
-            if (!res.ok) { showMsg('Error al cargar los turnos.', 'error'); return; }
-            const shifts = await res.json();
-            if (!shifts.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No hay turnos asignados para esta campaña.</td></tr>';
-                return;
-            }
-            const rows = [];
-            shifts.forEach(function(shift) {
-                const volunteers = Array.isArray(shift.volunteers) ? shift.volunteers : [];
-                if (!volunteers.length) {
-                    rows.push(
-                        '<tr>' +
-                        '<td>' + (shift.storeName || '-') + '</td>' +
-                        '<td>' + (shift.day || '-') + '</td>' +
-                        '<td>' + (shift.startTime || '-') + '</td>' +
-                        '<td>' + (shift.endTime || '-') + '</td>' +
-                        '<td><em>Sin voluntarios</em></td>' +
-                        '<td>—</td>' +
-                        '</tr>'
-                    );
-                } else {
-                    volunteers.forEach(function(v) {
-                        rows.push(
-                            '<tr>' +
-                            '<td>' + (shift.storeName || '-') + '</td>' +
-                            '<td>' + (shift.day || '-') + '</td>' +
-                            '<td>' + (shift.startTime || '-') + '</td>' +
-                            '<td>' + (shift.endTime || '-') + '</td>' +
-                            '<td>' + (v.volunteerName || '-') + '</td>' +
-                            '<td><input type="checkbox"' + (v.attendance ? ' checked' : '') + ' disabled></td>' +
-                            '</tr>'
-                        );
-                    });
-                }
-            });
-            tbody.innerHTML = rows.join('');
-        } catch (err) {
-            showMsg('Error de conexión.', 'error');
-        }
-    });
-</script>
 </body>
 </html>

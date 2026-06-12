@@ -2,8 +2,7 @@
  * DTO de entrada para asignar un coordinador a una campaña.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 95%
- * - IA Generativa: 5%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.dto;
 

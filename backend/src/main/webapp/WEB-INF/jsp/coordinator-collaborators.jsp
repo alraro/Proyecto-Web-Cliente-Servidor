@@ -6,8 +6,8 @@
   - Hugo Herrero González: 5%
   - IA Generativa: 25%
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.VoluntarioResponseDto, es.grupo8.backend.dto.PartnerEntityResponseDto" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String role = (String) session.getAttribute("role");
@@ -16,7 +16,20 @@
         return;
     }
     @SuppressWarnings("unchecked")
-    List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+    List<VoluntarioResponseDto> volunteers = (List<VoluntarioResponseDto>) request.getAttribute("volunteers");
+    @SuppressWarnings("unchecked")
+    List<PartnerEntityResponseDto> partnerEntities = (List<PartnerEntityResponseDto>) request.getAttribute("partnerEntities");
+    if (volunteers == null) volunteers = List.of();
+    if (partnerEntities == null) partnerEntities = List.of();
+
+    Boolean showForm = (Boolean) request.getAttribute("showForm");
+    Boolean isCreating = (Boolean) request.getAttribute("isCreating");
+    VoluntarioResponseDto editEntity = (VoluntarioResponseDto) request.getAttribute("editEntity");
+    if (showForm == null) showForm = false;
+    if (isCreating == null) isCreating = false;
+
+    String flashSuccess = (String) request.getAttribute("success");
+    String flashError = (String) request.getAttribute("error");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,8 +44,9 @@
     <link rel="stylesheet" href="/css/assignment.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/coordinator-dashboard" aria-label="Bancosol home">
+
+<header class="topbar">
+    <a class="brand" href="/coordinator-dashboard">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -40,28 +54,81 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Coordinador" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper">
     <div class="page-header">
-        <a href="/coordinator-dashboard" class="back-link-inline">← Volver al panel</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Colaboradores</h1>
-                <p>Gestión de voluntarios y colaboradores de campaña.</p>
-            </div>
-        </div>
+        <a href="/coordinator-dashboard" class="back-link-inline">&larr; Volver al panel</a>
+        <h1>Colaboradores</h1>
+        <p>Gestión de voluntarios y colaboradores de campaña.</p>
     </div>
 
-    <div id="global-message" hidden></div>
+    <% if (flashSuccess != null) { %>
+    <div class="toast toast-success" id="flash-message"><%= flashSuccess %></div>
+    <% } else if (flashError != null) { %>
+    <div class="toast toast-error" id="flash-message"><%= flashError %></div>
+    <% } %>
+
+    <% if (showForm) { %>
+    <div class="card">
+        <div class="card-header">
+            <h2><%= isCreating ? "Nuevo colaborador" : "Editar colaborador" %></h2>
+        </div>
+        <form method="POST" action="/coordinator-collaborators/guardar">
+            <% if (!isCreating && editEntity != null) { %>
+            <input type="hidden" name="id" value="<%= editEntity.id() %>">
+            <% } %>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="edit-name">Nombre <span class="required-asterisk">*</span></label>
+                    <input type="text" id="edit-name" name="name" required placeholder="Nombre completo"
+                           value="<%= editEntity != null && editEntity.name() != null ? editEntity.name() : "" %>">
+                </div>
+                <div class="form-group">
+                    <label for="edit-phone">Teléfono</label>
+                    <input type="text" id="edit-phone" name="phone" placeholder="Teléfono de contacto"
+                           value="<%= editEntity != null && editEntity.phone() != null ? editEntity.phone() : "" %>">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email" name="email" placeholder="email@ejemplo.com"
+                           value="<%= editEntity != null && editEntity.email() != null ? editEntity.email() : "" %>">
+                </div>
+                <div class="form-group">
+                    <label for="edit-address">Dirección</label>
+                    <input type="text" id="edit-address" name="address" placeholder="Dirección (opcional)"
+                           value="<%= editEntity != null && editEntity.address() != null ? editEntity.address() : "" %>">
+                </div>
+                <div class="form-group">
+                    <label for="edit-partner-entity">Entidad colaboradora (opcional)</label>
+                    <select id="edit-partner-entity" name="partnerEntityId">
+                        <option value="">Sin entidad (voluntario independiente)</option>
+                        <% for (PartnerEntityResponseDto pe : partnerEntities) { %>
+                        <option value="<%= pe.id() %>"
+                            <%= editEntity != null && pe.id().equals(editEntity.partnerEntityId()) ? "selected" : "" %>>
+                            <%= pe.name() %>
+                        </option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="/coordinator-collaborators" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <% } %>
 
     <div class="card">
-        <div class="card-head card-head-flex">
+        <div class="card-header">
             <h2>Colaboradores y voluntarios</h2>
-            <button type="button" id="btn-new" class="btn btn-primary m-0">+ Nuevo colaborador</button>
+            <div class="card-actions">
+                <a href="/coordinator-collaborators?crear=1" class="btn btn-primary">+ Nuevo colaborador</a>
+            </div>
         </div>
         <div class="table-wrap">
             <table>
@@ -74,158 +141,38 @@
                         <th>Acción</th>
                     </tr>
                 </thead>
-                <tbody id="collaborators-tbody">
-                    <tr><td colspan="5" class="table-empty">Cargando colaboradores...</td></tr>
+                <tbody>
+                    <% if (volunteers.isEmpty()) { %>
+                    <tr>
+                        <td colspan="5" class="table-empty">No hay colaboradores.</td>
+                    </tr>
+                    <% } else { %>
+                        <% for (VoluntarioResponseDto v : volunteers) { %>
+                        <tr>
+                            <td><%= v.name() != null ? v.name() : "-" %></td>
+                            <td><%= v.phone() != null ? v.phone() : "-" %></td>
+                            <td><%= v.email() != null ? v.email() : "-" %></td>
+                            <td><%= v.partnerEntityName() != null ? v.partnerEntityName() : "Independiente" %></td>
+                            <td>
+                                <a href="/coordinator-collaborators?editar=<%= v.id() %>" class="btn btn-secondary btn-sm">Editar</a>
+                            </td>
+                        </tr>
+                        <% } %>
+                    <% } %>
                 </tbody>
             </table>
         </div>
     </div>
-
-    <div class="card" id="form-card" hidden>
-        <div class="card-head">
-            <h2 id="form-title">Nuevo colaborador</h2>
-        </div>
-        <div class="card-body">
-            <input type="hidden" id="edit-id">
-            <div class="form-group">
-                <label for="edit-name">Nombre</label>
-                <input type="text" id="edit-name" placeholder="Nombre completo">
-            </div>
-            <div class="form-group">
-                <label for="edit-phone">Teléfono</label>
-                <input type="text" id="edit-phone" placeholder="Teléfono de contacto">
-            </div>
-            <div class="form-group">
-                <label for="edit-email">Email</label>
-                <input type="email" id="edit-email" placeholder="email@ejemplo.com">
-            </div>
-            <div class="form-group">
-                <label for="edit-address">Dirección</label>
-                <input type="text" id="edit-address" placeholder="Dirección (opcional)">
-            </div>
-            <div class="form-group mb-0">
-                <label for="edit-partner-entity">Entidad colaboradora (opcional)</label>
-                <select id="edit-partner-entity">
-                    <option value="">Sin entidad (voluntario independiente)</option>
-                </select>
-            </div>
-        </div>
-        <div class="card-body card-actions-row">
-            <button type="button" id="btn-save" class="btn btn-primary">Guardar</button>
-            <button type="button" id="btn-cancel-form" class="btn btn-secondary">Cancelar</button>
-        </div>
-    </div>
 </main>
+
 <script>
-    const BEARER_TOKEN = '<%= session.getAttribute("token") != null ? session.getAttribute("token") : "" %>';
-    let editingId = null;
-
-    function showMsg(text, type) {
-        const el = document.getElementById('global-message');
-        el.textContent = text;
-        el.className = 'global-message ' + type;
-        el.removeAttribute('hidden');
-        setTimeout(() => el.setAttribute('hidden', ''), 4000);
-    }
-
-    function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-
-    async function loadCollaborators() {
-        const res = await fetch('/api/coordinator/volunteers', {
-            headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
-        });
-        if (!res.ok) return;
-        const vols = await res.json();
-        const tbody = document.getElementById('collaborators-tbody');
-        tbody.innerHTML = vols.length
-            ? vols.map(v =>
-                `<tr>
-                    <td>${v.name || '-'}</td>
-                    <td>${v.phone || '-'}</td>
-                    <td>${v.email || '-'}</td>
-                    <td>${v.partnerEntityName || 'Independiente'}</td>
-                    <td><button type="button" class="btn btn-secondary" onclick="startEdit(${v.id},'${esc(v.name)}','${esc(v.phone)}','${esc(v.email)}','${esc(v.address)}',${v.partnerEntityId || 'null'})">Editar</button></td>
-                </tr>`
-            ).join('')
-            : '<tr><td colspan="5" class="table-empty">No hay colaboradores.</td></tr>';
-    }
-
-    async function loadEntities() {
-        const res = await fetch('/api/coordinator/partner-entities', {
-            headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
-        });
-        if (!res.ok) return;
-        const entities = await res.json();
-        const sel = document.getElementById('edit-partner-entity');
-        entities.forEach(e => {
-            const opt = document.createElement('option');
-            opt.value = e.id;
-            opt.textContent = e.name;
-            sel.appendChild(opt);
-        });
-    }
-
-    function startEdit(id, name, phone, email, address, partnerEntityId) {
-        editingId = id;
-        document.getElementById('form-title').textContent = 'Editar colaborador';
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-name').value = name;
-        document.getElementById('edit-phone').value = phone || '';
-        document.getElementById('edit-email').value = email || '';
-        document.getElementById('edit-address').value = address || '';
-        document.getElementById('edit-partner-entity').value = partnerEntityId || '';
-        document.getElementById('form-card').removeAttribute('hidden');
-        document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function showNew() {
-        editingId = null;
-        document.getElementById('form-title').textContent = 'Nuevo colaborador';
-        document.getElementById('edit-id').value = '';
-        document.getElementById('edit-name').value = '';
-        document.getElementById('edit-phone').value = '';
-        document.getElementById('edit-email').value = '';
-        document.getElementById('edit-address').value = '';
-        document.getElementById('edit-partner-entity').value = '';
-        document.getElementById('form-card').removeAttribute('hidden');
-    }
-
-    document.getElementById('btn-new').addEventListener('click', showNew);
-    document.getElementById('btn-cancel-form').addEventListener('click', () => {
-        document.getElementById('form-card').setAttribute('hidden', '');
-    });
-
-    document.getElementById('btn-save').addEventListener('click', async () => {
-        const name     = document.getElementById('edit-name').value.trim();
-        const phone    = document.getElementById('edit-phone').value.trim();
-        const email    = document.getElementById('edit-email').value.trim();
-        const address  = document.getElementById('edit-address').value.trim();
-        const entityId = document.getElementById('edit-partner-entity').value;
-        if (!name) { showMsg('El nombre es obligatorio.', 'error'); return; }
-        const body = { name, phone: phone || null, email: email || null, address: address || null, partnerEntityId: entityId ? parseInt(entityId) : null };
-        const url = editingId ? '/api/coordinator/volunteers/' + editingId : '/api/coordinator/volunteers';
-        const method = editingId ? 'PUT' : 'POST';
-        try {
-            const res = await fetch(url, {
-                method,
-                headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            if (res.ok) {
-                showMsg(editingId ? 'Colaborador actualizado.' : 'Colaborador creado.', 'success');
-                document.getElementById('form-card').setAttribute('hidden', '');
-                loadCollaborators();
-            } else {
-                const err = await res.json().catch(() => ({}));
-                showMsg(err.message || 'Error al guardar.', 'error');
-            }
-        } catch (e) {
-            showMsg('Error de conexión.', 'error');
+    (function () {
+        var msg = document.getElementById("flash-message");
+        if (msg) {
+            setTimeout(function () { msg.style.opacity = "0"; }, 3000);
+            setTimeout(function () { msg.remove(); }, 3500);
         }
-    });
-
-    loadCollaborators();
-    loadEntities();
+    }());
 </script>
 </body>
 </html>

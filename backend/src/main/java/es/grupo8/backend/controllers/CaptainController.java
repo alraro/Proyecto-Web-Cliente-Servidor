@@ -10,106 +10,130 @@ package es.grupo8.backend.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.grupo8.backend.services.CaptainDashboardService;
+import es.grupo8.backend.services.CaptainShiftService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-/**
- * MVC controller for captain views.
- * Loads model data from CaptainDashboardService for server-side JSP rendering.
- */
+// MVC controller for the captain views. Selections travel as GET params and the data is
+// rendered server-side; the only POST is the incident report form.
 @Controller
 @AllArgsConstructor
 public class CaptainController {
 
     private final CaptainDashboardService captainDashboardService;
+    private final CaptainShiftService captainShiftService;
 
-    /**
-     * Serves the captain welcome page.
-     *
-     * @param session HTTP session carrying the user role
-     * @return view name or redirect
-     */
+    private boolean notCaptain(HttpSession session) {
+        return !"CAPITAN".equals(session.getAttribute("role"));
+    }
+
+    private Integer userId(HttpSession session) {
+        return (Integer) session.getAttribute("userID");
+    }
+
+    // Captain welcome page.
     @GetMapping("/captain")
     public String captain(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"CAPITAN".equals(role)) {
+        if (notCaptain(session)) {
             return "redirect:/login";
         }
         return "captain";
     }
 
-    /**
-     * Serves the captain dashboard with the user's assigned campaigns.
-     *
-     * @param session HTTP session carrying role, userId and nombre
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
+    // Dashboard with the captain's campaigns.
     @GetMapping("/captain-dashboard")
     public String captainDashboard(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"CAPITAN".equals(role)) {
+        if (notCaptain(session)) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
         model.addAttribute("userName", session.getAttribute("nombre"));
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
         return "captain-dashboard";
     }
 
-    /**
-     * Serves the captain stores page with campaign selector.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
+    // Stores page. With ?campaignId= the stores are listed; adding &storeId= also renders
+    // that store's volunteer shifts, all server-side.
     @GetMapping("/captain-stores")
-    public String captainStores(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"CAPITAN".equals(role)) {
+    public String captainStores(HttpSession session,
+                                @RequestParam(required = false) Integer campaignId,
+                                @RequestParam(required = false) Integer storeId,
+                                Model model) {
+        if (notCaptain(session)) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("stores", captainDashboardService.getMyStores(userId(session), campaignId));
+            if (storeId != null) {
+                model.addAttribute("selectedStoreId", storeId);
+                model.addAttribute("shifts",
+                        captainDashboardService.getVolunteerShifts(userId(session), campaignId, storeId));
+            }
+        }
         return "captain-stores";
     }
 
-    /**
-     * Serves the incidents page with campaign selector.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
+    // Incident page. The campaign/store selection is a GET form; reporting is a POST below.
     @GetMapping("/captain-incidents")
-    public String captainIncidents(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"CAPITAN".equals(role)) {
+    public String captainIncidents(HttpSession session,
+                                   @RequestParam(required = false) Integer campaignId,
+                                   @RequestParam(required = false) Integer storeId,
+                                   Model model) {
+        if (notCaptain(session)) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("stores", captainDashboardService.getMyStores(userId(session), campaignId));
+            if (storeId != null) {
+                model.addAttribute("selectedStoreId", storeId);
+                model.addAttribute("incidents",
+                        captainDashboardService.getIncidents(userId(session), campaignId, storeId));
+            }
+        }
         return "captain-incidents";
     }
 
-    /**
-     * Serves the attendance tracking page with campaign selector.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
-    @GetMapping("/captain-attendance")
-    public String captainAttendance(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"CAPITAN".equals(role)) {
+    // Creates the incident and returns to the same campaign/store with a flash message.
+    @PostMapping("/captain-incidents/crear")
+    public String createIncident(HttpSession session,
+                                 @RequestParam Integer campaignId,
+                                 @RequestParam Integer storeId,
+                                 @RequestParam String description,
+                                 RedirectAttributes attr) {
+        if (notCaptain(session)) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId));
+        try {
+            captainDashboardService.createIncident(userId(session), campaignId, storeId,
+                    description != null && !description.trim().isEmpty() ? description.trim() : null);
+            attr.addFlashAttribute("success", "Incidencia registrada correctamente.");
+        } catch (IllegalArgumentException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/captain-incidents?campaignId=" + campaignId + "&storeId=" + storeId;
+    }
+
+    // Attendance page: with ?campaignId= the whole team's shifts are rendered server-side.
+    @GetMapping("/captain-attendance")
+    public String captainAttendance(HttpSession session,
+                                    @RequestParam(required = false) Integer campaignId,
+                                    Model model) {
+        if (notCaptain(session)) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("teamShifts", captainShiftService.getMyTeamShifts(userId(session), campaignId));
+        }
         return "captain-attendance";
     }
 }

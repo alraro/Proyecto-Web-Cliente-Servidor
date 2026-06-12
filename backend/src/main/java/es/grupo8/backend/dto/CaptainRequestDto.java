@@ -2,8 +2,7 @@
  * DTO de entrada para solicitar el alta de un capitán.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 95%
- * - IA Generativa: 5%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.dto;
 

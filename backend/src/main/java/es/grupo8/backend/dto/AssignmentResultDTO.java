@@ -2,8 +2,7 @@
  * DTO con el resultado de una asignación a campaña.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 90%
- * - IA Generativa: 10%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.dto;
 

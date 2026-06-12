@@ -2,8 +2,7 @@
  * DTO con los coordinadores y capitanes asignados a una campaña.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 90%
- * - IA Generativa: 10%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.dto;
 

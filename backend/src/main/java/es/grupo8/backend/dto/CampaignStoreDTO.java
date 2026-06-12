@@ -2,8 +2,7 @@
  * DTO de la relación entre campaña y tienda.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 90%
- * - IA Generativa: 10%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.dto;
 import es.grupo8.backend.entity.Campaign;

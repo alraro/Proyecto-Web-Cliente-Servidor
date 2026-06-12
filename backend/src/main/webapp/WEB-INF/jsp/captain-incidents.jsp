@@ -6,8 +6,8 @@
   - Hugo Herrero González: 5%
   - IA Generativa: 20%
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO, es.grupo8.backend.dto.StoreResponseDto, es.grupo8.backend.dto.IncidentDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String role = (String) session.getAttribute("role");
@@ -17,6 +17,19 @@
     }
     @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+    if (campaigns == null) campaigns = List.of();
+
+    Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
+    Integer selectedStoreId = (Integer) request.getAttribute("selectedStoreId");
+    @SuppressWarnings("unchecked")
+    List<StoreResponseDto> stores = (List<StoreResponseDto>) request.getAttribute("stores");
+    @SuppressWarnings("unchecked")
+    List<IncidentDTO> incidents = (List<IncidentDTO>) request.getAttribute("incidents");
+    if (stores == null) stores = List.of();
+    if (incidents == null) incidents = List.of();
+
+    String flashSuccess = (String) request.getAttribute("success");
+    String flashError = (String) request.getAttribute("error");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,8 +44,9 @@
     <link rel="stylesheet" href="/css/assignment.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/captain-dashboard" aria-label="Bancosol home">
+
+<header class="topbar">
+    <a class="brand" href="/captain-dashboard">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -40,61 +54,90 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Capitán" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper">
     <div class="page-header">
-        <a href="/captain-dashboard" class="back-link-inline">← Volver al panel</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Registrar Incidencia</h1>
-                <p>Notifica incidencias ocurridas en tus tiendas.</p>
-            </div>
+        <a href="/captain-dashboard" class="back-link-inline">&larr; Volver al panel</a>
+        <h1>Registrar Incidencia</h1>
+        <p>Notifica incidencias ocurridas en tus tiendas.</p>
+    </div>
+
+    <% if (flashSuccess != null) { %>
+    <div class="toast toast-success" id="flash-message"><%= flashSuccess %></div>
+    <% } else if (flashError != null) { %>
+    <div class="toast toast-error" id="flash-message"><%= flashError %></div>
+    <% } %>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Selecciona campaña y tienda</h2>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="/captain-incidents">
+                <label for="campaign-select">Campaña</label>
+                <div class="selector-row">
+                    <select id="campaign-select" name="campaignId">
+                        <option value="">Selecciona una campaña...</option>
+                        <% for (CampaignDTO camp : campaigns) { %>
+                        <option value="<%= camp.getId() %>"
+                            <%= selectedCampaignId != null && selectedCampaignId.equals(camp.getId()) ? "selected" : "" %>>
+                            <%= camp.getName() %>
+                        </option>
+                        <% } %>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Cargar tiendas</button>
+                </div>
+            </form>
+            <% if (selectedCampaignId != null) { %>
+            <form method="GET" action="/captain-incidents">
+                <input type="hidden" name="campaignId" value="<%= selectedCampaignId %>">
+                <label for="store-select">Tienda</label>
+                <div class="selector-row">
+                    <select id="store-select" name="storeId">
+                        <option value="">Selecciona una tienda...</option>
+                        <% for (StoreResponseDto s : stores) { %>
+                        <option value="<%= s.id() %>"
+                            <%= selectedStoreId != null && selectedStoreId.equals(s.id()) ? "selected" : "" %>>
+                            <%= s.name() %>
+                        </option>
+                        <% } %>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Ver incidencias</button>
+                </div>
+            </form>
+            <% } %>
         </div>
     </div>
 
-    <div id="global-message" hidden></div>
-
+    <% if (selectedCampaignId != null && selectedStoreId != null) { %>
     <div class="card">
-        <div class="card-head">
+        <div class="card-header">
             <h2>Nueva incidencia</h2>
         </div>
         <div class="card-body">
-            <div class="form-group">
-                <label for="campaign-select">Campaña</label>
-                <select id="campaign-select">
-                    <option value="">Selecciona una campaña...</option>
-                    <% if (campaigns != null) {
-                        for (CampaignDTO camp : campaigns) { %>
-                    <option value="<%= camp.getId() %>"><%= camp.getName() %></option>
-                    <%  }
-                       } %>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="store-select">Tienda</label>
-                <select id="store-select" disabled>
-                    <option value="">Selecciona primero una campaña...</option>
-                </select>
-            </div>
-            <div class="form-group mb-0">
-                <label for="description">Descripción de la incidencia</label>
-                <textarea id="description" rows="5" placeholder="Describe con detalle la incidencia ocurrida..."
-                    class="textarea-field"></textarea>
-            </div>
-        </div>
-        <div class="card-body pt-0">
-            <button type="button" id="btn-submit" class="btn btn-primary">Enviar incidencia</button>
+            <form method="POST" action="/captain-incidents/crear">
+                <input type="hidden" name="campaignId" value="<%= selectedCampaignId %>">
+                <input type="hidden" name="storeId" value="<%= selectedStoreId %>">
+                <div class="form-group">
+                    <label for="description">Descripción de la incidencia</label>
+                    <textarea id="description" name="description" rows="5" required
+                              class="textarea-field"
+                              placeholder="Describe con detalle la incidencia ocurrida..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Enviar incidencia</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <div class="card">
-        <div class="card-head card-head-flex">
+        <div class="card-header">
             <h2>Historial de incidencias</h2>
-            <button type="button" id="btn-load-history" class="btn btn-secondary m-0">Cargar historial</button>
         </div>
         <div class="table-wrap">
             <table>
@@ -106,95 +149,36 @@
                         <th>Descripción</th>
                     </tr>
                 </thead>
-                <tbody id="incidents-tbody">
-                    <tr><td colspan="4" class="table-empty">Selecciona campaña y tienda para ver el historial.</td></tr>
+                <tbody>
+                    <% if (incidents.isEmpty()) { %>
+                    <tr>
+                        <td colspan="4" class="table-empty">No hay incidencias registradas.</td>
+                    </tr>
+                    <% } else { %>
+                        <% for (IncidentDTO i : incidents) { %>
+                        <tr>
+                            <td><%= i.createdAt() != null ? i.createdAt() : "-" %></td>
+                            <td><%= i.campaignName() != null ? i.campaignName() : "-" %></td>
+                            <td><%= i.storeName() != null ? i.storeName() : "-" %></td>
+                            <td><%= i.description() != null ? i.description() : "-" %></td>
+                        </tr>
+                        <% } %>
+                    <% } %>
                 </tbody>
             </table>
         </div>
     </div>
+    <% } %>
 </main>
+
 <script>
-    const BEARER_TOKEN = '<%= session.getAttribute("token") != null ? session.getAttribute("token") : "" %>';
-
-    function showMsg(text, type) {
-        const el = document.getElementById('global-message');
-        el.textContent = text;
-        el.className = 'global-message ' + type;
-        el.removeAttribute('hidden');
-        setTimeout(() => el.setAttribute('hidden', ''), 4000);
-    }
-
-    document.getElementById('campaign-select').addEventListener('change', async () => {
-        const campaignId = document.getElementById('campaign-select').value;
-        const storeSelect = document.getElementById('store-select');
-        storeSelect.innerHTML = '<option value="">Cargando tiendas...</option>';
-        storeSelect.disabled = true;
-        if (!campaignId) { storeSelect.innerHTML = '<option value="">Selecciona primero una campaña...</option>'; return; }
-        try {
-            const res = await fetch('/api/captain/my-stores?campaignId=' + campaignId, {
-                headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
-            });
-            if (!res.ok) { storeSelect.innerHTML = '<option value="">Error al cargar</option>'; return; }
-            const stores = await res.json();
-            storeSelect.innerHTML = '<option value="">Selecciona una tienda...</option>' +
-                stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-            storeSelect.disabled = false;
-        } catch (e) {
-            storeSelect.innerHTML = '<option value="">Error de conexión</option>';
+    (function () {
+        var msg = document.getElementById("flash-message");
+        if (msg) {
+            setTimeout(function () { msg.style.opacity = "0"; }, 3000);
+            setTimeout(function () { msg.remove(); }, 3500);
         }
-    });
-
-    document.getElementById('btn-submit').addEventListener('click', async () => {
-        const campaignId  = document.getElementById('campaign-select').value;
-        const storeId     = document.getElementById('store-select').value;
-        const description = document.getElementById('description').value.trim();
-        if (!campaignId || !storeId || !description) {
-            showMsg('Selecciona campaña, tienda y escribe una descripción.', 'error'); return;
-        }
-        try {
-            const res = await fetch('/api/captain/incidents', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ campaignId: parseInt(campaignId), storeId: parseInt(storeId), description })
-            });
-            if (res.ok) {
-                showMsg('Incidencia enviada correctamente.', 'success');
-                document.getElementById('description').value = '';
-            } else {
-                const err = await res.json().catch(() => ({}));
-                showMsg(err.message || 'Error al enviar la incidencia.', 'error');
-            }
-        } catch (e) {
-            showMsg('Error de conexión.', 'error');
-        }
-    });
-
-    document.getElementById('btn-load-history').addEventListener('click', async () => {
-        const campaignId = document.getElementById('campaign-select').value;
-        const storeId    = document.getElementById('store-select').value;
-        if (!campaignId || !storeId) { showMsg('Selecciona campaña y tienda para ver el historial.', 'error'); return; }
-        const tbody = document.getElementById('incidents-tbody');
-        tbody.innerHTML = '<tr><td colspan="4" class="table-empty">Cargando...</td></tr>';
-        try {
-            const res = await fetch('/api/captain/incidents?campaignId=' + campaignId + '&storeId=' + storeId, {
-                headers: { 'Authorization': 'Bearer ' + BEARER_TOKEN }
-            });
-            if (!res.ok) { showMsg('Error al cargar el historial.', 'error'); return; }
-            const incidents = await res.json();
-            tbody.innerHTML = incidents.length
-                ? incidents.map(i =>
-                    `<tr>
-                        <td>${i.createdAt || '-'}</td>
-                        <td>${i.campaignName || '-'}</td>
-                        <td>${i.storeName || '-'}</td>
-                        <td>${i.description || '-'}</td>
-                    </tr>`
-                ).join('')
-                : '<tr><td colspan="4" class="table-empty">No hay incidencias registradas.</td></tr>';
-        } catch (e) {
-            showMsg('Error de conexión.', 'error');
-        }
-    });
+    }());
 </script>
 </body>
 </html>

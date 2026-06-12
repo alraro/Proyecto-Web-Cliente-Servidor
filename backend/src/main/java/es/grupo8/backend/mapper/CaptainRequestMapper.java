@@ -2,8 +2,7 @@
  * Mapeador entre solicitud de capitán y su DTO.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 90%
- * - IA Generativa: 10%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.mapper;
 
