@@ -8,15 +8,12 @@
  */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +55,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class CoordinatorDashboardService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CoordinatorRepository coordinatorRepository;
     private final CaptainRepository captainRepository;
@@ -115,7 +110,7 @@ public class CoordinatorDashboardService {
     /**
      * Creates a new volunteer.
      *
-     * @param coordinatorId   coordinator user identifier (for audit)
+     * @param coordinatorId   coordinator user identifier
      * @param name            required volunteer name
      * @param phone           volunteer phone
      * @param email           volunteer email
@@ -144,15 +139,13 @@ public class CoordinatorDashboardService {
         }
 
         Volunteer saved = volunteerRepository.save(v);
-        auditLog.info("ACTION=CREATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
-                coordinatorId, Instant.now(), saved.getId());
         return volunteerMapper.toDTO(saved);
     }
 
     /**
      * Updates an existing volunteer.
      *
-     * @param coordinatorId           coordinator user identifier (for audit)
+     * @param coordinatorId           coordinator user identifier
      * @param volunteerId             volunteer identifier
      * @param name                    required volunteer name
      * @param phone                   volunteer phone
@@ -188,15 +181,13 @@ public class CoordinatorDashboardService {
         }
 
         Volunteer saved = volunteerRepository.save(v);
-        auditLog.info("ACTION=UPDATE_VOLUNTEER userId={} timestamp={} volunteerId={}",
-                coordinatorId, Instant.now(), saved.getId());
         return volunteerMapper.toDTO(saved);
     }
 
     /**
      * Assigns a volunteer to a shift in a campaign store.
      *
-     * @param coordinatorId coordinator user identifier (for audit)
+     * @param coordinatorId coordinator user identifier
      * @param volunteerId   required volunteer identifier
      * @param campaignId    required campaign identifier
      * @param storeId       required store identifier
@@ -257,8 +248,6 @@ public class CoordinatorDashboardService {
 
         volunteerShiftRepository.save(vs);
 
-        auditLog.info("ACTION=ASSIGN_VOLUNTEER_SHIFT userId={} timestamp={} volunteerId={} campaignId={} storeId={} day={} start={}",
-                coordinatorId, Instant.now(), volunteerId, campaignId, storeId, day, start);
     }
 
     /**
@@ -278,7 +267,7 @@ public class CoordinatorDashboardService {
     /**
      * Submits a captain registration request for admin approval.
      *
-     * @param coordinatorId coordinator user identifier (for audit)
+     * @param coordinatorId coordinator user identifier
      * @param name          required captain name
      * @param email         required captain email
      * @param password      required captain password (min 6 chars)
@@ -321,9 +310,6 @@ public class CoordinatorDashboardService {
         req.setStatus("PENDIENTE");
 
         CaptainRequest saved = captainRequestRepository.save(req);
-
-        auditLog.info("ACTION=REQUEST_CAPTAIN coordinatorUserId={} timestamp={} campaignId={} requestId={}",
-                coordinatorId, Instant.now(), campaignId, saved.getId());
 
         return new RegisterResultDTO("Solicitud enviada. El administrador deberá aprobarla.", saved.getId());
     }

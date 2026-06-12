@@ -7,7 +7,7 @@
   - IA Generativa: 30%
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List, java.util.Set, es.grupo8.backend.dto.CampaignDTO, es.grupo8.backend.dto.CampaignTypeResponseDto, es.grupo8.backend.dto.StoreResponseDto" %>
+<%@ page import="java.util.List, java.util.Map, java.util.Set, java.util.HashSet, es.grupo8.backend.dto.CampaignDTO, es.grupo8.backend.dto.CampaignTypeResponseDto, es.grupo8.backend.dto.StoreResponseDto, es.grupo8.backend.dto.ChainResponseDto" %>
 <%
     String role   = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
@@ -34,6 +34,30 @@
     Set<Integer> assignedStoreIds = (Set<Integer>) request.getAttribute("assignedStoreIds");
     if (allStores == null) allStores = List.of();
     if (assignedStoreIds == null) assignedStoreIds = Set.of();
+
+    @SuppressWarnings("unchecked")
+    List<ChainResponseDto> chains = (List<ChainResponseDto>) request.getAttribute("chains");
+    @SuppressWarnings("unchecked")
+    Map<Integer, String> zoneOptions = (Map<Integer, String>) request.getAttribute("zoneOptions");
+    @SuppressWarnings("unchecked")
+    Map<Integer, String> localityOptions = (Map<Integer, String>) request.getAttribute("localityOptions");
+    if (chains == null) chains = List.of();
+    if (zoneOptions == null) zoneOptions = Map.of();
+    if (localityOptions == null) localityOptions = Map.of();
+
+    Integer selectedChainId = (Integer) request.getAttribute("selectedChainId");
+    Integer selectedZoneId = (Integer) request.getAttribute("selectedZoneId");
+    Integer selectedLocalityId = (Integer) request.getAttribute("selectedLocalityId");
+
+    // Stores assigned to the campaign but hidden by the active filter: they must travel as
+    // hidden inputs so saving the form does not silently unassign them.
+    Set<Integer> visibleIds = new HashSet<>();
+    for (StoreResponseDto s : allStores) visibleIds.add(s.id());
+    Set<Integer> hiddenAssigned = new HashSet<>(assignedStoreIds);
+    hiddenAssigned.removeAll(visibleIds);
+
+    String formModeParam = isCreating ? "crear=1"
+            : (editEntity != null ? "editar=" + editEntity.getId() : "crear=1");
 
     String flashSuccess = (String) request.getAttribute("success");
     String flashError = (String) request.getAttribute("error");
@@ -84,6 +108,9 @@
         <div class="card-header">
             <h2><%= isCreating ? "Nueva campaña" : "Editar campaña" %></h2>
         </div>
+        <%-- Store-filter form: declared outside the POST form (forms cannot nest); its
+             controls live inside the section below and point here via form="store-filter-form". --%>
+        <form id="store-filter-form" method="GET" action="/admin-campaigns"></form>
         <form method="POST" action="/admin-campaigns/guardar">
             <% if (!isCreating && editEntity != null) { %>
             <input type="hidden" name="id" value="<%= editEntity.getId() %>">
@@ -122,6 +149,49 @@
 
                 <div class="store-selector-section">
                     <h3 class="store-selector-title">Tiendas participantes</h3>
+
+                    <div class="store-filter-row">
+                        <% if (isCreating) { %>
+                        <input type="hidden" name="crear" value="1" form="store-filter-form">
+                        <% } else if (editEntity != null) { %>
+                        <input type="hidden" name="editar" value="<%= editEntity.getId() %>" form="store-filter-form">
+                        <% } %>
+                        <select name="chainId" form="store-filter-form">
+                            <option value="">Todas las cadenas</option>
+                            <% for (ChainResponseDto ch : chains) { %>
+                            <option value="<%= ch.id() %>"
+                                <%= selectedChainId != null && selectedChainId.equals(ch.id()) ? "selected" : "" %>>
+                                <%= ch.name() %>
+                            </option>
+                            <% } %>
+                        </select>
+                        <select name="zoneId" form="store-filter-form">
+                            <option value="">Todas las zonas</option>
+                            <% for (Map.Entry<Integer, String> z : zoneOptions.entrySet()) { %>
+                            <option value="<%= z.getKey() %>"
+                                <%= selectedZoneId != null && selectedZoneId.equals(z.getKey()) ? "selected" : "" %>>
+                                <%= z.getValue() %>
+                            </option>
+                            <% } %>
+                        </select>
+                        <select name="localityId" form="store-filter-form">
+                            <option value="">Todas las localidades</option>
+                            <% for (Map.Entry<Integer, String> l : localityOptions.entrySet()) { %>
+                            <option value="<%= l.getKey() %>"
+                                <%= selectedLocalityId != null && selectedLocalityId.equals(l.getKey()) ? "selected" : "" %>>
+                                <%= l.getValue() %>
+                            </option>
+                            <% } %>
+                        </select>
+                        <button type="submit" form="store-filter-form" class="btn btn-secondary btn-sm">Filtrar</button>
+                        <a href="/admin-campaigns?<%= formModeParam %>" class="btn btn-secondary btn-sm">Limpiar</a>
+                    </div>
+
+                    <%-- Assigned stores hidden by the filter: kept so saving doesn't unassign them. --%>
+                    <% for (Integer hiddenId : hiddenAssigned) { %>
+                    <input type="hidden" name="storeIds" value="<%= hiddenId %>">
+                    <% } %>
+
                     <ul class="store-list">
                         <% if (allStores.isEmpty()) { %>
                         <li class="store-list-empty">No hay tiendas registradas.</li>

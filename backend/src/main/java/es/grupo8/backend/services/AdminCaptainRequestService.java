@@ -11,8 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +30,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class AdminCaptainRequestService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CaptainRequestRepository captainRequestRepository;
     private final UserRepository userRepository;
@@ -64,7 +60,7 @@ public class AdminCaptainRequestService {
      * Approves a captain request: creates the user account, assigns the captain role
      * to the request's campaign and marks the request as APROBADA. Atomic.
      *
-     * @param adminUserId admin user identifier (for audit)
+     * @param adminUserId admin user identifier
      * @param requestId   captain request identifier
      * @return identifier of the newly created user
      * @throws NoSuchElementException if the request does not exist
@@ -98,15 +94,13 @@ public class AdminCaptainRequestService {
         req.setResolvedAt(Instant.now());
         captainRequestRepository.save(req);
 
-        auditLog.info("ACTION=APPROVE_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={} newUserId={}",
-                adminUserId, Instant.now(), requestId, savedUser.getIdUser());
         return savedUser.getIdUser();
     }
 
     /**
      * Rejects a captain request and marks it as RECHAZADA.
      *
-     * @param adminUserId admin user identifier (for audit)
+     * @param adminUserId admin user identifier
      * @param requestId   captain request identifier
      * @throws NoSuchElementException if the request does not exist
      * @throws IllegalStateException  if the request is not pending
@@ -123,7 +117,5 @@ public class AdminCaptainRequestService {
         req.setResolvedAt(Instant.now());
         captainRequestRepository.save(req);
 
-        auditLog.info("ACTION=REJECT_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={}",
-                adminUserId, Instant.now(), requestId);
     }
 }

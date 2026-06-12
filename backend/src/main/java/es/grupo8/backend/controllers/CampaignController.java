@@ -10,10 +10,12 @@ package es.grupo8.backend.controllers;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,7 @@ import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.services.CampaignAssignmentService;
 import es.grupo8.backend.services.CampaignService;
 import es.grupo8.backend.services.CampaignStoreService;
+import es.grupo8.backend.services.ChainService;
 import es.grupo8.backend.services.StoreService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -46,6 +49,7 @@ public class CampaignController {
     private final CampaignAssignmentService campaignAssignmentService;
     private final CampaignStoreService campaignStoreService;
     private final StoreService storeService;
+    private final ChainService chainService;
 
     private boolean notAdmin(HttpSession session) {
         return !"ADMINISTRADOR".equals(session.getAttribute("role"));
@@ -58,11 +62,15 @@ public class CampaignController {
     // ── Campaign CRUD ─────────────────────────────────────────────────────────
 
     // Campaign list page. ?crear=1 opens the empty form and ?editar=id opens it pre-filled,
-    // including the store checkboxes, all rendered server-side.
+    // including the store checkboxes. chainId/zoneId/localityId narrow the store list
+    // (the filtering itself runs at database level), all rendered server-side.
     @GetMapping("/admin-campaigns")
     public String adminCampaigns(HttpSession session,
                                  @RequestParam(required = false) Integer crear,
                                  @RequestParam(required = false) Integer editar,
+                                 @RequestParam(required = false) Integer chainId,
+                                 @RequestParam(required = false) Integer zoneId,
+                                 @RequestParam(required = false) Integer localityId,
                                  Model model) {
         if (notAdmin(session)) {
             return "redirect:/login";
@@ -74,8 +82,20 @@ public class CampaignController {
 
         if (crear != null || editar != null) {
             model.addAttribute("showForm", true);
-            model.addAttribute("allStores",
-                    storeService.findAll(null, null, null, 0, 100).content());
+
+            // The full list feeds the filter dropdowns; the visible list honours the filters.
+            List<StoreResponseDto> unfiltered = storeService.findAll(null, null, null, 0, 100).content();
+            boolean filtering = chainId != null || zoneId != null || localityId != null;
+            model.addAttribute("allStores", filtering
+                    ? storeService.findAll(chainId, localityId, zoneId, 0, 100).content()
+                    : unfiltered);
+            model.addAttribute("chains", chainService.findAll());
+            model.addAttribute("zoneOptions", options(unfiltered, true));
+            model.addAttribute("localityOptions", options(unfiltered, false));
+            model.addAttribute("selectedChainId", chainId);
+            model.addAttribute("selectedZoneId", zoneId);
+            model.addAttribute("selectedLocalityId", localityId);
+
             if (crear != null) {
                 model.addAttribute("isCreating", true);
                 model.addAttribute("assignedStoreIds", Set.of());
@@ -338,6 +358,22 @@ public class CampaignController {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    // Distinct zone or locality options (id -> name, sorted by name) taken from the store list,
+    // so the filter dropdowns don't need extra repositories.
+    private Map<Integer, String> options(List<StoreResponseDto> stores, boolean zones) {
+        Map<String, Integer> byName = new TreeMap<>();
+        for (StoreResponseDto s : stores) {
+            Integer id = zones ? s.zoneId() : s.localityId();
+            String name = zones ? s.zone() : s.locality();
+            if (id != null && name != null) {
+                byName.put(name, id);
+            }
+        }
+        Map<Integer, String> result = new LinkedHashMap<>();
+        byName.forEach((name, id) -> result.put(id, name));
+        return result;
+    }
 
     // Ids of the stores currently assigned to the campaign, for pre-checking the form checkboxes.
     private Set<Integer> assignedStoreIds(HttpSession session, Integer campaignId) {
