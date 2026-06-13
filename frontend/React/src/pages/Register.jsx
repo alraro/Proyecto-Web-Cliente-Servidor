@@ -16,11 +16,11 @@ function Register() {
 
         const nombre = e.target.nombre.value.trim();
         const email = e.target.email.value.trim();
-        const telefono = e.target.telefono.value.trim();
+        const phone = e.target.telefono.value.trim();
         const password = e.target.password.value;
         const confirmPassword = e.target.confirmPassword.value;
-        const domicilio = e.target.domicilio.value.trim();
-        const cp = e.target.cp.value.trim();
+        const address = e.target.domicilio.value.trim();
+        const postalCode = e.target.cp.value.trim();
 
         if(!nombre || !email || !password || !confirmPassword) {
             setMessage("Completa los campos obligatorios");
@@ -43,7 +43,7 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nombre, email, telefono, password, domicilio, cp }),
+                body: JSON.stringify({ nombre, email, phone, password, confirmPassword, address, postalCode }),
             });
 
             const data = await res.json();
