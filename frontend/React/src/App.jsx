@@ -6,10 +6,13 @@ import Admin from './pages/admin/Admin';
 import Dashboard from './pages/admin/AdminDashboard';
 import AdminChains from './pages/admin/AdminChains';
 import AdminStores from './pages/admin/AdminStores';
+import AdminCampaigns from './pages/admin/AdminCampaings';
+import Campaigns from './pages/admin/Campaigns';
 import AdminCreateUser from './pages/admin/AdminCreateUser';
 import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Coordinator from './pages/coordinator/Coordinator';
 import CreateShift from './pages/coordinator/CreateShift';
+import ShiftsCalendar from './pages/coordinator/ShiftsCalendar';
 import Captain from './pages/captain/Captain';
 import Colaborator from './pages/colaborator/Colaborator';
 import ColaboradorEntity from './pages/colaborator/ColaboradorEntity';
@@ -39,6 +42,8 @@ function App() {
           <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/campaigns" element={<AdminCampaigns />} />
+            <Route path="/admin/view-campaigns" element={<Campaigns />} />
             <Route path="/admin/chains" element={<AdminChains />} />
             <Route path="/admin/stores" element={<AdminStores />} />
             <Route path="/admin/volunteers" element={<AdminVolunteers />} />
@@ -49,6 +54,7 @@ function App() {
           <Route element={<RutaProtegida roles={['COORDINADOR']} />}>
             <Route path="/coordinator" element={<Coordinator />} />
             <Route path="/coordinator/create-shift" element={<CreateShift />} />
+            <Route path="/coordinator/shifts-calendar" element={<ShiftsCalendar />} />
           </Route>
 
           {/* Captain routes */}
