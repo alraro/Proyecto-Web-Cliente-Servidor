@@ -20,35 +20,27 @@ import es.grupo8.backend.services.AdminCaptainRequestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-// Admin screen for reviewing captain sign-ups that are still pending approval.
-// Approve/reject are plain POST forms with flash messages, following the SSR pattern of the admin views.
 @Controller
 @AllArgsConstructor
-public class AdminCaptainRequestController {
+public class AdminCaptainRequestController extends MvcSessionController {
 
     private final AdminCaptainRequestService adminCaptainRequestService;
 
-    private boolean notAdmin(HttpSession session) {
-        return !"ADMINISTRADOR".equals(session.getAttribute("role"));
-    }
-
-    // Admins only; anyone else is sent to login. The pending requests go to the JSP through the model.
     @GetMapping("/admin-captain-requests")
     public String adminCaptainRequests(HttpSession session, Model model) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         model.addAttribute("pendingRequests", adminCaptainRequestService.getPendingRequests());
         return "admin-captain-requests";
     }
 
-    // Approves a request (creates the captain user) and comes back with a flash message.
     @PostMapping("/admin-captain-requests/{id}/aprobar")
     public String approveRequest(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
-        Integer adminUserId = (Integer) session.getAttribute("userID");
+        Integer adminUserId = currentUserId(session);
         try {
             adminCaptainRequestService.approveRequest(adminUserId, id);
             attr.addFlashAttribute("success", "Solicitud aprobada. El capitán ha sido creado.");
@@ -58,13 +50,12 @@ public class AdminCaptainRequestController {
         return "redirect:/admin-captain-requests";
     }
 
-    // Rejects a request and comes back with a flash message.
     @PostMapping("/admin-captain-requests/{id}/rechazar")
     public String rejectRequest(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
-        Integer adminUserId = (Integer) session.getAttribute("userID");
+        Integer adminUserId = currentUserId(session);
         try {
             adminCaptainRequestService.rejectRequest(adminUserId, id);
             attr.addFlashAttribute("success", "Solicitud rechazada.");

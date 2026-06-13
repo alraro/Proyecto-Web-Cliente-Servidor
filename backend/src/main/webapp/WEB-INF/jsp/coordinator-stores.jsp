@@ -15,12 +15,10 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = List.of();
 
     Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
-    @SuppressWarnings("unchecked")
     List<StoreResponseDto> stores = (List<StoreResponseDto>) request.getAttribute("stores");
     if (stores == null) stores = List.of();
 %>

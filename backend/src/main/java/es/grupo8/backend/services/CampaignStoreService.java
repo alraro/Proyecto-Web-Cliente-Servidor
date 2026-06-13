@@ -27,7 +27,6 @@ import es.grupo8.backend.entity.Store;
 import es.grupo8.backend.mapper.StoreMapper;
 import lombok.AllArgsConstructor;
 
-// RF-12: campaign–store assignment management, admin only.
 @Service
 @AllArgsConstructor
 public class CampaignStoreService {

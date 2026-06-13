@@ -8,7 +8,6 @@ package es.grupo8.backend.dto;
 
 import lombok.Data;
 
-
 //DTO for submitting a captain application request.
  
 @Data

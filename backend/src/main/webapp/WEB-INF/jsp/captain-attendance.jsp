@@ -15,12 +15,10 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = List.of();
 
     Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
-    @SuppressWarnings("unchecked")
     List<Map<String, Object>> teamShifts = (List<Map<String, Object>>) request.getAttribute("teamShifts");
     if (teamShifts == null) teamShifts = List.of();
 %>
@@ -110,7 +108,6 @@
                             String day       = shift.get("day")       != null ? shift.get("day").toString()       : "-";
                             String startTime = shift.get("startTime") != null ? shift.get("startTime").toString() : "-";
                             String endTime   = shift.get("endTime")   != null ? shift.get("endTime").toString()   : "-";
-                            @SuppressWarnings("unchecked")
                             List<Map<String, Object>> volunteers = (List<Map<String, Object>>) shift.get("volunteers");
                             if (volunteers == null || volunteers.isEmpty()) { %>
                         <tr>
@@ -125,7 +122,7 @@
                                 for (Map<String, Object> v : volunteers) {
                                     boolean attended = Boolean.TRUE.equals(v.get("attendance")); %>
                         <tr>
-                            <td><%= storeName %></td>
+                            <td><%= storen  Name %></td>
                             <td><%= day %></td>
                             <td><%= startTime %></td>
                             <td><%= endTime %></td>

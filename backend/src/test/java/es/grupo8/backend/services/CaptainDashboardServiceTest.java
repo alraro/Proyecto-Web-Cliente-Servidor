@@ -37,10 +37,6 @@ import es.grupo8.backend.mapper.ShiftMapper;
 import es.grupo8.backend.mapper.StoreMapper;
 import es.grupo8.backend.mapper.VolunteerShiftMapper;
 
-/**
- * Verifies that getVolunteerShifts and getMyStores resolve their data through JPQL
- * repository methods instead of {@code findAll()} + in-memory filtering/mapping.
- */
 @ExtendWith(MockitoExtension.class)
 class CaptainDashboardServiceTest {
 
@@ -57,7 +53,6 @@ class CaptainDashboardServiceTest {
 
     @InjectMocks CaptainDashboardService service;
 
-    /** getVolunteerShifts narrows by campaign and store through JPQL, never scanning all rows. */
     @Test
     void getVolunteerShifts_withStore_usesJpql() {
         List<VolunteerShift> shifts = new ArrayList<>();
@@ -72,7 +67,6 @@ class CaptainDashboardServiceTest {
         verify(volunteerShiftRepository, never()).findAll();
     }
 
-    /** getVolunteerShifts forwards a null store filter (all stores of the campaign). */
     @Test
     void getVolunteerShifts_nullStore_passesNull() {
         List<VolunteerShift> shifts = new ArrayList<>();
@@ -86,13 +80,11 @@ class CaptainDashboardServiceTest {
         verify(volunteerShiftRepository).findByCampaignAndOptionalStore(1, null);
     }
 
-    /** getVolunteerShifts requires a campaign id. */
     @Test
     void getVolunteerShifts_nullCampaign_throws() {
         assertThrows(IllegalArgumentException.class, () -> service.getVolunteerShifts(10, null, 2));
     }
 
-    /** getMyStores resolves campaign stores through the JPQL repo method. */
     @Test
     void getMyStores_usesJpql() {
         List<Store> stores = new ArrayList<>();

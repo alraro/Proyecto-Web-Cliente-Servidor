@@ -15,9 +15,7 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
-    @SuppressWarnings("unchecked")
     List<CampaignTypeResponseDto> campaignTypes = (List<CampaignTypeResponseDto>) request.getAttribute("campaignTypes");
     if (campaigns == null) campaigns = List.of();
     if (campaignTypes == null) campaignTypes = List.of();
@@ -28,18 +26,13 @@
     if (showForm == null) showForm = false;
     if (isCreating == null) isCreating = false;
 
-    @SuppressWarnings("unchecked")
     List<StoreResponseDto> allStores = (List<StoreResponseDto>) request.getAttribute("allStores");
-    @SuppressWarnings("unchecked")
     Set<Integer> assignedStoreIds = (Set<Integer>) request.getAttribute("assignedStoreIds");
     if (allStores == null) allStores = List.of();
     if (assignedStoreIds == null) assignedStoreIds = Set.of();
 
-    @SuppressWarnings("unchecked")
     List<ChainResponseDto> chains = (List<ChainResponseDto>) request.getAttribute("chains");
-    @SuppressWarnings("unchecked")
     Map<Integer, String> zoneOptions = (Map<Integer, String>) request.getAttribute("zoneOptions");
-    @SuppressWarnings("unchecked")
     Map<Integer, String> localityOptions = (Map<Integer, String>) request.getAttribute("localityOptions");
     if (chains == null) chains = List.of();
     if (zoneOptions == null) zoneOptions = Map.of();
@@ -49,8 +42,7 @@
     Integer selectedZoneId = (Integer) request.getAttribute("selectedZoneId");
     Integer selectedLocalityId = (Integer) request.getAttribute("selectedLocalityId");
 
-    // Stores assigned to the campaign but hidden by the active filter: they must travel as
-    // hidden inputs so saving the form does not silently unassign them.
+    // Tiendas asignadas que el filtro deja fuera: hay que mandarlas igualmente al guardar
     Set<Integer> visibleIds = new HashSet<>();
     for (StoreResponseDto s : allStores) visibleIds.add(s.id());
     Set<Integer> hiddenAssigned = new HashSet<>(assignedStoreIds);
@@ -108,8 +100,7 @@
         <div class="card-header">
             <h2><%= isCreating ? "Nueva campaña" : "Editar campaña" %></h2>
         </div>
-        <%-- Store-filter form: declared outside the POST form (forms cannot nest); its
-             controls live inside the section below and point here via form="store-filter-form". --%>
+        <%-- Formulario del filtro fuera del POST (no se pueden anidar formularios) --%>
         <form id="store-filter-form" method="GET" action="/admin-campaigns"></form>
         <form method="POST" action="/admin-campaigns/guardar">
             <% if (!isCreating && editEntity != null) { %>
@@ -187,7 +178,6 @@
                         <a href="/admin-campaigns?<%= formModeParam %>" class="btn btn-secondary btn-sm">Limpiar</a>
                     </div>
 
-                    <%-- Assigned stores hidden by the filter: kept so saving doesn't unassign them. --%>
                     <% for (Integer hiddenId : hiddenAssigned) { %>
                     <input type="hidden" name="storeIds" value="<%= hiddenId %>">
                     <% } %>

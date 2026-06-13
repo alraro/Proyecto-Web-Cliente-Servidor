@@ -39,11 +39,9 @@ import es.grupo8.backend.services.StoreService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-// MVC controller for the admin campaign views. Everything renders server-side: the JSPs get
-// their data through the model and the actions are plain POST forms with flash messages.
 @Controller
 @AllArgsConstructor
-public class CampaignController {
+public class CampaignController extends MvcSessionController {
 
     private final CampaignService campaignService;
     private final CampaignAssignmentService campaignAssignmentService;
@@ -51,19 +49,7 @@ public class CampaignController {
     private final StoreService storeService;
     private final ChainService chainService;
 
-    private boolean notAdmin(HttpSession session) {
-        return !"ADMINISTRADOR".equals(session.getAttribute("role"));
-    }
-
-    private Integer adminId(HttpSession session) {
-        return (Integer) session.getAttribute("userID");
-    }
-
-    // ── Campaign CRUD ─────────────────────────────────────────────────────────
-
-    // Campaign list page. ?crear=1 opens the empty form and ?editar=id opens it pre-filled,
-    // including the store checkboxes. chainId/zoneId/localityId narrow the store list
-    // (the filtering itself runs at database level), all rendered server-side.
+    // crear=1 abre el formulario vacio y editar=id lo abre relleno; los filtros acotan la lista de tiendas
     @GetMapping("/admin-campaigns")
     public String adminCampaigns(HttpSession session,
                                  @RequestParam(required = false) Integer crear,
@@ -72,7 +58,7 @@ public class CampaignController {
                                  @RequestParam(required = false) Integer zoneId,
                                  @RequestParam(required = false) Integer localityId,
                                  Model model) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         Page<CampaignDTO> campaigns = campaignService.getCampaigns(
@@ -83,7 +69,6 @@ public class CampaignController {
         if (crear != null || editar != null) {
             model.addAttribute("showForm", true);
 
-            // The full list feeds the filter dropdowns; the visible list honours the filters.
             List<StoreResponseDto> unfiltered = storeService.findAll(null, null, null, 0, 100).content();
             boolean filtering = chainId != null || zoneId != null || localityId != null;
             model.addAttribute("allStores", filtering
@@ -109,7 +94,6 @@ public class CampaignController {
         return "admin-campaigns";
     }
 
-    // Creates or updates a campaign together with its store set, then comes back with a flash.
     @PostMapping("/admin-campaigns/guardar")
     public String saveCampaign(HttpSession session,
                                @RequestParam(required = false) Integer id,
@@ -119,7 +103,7 @@ public class CampaignController {
                                @RequestParam String endDate,
                                @RequestParam(required = false) List<Integer> storeIds,
                                RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
@@ -131,13 +115,13 @@ public class CampaignController {
 
             Integer campaignId;
             if (id == null) {
-                campaignId = campaignService.createCampaign(adminId(session), dto).getId();
+                campaignId = campaignService.createCampaign(currentUserId(session), dto).getId();
                 attr.addFlashAttribute("success", "Campaña creada correctamente.");
             } else {
-                campaignId = campaignService.updateCampaign(adminId(session), id, dto).getId();
+                campaignId = campaignService.updateCampaign(currentUserId(session), id, dto).getId();
                 attr.addFlashAttribute("success", "Campaña actualizada correctamente.");
             }
-            campaignStoreService.replaceCampaignStores(adminId(session), campaignId,
+            campaignStoreService.replaceCampaignStores(currentUserId(session), campaignId,
                     storeIds != null ? storeIds : List.of());
         } catch (DateTimeParseException e) {
             attr.addFlashAttribute("error", "Formato de fecha inválido.");
@@ -147,14 +131,13 @@ public class CampaignController {
         return "redirect:/admin-campaigns";
     }
 
-    // Deletes a campaign and its assignments.
     @PostMapping("/admin-campaigns/eliminar/{id}")
     public String deleteCampaign(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
-            campaignService.deleteCampaign(adminId(session), id);
+            campaignService.deleteCampaign(currentUserId(session), id);
             attr.addFlashAttribute("success", "Campaña eliminada correctamente.");
         } catch (NoSuchElementException e) {
             attr.addFlashAttribute("error", e.getMessage());
@@ -162,49 +145,45 @@ public class CampaignController {
         return "redirect:/admin-campaigns";
     }
 
-    // ── Combined assignments page ─────────────────────────────────────────────
-
-    // Coordinator and captain assignments side by side for one campaign.
     @GetMapping("/admin-campaign-assignments")
     public String adminCampaignAssignments(HttpSession session,
                                            @RequestParam(required = false) Integer campaignId,
                                            Model model) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(adminId(session)));
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
         if (campaignId != null) {
             try {
                 model.addAttribute("selectedCampaignId", campaignId);
-                var assignments = campaignAssignmentService.getCampaignAssignments(adminId(session), campaignId);
+                var assignments = campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId);
                 model.addAttribute("assignedCoordinators", assignments.getCoordinators());
                 model.addAttribute("assignedCaptains", assignments.getCaptains());
                 model.addAttribute("availableCoordinators",
-                        campaignAssignmentService.getAvailableUsers(adminId(session), campaignId, "COORDINATOR"));
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
                 model.addAttribute("availableCaptains",
-                        campaignAssignmentService.getAvailableUsers(adminId(session), campaignId, "CAPTAIN"));
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
             } catch (NoSuchElementException ignored) {
             }
         }
         return "admin-campaign-assignments";
     }
 
-    // Assigns or removes either role from the combined page and returns to the same campaign.
     @PostMapping("/admin-campaign-assignments/asignar")
     public String assignFromCombined(HttpSession session,
                                      @RequestParam Integer campaignId,
                                      @RequestParam Integer userId,
                                      @RequestParam String rol,
                                      RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
             if ("COORDINATOR".equals(rol)) {
-                campaignAssignmentService.assignCoordinator(adminId(session), campaignId, userId);
+                campaignAssignmentService.assignCoordinator(currentUserId(session), campaignId, userId);
                 attr.addFlashAttribute("success", "Coordinador asignado correctamente.");
             } else {
-                campaignAssignmentService.assignCaptain(adminId(session), campaignId, userId);
+                campaignAssignmentService.assignCaptain(currentUserId(session), campaignId, userId);
                 attr.addFlashAttribute("success", "Capitán asignado correctamente.");
             }
         } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
@@ -219,15 +198,15 @@ public class CampaignController {
                                        @RequestParam Integer userId,
                                        @RequestParam String rol,
                                        RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
             if ("COORDINATOR".equals(rol)) {
-                campaignAssignmentService.unassignCoordinator(adminId(session), campaignId, userId);
+                campaignAssignmentService.unassignCoordinator(currentUserId(session), campaignId, userId);
                 attr.addFlashAttribute("success", "Coordinador desasignado correctamente.");
             } else {
-                campaignAssignmentService.unassignCaptain(adminId(session), campaignId, userId);
+                campaignAssignmentService.unassignCaptain(currentUserId(session), campaignId, userId);
                 attr.addFlashAttribute("success", "Capitán desasignado correctamente.");
             }
         } catch (NoSuchElementException e) {
@@ -236,42 +215,37 @@ public class CampaignController {
         return "redirect:/admin-campaign-assignments?campaignId=" + campaignId;
     }
 
-    // ── Captains page ─────────────────────────────────────────────────────────
-
-    // Captains page. When a campaign is picked (?campaignId=) the assigned and available
-    // captains are loaded into the model so the JSP renders everything server-side.
     @GetMapping("/admin-captains")
     public String adminCaptains(HttpSession session,
                                 @RequestParam(required = false) Integer campaignId,
                                 Model model) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(adminId(session)));
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
         if (campaignId != null) {
             try {
                 model.addAttribute("selectedCampaignId", campaignId);
                 model.addAttribute("assignedCaptains",
-                        campaignAssignmentService.getCampaignAssignments(adminId(session), campaignId).getCaptains());
+                        campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCaptains());
                 model.addAttribute("availableCaptains",
-                        campaignAssignmentService.getAvailableUsers(adminId(session), campaignId, "CAPTAIN"));
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
             } catch (NoSuchElementException ignored) {
             }
         }
         return "admin-captains";
     }
 
-    // Assigns a captain and returns to the same campaign with a flash message.
     @PostMapping("/admin-captains/asignar")
     public String assignCaptain(HttpSession session,
                                 @RequestParam Integer campaignId,
                                 @RequestParam Integer userId,
                                 RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
-            campaignAssignmentService.assignCaptain(adminId(session), campaignId, userId);
+            campaignAssignmentService.assignCaptain(currentUserId(session), campaignId, userId);
             attr.addFlashAttribute("success", "Capitán asignado correctamente.");
         } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
             attr.addFlashAttribute("error", e.getMessage());
@@ -279,17 +253,16 @@ public class CampaignController {
         return "redirect:/admin-captains?campaignId=" + campaignId;
     }
 
-    // Removes a captain from the campaign.
     @PostMapping("/admin-captains/eliminar")
     public String unassignCaptain(HttpSession session,
                                   @RequestParam Integer campaignId,
                                   @RequestParam Integer userId,
                                   RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
-            campaignAssignmentService.unassignCaptain(adminId(session), campaignId, userId);
+            campaignAssignmentService.unassignCaptain(currentUserId(session), campaignId, userId);
             attr.addFlashAttribute("success", "Capitán desasignado correctamente.");
         } catch (NoSuchElementException e) {
             attr.addFlashAttribute("error", e.getMessage());
@@ -297,41 +270,37 @@ public class CampaignController {
         return "redirect:/admin-captains?campaignId=" + campaignId;
     }
 
-    // ── Coordinators page ─────────────────────────────────────────────────────
-
-    // Coordinators page, same server-side pattern as the captains one.
     @GetMapping("/admin-coordinators")
     public String adminCoordinators(HttpSession session,
                                     @RequestParam(required = false) Integer campaignId,
                                     Model model) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(adminId(session)));
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
         if (campaignId != null) {
             try {
                 model.addAttribute("selectedCampaignId", campaignId);
                 model.addAttribute("assignedCoordinators",
-                        campaignAssignmentService.getCampaignAssignments(adminId(session), campaignId).getCoordinators());
+                        campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCoordinators());
                 model.addAttribute("availableCoordinators",
-                        campaignAssignmentService.getAvailableUsers(adminId(session), campaignId, "COORDINATOR"));
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
             } catch (NoSuchElementException ignored) {
             }
         }
         return "admin-coordinators";
     }
 
-    // Assigns a coordinator and returns to the same campaign with a flash message.
     @PostMapping("/admin-coordinators/asignar")
     public String assignCoordinator(HttpSession session,
                                     @RequestParam Integer campaignId,
                                     @RequestParam Integer userId,
                                     RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
-            campaignAssignmentService.assignCoordinator(adminId(session), campaignId, userId);
+            campaignAssignmentService.assignCoordinator(currentUserId(session), campaignId, userId);
             attr.addFlashAttribute("success", "Coordinador asignado correctamente.");
         } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
             attr.addFlashAttribute("error", e.getMessage());
@@ -339,17 +308,16 @@ public class CampaignController {
         return "redirect:/admin-coordinators?campaignId=" + campaignId;
     }
 
-    // Removes a coordinator from the campaign.
     @PostMapping("/admin-coordinators/eliminar")
     public String unassignCoordinator(HttpSession session,
                                       @RequestParam Integer campaignId,
                                       @RequestParam Integer userId,
                                       RedirectAttributes attr) {
-        if (notAdmin(session)) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
             return "redirect:/login";
         }
         try {
-            campaignAssignmentService.unassignCoordinator(adminId(session), campaignId, userId);
+            campaignAssignmentService.unassignCoordinator(currentUserId(session), campaignId, userId);
             attr.addFlashAttribute("success", "Coordinador desasignado correctamente.");
         } catch (NoSuchElementException e) {
             attr.addFlashAttribute("error", e.getMessage());
@@ -357,10 +325,7 @@ public class CampaignController {
         return "redirect:/admin-coordinators?campaignId=" + campaignId;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    // Distinct zone or locality options (id -> name, sorted by name) taken from the store list,
-    // so the filter dropdowns don't need extra repositories.
+    // Opciones de zona/localidad para los filtros, sacadas de las propias tiendas
     private Map<Integer, String> options(List<StoreResponseDto> stores, boolean zones) {
         Map<String, Integer> byName = new TreeMap<>();
         for (StoreResponseDto s : stores) {
@@ -375,11 +340,11 @@ public class CampaignController {
         return result;
     }
 
-    // Ids of the stores currently assigned to the campaign, for pre-checking the form checkboxes.
+    // Ids de las tiendas ya asignadas, para marcar los checkbox al editar
     private Set<Integer> assignedStoreIds(HttpSession session, Integer campaignId) {
         Set<Integer> ids = new HashSet<>();
         try {
-            Map<String, Object> data = campaignStoreService.getCampaignStores(adminId(session), campaignId);
+            Map<String, Object> data = campaignStoreService.getCampaignStores(currentUserId(session), campaignId);
             Object stores = data.get("stores");
             if (stores instanceof List<?> list) {
                 for (Object o : list) {

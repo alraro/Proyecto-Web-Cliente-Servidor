@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.grupo8.backend.dto.AttendanceRequestDto;
 import es.grupo8.backend.dto.CaptainShiftAssignRequestDto;
 import es.grupo8.backend.dto.VolunteerShiftAssignRequestDto;
-import es.grupo8.backend.exception.ShiftConflictException;
+import es.grupo8.backend.exceptions.ShiftConflictException;
 import es.grupo8.backend.services.ShiftAssignmentService;
 import es.grupo8.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;

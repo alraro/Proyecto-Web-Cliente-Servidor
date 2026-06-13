@@ -28,10 +28,6 @@ import es.grupo8.backend.entity.CampaignType;
 import es.grupo8.backend.mapper.CampaignMapper;
 import es.grupo8.backend.mapper.CampaignTypeMapper;
 
-/**
- * Unit tests for {@link CampaignService}: DTO mapping, duplicate-name detection, and
- * not-found exception paths. No Spring context or database required.
- */
 @ExtendWith(MockitoExtension.class)
 class CampaignServiceTest {
 
@@ -45,7 +41,6 @@ class CampaignServiceTest {
 
     @InjectMocks CampaignService campaignService;
 
-    /** getCampaignById returns a populated Optional when the campaign exists. */
     @Test
     void getCampaignById_exists_returnsDto() {
         Campaign campaign = new Campaign();
@@ -63,7 +58,6 @@ class CampaignServiceTest {
         assertEquals("Test Campaign", result.get().getName());
     }
 
-    /** getCampaignById returns an empty Optional when no campaign matches the id. */
     @Test
     void getCampaignById_notExists_returnsEmpty() {
         when(campaignRepository.findById(99)).thenReturn(Optional.empty());
@@ -73,7 +67,6 @@ class CampaignServiceTest {
         assertFalse(result.isPresent());
     }
 
-    /** createCampaign throws IllegalStateException when another campaign shares the same name. */
     @Test
     void createCampaign_duplicateName_throwsIllegalStateException() {
         CampaignRequestDto req = new CampaignRequestDto();
@@ -92,7 +85,6 @@ class CampaignServiceTest {
                 () -> campaignService.createCampaign(1, req));
     }
 
-    /** deleteCampaign throws NoSuchElementException when the campaign id does not exist. */
     @Test
     void deleteCampaign_notFound_throwsNoSuchElementException() {
         when(campaignRepository.findById(99)).thenReturn(Optional.empty());

@@ -48,12 +48,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>, JpaS
     @Query(value = "SELECT u.* FROM user_accounts u INNER JOIN captains c ON u.id_user = c.id_user GROUP BY u.id_user", nativeQuery = true)
     List<UserEntity> findAllCaptains();
 
-    /** Coordinator-role users not yet assigned as coordinators to the given campaign. */
+    // Coordinators not yet assigned to the given campaign
     @Query("SELECT u FROM UserEntity u WHERE u.idUser IN (SELECT c.id.idUser FROM Coordinator c) "
          + "AND u.idUser NOT IN (SELECT c2.id.idUser FROM Coordinator c2 WHERE c2.id.idCampaign = :campaignId)")
     List<UserEntity> findAvailableCoordinators(@Param("campaignId") Integer campaignId);
 
-    /** Captain-role users not yet assigned as captains to the given campaign. */
+    // Captains not yet assigned to the given campaign
     @Query("SELECT u FROM UserEntity u WHERE u.idUser IN (SELECT c.id.idUser FROM Captain c) "
          + "AND u.idUser NOT IN (SELECT c2.id.idUser FROM Captain c2 WHERE c2.id.idCampaign = :campaignId)")
     List<UserEntity> findAvailableCaptains(@Param("campaignId") Integer campaignId);

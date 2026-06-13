@@ -14,7 +14,6 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CaptainRequest> pendingRequests = (List<CaptainRequest>) request.getAttribute("pendingRequests");
     if (pendingRequests == null) pendingRequests = List.of();
 

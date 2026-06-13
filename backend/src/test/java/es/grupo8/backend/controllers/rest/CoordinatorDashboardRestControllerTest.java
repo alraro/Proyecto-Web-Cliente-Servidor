@@ -24,11 +24,6 @@ import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CoordinatorDashboardService;
 import es.grupo8.backend.services.UserService;
 
-/**
- * Unit tests for {@link CoordinatorDashboardRestController}: coordinator auth enforcement
- * and null-body handling.
- * Uses direct method invocation — no Spring context or HTTP layer required.
- */
 @ExtendWith(MockitoExtension.class)
 class CoordinatorDashboardRestControllerTest {
 
@@ -38,7 +33,6 @@ class CoordinatorDashboardRestControllerTest {
 
     @InjectMocks CoordinatorDashboardRestController controller;
 
-    /** getMyCampaigns with a non-coordinator token must return 403. */
     @Test
     void getMyCampaigns_notCoordinator_returnsForbidden() {
         when(userService.isCoordinatorFromToken("Bearer bad-token")).thenReturn(false);
@@ -48,7 +42,6 @@ class CoordinatorDashboardRestControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
-    /** getMyCampaigns with a valid coordinator token must return 200. */
     @Test
     void getMyCampaigns_validToken_returnsOk() {
         when(userService.isCoordinatorFromToken("Bearer test-token")).thenReturn(true);
@@ -60,7 +53,6 @@ class CoordinatorDashboardRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
-    /** createVolunteer with a null body and valid token must return 400. */
     @Test
     void createVolunteer_missingBody_returns400() {
         when(userService.isCoordinatorFromToken("Bearer test-token")).thenReturn(true);
@@ -70,7 +62,6 @@ class CoordinatorDashboardRestControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-    /** assignVolunteerShift with a non-coordinator token must return 403. */
     @Test
     void assignVolunteerShift_notCoordinator_returnsForbidden() {
         when(userService.isCoordinatorFromToken("Bearer bad-token")).thenReturn(false);

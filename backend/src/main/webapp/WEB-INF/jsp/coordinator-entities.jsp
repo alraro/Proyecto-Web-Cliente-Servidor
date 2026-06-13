@@ -15,12 +15,10 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = List.of();
 
     Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
-    @SuppressWarnings("unchecked")
     List<CampaignEntityDTO> entities = (List<CampaignEntityDTO>) request.getAttribute("entities");
     if (entities == null) entities = List.of();
 %>
@@ -104,9 +102,9 @@
                     <% } else { %>
                         <% for (CampaignEntityDTO e : entities) { %>
                         <tr>
-                            <td><%= e.name() != null ? e.name() : "-" %></td>
-                            <td><%= e.phone() != null ? e.phone() : "-" %></td>
-                            <td><%= e.volunteerCount() != null ? e.volunteerCount() : 0 %></td>
+                            <td><%= e.getName() != null ? e.getName() : "-" %></td>
+                            <td><%= e.getPhone() != null ? e.getPhone() : "-" %></td>
+                            <td><%= e.getVolunteerCount() != null ? e.getVolunteerCount() : 0 %></td>
                         </tr>
                         <% } %>
                     <% } %>

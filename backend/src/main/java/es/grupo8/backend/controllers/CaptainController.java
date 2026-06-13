@@ -2,8 +2,8 @@
  * Controlador MVC de las vistas del capitán.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 80%
- * - IA Generativa: 20%
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
  */
 package es.grupo8.backend.controllers;
 
@@ -19,100 +19,84 @@ import es.grupo8.backend.services.CaptainShiftService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-// MVC controller for the captain views. Selections travel as GET params and the data is
-// rendered server-side; the only POST is the incident report form.
 @Controller
 @AllArgsConstructor
-public class CaptainController {
+public class CaptainController extends MvcSessionController {
 
     private final CaptainDashboardService captainDashboardService;
     private final CaptainShiftService captainShiftService;
 
-    private boolean notCaptain(HttpSession session) {
-        return !"CAPITAN".equals(session.getAttribute("role"));
-    }
-
-    private Integer userId(HttpSession session) {
-        return (Integer) session.getAttribute("userID");
-    }
-
-    // Captain welcome page.
     @GetMapping("/captain")
     public String captain(HttpSession session) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
         return "captain";
     }
 
-    // Dashboard with the captain's campaigns.
     @GetMapping("/captain-dashboard")
     public String captainDashboard(HttpSession session, Model model) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
         model.addAttribute("userName", session.getAttribute("nombre"));
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(currentUserId(session)));
         return "captain-dashboard";
     }
 
-    // Stores page. With ?campaignId= the stores are listed; adding &storeId= also renders
-    // that store's volunteer shifts, all server-side.
     @GetMapping("/captain-stores")
     public String captainStores(HttpSession session,
                                 @RequestParam(required = false) Integer campaignId,
                                 @RequestParam(required = false) Integer storeId,
                                 Model model) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(currentUserId(session)));
         if (campaignId != null) {
             model.addAttribute("selectedCampaignId", campaignId);
-            model.addAttribute("stores", captainDashboardService.getMyStores(userId(session), campaignId));
+            model.addAttribute("stores", captainDashboardService.getMyStores(currentUserId(session), campaignId));
             if (storeId != null) {
                 model.addAttribute("selectedStoreId", storeId);
                 model.addAttribute("shifts",
-                        captainDashboardService.getVolunteerShifts(userId(session), campaignId, storeId));
+                        captainDashboardService.getVolunteerShifts(currentUserId(session), campaignId, storeId));
             }
         }
         return "captain-stores";
     }
 
-    // Incident page. The campaign/store selection is a GET form; reporting is a POST below.
     @GetMapping("/captain-incidents")
     public String captainIncidents(HttpSession session,
                                    @RequestParam(required = false) Integer campaignId,
                                    @RequestParam(required = false) Integer storeId,
                                    Model model) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(currentUserId(session)));
         if (campaignId != null) {
             model.addAttribute("selectedCampaignId", campaignId);
-            model.addAttribute("stores", captainDashboardService.getMyStores(userId(session), campaignId));
+            model.addAttribute("stores", captainDashboardService.getMyStores(currentUserId(session), campaignId));
             if (storeId != null) {
                 model.addAttribute("selectedStoreId", storeId);
                 model.addAttribute("incidents",
-                        captainDashboardService.getIncidents(userId(session), campaignId, storeId));
+                        captainDashboardService.getIncidents(currentUserId(session), campaignId, storeId));
             }
         }
         return "captain-incidents";
     }
 
-    // Creates the incident and returns to the same campaign/store with a flash message.
     @PostMapping("/captain-incidents/crear")
     public String createIncident(HttpSession session,
                                  @RequestParam Integer campaignId,
                                  @RequestParam Integer storeId,
                                  @RequestParam String description,
                                  RedirectAttributes attr) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
         try {
-            captainDashboardService.createIncident(userId(session), campaignId, storeId,
+            captainDashboardService.createIncident(currentUserId(session), campaignId, storeId,
                     description != null && !description.trim().isEmpty() ? description.trim() : null);
             attr.addFlashAttribute("success", "Incidencia registrada correctamente.");
         } catch (IllegalArgumentException e) {
@@ -121,18 +105,17 @@ public class CaptainController {
         return "redirect:/captain-incidents?campaignId=" + campaignId + "&storeId=" + storeId;
     }
 
-    // Attendance page: with ?campaignId= the whole team's shifts are rendered server-side.
     @GetMapping("/captain-attendance")
     public String captainAttendance(HttpSession session,
                                     @RequestParam(required = false) Integer campaignId,
                                     Model model) {
-        if (notCaptain(session)) {
+        if (!hasRole(session, "CAPITAN")) {
             return "redirect:/login";
         }
-        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(userId(session)));
+        model.addAttribute("campaigns", captainDashboardService.getMyCampaigns(currentUserId(session)));
         if (campaignId != null) {
             model.addAttribute("selectedCampaignId", campaignId);
-            model.addAttribute("teamShifts", captainShiftService.getMyTeamShifts(userId(session), campaignId));
+            model.addAttribute("teamShifts", captainShiftService.getMyTeamShifts(currentUserId(session), campaignId));
         }
         return "captain-attendance";
     }

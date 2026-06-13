@@ -15,9 +15,7 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<VoluntarioResponseDto> volunteers = (List<VoluntarioResponseDto>) request.getAttribute("volunteers");
-    @SuppressWarnings("unchecked")
     List<PartnerEntityResponseDto> partnerEntities = (List<PartnerEntityResponseDto>) request.getAttribute("partnerEntities");
     if (volunteers == null) volunteers = List.of();
     if (partnerEntities == null) partnerEntities = List.of();

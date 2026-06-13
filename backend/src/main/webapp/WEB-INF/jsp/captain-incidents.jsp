@@ -15,15 +15,12 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = List.of();
 
     Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
     Integer selectedStoreId = (Integer) request.getAttribute("selectedStoreId");
-    @SuppressWarnings("unchecked")
     List<StoreResponseDto> stores = (List<StoreResponseDto>) request.getAttribute("stores");
-    @SuppressWarnings("unchecked")
     List<IncidentDTO> incidents = (List<IncidentDTO>) request.getAttribute("incidents");
     if (stores == null) stores = List.of();
     if (incidents == null) incidents = List.of();
@@ -157,10 +154,10 @@
                     <% } else { %>
                         <% for (IncidentDTO i : incidents) { %>
                         <tr>
-                            <td><%= i.createdAt() != null ? i.createdAt() : "-" %></td>
-                            <td><%= i.campaignName() != null ? i.campaignName() : "-" %></td>
-                            <td><%= i.storeName() != null ? i.storeName() : "-" %></td>
-                            <td><%= i.description() != null ? i.description() : "-" %></td>
+                            <td><%= i.getCreatedAt() != null ? i.getCreatedAt() : "-" %></td>
+                            <td><%= i.getCampaignName() != null ? i.getCampaignName() : "-" %></td>
+                            <td><%= i.getStoreName() != null ? i.getStoreName() : "-" %></td>
+                            <td><%= i.getDescription() != null ? i.getDescription() : "-" %></td>
                         </tr>
                         <% } %>
                     <% } %>

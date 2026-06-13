@@ -15,13 +15,9 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
-    @SuppressWarnings("unchecked")
     List<VoluntarioResponseDto> volunteers = (List<VoluntarioResponseDto>) request.getAttribute("volunteers");
-    @SuppressWarnings("unchecked")
     List<StoreSimpleDto> stores = (List<StoreSimpleDto>) request.getAttribute("stores");
-    @SuppressWarnings("unchecked")
     List<ShiftResponseDto> shifts = (List<ShiftResponseDto>) request.getAttribute("shifts");
     if (campaigns == null) campaigns = List.of();
     if (volunteers == null) volunteers = List.of();

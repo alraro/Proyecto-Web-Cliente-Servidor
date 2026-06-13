@@ -15,15 +15,12 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = List.of();
 
     Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
     Integer selectedStoreId = (Integer) request.getAttribute("selectedStoreId");
-    @SuppressWarnings("unchecked")
     List<StoreResponseDto> stores = (List<StoreResponseDto>) request.getAttribute("stores");
-    @SuppressWarnings("unchecked")
     List<VolunteerShiftDTO> shifts = (List<VolunteerShiftDTO>) request.getAttribute("shifts");
     if (stores == null) stores = List.of();
     if (shifts == null) shifts = List.of();
@@ -152,10 +149,10 @@
                     <% } else { %>
                         <% for (VolunteerShiftDTO vs : shifts) { %>
                         <tr>
-                            <td><%= vs.shiftDay() != null ? vs.shiftDay() : "-" %></td>
-                            <td><%= vs.startTime() != null ? vs.startTime() : "-" %></td>
-                            <td><%= vs.endTime() != null ? vs.endTime() : "-" %></td>
-                            <td><%= vs.volunteerName() != null ? vs.volunteerName() : "Sin asignar" %></td>
+                            <td><%= vs.getShiftDay() != null ? vs.getShiftDay() : "-" %></td>
+                            <td><%= vs.getStartTime() != null ? vs.getStartTime() : "-" %></td>
+                            <td><%= vs.getEndTime() != null ? vs.getEndTime() : "-" %></td>
+                            <td><%= vs.getVolunteerName() != null ? vs.getVolunteerName() : "Sin asignar" %></td>
                         </tr>
                         <% } %>
                     <% } %>
