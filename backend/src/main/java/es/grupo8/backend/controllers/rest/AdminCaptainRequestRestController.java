@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.services.AdminCaptainRequestService;
 import es.grupo8.backend.services.AdminService;
@@ -94,7 +95,7 @@ public class AdminCaptainRequestRestController extends BaseRestController {
         if (!userService.isAdminFromToken(authHeader)) {
             return forbidden("administrators");
         }
-        List<Map<String, Object>> incidents = adminService.getAllIncidents("desc");
+        List<IncidentDTO> incidents = adminService.getAllIncidents("desc");
 
         return ResponseEntity.ok(incidents);
     }

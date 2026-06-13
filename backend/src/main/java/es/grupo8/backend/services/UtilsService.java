@@ -7,14 +7,10 @@
 
 package es.grupo8.backend.services;
 
-<<<<<<< HEAD
-=======
-import es.grupo8.backend.dto.PaginatedResponse;
 import java.util.List;
->>>>>>> 4ba6d542aef4e5958b43aa0e51f616e2074360cc
 import java.util.regex.Pattern;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import es.grupo8.backend.dto.PaginatedResponse;
 
 public final class UtilsService {
 
