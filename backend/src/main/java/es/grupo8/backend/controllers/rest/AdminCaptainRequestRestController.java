@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -90,14 +90,21 @@ public class AdminCaptainRequestRestController extends BaseRestController {
 
 
     @GetMapping("/incidents")
-    public ResponseEntity<List<Map<String, Object>>> getIncidents() {
+    public ResponseEntity<?> getIncidents(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!userService.isAdminFromToken(authHeader)) {
+            return forbidden("administrators");
+        }
         List<Map<String, Object>> incidents = adminService.getAllIncidents("desc");
 
         return ResponseEntity.ok(incidents);
     }
 
     @DeleteMapping("/incidents/{id}")
-    public ResponseEntity<?> deleteIncident(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteIncident(@RequestHeader(value = "Authorization", required = false) String authHeader, 
+                                            @PathVariable Integer id) {
+        if (!userService.isAdminFromToken(authHeader)) {
+            return forbidden("administrators");
+        }
         try {
             adminService.deleteIncident(id);
             return ResponseEntity.ok("Incidencia eliminada");
