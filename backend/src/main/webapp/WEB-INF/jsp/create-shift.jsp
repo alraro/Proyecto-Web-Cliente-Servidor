@@ -1,3 +1,11 @@
+<%--
+  Vista de creación de turnos.
+
+  Autores:
+  - Alejandro Calvo Aguilar: 75%
+  - IA Generativa: 25%
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");

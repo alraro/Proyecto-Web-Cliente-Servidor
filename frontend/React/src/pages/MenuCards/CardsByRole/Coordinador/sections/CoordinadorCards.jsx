@@ -21,4 +21,11 @@ gestionCards.push({
     link: "/coordinator/create-shift"
 });
 
+gestionCards.push({
+    icon: "📅",
+    title: "Calendario de turnos",
+    description: "Visualiza todos los turnos de una campaña agrupados por tienda y día.",
+    link: "/coordinator/shifts-calendar"
+});
+
 export default gestionCards;
