@@ -255,15 +255,10 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        const parts = dateStr.split('-');
-        const y = Number(parts[0]);
-        const m = Number(parts[1]);
-        const d = Number(parts[2]);
-        const names = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
-        const t  = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
-        const yr = m < 3 ? y - 1 : y;
-        const dow = (yr + Math.floor(yr / 4) - Math.floor(yr / 100) + Math.floor(yr / 400) + t[m - 1] + d) % 7;
-        return names[dow] + ' ' + parts[2] + '/' + parts[1];
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        const dayNames = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+        return dayNames[date.getDay()] + ' ' + String(d).padStart(2, '0') + '/' + String(m).padStart(2, '0');
     }
 
     loadCampaigns();
