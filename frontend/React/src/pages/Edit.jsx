@@ -16,7 +16,6 @@ function Edit() {
     const [profileData, setProfileData] = useState(null);
 
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,7 +32,6 @@ function Edit() {
 
             if(!token) {
                 setMessage('No se ha encontrado una sesión activa para cargar el perfil.');
-                setMessageType('error');
                 
                 setTimeout(() => navigate('/login'), 1500);
                 return;
@@ -50,7 +48,6 @@ function Edit() {
 
                 if(!res.ok) {
                     setMessage(data.message || 'Error al cargar perfil');
-                    setMessageType('error');
                     return;
                 }
 
@@ -59,7 +56,6 @@ function Edit() {
             } catch (e) {
                 console.log(e);
                 setMessage('Error de conexión. Intenta nuevamente.');
-                setMessageType('error');
             }
         };
 
@@ -79,37 +75,31 @@ function Edit() {
 
         if(!email.trim()) {
             setMessage('El email es obligatorio');
-            setMessageType('error');
             return false;
         }
 
         if(!emailRegex.test(email)) {
             setMessage('El email no es válido');
-            setMessageType('error');
             return false;
         }
 
         if(!telefono.trim()) {
             setMessage('El teléfono es obligatorio');
-            setMessageType('error');
             return false;
         }
 
         if(cp.trim() && !/^[0-9]{5}$/.test(cp.trim())) {
             setMessage('El código postal debe tener 5 dígitos');
-            setMessageType('error');
             return false;
         }
 
         if (password || confirmPassword) {
             if (password.length < 6) {
                 setMessage('La contraseña debe tener al menos 6 caracteres');
-                setMessageType('error');
                 return false;
             }
             if(password !== confirmPassword) {
                 setMessage('Las contraseñas no coinciden');
-                setMessageType('error');
                 return false;
             }
         }
@@ -130,7 +120,6 @@ function Edit() {
 
         if(!token) {
             setMessage('No se ha encontrado una sesión activa para guardar los cambios.');
-            setMessageType('error');
             return;
         }
 
@@ -156,12 +145,10 @@ function Edit() {
 
             if(!res.ok) {
                 setMessage(responsedata.message || 'Error al actualizar perfil');
-                setMessageType('error');
                 return;
             }
             
             setMessage('Perfil actualizado correctamente');
-            setMessageType('success');
 
             setTimeout(() => {
                 navigate(returnRoute);
@@ -171,7 +158,6 @@ function Edit() {
         } catch (e) {
             console.log(e);
             setMessage('Error de conexión. Intenta nuevamente.');
-            setMessageType('error');
         }
 
     };
@@ -280,16 +266,7 @@ function Edit() {
                             <button type="button" className="secondary-button" id="cancel-button"onClick={() => navigate(returnRoute)}>Cancelar</button>
                         </div>
 
-                        {message && (
-                            <p 
-                                className={`form-message ${messageType === 'error' ? 'is-error' : 'is-success'}`} 
-                                style={{ color: messageType === 'error' ? '#d32f2f' : '#2e7d32', marginTop: '15px' }}
-                                role="status" 
-                                aria-live="polite"
-                            >
-                                {message}
-                            </p>
-                        )}
+                        {message}
                     </form>
                 </section>
             </main>

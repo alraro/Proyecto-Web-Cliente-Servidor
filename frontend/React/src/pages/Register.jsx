@@ -9,7 +9,6 @@ const ruta = "http://localhost:8080";
 
 function Register() {
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
     const navigate = useNavigate();
 
     const handleFormSubmit = async (e) => {
@@ -25,19 +24,16 @@ function Register() {
 
         if(!nombre || !email || !password || !confirmPassword) {
             setMessage("Completa los campos obligatorios");
-            setMessageType("error");
             return;
         }
 
         if(password.length < 6) {
             setMessage("La contraseña debe tener al menos 6 caracteres");
-            setMessageType("error");
             return;
         }
 
         if(password !== confirmPassword) {
             setMessage("Las contraseñas no coinciden");
-            setMessageType("error");
             return;
         }
 
@@ -54,18 +50,15 @@ function Register() {
 
             if(res.ok) {
                 setMessage("Solicitud registrada, espera aprobación del administrador");
-                setMessageType("success");
                 e.target.reset();
                 setTimeout(() => navigate('/login'), 1500);
                 return;
             }
 
             setMessage(data.message || "Error al registrar. Intenta nuevamente.");
-            setMessageType("error");
         } catch (e) {
             console.error(e);
             setMessage("Error de conexión. Intenta nuevamente.");
-            setMessageType("error");
         }
     };
 
@@ -177,12 +170,7 @@ function Register() {
                             <p className="help-text full-width">Los datos se almacenan en la tabla Usuario de PostgreSQL y la contraseña se usa para autenticación inicial del proyecto.</p>
                         </div>
 
-                        {/* Renderizado condicional del mensaje */}
-                        {message && (
-                            <p className={`form-message ${messageType === 'error' ? 'is-error' : 'is-success'}`} style={{ color: messageType === 'error' ? '#d32f2f' : '#2e7d32', margin: '10px 0' }}>
-                                {message}
-                            </p>
-                        )}
+                        {message}
 
                         <button type="submit" className="login-button">Crear cuenta</button>
                         
