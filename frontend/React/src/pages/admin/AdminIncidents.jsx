@@ -52,11 +52,9 @@ function Incidencias() {
                 headers: authHeaders()
             });
 
-            const data = await res.json();
-
             if(!res.ok) throw new Error('No se puede eliminar');
 
-            setIncidencias(data);
+            setIncidencias(prev => prev.filter(i => i.id !== id));
 
         } catch(e) {
             alert('Error al intentar eliminar');
