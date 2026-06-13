@@ -84,17 +84,7 @@ public class AdminService {
         }
         
         
-        return incidents.stream().map(i ->{
-            IncidentDTO dto = new IncidentDTO();
-            dto.setId(i.getId());
-            dto.setDescription(i.getDescription());
-            dto.setCreatedAt(i.getCreatedAt() != null ? i.getCreatedAt().toString() : "-");
-            dto.setCampaignName(i.getIdCampaign() != null ? i.getIdCampaign().getName() : "-");
-            dto.setStoreName(i.getIdStore() != null ? i.getIdStore().getName() : "-");
-            dto.setCaptainName(i.getIdUser() != null ? i.getIdUser().getName() : "-");
-
-            return dto;
-        }).collect(Collectors.toList());
+        return incidents.stream().map(incidentMapper::toDTO).collect(Collectors.toList());
     }
 
     public void deleteIncident (Integer id) {

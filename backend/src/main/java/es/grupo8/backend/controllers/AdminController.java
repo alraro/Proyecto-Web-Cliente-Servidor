@@ -11,7 +11,6 @@
 package es.grupo8.backend.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import es.grupo8.backend.dao.GeographicZoneRepository;
 import es.grupo8.backend.dao.LocalityRepository;
 import es.grupo8.backend.dto.AdminDTO;
 import es.grupo8.backend.dto.ChainRequestDto;
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.StoreRequestDto;
 import es.grupo8.backend.dto.StoreResponseDto;
