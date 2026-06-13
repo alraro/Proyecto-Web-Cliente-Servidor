@@ -11,7 +11,6 @@
 package es.grupo8.backend.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import es.grupo8.backend.dao.GeographicZoneRepository;
 import es.grupo8.backend.dao.LocalityRepository;
 import es.grupo8.backend.dto.AdminDTO;
 import es.grupo8.backend.dto.ChainRequestDto;
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
@@ -203,7 +203,8 @@ public class AdminController {
             try {
                 model.addAttribute("editEntity", chainService.findById(editar));
                 model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "Cadena no encontrada.");
             }
         }
 
@@ -313,7 +314,8 @@ public class AdminController {
             try {
                 model.addAttribute("editEntity", storeService.findById(editar));
                 model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "Tienda no encontrada.");
             }
         }
 
@@ -516,7 +518,7 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+        List<IncidentDTO> incidents = adminService.getAllIncidents();
 
         model.addAttribute("incidents", incidents);
         model.addAttribute("pageTitle", "Bancosol | Todas las incidencias");

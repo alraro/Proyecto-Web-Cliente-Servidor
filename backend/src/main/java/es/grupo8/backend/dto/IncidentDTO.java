@@ -15,4 +15,5 @@ public class IncidentDTO {
     private String createdAt;
     private String campaignName;
     private String storeName;
+    private String captainName;
 }

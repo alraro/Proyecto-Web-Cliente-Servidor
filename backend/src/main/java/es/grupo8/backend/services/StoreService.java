@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +76,7 @@ public class StoreService {
 
     public StoreResponseDto findById(Integer id) {
         es.grupo8.backend.entity.Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new NoSuchElementException("Store not found"));
         return storeMapper.toDTO(store);
     }
 
@@ -91,7 +92,7 @@ public class StoreService {
 
     public StoreResponseDto update(Integer id, StoreRequestDto req) {
         es.grupo8.backend.entity.Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new NoSuchElementException("Store not found"));
         StoreComponents c = resolve(req);
         store.setName(c.name());
         store.setAddress(c.address());
@@ -102,7 +103,7 @@ public class StoreService {
 
     public void delete(Integer id) {
         if (!storeRepository.existsById(id))
-            throw new RuntimeException("Store not found");
+            throw new NoSuchElementException("Store not found");
         storeRepository.deleteById(id);
     }
 

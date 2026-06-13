@@ -22,6 +22,7 @@ public class IncidentMapper extends MapperDTO<IncidentDTO, Incident> {
         dto.setCreatedAt(i.getCreatedAt() != null ? i.getCreatedAt().toString() : null);
         dto.setCampaignName(i.getIdCampaign() != null ? i.getIdCampaign().getName() : null);
         dto.setStoreName(i.getIdStore() != null ? i.getIdStore().getName() : null);
+        dto.setCaptainName(i.getIdUser() != null ? i.getIdUser().getName() : null);
         return dto;
     }
 }

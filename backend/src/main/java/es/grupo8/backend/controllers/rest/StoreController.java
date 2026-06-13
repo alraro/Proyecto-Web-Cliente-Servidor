@@ -29,16 +29,6 @@ public class StoreController extends BaseRestController {
     private final AuthService authService;
     private final UserService userService;
 
-    private void checkAdmin(String authHeader) {
-        Integer userId = authService.extractUserIdFromToken(authHeader);
-        if (userId == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!userService.isAdmin(userId)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
-        }
-    }
-
     private void checkAdminOrCoordinator(String authHeader) {
         Integer userId = authService.extractUserIdFromToken(authHeader);
         if (userId == null) {
@@ -69,7 +59,7 @@ public class StoreController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         return ResponseEntity.ok(storeService.findById(id));
     }
 
@@ -78,7 +68,7 @@ public class StoreController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) StoreRequestDto req) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         StoreResponseDto created = storeService.create(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -89,7 +79,7 @@ public class StoreController extends BaseRestController {
             @PathVariable Integer id,
             @RequestBody(required = false) StoreRequestDto req) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         StoreResponseDto updated = storeService.update(id, req);
         return ResponseEntity.ok(updated);
     }
@@ -99,7 +89,7 @@ public class StoreController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         storeService.delete(id);
         return ResponseEntity.noContent().build();
     }

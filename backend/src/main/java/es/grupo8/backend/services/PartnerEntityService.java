@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class PartnerEntityService {
@@ -57,7 +58,7 @@ public class PartnerEntityService {
 
     public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
         PartnerEntity entity = partnerEntityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Partner entity not found with ID: " + id));
         return partnerEntityMapper.toDTO(entity);
     }
 
@@ -77,7 +78,7 @@ public class PartnerEntityService {
         validateRequest(request);
 
         PartnerEntity entity = partnerEntityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Partner entity not found with ID: " + id));
 
         entity.setName(request.getName().trim());
         entity.setAddress(UtilsService.trimToNull(request.getAddress()));
@@ -89,7 +90,7 @@ public class PartnerEntityService {
 
     public void deletePartnerEntity(Integer id) {
         if (!partnerEntityRepository.existsById(id)) {
-            throw new RuntimeException("Partner entity not found with ID: " + id);
+            throw new NoSuchElementException("Partner entity not found with ID: " + id);
         }
         partnerEntityRepository.deleteById(id);
     }

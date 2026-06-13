@@ -1,7 +1,7 @@
 package es.grupo8.backend.services;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
-
+import es.grupo8.backend.dto.PaginatedResponse;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public final class UtilsService {
@@ -53,22 +53,24 @@ public final class UtilsService {
         return trimmed.replaceAll("\\s+", " ");
     }
 
-    public static String hashPassword(String rawPassword) {
-        if (rawPassword == null) return null;
-        return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
+    public static int clampPageSize(int size) {
+        return clampPageSize(size, 100);
     }
 
-    public static boolean matchesPassword(String rawPassword, String storedPassword) {
-        if (rawPassword == null || storedPassword == null) return false;
-
-        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
-            return BCrypt.checkpw(rawPassword, storedPassword);
-        }
-        return rawPassword.equals(storedPassword);
+    public static int clampPageSize(int size, int max) {
+        return Math.max(1, Math.min(size, max));
     }
 
-    public static boolean needsMigration(String storedPassword) {
-        if (storedPassword == null) return false;
-        return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
+    public static <T> PaginatedResponse<T> buildPaginatedResponse(List<T> content, int page, int size, long totalElements) {
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        return new PaginatedResponse<>(
+                content,
+                page,
+                size,
+                totalElements,
+                totalPages,
+                page < totalPages - 1,
+                page > 0
+        );
     }
 }
