@@ -10,7 +10,8 @@
 <%@ page import="java.util.List, java.util.Map, es.grupo8.backend.dto.CampaignDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String role = (String) session.getAttribute("role");
+    String role  = (String) session.getAttribute("role");
+    String token = (String) session.getAttribute("token");
     if (!"CAPITAN".equals(role)) {
         response.sendRedirect("/login");
         return;
@@ -80,6 +81,8 @@
         </div>
     </div>
 
+    <div id="attendance-message" hidden></div>
+
     <% if (selectedCampaignId != null) { %>
     <div class="card">
         <div class="card-header">
@@ -122,12 +125,12 @@
                                 for (Map<String, Object> v : volunteers) {
                                     boolean attended = Boolean.TRUE.equals(v.get("attendance")); %>
                         <tr>
-                            <td><%= storen  Name %></td>
+                            <td><%= storeName %></td>
                             <td><%= day %></td>
                             <td><%= startTime %></td>
                             <td><%= endTime %></td>
                             <td><%= v.get("volunteerName") != null ? v.get("volunteerName") : "-" %></td>
-                            <td><input type="checkbox" <%= attended ? "checked" : "" %> disabled></td>
+                            <td><input type="checkbox" class="attendance-check" data-shift-id="<%= shift.get("shiftId") %>" data-volunteer-id="<%= v.get("volunteerId") %>" <%= attended ? "checked" : "" %>></td>
                         </tr>
                         <%      }
                             }
@@ -139,5 +142,47 @@
     </div>
     <% } %>
 </main>
+
+<script>
+    const TOKEN = '<%= token != null ? token : "" %>';
+
+    document.querySelectorAll('.attendance-check').forEach(function(cb) {
+        cb.addEventListener('change', async function() {
+            const shiftId    = this.dataset.shiftId;
+            const volunteerId = parseInt(this.dataset.volunteerId);
+            const attended   = this.checked;
+
+            try {
+                const res = await fetch('/api/shifts/' + shiftId + '/attendance', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ volunteerId: volunteerId, attendance: attended })
+                });
+
+                if (!res.ok) {
+                    this.checked = !attended;
+                    showFeedback('Error al registrar la asistencia', true);
+                    return;
+                }
+                showFeedback('Asistencia actualizada correctamente', false);
+            } catch (e) {
+                this.checked = !attended;
+                showFeedback('Error al conectar con el servidor', true);
+            }
+        });
+    });
+
+    function showFeedback(text, isError) {
+        const el = document.querySelector('#attendance-message');
+        el.textContent = text;
+        el.className   = 'form-message ' + (isError ? 'error' : 'success');
+        el.hidden      = false;
+        setTimeout(function() { el.hidden = true; }, 3000);
+    }
+</script>
+
 </body>
 </html>
