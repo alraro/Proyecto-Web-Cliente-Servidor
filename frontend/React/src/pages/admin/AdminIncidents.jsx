@@ -19,9 +19,9 @@ function Incidencias() {
     const [message, setMessage] = useState('');
     const [incidencias, setIncidencias] = useState([]);
 
-    const incidenciasFetch = async (dir = 'asc') => {
+    const incidenciasFetch = async () => {
         try {
-            const res = await fetch(`${ruta}/api/admin/incidents?sort=${dir}`, {
+            const res = await fetch(`${ruta}/api/admin/incidents`, {
                 method: 'GET',
                 headers: authHeaders({
                     'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ function Incidencias() {
     };
 
     useEffect(() => {
-        incidenciasFetch('asc');
+        incidenciasFetch();
     }, []); // Se ejecuta solo una vez al montar el componente
 
     const handleDelete = async (id) => {
@@ -55,7 +55,6 @@ function Incidencias() {
             if(!res.ok) throw new Error('No se puede eliminar');
 
             setIncidencias(data);
-            setNextDir(dir === 'asc' ? 'desc' : 'asc');
 
         } catch(e) {
             alert('Error al intentar eliminar');
