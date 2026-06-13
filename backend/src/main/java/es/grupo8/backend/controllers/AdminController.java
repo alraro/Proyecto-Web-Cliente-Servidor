@@ -45,6 +45,7 @@ import es.grupo8.backend.services.ChainService;
 import es.grupo8.backend.services.PartnerEntityService;
 import es.grupo8.backend.services.StoreService;
 import es.grupo8.backend.services.UserService;
+import es.grupo8.backend.services.UtilsService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -456,10 +457,9 @@ public class AdminController {
         model.addAttribute("currentSearch", search);
         model.addAttribute("currentRole", role);
 
-        if (sort == null) sort = "id,asc";
-        String[] parts = sort.split(",");
-        model.addAttribute("sortField", parts[0]);
-        model.addAttribute("sortOrder", parts.length > 1 ? parts[1] : "asc");
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
+        model.addAttribute("sortField", sortInfo.field());
+        model.addAttribute("sortOrder", sortInfo.order());
 
         return "admin-users";
     }

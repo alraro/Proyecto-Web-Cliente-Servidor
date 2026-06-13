@@ -30,7 +30,7 @@ public class PartnerEntityService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        SortInfo sortInfo = parseSort(sort);
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
 
         List<PartnerEntity> entities = switch (sortInfo.field()) {
             case "name" -> sortInfo.order().equals("asc")
@@ -120,16 +120,4 @@ public class PartnerEntityService {
         }
     }
 
-    public SortInfo parseSort(String sort) {
-        String field = "id";
-        String order = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            field = parts[0].trim().toLowerCase();
-            order = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
-        return new SortInfo(field, order);
-    }
-
-    public record SortInfo(String field, String order) {}
 }

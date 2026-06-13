@@ -48,19 +48,13 @@ public class PartnerEntityManagerService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        String sortField = "id";
-        String sortDir = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0].trim().toLowerCase();
-            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
 
-        List<PartnerEntityManager> managers = switch (sortField) {
-            case "name" -> sortDir.equals("asc")
+        List<PartnerEntityManager> managers = switch (sortInfo.field()) {
+            case "name" -> sortInfo.order().equals("asc")
                     ? partnerEntityManagerRepository.findAllByNameAsc(search, size, offset)
                     : partnerEntityManagerRepository.findAllByNameDesc(search, size, offset);
-            default -> sortDir.equals("asc")
+            default -> sortInfo.order().equals("asc")
                     ? partnerEntityManagerRepository.findAllByIdAsc(search, size, offset)
                     : partnerEntityManagerRepository.findAllByIdDesc(search, size, offset);
         };

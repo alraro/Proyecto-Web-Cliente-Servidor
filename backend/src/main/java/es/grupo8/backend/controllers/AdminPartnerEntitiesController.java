@@ -5,6 +5,7 @@ import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.PartnerEntityService;
+import es.grupo8.backend.services.UtilsService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class AdminPartnerEntitiesController {
         model.addAttribute("currentSearch", search);
         model.addAttribute("currentSize", size);
 
-        PartnerEntityService.SortInfo sortInfo = partnerEntityService.parseSort(sort);
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
         model.addAttribute("sortField", sortInfo.field());
         model.addAttribute("sortOrder", sortInfo.order());
 

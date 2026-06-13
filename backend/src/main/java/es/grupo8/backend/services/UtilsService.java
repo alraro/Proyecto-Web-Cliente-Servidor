@@ -11,6 +11,19 @@ public final class UtilsService {
     private UtilsService() {
     }
 
+    public record SortInfo(String field, String order) {}
+
+    public static SortInfo parseSort(String sort) {
+        String field = "id";
+        String order = "asc";
+        if (sort != null && sort.contains(",")) {
+            String[] parts = sort.split(",");
+            field = parts[0].trim().toLowerCase();
+            order = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
+        }
+        return new SortInfo(field, order);
+    }
+
     public static String trimToNull(String value) {
         if (value == null) return null;
         String trimmed = value.trim();
