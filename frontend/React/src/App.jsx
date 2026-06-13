@@ -6,6 +6,8 @@ import Admin from './pages/admin/Admin';
 import Dashboard from './pages/admin/AdminDashboard';
 import AdminChains from './pages/admin/AdminChains';
 import AdminStores from './pages/admin/AdminStores';
+import AdminCampaigns from './pages/admin/AdminCampaings';
+import Campaigns from './pages/admin/Campaigns';
 import AdminCreateUser from './pages/admin/AdminCreateUser';
 import AdminIncidents from './pages/admin/AdminIncidents';
 import AdminVolunteers from './pages/admin/AdminVolunteers';
@@ -41,6 +43,8 @@ function App() {
           <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/campaigns" element={<AdminCampaigns />} />
+            <Route path="/admin/view-campaigns" element={<Campaigns />} />
             <Route path="/admin/chains" element={<AdminChains />} />
             <Route path="/admin/stores" element={<AdminStores />} />
             <Route path="/admin/volunteers" element={<AdminVolunteers />} />
