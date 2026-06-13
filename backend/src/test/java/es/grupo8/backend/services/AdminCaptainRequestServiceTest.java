@@ -33,10 +33,6 @@ import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.entity.UserEntity;
 
-/**
- * Checks that the approve flow creates the user + captain and marks the request, and that
- * both approve and reject guard against missing or already-processed requests.
- */
 @ExtendWith(MockitoExtension.class)
 class AdminCaptainRequestServiceTest {
 
@@ -59,7 +55,6 @@ class AdminCaptainRequestServiceTest {
         return req;
     }
 
-    /** getPendingRequests just forwards the PENDIENTE look-up. */
     @Test
     void getPendingRequests_delegates() {
         List<CaptainRequest> list = new ArrayList<>();
@@ -67,7 +62,6 @@ class AdminCaptainRequestServiceTest {
         assertSame(list, service.getPendingRequests());
     }
 
-    /** approveRequest creates the user, the captain assignment and marks the request APROBADA. */
     @Test
     void approveRequest_createsUserAndCaptain() {
         CaptainRequest req = pendingRequest(5);
@@ -86,14 +80,12 @@ class AdminCaptainRequestServiceTest {
         verify(captainRequestRepository).save(req);
     }
 
-    /** approveRequest throws when the request does not exist. */
     @Test
     void approveRequest_notFound_throws() {
         when(captainRequestRepository.findById(7)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> service.approveRequest(99, 7));
     }
 
-    /** approveRequest refuses a request that is not pending. */
     @Test
     void approveRequest_alreadyProcessed_throws() {
         CaptainRequest req = pendingRequest(5);
@@ -102,7 +94,6 @@ class AdminCaptainRequestServiceTest {
         assertThrows(IllegalStateException.class, () -> service.approveRequest(99, 1));
     }
 
-    /** rejectRequest marks a pending request as RECHAZADA. */
     @Test
     void rejectRequest_marksRejected() {
         CaptainRequest req = pendingRequest(5);
@@ -114,7 +105,6 @@ class AdminCaptainRequestServiceTest {
         verify(captainRequestRepository).save(req);
     }
 
-    /** rejectRequest refuses a request that is not pending. */
     @Test
     void rejectRequest_alreadyProcessed_throws() {
         CaptainRequest req = pendingRequest(5);

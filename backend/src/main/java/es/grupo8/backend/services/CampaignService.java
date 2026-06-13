@@ -31,10 +31,6 @@ import es.grupo8.backend.entity.CampaignType;
 import es.grupo8.backend.mapper.CampaignMapper;
 import es.grupo8.backend.mapper.CampaignTypeMapper;
 
-/**
- * Service for campaign management operations.
- * Throws IllegalArgumentException (400), NoSuchElementException (404), IllegalStateException (409).
- */
 @Service
 public class CampaignService {
 
@@ -46,17 +42,10 @@ public class CampaignService {
     @Autowired private CampaignMapper campaignMapper;
     @Autowired private CampaignTypeMapper campaignTypeMapper;
 
-    /** Returns all campaign types. */
     public List<CampaignTypeResponseDto> getCampaignTypes() {
         return campaignTypeMapper.toDTOList(campaignTypeRepository.findAll());
     }
 
-    /**
-     * Returns a paginated and optionally filtered list of campaigns.
-     *
-     * @param status ACTIVE, PAST, FUTURE or null for all
-     * @param pageable pagination and sorting settings
-     */
     public Page<CampaignDTO> getCampaigns(String status, Pageable pageable) {
         validateStatus(status);
         LocalDate today = LocalDate.now();
@@ -71,9 +60,6 @@ public class CampaignService {
         return page.map(campaignMapper::toDTO);
     }
 
-    /**
-     * Returns [totalActive, totalPast, totalFuture] counts for the summary section.
-     */
     public long[] getCampaignCounts() {
         LocalDate today = LocalDate.now();
         return new long[]{
@@ -83,17 +69,10 @@ public class CampaignService {
         };
     }
 
-    /** Returns the campaign with the given id, or empty if not found. */
     public Optional<CampaignDTO> getCampaignById(Integer id) {
         return campaignRepository.findById(id).map(campaignMapper::toDTO);
     }
 
-    /**
-     * Creates a new campaign.
-     *
-     * @param request campaign data
-     * @return the created campaign DTO
-     */
     public CampaignDTO createCampaign(Integer adminUserId, CampaignRequestDto request) {
         validate(request);
         CampaignType type = findType(request.getTypeId());
@@ -108,13 +87,6 @@ public class CampaignService {
         return campaignMapper.toDTO(campaignRepository.save(campaign));
     }
 
-    /**
-     * Updates an existing campaign.
-     *
-     * @param id      campaign id
-     * @param request updated data
-     * @return the updated campaign DTO
-     */
     public CampaignDTO updateCampaign(Integer adminUserId, Integer id, CampaignRequestDto request) {
         validate(request);
         Campaign campaign = campaignRepository.findById(id)
@@ -130,12 +102,6 @@ public class CampaignService {
         return campaignMapper.toDTO(campaignRepository.save(campaign));
     }
 
-    /**
-     * Deletes a campaign and all its related assignments.
-     *
-     * @param id campaign id
-     * @return the name of the deleted campaign (for audit logging)
-     */
     @Transactional
     public void deleteCampaign(Integer adminUserId, Integer id) {
         campaignRepository.findById(id)

@@ -8,171 +8,220 @@
  */
 package es.grupo8.backend.controllers;
 
-import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.dto.VoluntarioResponseDto;
 import es.grupo8.backend.services.CoordinatorDashboardService;
+import es.grupo8.backend.services.ShiftService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
-/**
- * MVC controller for coordinator views.
- * Loads model data from CoordinatorDashboardService for server-side JSP rendering.
- */
 @Controller
 @AllArgsConstructor
-public class CoordinatorController {
+public class CoordinatorController extends MvcSessionController {
 
     private final CoordinatorDashboardService coordinatorDashboardService;
+    private final ShiftService shiftService;
 
-    /**
-     * Serves the coordinator welcome page.
-     *
-     * @param session HTTP session carrying the user role
-     * @return view name or redirect
-     */
     @GetMapping("/coordinator")
     public String coordinator(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
         return "coordinator";
     }
 
-    /**
-     * Serves the coordinator dashboard with the user's assigned campaigns.
-     *
-     * @param session HTTP session carrying role, userId and nombre
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
     @GetMapping("/coordinator-dashboard")
     public String coordinatorDashboard(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
         model.addAttribute("userName", session.getAttribute("nombre"));
-        model.addAttribute("myCampaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        model.addAttribute("myCampaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
         return "coordinator-dashboard";
     }
 
-    /**
-     * Serves the coordinator campaigns list.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
     @GetMapping("/coordinator-campaigns")
     public String coordinatorCampaigns(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
         return "coordinator-campaigns";
     }
 
-    /**
-     * Serves the coordinator stores page with campaign selector.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
     @GetMapping("/coordinator-stores")
-    public String coordinatorStores(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+    public String coordinatorStores(HttpSession session,
+                                    @RequestParam(required = false) Integer campaignId,
+                                    Model model) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("stores", coordinatorDashboardService.getMyStores(campaignId));
+        }
         return "coordinator-stores";
     }
 
-    /**
-     * Serves the coordinator captains page with campaign selector.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
     @GetMapping("/coordinator-captains")
-    public String coordinatorCaptains(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+    public String coordinatorCaptains(HttpSession session,
+                                      @RequestParam(required = false) Integer campaignId,
+                                      Model model) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("captains", coordinatorDashboardService.getCaptains(campaignId));
+        }
         return "coordinator-captains";
     }
 
-    /**
-     * Serves the volunteer assignment page with campaigns, volunteers and partner entities.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
-    @GetMapping("/coordinator-volunteers")
-    public String coordinatorVolunteers(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+    @PostMapping("/coordinator-captains/registrar")
+    public String registerCaptain(HttpSession session,
+                                  @RequestParam Integer campaignId,
+                                  @RequestParam String name,
+                                  @RequestParam String email,
+                                  @RequestParam String password,
+                                  RedirectAttributes attr) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        List<VoluntarioResponseDto> volunteers = coordinatorDashboardService.getVolunteers();
-        List<PartnerEntityResponseDto> partnerEntities = coordinatorDashboardService.getPartnerEntities();
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
-        model.addAttribute("volunteers", volunteers);
-        model.addAttribute("partnerEntities", partnerEntities);
+        try {
+            coordinatorDashboardService.registerCaptain(currentUserId(session), name, email, password, campaignId);
+            attr.addFlashAttribute("success", "Capitán registrado. Pendiente de aprobación del administrador.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/coordinator-captains?campaignId=" + campaignId;
+    }
+
+    @GetMapping("/coordinator-volunteers")
+    public String coordinatorVolunteers(HttpSession session,
+                                        @RequestParam(required = false) Integer campaignId,
+                                        @RequestParam(required = false) Integer storeId,
+                                        @RequestParam(required = false) Integer shiftId,
+                                        Model model) {
+        if (!hasRole(session, "COORDINADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
+        model.addAttribute("volunteers", coordinatorDashboardService.getVolunteers());
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("stores", shiftService.getStoresForCampaign(campaignId));
+            if (storeId != null) {
+                model.addAttribute("selectedStoreId", storeId);
+                model.addAttribute("shifts", shiftService.getShifts(campaignId, storeId));
+                if (shiftId != null) {
+                    model.addAttribute("selectedShiftId", shiftId);
+                }
+            }
+        }
         return "coordinator-volunteers";
     }
 
-    /**
-     * Serves the collaborators management page.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
-    @GetMapping("/coordinator-collaborators")
-    public String coordinatorCollaborators(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+    @PostMapping("/coordinator-volunteers/asignar")
+    public String assignVolunteerShift(HttpSession session,
+                                       @RequestParam Integer campaignId,
+                                       @RequestParam Integer storeId,
+                                       @RequestParam Integer volunteerId,
+                                       @RequestParam String shiftDay,
+                                       @RequestParam String startTime,
+                                       @RequestParam String endTime,
+                                       RedirectAttributes attr) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        try {
+            coordinatorDashboardService.assignVolunteerShift(currentUserId(session), volunteerId,
+                    campaignId, storeId, shiftDay, startTime, endTime);
+            attr.addFlashAttribute("success", "Voluntario asignado correctamente.");
+        } catch (IllegalArgumentException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/coordinator-volunteers?campaignId=" + campaignId + "&storeId=" + storeId;
+    }
+
+    @GetMapping("/coordinator-collaborators")
+    public String coordinatorCollaborators(HttpSession session,
+                                           @RequestParam(required = false) Integer crear,
+                                           @RequestParam(required = false) Integer editar,
+                                           Model model) {
+        if (!hasRole(session, "COORDINADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("volunteers", coordinatorDashboardService.getVolunteers());
+        model.addAttribute("partnerEntities", coordinatorDashboardService.getPartnerEntities());
+        if (crear != null) {
+            model.addAttribute("showForm", true);
+            model.addAttribute("isCreating", true);
+        } else if (editar != null) {
+            for (VoluntarioResponseDto v : coordinatorDashboardService.getVolunteers()) {
+                if (editar.equals(v.id())) {
+                    model.addAttribute("editEntity", v);
+                    model.addAttribute("showForm", true);
+                    break;
+                }
+            }
+        }
         return "coordinator-collaborators";
     }
 
-    /**
-     * Serves the partner entities page with campaign selector for AJAX filtering.
-     *
-     * @param session HTTP session carrying role and userId
-     * @param model   Spring MVC model for the JSP
-     * @return view name or redirect
-     */
-    @GetMapping("/coordinator-entities")
-    public String coordinatorEntities(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (!"COORDINADOR".equals(role)) {
+    @PostMapping("/coordinator-collaborators/guardar")
+    public String saveCollaborator(HttpSession session,
+                                   @RequestParam(required = false) Integer id,
+                                   @RequestParam String name,
+                                   @RequestParam(required = false) String phone,
+                                   @RequestParam(required = false) String email,
+                                   @RequestParam(required = false) String address,
+                                   @RequestParam(required = false) Integer partnerEntityId,
+                                   RedirectAttributes attr) {
+        if (!hasRole(session, "COORDINADOR")) {
             return "redirect:/login";
         }
-        Integer userId = (Integer) session.getAttribute("userID");
-        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(userId));
+        try {
+            if (id == null) {
+                coordinatorDashboardService.createVolunteer(currentUserId(session), emptyToNull(name),
+                        emptyToNull(phone), emptyToNull(email), emptyToNull(address), partnerEntityId);
+                attr.addFlashAttribute("success", "Colaborador creado correctamente.");
+            } else {
+                coordinatorDashboardService.updateVolunteer(currentUserId(session), id, emptyToNull(name),
+                        emptyToNull(phone), emptyToNull(email), emptyToNull(address), partnerEntityId);
+                attr.addFlashAttribute("success", "Colaborador actualizado correctamente.");
+            }
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/coordinator-collaborators";
+    }
+
+    @GetMapping("/coordinator-entities")
+    public String coordinatorEntities(HttpSession session,
+                                      @RequestParam(required = false) Integer campaignId,
+                                      Model model) {
+        if (!hasRole(session, "COORDINADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", coordinatorDashboardService.getMyCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            model.addAttribute("selectedCampaignId", campaignId);
+            model.addAttribute("entities", coordinatorDashboardService.getCampaignEntities(campaignId));
+        }
         return "coordinator-entities";
+    }
+
+    private static String emptyToNull(String value) {
+        return value == null || value.trim().isEmpty() ? null : value.trim();
     }
 }

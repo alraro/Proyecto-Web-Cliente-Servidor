@@ -41,10 +41,6 @@ import es.grupo8.backend.mapper.StoreMapper;
 import es.grupo8.backend.mapper.UserMapper;
 import es.grupo8.backend.mapper.VolunteerMapper;
 
-/**
- * Verifies that getCaptains and getMyStores resolve their data through JPQL repository
- * methods instead of loading rows and mapping/filtering them in memory.
- */
 @ExtendWith(MockitoExtension.class)
 class CoordinatorDashboardServiceTest {
 
@@ -65,7 +61,6 @@ class CoordinatorDashboardServiceTest {
 
     @InjectMocks CoordinatorDashboardService service;
 
-    /** getCaptains resolves campaign captains through the JPQL repo method. */
     @Test
     void getCaptains_usesJpql() {
         List<UserEntity> entities = new ArrayList<>();
@@ -80,13 +75,11 @@ class CoordinatorDashboardServiceTest {
         verify(captainRepository, never()).findByIdIdCampaign(1);
     }
 
-    /** getCaptains requires a campaign id. */
     @Test
     void getCaptains_nullCampaign_throws() {
         assertThrows(IllegalArgumentException.class, () -> service.getCaptains(null));
     }
 
-    /** getMyStores resolves campaign stores through the JPQL repo method. */
     @Test
     void getMyStores_usesJpql() {
         List<Store> stores = new ArrayList<>();
@@ -101,7 +94,6 @@ class CoordinatorDashboardServiceTest {
         verify(campaignStoreRepository, never()).findByIdCampaign_Id(3);
     }
 
-    /** getMyStores requires a campaign id. */
     @Test
     void getMyStores_nullCampaign_throws() {
         assertThrows(IllegalArgumentException.class, () -> service.getMyStores(null));

@@ -4,7 +4,8 @@
  * Autores:
  * - Alejandra Ortiz: 30%
  * - Hugo Herrero González: 30%
- * - Alfonso Ramos Rojas: 30%
+ * - Fernando Luis Pinilla Molina: 15%
+ * - Alfonso Ramos Rojas: 15%
  * - IA Generativa: 10%
  */
 package es.grupo8.backend.controllers;
@@ -76,8 +77,7 @@ public class AdminController {
     @Autowired
     private GeographicZoneRepository geographicZoneRepository;
 
-    // Read-only campaigns list. The data comes through the model (SSR) so the JSP renders it server-side
-    // instead of fetching it with JavaScript.
+    // Listado de campañas de solo lectura, los datos van por el model
     @GetMapping("/campaigns")
     public String campaigns(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");

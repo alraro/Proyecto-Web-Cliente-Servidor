@@ -20,11 +20,6 @@ import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CaptainDashboardService;
 import es.grupo8.backend.services.UserService;
 
-/**
- * Unit tests for {@link CaptainDashboardRestController}: captain auth enforcement,
- * null-body handling, and incident creation.
- * Uses direct method invocation — no Spring context or HTTP layer required.
- */
 @ExtendWith(MockitoExtension.class)
 class CaptainDashboardRestControllerTest {
 
@@ -34,7 +29,6 @@ class CaptainDashboardRestControllerTest {
 
     @InjectMocks CaptainDashboardRestController controller;
 
-    /** getMyCampaigns with a non-captain token must return 403. */
     @Test
     void getMyCampaigns_notCaptain_returnsForbidden() {
         when(userService.isCaptainFromToken("Bearer bad-token")).thenReturn(false);
@@ -44,7 +38,6 @@ class CaptainDashboardRestControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
-    /** getShifts with a valid captain token must return 200. */
     @Test
     void getShifts_validCaptain_returnsOk() {
         when(userService.isCaptainFromToken("Bearer test-token")).thenReturn(true);
@@ -56,7 +49,6 @@ class CaptainDashboardRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
-    /** createIncident with a null body and valid token must return 400. */
     @Test
     void createIncident_missingBody_returns400() {
         when(userService.isCaptainFromToken("Bearer test-token")).thenReturn(true);
@@ -66,7 +58,6 @@ class CaptainDashboardRestControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-    /** createIncident with valid token and full body must return 201 with incidentId. */
     @Test
     void createIncident_validRequest_returns201() {
         when(userService.isCaptainFromToken("Bearer test-token")).thenReturn(true);

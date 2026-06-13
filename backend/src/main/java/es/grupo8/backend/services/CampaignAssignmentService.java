@@ -7,12 +7,9 @@
  */
 package es.grupo8.backend.services;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +32,9 @@ import es.grupo8.backend.mapper.CampaignMapper;
 import es.grupo8.backend.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 
-/**
- * Service for admin management of coordinator and captain assignments to campaigns (RF-14).
- */
 @Service
 @AllArgsConstructor
 public class CampaignAssignmentService {
-
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
 
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
@@ -53,28 +45,11 @@ public class CampaignAssignmentService {
     private final UserMapper userMapper;
     private final CampaignAssignmentsMapper campaignAssignmentsMapper;
 
-    /**
-     * Returns all campaigns as a typed list for the admin assignment view.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @return list of campaign DTOs
-     */
     @Transactional(readOnly = true)
     public List<CampaignDTO> getCampaigns(Integer adminUserId) {
-        List<CampaignDTO> result = campaignMapper.toDTOList(campaignRepository.findAll());
-        auditLog.info("ACTION=LIST_CAMPAIGNS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), null, null);
-        return result;
+        return campaignMapper.toDTOList(campaignRepository.findAll());
     }
 
-    /**
-     * Returns the coordinator and captain assignments for a campaign.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @return typed DTO with campaign info and coordinator/captain lists
-     * @throws NoSuchElementException if campaign not found
-     */
     @Transactional(readOnly = true)
     public CampaignAssignmentsDTO getCampaignAssignments(Integer adminUserId, Integer campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId)
@@ -85,22 +60,9 @@ public class CampaignAssignmentService {
         List<UserResponseDto> captains = userMapper.toDTOList(
                 captainRepository.findUsersByCampaignId(campaignId));
 
-        auditLog.info("ACTION=GET_CAMPAIGN_ASSIGNMENTS adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, null);
-
         return campaignAssignmentsMapper.toDTO(campaign, coordinators, captains);
     }
 
-    /**
-     * Returns users eligible to be assigned to a campaign in the given role.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @param role        required role filter (COORDINATOR or CAPTAIN)
-     * @return list of available user DTOs
-     * @throws NoSuchElementException   if campaign not found
-     * @throws IllegalArgumentException if role is invalid
-     */
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAvailableUsers(Integer adminUserId, Integer campaignId, String role) {
         if (!campaignRepository.existsById(campaignId)) {
@@ -110,26 +72,11 @@ public class CampaignAssignmentService {
             throw new IllegalArgumentException("Invalid role. Use COORDINATOR or CAPTAIN");
         }
 
-        List<UserResponseDto> result = "COORDINATOR".equalsIgnoreCase(role)
+        return "COORDINATOR".equalsIgnoreCase(role)
                 ? userMapper.toDTOList(userRepository.findAvailableCoordinators(campaignId))
                 : userMapper.toDTOList(userRepository.findAvailableCaptains(campaignId));
-
-        auditLog.info("ACTION=LIST_AVAILABLE_USERS_FOR_CAMPAIGN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, null);
-        return result;
     }
 
-    /**
-     * Assigns a coordinator to a campaign.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @param userId      coordinator user identifier
-     * @return typed assignment result DTO
-     * @throws NoSuchElementException   if campaign or user not found
-     * @throws IllegalArgumentException if user is not a coordinator
-     * @throws IllegalStateException    if user is already assigned
-     */
     public AssignmentResultDTO assignCoordinator(Integer adminUserId, Integer campaignId, Integer userId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
@@ -153,20 +100,14 @@ public class CampaignAssignmentService {
         coordinator.setIdCampaign(campaign);
         coordinatorRepository.save(coordinator);
 
-        auditLog.info("ACTION=ASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
-
-        return new AssignmentResultDTO("Coordinator assigned successfully", campaignId, userId, user.getName());
+        AssignmentResultDTO result = new AssignmentResultDTO();
+        result.setMessage("Coordinator assigned successfully");
+        result.setCampaignId(campaignId);
+        result.setUserId(userId);
+        result.setUserName(user.getName());
+        return result;
     }
 
-    /**
-     * Removes a coordinator from a campaign.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @param userId      coordinator user identifier
-     * @throws NoSuchElementException if campaign or assignment not found
-     */
     @Transactional
     public void unassignCoordinator(Integer adminUserId, Integer campaignId, Integer userId) {
         if (!campaignRepository.existsById(campaignId)) {
@@ -176,21 +117,8 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         coordinatorRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
-        auditLog.info("ACTION=UNASSIGN_COORDINATOR adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
     }
 
-    /**
-     * Assigns a captain to a campaign.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @param userId      captain user identifier
-     * @return typed assignment result DTO
-     * @throws NoSuchElementException   if campaign or user not found
-     * @throws IllegalArgumentException if user is not a captain
-     * @throws IllegalStateException    if user is already assigned
-     */
     public AssignmentResultDTO assignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new NoSuchElementException("Campaign not found"));
@@ -214,20 +142,14 @@ public class CampaignAssignmentService {
         captain.setIdCampaign(campaign);
         captainRepository.save(captain);
 
-        auditLog.info("ACTION=ASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
-
-        return new AssignmentResultDTO("Captain assigned successfully", campaignId, userId, user.getName());
+        AssignmentResultDTO result = new AssignmentResultDTO();
+        result.setMessage("Captain assigned successfully");
+        result.setCampaignId(campaignId);
+        result.setUserId(userId);
+        result.setUserName(user.getName());
+        return result;
     }
 
-    /**
-     * Removes a captain from a campaign.
-     *
-     * @param adminUserId admin user identifier (for audit)
-     * @param campaignId  target campaign identifier
-     * @param userId      captain user identifier
-     * @throws NoSuchElementException if campaign or assignment not found
-     */
     @Transactional
     public void unassignCaptain(Integer adminUserId, Integer campaignId, Integer userId) {
         if (!campaignRepository.existsById(campaignId)) {
@@ -237,8 +159,6 @@ public class CampaignAssignmentService {
             throw new NoSuchElementException("Assignment not found");
         }
         captainRepository.deleteByIdIdUserAndIdIdCampaign(userId, campaignId);
-        auditLog.info("ACTION=UNASSIGN_CAPTAIN adminUserId={} timestamp={} campaignId={} affectedUserId={}",
-                adminUserId, Instant.now(), campaignId, userId);
     }
 
 }

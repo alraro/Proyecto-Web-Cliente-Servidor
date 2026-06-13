@@ -6,18 +6,26 @@
   - Hugo Herrero González: 5%
   - IA Generativa: 25%
 --%>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
-<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.CampaignDTO, es.grupo8.backend.dto.UserResponseDto" %>
 <%
-    String token  = (String) session.getAttribute("token");
     String role   = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
     if (!"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
+    if (campaigns == null) campaigns = List.of();
+
+    Integer selectedCampaignId = (Integer) request.getAttribute("selectedCampaignId");
+    List<UserResponseDto> assignedCaptains = (List<UserResponseDto>) request.getAttribute("assignedCaptains");
+    List<UserResponseDto> availableCaptains = (List<UserResponseDto>) request.getAttribute("availableCaptains");
+    if (assignedCaptains == null) assignedCaptains = List.of();
+    if (availableCaptains == null) availableCaptains = List.of();
+
+    String flashSuccess = (String) request.getAttribute("success");
+    String flashError = (String) request.getAttribute("error");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,8 +39,9 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-<header class="topbar" aria-label="Top navigation">
-    <a class="brand" href="/admin" aria-label="Bancosol home">
+
+<header class="topbar">
+    <a class="brand" href="/">
         <img src="/assets/LOGO_BANCOSOL.png" alt="Bancosol logo" class="logo">
     </a>
     <div class="topbar-right">
@@ -40,197 +49,114 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
-        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil &#9998;</a>
+        <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesion &times;</a>
     </div>
 </header>
 
 <main class="page-wrapper" aria-label="Captains management page">
     <div class="page-header">
-        <a href="/admin" class="back-link-inline">&larr; Volver al menú</a>
-        <div class="page-header-row">
-            <div>
-                <h1>Gestión de Capitanes</h1>
-                <p>Asigna capitanes a campañas de recogida.</p>
-            </div>
-        </div>
+        <a href="/admin" class="back-link-inline">&larr; Volver al panel</a>
+        <h1>Gestión de Capitanes</h1>
+        <p>Asigna capitanes a campañas de recogida.</p>
     </div>
 
-    <div class="card" aria-label="Campaign selector">
+    <% if (flashSuccess != null) { %>
+    <div class="toast toast-success" id="flash-message"><%= flashSuccess %></div>
+    <% } else if (flashError != null) { %>
+    <div class="toast toast-error" id="flash-message"><%= flashError %></div>
+    <% } %>
+
+    <div class="card">
         <div class="card-body">
-            <label for="campaign-select">Campaña</label>
-            <div class="selector-row">
-                <select id="campaign-select">
-                    <option value="">Selecciona una campaña...</option>
-                    <% if (campaigns != null) {
-                        for (CampaignDTO camp : campaigns) { %>
-                    <option value="<%= camp.getId() %>"><%= camp.getName() %> (<%= camp.getStartDate() %> - <%= camp.getEndDate() %>)</option>
-                    <%  }
-                       } %>
-                </select>
-                <button type="button" id="btn-load" class="btn btn-secondary">Cargar capitanes</button>
-            </div>
+            <form method="GET" action="/admin-captains">
+                <label for="campaign-select">Campaña</label>
+                <div class="selector-row">
+                    <select id="campaign-select" name="campaignId">
+                        <option value="">Selecciona una campaña...</option>
+                        <% for (CampaignDTO camp : campaigns) { %>
+                        <option value="<%= camp.getId() %>"
+                            <%= selectedCampaignId != null && selectedCampaignId.equals(camp.getId()) ? "selected" : "" %>>
+                            <%= camp.getName() %> (<%= camp.getStartDate() %> - <%= camp.getEndDate() %>)
+                        </option>
+                        <% } %>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Cargar capitanes</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div id="global-message" hidden></div>
-
-    <div class="card" aria-label="Current captains">
-        <div class="card-head">
+    <% if (selectedCampaignId != null) { %>
+    <div class="card">
+        <div class="card-header">
             <h2>Capitanes asignados</h2>
         </div>
         <div class="table-wrap">
             <table>
                 <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Acción</th>
-                </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acción</th>
+                    </tr>
                 </thead>
-                <tbody id="captains-tbody"></tbody>
+                <tbody>
+                    <% if (assignedCaptains.isEmpty()) { %>
+                    <tr>
+                        <td colspan="3" class="table-empty">Sin capitanes asignados.</td>
+                    </tr>
+                    <% } else { %>
+                        <% for (UserResponseDto captain : assignedCaptains) { %>
+                        <tr>
+                            <td><%= captain.name() != null ? captain.name() : "-" %></td>
+                            <td><%= captain.email() != null ? captain.email() : "-" %></td>
+                            <td>
+                                <form method="POST" action="/admin-captains/eliminar" style="display:inline"
+                                      onsubmit="return confirm('&iquest;Quitar a &quot;<%= captain.name() %>&quot; de la campa&ntilde;a?')">
+                                    <input type="hidden" name="campaignId" value="<%= selectedCampaignId %>">
+                                    <input type="hidden" name="userId" value="<%= captain.idUser() %>">
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% } %>
+                    <% } %>
+                </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card" aria-label="Add captain">
-        <div class="card-head">
+    <div class="card">
+        <div class="card-header">
             <h2>Añadir capitán</h2>
         </div>
         <div class="card-body">
-            <div class="selector-row">
-                <select id="captain-select" disabled>
-                    <option value="">Selecciona un capitán...</option>
-                </select>
-                <button type="button" id="btn-assign" class="btn btn-primary" disabled>Asignar</button>
-            </div>
+            <form method="POST" action="/admin-captains/asignar">
+                <input type="hidden" name="campaignId" value="<%= selectedCampaignId %>">
+                <div class="selector-row">
+                    <select name="userId" required>
+                        <option value="">Selecciona un capitán...</option>
+                        <% for (UserResponseDto user : availableCaptains) { %>
+                        <option value="<%= user.idUser() %>"><%= user.name() %> (<%= user.email() %>)</option>
+                        <% } %>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Asignar</button>
+                </div>
+            </form>
         </div>
     </div>
+    <% } %>
 </main>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        const token = '<%= token %>';
-
-        const campaignSelect = document.getElementById("campaign-select");
-        const btnLoad = document.getElementById("btn-load");
-        const globalMessage = document.getElementById("global-message");
-        const captainsTbody = document.getElementById("captains-tbody");
-        const captainSelect = document.getElementById("captain-select");
-        const btnAssign = document.getElementById("btn-assign");
-
-        btnLoad.addEventListener("click", async () => {
-            const campaignId = campaignSelect.value;
-            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
-            try {
-                await loadCampaignData(campaignId);
-                captainSelect.disabled = false;
-                btnAssign.disabled = false;
-            } catch (error) {
-                captainSelect.disabled = true;
-                btnAssign.disabled = true;
-                showMessage(error.message || "No se pudieron cargar los capitanes", true);
-            }
-        });
-
-        btnAssign.addEventListener("click", async () => {
-            const campaignId = campaignSelect.value;
-            const userId = captainSelect.value;
-            if (!campaignId) { showMessage("Selecciona una campaña", true); return; }
-            if (!userId) { showMessage("Selecciona un capitán", true); return; }
-            try {
-                await fetchJson(`/api/campaigns/${campaignId}/captains`, {
-                    method: "POST",
-                    headers: authHeaders(token),
-                    body: JSON.stringify({ userId: Number(userId) })
-                });
-                showMessage("Capitán asignado correctamente", false);
-                await loadCampaignData(campaignId);
-            } catch (error) {
-                showMessage(error.message || "No se pudo asignar el capitán", true);
-            }
-        });
-
-        captainsTbody.addEventListener("click", async (event) => {
-            const button = event.target.closest("button[data-role='CAPTAIN']");
-            if (!button) return;
-            const campaignId = campaignSelect.value;
-            const userId = button.dataset.userid;
-            if (!campaignId || !userId) { showMessage("Selección inválida", true); return; }
-            try {
-                await fetchJson(`/api/campaigns/${campaignId}/captains/${userId}`, {
-                    method: "DELETE",
-                    headers: authHeaders(token)
-                });
-                showMessage("Capitán desasignado correctamente", false);
-                await loadCampaignData(campaignId);
-            } catch (error) {
-                showMessage(error.message || "No se pudo desasignar el capitán", true);
-            }
-        });
-
-        function authHeaders(jwtToken) {
-            return { "Content-Type": "application/json", "Authorization": `Bearer ${jwtToken}` };
+    (function () {
+        var msg = document.getElementById("flash-message");
+        if (msg) {
+            setTimeout(function () { msg.style.opacity = "0"; }, 3000);
+            setTimeout(function () { msg.remove(); }, 3500);
         }
-
-        async function loadCampaignData(campaignId) {
-            const [assignments, availableCaptainsData] = await Promise.all([
-                fetchJson(`/api/campaigns/${campaignId}/assignments`, { method: "GET", headers: authHeaders(token) }),
-                fetchJson(`/api/campaigns/${campaignId}/available-users?role=CAPTAIN`, { method: "GET", headers: authHeaders(token) })
-            ]);
-            const availableCaptains = Array.isArray(availableCaptainsData)
-                ? availableCaptainsData : (availableCaptainsData.content || []);
-            renderCaptainsTable(assignments?.captains || []);
-            populateSelect(captainSelect, availableCaptains, "Selecciona un capitán...");
-        }
-
-        async function fetchJson(url, options) {
-            const response = await fetch(url, options);
-            const data = await response.json().catch(() => ({}));
-            if (response.status === 401 || response.status === 403) throw new Error("Tu sesión no es válida o ha expirado.");
-            if (!response.ok) throw new Error(data.message || `Error ${response.status}`);
-            return data;
-        }
-
-        function renderCaptainsTable(captains) {
-            captainsTbody.innerHTML = "";
-            if (!captains.length) {
-                captainsTbody.innerHTML = "<tr><td colspan='3'>Sin capitanes asignados</td></tr>"; return;
-            }
-            captains.forEach((captain) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${escapeHtml(captain.name || "")}</td>
-                    <td>${escapeHtml(captain.email || "")}</td>
-                    <td><button type="button" data-userid="${captain.idUser}" data-role="CAPTAIN">Eliminar</button></td>`;
-                captainsTbody.appendChild(row);
-            });
-        }
-
-        function populateSelect(selectEl, users, placeholder) {
-            selectEl.innerHTML = `<option value=''>${placeholder}</option>`;
-            (users || []).forEach((user) => {
-                const option = document.createElement("option");
-                option.value = String(user.idUser);
-                option.textContent = `${user.name} (${user.email})`;
-                selectEl.appendChild(option);
-            });
-        }
-
-        function showMessage(text, isError) {
-            globalMessage.hidden = false;
-            globalMessage.textContent = text;
-            globalMessage.classList.remove("success", "error");
-            globalMessage.classList.add(isError ? "error" : "success");
-            window.clearTimeout(showMessage.hideTimer);
-            showMessage.hideTimer = window.setTimeout(() => { globalMessage.hidden = true; }, 4000);
-        }
-
-        function escapeHtml(value) {
-            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
-        }
-    });
+    }());
 </script>
 </body>
 </html>
