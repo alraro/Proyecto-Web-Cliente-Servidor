@@ -23,7 +23,9 @@ import es.grupo8.backend.dao.UserRepository;
 import es.grupo8.backend.dto.AuthResponseDTO;
 import es.grupo8.backend.dto.ProfileDTO;
 import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.mapper.UserAuthMapper;
+import org.springframework.http.HttpStatus;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -41,6 +43,9 @@ public class AuthService {
 
     @Autowired
     private UserAuthMapper userAuthMapper;
+
+    @Autowired
+    private PasswordService passwordService;
 
 
     // Usa JWT para autenticación en lugar de sesiones tradicionales, lo que es más adecuado para APIs RESTful y aplicaciones modernas.
@@ -75,10 +80,10 @@ public class AuthService {
         if (user == null) return null;
 
         String stored = user.getPassword();
-        if(!UtilsService.matchesPassword(password, stored)) return null;
+        if(!passwordService.matches(password, stored)) return null;
 
-        if(UtilsService.needsMigration(stored)) {
-            user.setPassword(UtilsService.hashPassword(password));
+        if(passwordService.needsMigration(stored)) {
+            user.setPassword(passwordService.hash(password));
             userRepository.save(user);
         }
 
@@ -103,7 +108,7 @@ public class AuthService {
         user.setName(UtilsService.trimToNull(nombreParam));
         user.setEmail(UtilsService.normalizeEmail(emailParam));
         user.setPhone(UtilsService.trimToNull(telefonoParam));
-        user.setPassword(UtilsService.hashPassword(UtilsService.trimToNull(passwordParam)));
+        user.setPassword(passwordService.hash(UtilsService.trimToNull(passwordParam)));
         user.setAddress(UtilsService.trimToNull(domicilioParam));
         user.setPostalCode(UtilsService.trimToNull(cpParam));
 		
@@ -176,7 +181,7 @@ public class AuthService {
 				throw new IllegalArgumentException("La contraseña no coincide con la confirmación");
 			}
 
-			user.setPassword(UtilsService.hashPassword(newPassword));
+			user.setPassword(passwordService.hash(newPassword));
 		}
 
 		if (user.getEmail() == null) {
@@ -316,5 +321,11 @@ public class AuthService {
 		return !email.equalsIgnoreCase(current) && userRepository.existsByEmail(email);
 	}
 
-    
+    public void checkAdmin(String auth) {
+        Integer userId = extractUserIdFromToken(auth);
+        if (userId == null)
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
+        if (!userRepository.isAdmin(userId))
+            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
+    }
 }

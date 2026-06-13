@@ -11,7 +11,6 @@
 package es.grupo8.backend.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import es.grupo8.backend.dao.GeographicZoneRepository;
 import es.grupo8.backend.dao.LocalityRepository;
 import es.grupo8.backend.dto.AdminDTO;
 import es.grupo8.backend.dto.ChainRequestDto;
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
@@ -45,6 +45,7 @@ import es.grupo8.backend.services.ChainService;
 import es.grupo8.backend.services.PartnerEntityService;
 import es.grupo8.backend.services.StoreService;
 import es.grupo8.backend.services.UserService;
+import es.grupo8.backend.services.UtilsService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -55,9 +56,6 @@ public class AdminController {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private PartnerEntityService partnerEntityService;
 
     @Autowired
     private CampaignService campaignService;
@@ -205,7 +203,8 @@ public class AdminController {
             try {
                 model.addAttribute("editEntity", chainService.findById(editar));
                 model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "Cadena no encontrada.");
             }
         }
 
@@ -315,7 +314,8 @@ public class AdminController {
             try {
                 model.addAttribute("editEntity", storeService.findById(editar));
                 model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "Tienda no encontrada.");
             }
         }
 
@@ -459,10 +459,9 @@ public class AdminController {
         model.addAttribute("currentSearch", search);
         model.addAttribute("currentRole", role);
 
-        if (sort == null) sort = "id,asc";
-        String[] parts = sort.split(",");
-        model.addAttribute("sortField", parts[0]);
-        model.addAttribute("sortOrder", parts.length > 1 ? parts[1] : "asc");
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
+        model.addAttribute("sortField", sortInfo.field());
+        model.addAttribute("sortOrder", sortInfo.order());
 
         return "admin-users";
     }
@@ -512,112 +511,6 @@ public class AdminController {
         return "redirect:/admin-users";
     }
 
-
-    @GetMapping("/admin-partner-entities")
-    public String adminPartnerEntities(
-            HttpSession session,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer crear,
-            @RequestParam(required = false) Integer editar,
-            Model model) {
-
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-
-        PaginatedResponse<PartnerEntityResponseDto> response =
-                partnerEntityService.getAllPartnerEntities(page, size, sort, search);
-
-        model.addAttribute("entities", response.content());
-        model.addAttribute("currentPage", response.page());
-        model.addAttribute("totalPages", response.totalPages());
-        model.addAttribute("currentSearch", search);
-        model.addAttribute("currentSize", size);
-
-        String sortField = "id";
-        String sortOrder = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0];
-            sortOrder = parts.length > 1 ? parts[1] : "asc";
-        }
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortOrder", sortOrder);
-
-        if (crear != null) {
-            model.addAttribute("showForm", true);
-            model.addAttribute("isCreating", true);
-        } else if (editar != null) {
-            try {
-                PartnerEntityResponseDto entity = partnerEntityService.getPartnerEntityById(editar);
-                model.addAttribute("editEntity", entity);
-                model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
-            }
-        }
-
-        return "admin-partner-entities";
-    }
-
-    @PostMapping("/admin-partner-entities/guardar")
-    public String savePartnerEntity(
-            HttpSession session,
-            @RequestParam(required = false) Integer id,
-            @RequestParam String nombre,
-            @RequestParam(required = false) String direccion,
-            @RequestParam(required = false) String telefono,
-            RedirectAttributes attr) {
-
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-
-        PartnerEntityRequestDto dto = new PartnerEntityRequestDto();
-        dto.setName(nombre);
-        dto.setAddress(direccion);
-        dto.setPhone(telefono);
-
-        try {
-            if (id == null) {
-                partnerEntityService.createPartnerEntity(dto);
-                attr.addFlashAttribute("success", "Entidad creada correctamente.");
-            } else {
-                partnerEntityService.updatePartnerEntity(id, dto);
-                attr.addFlashAttribute("success", "Entidad actualizada correctamente.");
-            }
-        } catch (IllegalArgumentException e) {
-            attr.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/admin-partner-entities";
-    }
-
-    @PostMapping("/admin-partner-entities/eliminar/{id}")
-    public String deletePartnerEntity(
-            HttpSession session,
-            @PathVariable Integer id,
-            RedirectAttributes attr) {
-
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
-
-        try {
-            partnerEntityService.deletePartnerEntity(id);
-            attr.addFlashAttribute("success", "Entidad eliminada.");
-        } catch (RuntimeException e) {
-            attr.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/admin-partner-entities";
-    }
-
     @GetMapping("/admin-incidents")
     public String adminIncidents(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");
@@ -625,7 +518,7 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+        List<IncidentDTO> incidents = adminService.getAllIncidents();
 
         model.addAttribute("incidents", incidents);
         model.addAttribute("pageTitle", "Bancosol | Todas las incidencias");
@@ -633,5 +526,4 @@ public class AdminController {
         return "admin-incidents";
     }
 
-    
 }

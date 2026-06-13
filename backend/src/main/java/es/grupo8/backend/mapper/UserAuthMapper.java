@@ -8,16 +8,21 @@ import es.grupo8.backend.entity.UserEntity;
 
 
 @Component
-public class UserAuthMapper {
+public class UserAuthMapper extends MapperDTO<AuthResponseDTO, UserEntity> {
     @Autowired
     private ProfileMapper profileMapper;
 
-    public AuthResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
-
+    @Override
+    public AuthResponseDTO toDTO(UserEntity user) {
         AuthResponseDTO dto = new AuthResponseDTO();
         dto.setId(user.getIdUser());
         dto.setNombre(user.getName());
         dto.setEmail(user.getEmail());
+        return dto;
+    }
+
+    public AuthResponseDTO toLoginResponse(UserEntity user, String token, String role, String redirectUrl, Long expiresInSeconds, Integer storeId) {
+        AuthResponseDTO dto = toDTO(user);
         dto.setRole(role);
         dto.setRedirectUrl(redirectUrl);
         dto.setMessage("Login correcto");
@@ -25,33 +30,23 @@ public class UserAuthMapper {
         dto.setTokenType("Bearer");
         dto.setExpiresInSeconds(expiresInSeconds);
         dto.setStoreId(storeId);
-
         return dto;
     }
 
-
     public AuthResponseDTO toRegisterResponse(UserEntity user, String token, Long expiresInSeconds) {
-        
-        AuthResponseDTO dto = new AuthResponseDTO();
-        dto.setId(user.getIdUser());
-        dto.setNombre(user.getName());
-        dto.setEmail(user.getEmail());
+        AuthResponseDTO dto = toDTO(user);
         dto.setMessage("Registro correcto");
         dto.setToken(token);
         dto.setTokenType("Bearer");
         dto.setExpiresInSeconds(expiresInSeconds);
-
         return dto;
     }
 
-
     public ProfileDTO toProfileDTO(UserEntity user, String role, String redirectUrl, String message) {
-
         ProfileDTO dto = profileMapper.toDTO(user);
         dto.setRole(role);
         dto.setRedirectUrl(redirectUrl);
         dto.setMessage(message);
-
         return dto;
     }
 }

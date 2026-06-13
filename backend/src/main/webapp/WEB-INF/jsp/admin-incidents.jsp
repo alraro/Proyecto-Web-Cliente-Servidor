@@ -4,7 +4,7 @@
 -	- Hugo Herrero González: 100%
 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, java.util.Map" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.IncidentDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String token = (String) session.getAttribute("token");
@@ -15,7 +15,7 @@
         return;
     }
 
-    List<Map<String, Object>> incidents = (List<Map<String, Object>>) request.getAttribute("incidents");
+    List<IncidentDTO> incidents = (List<IncidentDTO>) request.getAttribute("incidents");
 
 %>
 <!DOCTYPE html>
@@ -74,14 +74,14 @@
                         </tr>
                         <%
                         } else {
-                            for (Map<String, Object> i : incidents) {
+                            for (IncidentDTO i : incidents) {
                         %>
                         <tr>
-                            <td><%= i.get("createdAt") != null ? i.get("createdAt") : "-" %></td>
-                            <td><%= i.get("campaignName") != null ? i.get("campaignName") : "-" %></td>
-                            <td><%= i.get("storeName") != null ? i.get("storeName") : "-" %></td>
-                            <td><%= i.get("captainName") != null ? i.get("captainName") : "-" %></td>
-                            <td><%= i.get("description") != null ? i.get("description") : "-" %></td>
+                            <td><%= i.getCreatedAt() != null ? i.getCreatedAt() : "-" %></td>
+                            <td><%= i.getCampaignName() != null ? i.getCampaignName() : "-" %></td>
+                            <td><%= i.getStoreName() != null ? i.getStoreName() : "-" %></td>
+                            <td><%= i.getCaptainName() != null ? i.getCaptainName() : "-" %></td>
+                            <td><%= i.getDescription() != null ? i.getDescription() : "-" %></td>
                         </tr>
                         <%
                         }}%>

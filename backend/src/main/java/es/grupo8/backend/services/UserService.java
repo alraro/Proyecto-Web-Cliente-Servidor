@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -107,7 +108,7 @@ public class UserService {
 
     public UserResponseDto getUserById(Integer userId) {
         return userMapper.toDTO(userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId)));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId)));
     }
 
     public UserResponseDto createUser(UserRequestDto request) {
@@ -126,14 +127,14 @@ public class UserService {
 
         UserEntity saved = userRepository.save(user);
         return userMapper.toDTO(userRepository.findById(saved.getIdUser())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado tras la creación")));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado tras la creación")));
     }
 
     public UserResponseDto updateUser(Integer userId, UserRequestDto request) {
         if (request == null) throw new IllegalArgumentException("La petición no es válida.");
 
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId));
 
         if (request.getName() != null) {
             String name = request.getName().trim();
@@ -170,7 +171,7 @@ public class UserService {
 
     public UserRoleResponseDto assignRole(Integer userId, UserRoleRequestDto request) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
 
         String role = normalizeRole(request == null ? null : request.getRole());
         if (role == null) {
@@ -185,7 +186,7 @@ public class UserService {
 
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId))
-            throw new RuntimeException("Usuario no encontrado con ID: " + userId);
+            throw new NoSuchElementException("Usuario no encontrado con ID: " + userId);
         userRepository.deleteById(userId);
     }
 
