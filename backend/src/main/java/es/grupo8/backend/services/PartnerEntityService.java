@@ -30,19 +30,13 @@ public class PartnerEntityService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        String sortField = "id";
-        String sortDir = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0].trim().toLowerCase();
-            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
+        SortInfo sortInfo = parseSort(sort);
 
-        List<PartnerEntity> entities = switch (sortField) {
-            case "name" -> sortDir.equals("asc")
+        List<PartnerEntity> entities = switch (sortInfo.field()) {
+            case "name" -> sortInfo.order().equals("asc")
                     ? partnerEntityRepository.findAllByNameAsc(search, size, offset)
                     : partnerEntityRepository.findAllByNameDesc(search, size, offset);
-            default -> sortDir.equals("asc")
+            default -> sortInfo.order().equals("asc")
                     ? partnerEntityRepository.findAllByIdAsc(search, size, offset)
                     : partnerEntityRepository.findAllByIdDesc(search, size, offset);
         };
@@ -125,4 +119,17 @@ public class PartnerEntityService {
             }
         }
     }
+
+    public SortInfo parseSort(String sort) {
+        String field = "id";
+        String order = "asc";
+        if (sort != null && sort.contains(",")) {
+            String[] parts = sort.split(",");
+            field = parts[0].trim().toLowerCase();
+            order = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
+        }
+        return new SortInfo(field, order);
+    }
+
+    public record SortInfo(String field, String order) {}
 }

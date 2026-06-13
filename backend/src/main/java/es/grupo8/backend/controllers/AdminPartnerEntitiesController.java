@@ -3,11 +3,14 @@ package es.grupo8.backend.controllers;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.PartnerEntityRequestDto;
 import es.grupo8.backend.dto.PartnerEntityResponseDto;
+import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.PartnerEntityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +34,7 @@ public class AdminPartnerEntitiesController {
             @RequestParam(required = false) Integer editar,
             Model model) {
 
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
+        checkAdmin(session);
 
         PaginatedResponse<PartnerEntityResponseDto> response =
                 partnerEntityService.getAllPartnerEntities(page, size, sort, search);
@@ -45,15 +45,9 @@ public class AdminPartnerEntitiesController {
         model.addAttribute("currentSearch", search);
         model.addAttribute("currentSize", size);
 
-        String sortField = "id";
-        String sortOrder = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0];
-            sortOrder = parts.length > 1 ? parts[1] : "asc";
-        }
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortOrder", sortOrder);
+        PartnerEntityService.SortInfo sortInfo = partnerEntityService.parseSort(sort);
+        model.addAttribute("sortField", sortInfo.field());
+        model.addAttribute("sortOrder", sortInfo.order());
 
         if (crear != null) {
             model.addAttribute("showForm", true);
@@ -63,7 +57,8 @@ public class AdminPartnerEntitiesController {
                 PartnerEntityResponseDto entity = partnerEntityService.getPartnerEntityById(editar);
                 model.addAttribute("editEntity", entity);
                 model.addAttribute("showForm", true);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException e) {
+                model.addAttribute("error", "Entidad no encontrada.");
             }
         }
 
@@ -79,10 +74,7 @@ public class AdminPartnerEntitiesController {
             @RequestParam(required = false) String telefono,
             RedirectAttributes attr) {
 
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
+        checkAdmin(session);
 
         PartnerEntityRequestDto dto = new PartnerEntityRequestDto();
         dto.setName(nombre);
@@ -110,10 +102,7 @@ public class AdminPartnerEntitiesController {
             @PathVariable Integer id,
             RedirectAttributes attr) {
 
-        String role = (String) session.getAttribute("role");
-        if (!"ADMINISTRADOR".equals(role)) {
-            return "redirect:/login";
-        }
+        checkAdmin(session);
 
         try {
             partnerEntityService.deletePartnerEntity(id);
@@ -123,5 +112,16 @@ public class AdminPartnerEntitiesController {
         }
 
         return "redirect:/admin-partner-entities";
+    }
+
+    private void checkAdmin(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (!"ADMINISTRADOR".equals(role))
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Acceso denegado");
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public String handleAuthException() {
+        return "redirect:/login";
     }
 }
