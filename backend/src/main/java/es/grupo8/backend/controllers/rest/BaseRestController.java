@@ -1,3 +1,12 @@
+/**
+ * Controlador REST para gestionar cadenas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 50%
+ * - Alfonso Ramos Rojas: 30%
+ * - IA Generativa: 20%
+ */
+
 package es.grupo8.backend.controllers.rest;
 
 import es.grupo8.backend.exceptions.AuthException;

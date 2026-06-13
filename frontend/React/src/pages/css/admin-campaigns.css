@@ -1,0 +1,88 @@
+/* Modal ampliado para el formulario de campañas (panel dual de tiendas).
+   Usa especificidad mayor (.modal-overlay .modal--wide) para ganar al .modal
+   de common.css sin tocar estilos compartidos. */
+
+/* Anchura y altura del modal */
+
+.modal-overlay .modal--wide {
+    width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem);
+    padding: 0;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 600px) {
+    .modal-overlay .modal--wide { width: 90vw; max-width: 90vw; }
+}
+@media (min-width: 768px) {
+    .modal-overlay .modal--wide { width: 85vw; max-width: 85vw; }
+}
+@media (min-width: 1024px) {
+    .modal-overlay .modal--wide { width: 80vw; max-width: 900px; }
+}
+@media (min-width: 1400px) {
+    .modal-overlay .modal--wide { width: 75vw; max-width: 1050px; }
+}
+
+/*  El <form> está entre el modal y el body/footer: hay que meterlo
+       en el flujo flex para que el footer quede siempre visible */
+
+.modal-overlay .modal--wide form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* El cuerpo scrollea; el footer queda fijo abajo */
+.modal-overlay .modal--wide .modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+}
+
+/* Listas de tiendas: pequeñas por defecto, crecen con la pantalla*/
+
+.modal-overlay .modal--wide .store-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Altura base reducida para que el modal quepa sin hacer zoom */
+.modal-overlay .modal--wide .store-list {
+    overflow-y: auto !important;
+    max-height: 120px;
+}
+
+@media (min-width: 600px) {
+    .modal-overlay .modal--wide .store-list { max-height: 150px; }
+}
+@media (min-width: 768px) {
+    .modal-overlay .modal--wide .store-list { max-height: 200px; }
+}
+@media (min-width: 1024px) {
+    .modal-overlay .modal--wide .store-list { max-height: 260px; }
+}
+@media (min-width: 1400px) {
+    .modal-overlay .modal--wide .store-list { max-height: 320px; }
+}
+
+/* Móvil: panel dual en columna, filtros apilados */
+
+@media (max-width: 599px) {
+    .modal-overlay .modal--wide .store-dual-panel {
+        grid-template-columns: 1fr;
+    }
+    .modal-overlay .modal--wide .store-filter-row {
+        flex-direction: column;
+    }
+    .modal-overlay .modal--wide .store-filter-row select,
+    .modal-overlay .modal--wide .store-filter-row button {
+        width: 100%;
+    }
+}
