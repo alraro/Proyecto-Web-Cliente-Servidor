@@ -160,22 +160,12 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        if (!password.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden.");
-            return "redirect:/admin-createusers";
-        }
-
-        if (password.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "La contraseña debe tener al menos 6 caracteres.");
-            return "redirect:/admin-createusers";
-        }
-
         if (telefono != null && telefono.isBlank()) telefono = null;
         if (domicilio != null && domicilio.isBlank()) domicilio = null;
         if (cp != null && cp.isBlank()) cp = null;
 
         try {
-            authService.register(nombre, email, password, telefono, domicilio, cp);
+            authService.register(nombre, email, password, confirmPassword, telefono, domicilio, cp);
             redirectAttributes.addFlashAttribute("success", "Usuario " + nombre + " creado, esperando validación de rol");
             return "redirect:/admin-createusers";
         } catch (Exception e) {

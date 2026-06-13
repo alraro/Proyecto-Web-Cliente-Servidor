@@ -12,6 +12,7 @@ public class AuthResponseDTO {
     private String nombre;
     private String email;
     private String password;
+    private String confirmPassword;
 
     private String phone;
     private String address;

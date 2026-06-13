@@ -96,9 +96,13 @@ public class AuthService {
 
 
     // Register
-    public AuthResponseDTO register(String nombreParam, String emailParam, String passwordParam, String telefonoParam, String domicilioParam, String cpParam) {
+    public AuthResponseDTO register(String nombreParam, String emailParam, String passwordParam, String confirmPasswordParam, String telefonoParam, String domicilioParam, String cpParam) {
 
         UserEntity user = new UserEntity();
+
+		if (!passwordParam.equals(confirmPasswordParam)) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
 
         user.setName(UtilsService.trimToNull(nombreParam));
         user.setEmail(UtilsService.normalizeEmail(emailParam));
