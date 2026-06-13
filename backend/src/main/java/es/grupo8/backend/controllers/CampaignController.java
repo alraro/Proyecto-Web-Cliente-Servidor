@@ -163,7 +163,8 @@ public class CampaignController extends MvcSessionController {
                         campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
                 model.addAttribute("availableCaptains",
                         campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
-            } catch (NoSuchElementException ignored) {
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
             }
         }
         return "admin-campaign-assignments";
@@ -230,7 +231,8 @@ public class CampaignController extends MvcSessionController {
                         campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCaptains());
                 model.addAttribute("availableCaptains",
                         campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
-            } catch (NoSuchElementException ignored) {
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
             }
         }
         return "admin-captains";
@@ -285,7 +287,8 @@ public class CampaignController extends MvcSessionController {
                         campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCoordinators());
                 model.addAttribute("availableCoordinators",
                         campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
-            } catch (NoSuchElementException ignored) {
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
             }
         }
         return "admin-coordinators";

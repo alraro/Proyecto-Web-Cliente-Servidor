@@ -26,32 +26,23 @@ import org.springframework.web.bind.annotation.RestController;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
 import es.grupo8.backend.dto.UserRoleResponseDto;
-import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.UserService;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/users")
+@AllArgsConstructor
 public class UserController extends BaseRestController {
 
-    @Autowired private AuthService authService;
-    @Autowired private UserService userService;
-
-    private void checkAdmin(String authHeader) {
-        Integer userId = authService.extractUserIdFromToken(authHeader);
-        if (userId == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token invalido o ausente");
-        }
-        if (!userService.isAdmin(userId)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
-        }
-    }
+    private final AuthService authService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         List<UserResponseDto> users = userService.getAllUsersOrdered();
         return ResponseEntity.ok(users);
     }
@@ -60,7 +51,7 @@ public class UserController extends BaseRestController {
     public ResponseEntity<List<UserResponseDto>> getPendingUsers(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         List<UserResponseDto> pending = userService.getPendingUsersOrdered();
         return ResponseEntity.ok(pending);
     }
@@ -71,7 +62,7 @@ public class UserController extends BaseRestController {
             @PathVariable Integer id,
             @RequestBody(required = false) UserRoleRequestDto request) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         UserRoleResponseDto response = userService.assignRole(id, request);
         return ResponseEntity.ok(response);
     }
@@ -81,7 +72,7 @@ public class UserController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         Integer adminId = authService.extractUserIdFromToken(authHeader);
         if (id.equals(adminId)) {
             return ResponseEntity.badRequest().body(Map.of("message", "No puedes eliminar tu propia cuenta"));

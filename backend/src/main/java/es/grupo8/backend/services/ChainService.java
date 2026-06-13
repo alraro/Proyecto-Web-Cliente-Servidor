@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public class ChainService {
 
     public ChainResponseDto findById(Integer id) {
         ChainEntity entity = chainRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chain not found"));
+                .orElseThrow(() -> new NoSuchElementException("Chain not found"));
         return chainMapper.toDTO(entity);
     }
 
@@ -49,7 +50,7 @@ public class ChainService {
     public ChainResponseDto update(Integer id, ChainRequestDto request) {
         validate(request);
         ChainEntity entity = chainRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chain not found"));
+                .orElseThrow(() -> new NoSuchElementException("Chain not found"));
 
         String newCode = request.getCode().trim();
         if (!newCode.equals(entity.getCode()) && chainRepository.existsByCode(newCode)) {
@@ -63,7 +64,7 @@ public class ChainService {
 
     public void delete(Integer id) {
         if (!chainRepository.existsById(id)) {
-            throw new RuntimeException("Chain not found");
+            throw new NoSuchElementException("Chain not found");
         }
         chainRepository.deleteById(id);
     }

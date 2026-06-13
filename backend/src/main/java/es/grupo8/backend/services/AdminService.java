@@ -6,9 +6,7 @@
  */
 package es.grupo8.backend.services;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,11 @@ import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.IncidentRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dto.AdminDTO;
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.mapper.AdminMapper;
+import es.grupo8.backend.mapper.IncidentMapper;
 
 @Service
 public class AdminService {
@@ -36,6 +36,9 @@ public class AdminService {
 
     @Autowired
     private AdminMapper adminMapper;
+
+    @Autowired
+    private IncidentMapper incidentMapper;
 
     public List<Campaign> getAllCampaigns() {
         return campaignRepository.findAll();
@@ -71,7 +74,7 @@ public class AdminService {
         ).collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> getAllIncidents(String dir) {
+    public List<IncidentDTO> getAllIncidents(String dir) {
         List<Incident> incidents;
 
         if ("asc".equals(dir)){
@@ -82,15 +85,15 @@ public class AdminService {
         
         
         return incidents.stream().map(i ->{
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", i.getId());
-            m.put("description", i.getDescription());
-            m.put("createdAt", i.getCreatedAt() != null ? i.getCreatedAt().toString() : "-");
-            m.put("campaignName", i.getIdCampaign() != null ? i.getIdCampaign().getName() : "-");
-            m.put("storeName", i.getIdStore() != null ? i.getIdStore().getName() : "-");
-            m.put("captainName", i.getIdUser() != null ? i.getIdUser().getName() : "-");
+            IncidentDTO dto = new IncidentDTO();
+            dto.setId(i.getId());
+            dto.setDescription(i.getDescription());
+            dto.setCreatedAt(i.getCreatedAt() != null ? i.getCreatedAt().toString() : "-");
+            dto.setCampaignName(i.getIdCampaign() != null ? i.getIdCampaign().getName() : "-");
+            dto.setStoreName(i.getIdStore() != null ? i.getIdStore().getName() : "-");
+            dto.setCaptainName(i.getIdUser() != null ? i.getIdUser().getName() : "-");
 
-            return m;
+            return dto;
         }).collect(Collectors.toList());
     }
 

@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import es.grupo8.backend.dto.ChainRequestDto;
 import es.grupo8.backend.dto.ChainResponseDto;
-import es.grupo8.backend.exceptions.AuthException;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.ChainService;
-import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -28,23 +26,12 @@ public class ChainController extends BaseRestController {
 
     private final ChainService chainService;
     private final AuthService authService;
-    private final UserService userService;
-
-    private void checkAdmin(String authHeader) {
-        Integer userId = authService.extractUserIdFromToken(authHeader);
-        if (userId == null) {
-            throw new AuthException(HttpStatus.UNAUTHORIZED, "Token inválido o ausente");
-        }
-        if (!userService.isAdmin(userId)) {
-            throw new AuthException(HttpStatus.FORBIDDEN, "No tienes permiso");
-        }
-    }
 
     @GetMapping
     public ResponseEntity<List<ChainResponseDto>> getChains(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         List<ChainResponseDto> chains = chainService.findAll();
         return ResponseEntity.ok(chains);
     }
@@ -54,7 +41,7 @@ public class ChainController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         return ResponseEntity.ok(chainService.findById(id));
     }
 
@@ -63,7 +50,7 @@ public class ChainController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) ChainRequestDto req) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         ChainResponseDto created = chainService.create(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -74,7 +61,7 @@ public class ChainController extends BaseRestController {
             @PathVariable Integer id,
             @RequestBody(required = false) ChainRequestDto req) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         ChainResponseDto updated = chainService.update(id, req);
         return ResponseEntity.ok(updated);
     }
@@ -84,7 +71,7 @@ public class ChainController extends BaseRestController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        checkAdmin(authHeader);
+        authService.checkAdmin(authHeader);
         chainService.delete(id);
         return ResponseEntity.noContent().build();
     }

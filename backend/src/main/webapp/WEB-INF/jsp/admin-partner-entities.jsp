@@ -8,12 +8,6 @@
 <%@ page import="es.grupo8.backend.dto.PartnerEntityResponseDto, java.util.List" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
-    String role = (String) session.getAttribute("role");
-
-    if (!"ADMINISTRADOR".equals(role)) {
-        response.sendRedirect("/login");
-        return;
-    }
 
     List<PartnerEntityResponseDto> entities = (List<PartnerEntityResponseDto>) request.getAttribute("entities");
     Integer currentPage = (Integer) request.getAttribute("currentPage");
@@ -66,7 +60,7 @@
             <span class="dot"></span>
             <span id="user-name"><%= nombre == null ? "Admin" : nombre %></span>
         </div>
-        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil 🖉</a>
+        <a href="/edit" class="btn-edit" id="btn-edit">Editar perfil</a>
         <a href="/logout" class="btn-logout" id="btn-logout">Cerrar sesión ×</a>
     </div>
 </header>
