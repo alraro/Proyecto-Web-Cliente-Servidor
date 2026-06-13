@@ -24,7 +24,7 @@ import es.grupo8.backend.services.DashboardService;
 
 @RestController
 @RequestMapping("/api/dashboard")
-public class DashboardController {
+public class DashboardController extends BaseRestController {
 
     @Autowired
     private DashboardService dashboardService;

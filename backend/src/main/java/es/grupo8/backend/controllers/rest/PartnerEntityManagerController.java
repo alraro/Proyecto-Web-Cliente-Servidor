@@ -16,11 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/partner-entity-managers")
-public class PartnerEntityManagerController {
+public class PartnerEntityManagerController extends BaseRestController {
 
     @Autowired
     private PartnerEntityManagerService partnerEntityManagerService;
@@ -129,23 +128,5 @@ public class PartnerEntityManagerController {
         checkAuth(auth);
         partnerEntityManagerService.removePartnerEntityManagerRole(userId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", e.getMessage()));
     }
 }
