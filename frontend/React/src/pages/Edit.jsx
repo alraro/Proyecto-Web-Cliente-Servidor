@@ -226,8 +226,8 @@ function Edit() {
                             <div className="field-group">
                                 <label>Confirmar nueva contraseña</label>
                                 <div className="input-shell">
-                                    <input id="confirmpassword" name="confirmpassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Ocultar' : 'Mostrar'}</button>
+                                    <input id="confirmpassword" name="confirmpassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                    <button type="button" className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? 'Ocultar' : 'Mostrar'}</button>
                                 </div>
                             </div>
                         </div>
