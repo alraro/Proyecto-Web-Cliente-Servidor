@@ -1,3 +1,11 @@
+<%--
+  Vista de calendario de turnos.
+
+  Autores:
+  - Alejandro Calvo Aguilar: 85%
+  - IA Generativa: 15%
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
