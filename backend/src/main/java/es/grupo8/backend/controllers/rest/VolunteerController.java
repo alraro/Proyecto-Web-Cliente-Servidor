@@ -11,11 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/voluntarios")
-public class VolunteerController {
+public class VolunteerController extends BaseRestController {
 
     @Autowired
     private VolunteerService volunteerService;
@@ -75,23 +74,5 @@ public class VolunteerController {
         checkAuth(auth, entidadId);
         volunteerService.deleteVolunteer(id, entidadId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", e.getMessage()));
     }
 }

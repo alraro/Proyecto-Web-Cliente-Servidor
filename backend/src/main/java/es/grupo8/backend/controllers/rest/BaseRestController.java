@@ -1,24 +1,32 @@
 /**
- * Clase base para los controladores REST: respuesta 403 y manejo común de excepciones.
+ * Controlador REST para gestionar cadenas.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 100%
+ * - Fernando Luis Pinilla Molina: 50%
+ * - Alfonso Ramos Rojas: 30%
+ * - IA Generativa: 20%
  */
+
 package es.grupo8.backend.controllers.rest;
 
+import es.grupo8.backend.exceptions.AuthException;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 public abstract class BaseRestController {
 
-    // 403 con el rol que se exigía
-    protected ResponseEntity<?> forbidden(String role) {
+    protected ResponseEntity<Map<String, String>> forbidden(String role) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("message", "Access restricted to " + role));
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
+        return ResponseEntity.status(e.getStatus())
+                .body(Map.of("message", e.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -34,5 +42,11 @@ public abstract class BaseRestController {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", e.getMessage()));
     }
 }
