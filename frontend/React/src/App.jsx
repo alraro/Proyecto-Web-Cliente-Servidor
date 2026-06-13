@@ -7,6 +7,7 @@ import Dashboard from './pages/admin/AdminDashboard';
 import AdminChains from './pages/admin/AdminChains';
 import AdminStores from './pages/admin/AdminStores';
 import AdminCreateUser from './pages/admin/AdminCreateUser';
+import AdminIncidents from './pages/admin/AdminIncidents';
 import AdminVolunteers from './pages/admin/AdminVolunteers';
 import Coordinator from './pages/coordinator/Coordinator';
 import CreateShift from './pages/coordinator/CreateShift';
@@ -43,6 +44,7 @@ function App() {
             <Route path="/admin/stores" element={<AdminStores />} />
             <Route path="/admin/volunteers" element={<AdminVolunteers />} />
             <Route path="/admin/create-user" element={<AdminCreateUser />} />
+            <Route path="/admin/incidents" element={<AdminIncidents />} />
           </Route>
 
           {/* Coordinator routes */}

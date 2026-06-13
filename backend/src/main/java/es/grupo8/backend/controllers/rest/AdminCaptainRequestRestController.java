@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.services.AdminCaptainRequestService;
+import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class AdminCaptainRequestRestController extends BaseRestController {
     private final AuthService authService;
     private final UserService userService;
     private final AdminCaptainRequestService adminCaptainRequestService;
+    private final AdminService adminService;
 
     @GetMapping("/captain-requests")
     public ResponseEntity<?> getCaptainRequests(
@@ -84,4 +86,14 @@ public class AdminCaptainRequestRestController extends BaseRestController {
         m.put("coordinatorName", r.getIdCoordinator() != null ? r.getIdCoordinator().getName()  : null);
         return m;
     }
+
+
+    @GetMapping("/incidents")
+    public ResponseEntity<List<Map<String, Object>>> getIncidents() {
+        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+
+        return ResponseEntity.ok(incidents);
+    }
+
+
 }
