@@ -2,10 +2,9 @@
  * Controlador MVC de las vistas generales (login, registro, perfil, etc.).
  *
  * Autores:
- * - Hugo Herrero González: 65%
- * - Fernando Luis Pinilla Molina: 5%
- * - Alejandro Calvo Aguilar: 5%
- * - IA Generativa: 25%
+ * - Hugo Herrero González: 85%
+ * - Alejandra Ortiz Robles: 10%
+ * - IA Generativa: 5%
  */
 package es.grupo8.backend.controllers;
 

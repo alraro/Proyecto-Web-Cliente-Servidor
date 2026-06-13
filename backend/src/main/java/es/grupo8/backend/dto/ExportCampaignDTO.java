@@ -2,9 +2,8 @@
  * DTO para exportar datos de campañas.
  *
  * Autores:
- * - Hugo Herrero González: 85%
+ * - Hugo Herrero González: 95%
  * - Fernando Luis Pinilla Molina: 5%
- * - IA Generativa: 10%
  */
 package es.grupo8.backend.dto;
 import lombok.Data;

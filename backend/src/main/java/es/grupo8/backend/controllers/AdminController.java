@@ -4,9 +4,8 @@
  * Autores:
  * - Alejandra Ortiz: 30%
  * - Hugo Herrero González: 30%
- * - Fernando Luis Pinilla Molina: 5%
- * - Alfonso Ramos Rojas: 5%
- * - IA Generativa: 30%
+ * - Alfonso Ramos Rojas: 30%
+ * - IA Generativa: 10%
  */
 package es.grupo8.backend.controllers;
 

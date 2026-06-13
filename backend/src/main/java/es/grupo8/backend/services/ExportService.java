@@ -6,17 +6,13 @@
  * - Fernando Luis Pinilla Molina: 5%
  * - IA Generativa: 25%
  */
-/*
-*   Participación en el proyecto:
-*  - Hugo Herrero González: 70%
-*  - IA Generativa: 30%
-*/
+
 
 package es.grupo8.backend.services;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
-
+import java.io.IOException;
 import java.util.List;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;

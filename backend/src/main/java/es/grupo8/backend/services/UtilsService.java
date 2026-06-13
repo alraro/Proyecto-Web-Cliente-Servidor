@@ -1,8 +1,15 @@
+/**
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - IA Generativa: 10%
+ */
+
 package es.grupo8.backend.services;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
-
 import java.util.regex.Pattern;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 public final class UtilsService {
 

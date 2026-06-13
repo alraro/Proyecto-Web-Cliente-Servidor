@@ -1,3 +1,10 @@
+/**
+ * Clase base genérica para los mapeadores entre entidades y DTOs.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
 import java.util.HashMap;

@@ -1,3 +1,9 @@
+/**
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
