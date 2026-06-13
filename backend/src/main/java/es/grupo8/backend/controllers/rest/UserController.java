@@ -33,7 +33,7 @@ import es.grupo8.backend.services.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController extends BaseRestController {
 
     @Autowired private AuthService authService;
     @Autowired private UserService userService;
@@ -90,23 +90,5 @@ public class UserController {
 
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "Usuario eliminado correctamente"));
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", e.getMessage()));
     }
 }

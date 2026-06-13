@@ -8,7 +8,6 @@
 package es.grupo8.backend.controllers.rest;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/chains")
 @AllArgsConstructor
-public class ChainController {
+public class ChainController extends BaseRestController {
 
     private final ChainService chainService;
     private final AuthService authService;
@@ -88,23 +87,5 @@ public class ChainController {
         checkAdmin(authHeader);
         chainService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", e.getMessage()));
     }
 }
