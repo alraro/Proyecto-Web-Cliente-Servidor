@@ -57,6 +57,14 @@ jobs:
         with:
           github-token: ${{ steps.bot-token.outputs.token }}
           script: |
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: context.issue.number
+            });
+
+            const allReviewers = ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101'];
+            const reviewers = allReviewers.filter(r => r !== pr.user.login);
+
             const { data: comments } = await github.rest.issues.listComments({
               ...context.repo,
               issue_number: context.issue.number,
@@ -98,7 +106,7 @@ jobs:
                 await github.rest.pulls.requestReviewers({
                   ...context.repo,
                   pull_number: context.issue.number,
-                  reviewers: ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101']
+                  reviewers
                 });
               }
             } else {
@@ -114,6 +122,6 @@ jobs:
               await github.rest.pulls.requestReviewers({
                 ...context.repo,
                 pull_number: context.issue.number,
-                reviewers: ['alraro', 'fernan92005', 'alejandraortiz05', 'Chewi9', 'alexcalvo0101']
+                reviewers
               });
             }
