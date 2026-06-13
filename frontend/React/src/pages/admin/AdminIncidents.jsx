@@ -19,32 +19,48 @@ function Incidencias() {
     const [message, setMessage] = useState('');
     const [incidencias, setIncidencias] = useState([]);
 
+    const incidenciasFetch = async (dir = 'asc') => {
+        try {
+            const res = await fetch(`${ruta}/api/admin/incidents?sort=${dir}`, {
+                method: 'GET',
+                headers: authHeaders({
+                    'Content-Type': 'application/json'
+                })
+            });
 
-    useEffect(() => {
-        const incidenciasFetch = async () => {
-            try {
-                const res = await fetch(`${ruta}/api/admin/incidents`, {
-                    method: 'GET',
-                    headers: authHeaders({
-                        'Content-Type': 'application/json'
-                    })
-                });
+            const data = await res.json();
 
-                const data = await res.json();
-
-                if (!res.ok) {
-                    setMessage('Error al cargar las incidencias');
-                }
-
-                setIncidencias(data);
-            } catch (e) {
-                console.log('Error al obtener incidencias: ', e);
+            if (!res.ok) {
                 setMessage('Error al cargar las incidencias');
             }
-        };
-        incidenciasFetch(); 
+
+            setIncidencias(data);
+        } catch (e) {
+            console.log('Error al obtener incidencias: ', e);
+            setMessage('Error al cargar las incidencias');
+        }
+    };
+
+    useEffect(() => {
+        incidenciasFetch('asc');
     }, []); // Se ejecuta solo una vez al montar el componente
 
+    const handleDelete = async (id) => {
+        try {
+            const res = await fetch(`${ruta}/api/admin/incidents/${id}`, {
+                method: 'DELETE',
+                headers: authHeaders()
+            });
+
+            if(!res.ok) throw new Error('No se puede eliminar');
+
+            setIncidencias(data);
+            setNextDir(dir === 'asc' ? 'desc' : 'asc');
+
+        } catch(e) {
+            alert('Error al intentar eliminar');
+        }
+    }
 
     return (
         <SecurePage>
@@ -67,6 +83,7 @@ function Incidencias() {
                                 <th>Tienda</th>
                                 <th>Reportado por</th>
                                 <th>Descripción</th>
+                                <th></th>
                             </tr>
                         </thead>
 
@@ -89,6 +106,11 @@ function Incidencias() {
                                     <td>{i.storeName || "-"}</td>
                                     <td>{i.captainName || "-"}</td>
                                     <td>{i.description || "-"}</td>
+                                    <td>
+                                        {i.id ? (
+                                            <button onClick={() => handleDelete(i.id)}>Eliminar</button>
+                                        ) : "-"}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

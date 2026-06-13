@@ -24,4 +24,11 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     @Query("SELECT i FROM Incident i WHERE i.idUser.idUser = :userId ORDER BY i.createdAt DESC")
     List<Incident> findByUserId(@Param("userId") Integer userId);
+
+
+    @Query("SELECT i FROM Incident i ORDER BY i.id ASC")
+    List<Incident> findAllOrderByIdAsc();
+
+    @Query("SELECT i FROM Incident i ORDER BY i.id DESC")
+    List<Incident> findAllOrderByIdDesc();
 }

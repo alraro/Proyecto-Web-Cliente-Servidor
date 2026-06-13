@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
     const nameFromQuery  = params.get('nombre');
-    if (tokenFromQuery) localStorage.setItem('token', tokenFromQuery);
-    if (nameFromQuery)  localStorage.setItem('nombre', nameFromQuery);
+    if (tokenFromQuery) sessionStorage.setItem('token', tokenFromQuery);
+    if (nameFromQuery)  sessionStorage.setItem('nombre', nameFromQuery);
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     const campaignSelect     = document.querySelector('#campaign-select');
     const btnLoad            = document.querySelector('#btn-load');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnAssign          = document.querySelector('#btn-assign');
 
 
-    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'COORDINADOR') {
+    if (!sessionStorage.getItem('token') || sessionStorage.getItem('role') !== 'COORDINADOR') {
         window.location.href = 'login.html';
         return;
     }

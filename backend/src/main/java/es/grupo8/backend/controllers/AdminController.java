@@ -609,18 +609,46 @@ public class AdminController {
     }
 
     @GetMapping("/admin-incidents")
-    public String adminIncidents(HttpSession session, Model model) {
+    public String adminIncidents(@RequestParam(value = "sort", required = false) String dir, 
+                                 HttpSession session, 
+                                 Model model) {
         String role = (String) session.getAttribute("role");
         if(!"ADMINISTRADOR".equals(role)){
             return "redirect:/login";
         }
 
-        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+        List<Map<String, Object>> incidents = adminService.getAllIncidents(dir);
+
+        if("asc".equals(dir)){
+            model.addAttribute("nextDir", "desc");
+        } else {
+            model.addAttribute("nextDir", "asc");
+        }
 
         model.addAttribute("incidents", incidents);
         model.addAttribute("pageTitle", "Bancosol | Todas las incidencias");
 
         return "admin-incidents";
+    }
+
+    @PostMapping("/admin-incidents/delete/{id}")
+    public String deleteIncident(@PathVariable Integer id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+    
+    String role = (String) session.getAttribute("role");
+    if (!"ADMINISTRADOR".equals(role)){
+        return "redirect:/login";
+    }
+
+    try {
+        adminService.deleteIncident(id);
+        redirectAttributes.addFlashAttribute("success", "Incidencia eliminada");
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("error", "Error al eliminar");
+    }
+
+          return "redirect:/admin-incidents";                       
     }
 
     

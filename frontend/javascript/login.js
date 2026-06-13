@@ -77,17 +77,17 @@ form.addEventListener('submit', async (event) => {
         }
 
         // Guardar token y datos del usuario
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('nombre', data.nombre);
-        localStorage.setItem('email', data.email);
-        localStorage.setItem('role', data.role);
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('nombre', data.nombre);
+        sessionStorage.setItem('email', data.email);
+        sessionStorage.setItem('role', data.role);
 
 
         // Guardar storeId si el rol es Responsable de Tienda
         if (data.storeId != null) {
-            localStorage.setItem('storeId', data.storeId);
+            sessionStorage.setItem('storeId', data.storeId);
         } else {
-            localStorage.removeItem('storeId');
+            sessionStorage.removeItem('storeId');
         }
 
 

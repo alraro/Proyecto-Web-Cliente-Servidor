@@ -19,6 +19,7 @@ import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.IncidentRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dto.AdminDTO;
+import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.mapper.AdminMapper;
 
@@ -71,8 +72,17 @@ public class AdminService {
         ).collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> getAllIncidents() {
-        return incidentRepository.findAll().stream().map(i ->{
+    public List<Map<String, Object>> getAllIncidents(String dir) {
+        List<Incident> incidents;
+
+        if ("asc".equals(dir)){
+            incidents = incidentRepository.findAllOrderByIdAsc();
+        } else {
+            incidents = incidentRepository.findAllOrderByIdDesc();
+        }
+        
+        
+        return incidents.stream().map(i ->{
             Map<String, Object> m = new HashMap<>();
             m.put("id", i.getId());
             m.put("description", i.getDescription());
@@ -83,6 +93,19 @@ public class AdminService {
 
             return m;
         }).collect(Collectors.toList());
+    }
+
+    public void deleteIncident (Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id de la incidencia no existe");
+        }
+
+
+        if(incidentRepository.existsById(id)){
+            incidentRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("No se encuentra esta incidencia");
+        }
     }
 
 }

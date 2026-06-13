@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,9 +91,19 @@ public class AdminCaptainRequestRestController extends BaseRestController {
 
     @GetMapping("/incidents")
     public ResponseEntity<List<Map<String, Object>>> getIncidents() {
-        List<Map<String, Object>> incidents = adminService.getAllIncidents();
+        List<Map<String, Object>> incidents = adminService.getAllIncidents("desc");
 
         return ResponseEntity.ok(incidents);
+    }
+
+    @DeleteMapping("/incidents/{id}")
+    public ResponseEntity<?> deleteIncident(@PathVariable Integer id) {
+        try {
+            adminService.deleteIncident(id);
+            return ResponseEntity.ok("Incidencia eliminada");
+        } catch(Exception e){
+            return ResponseEntity.badRequest().body("Error al eliminar");
+        }
     }
 
 

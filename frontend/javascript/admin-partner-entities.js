@@ -2,7 +2,7 @@
 
 // ── Auth ──────────────────────────────────────────────────────────────
 function getToken() { 
-    return localStorage.getItem('token'); 
+    return sessionStorage.getItem('token'); 
 }
 
 function authHeaders() {
@@ -13,17 +13,17 @@ function authHeaders() {
 }
 
 function logout() { 
-    localStorage.clear(); 
+    sessionStorage.clear(); 
     window.location.href = 'login.html'; 
 }
 
-const role = (localStorage.getItem('role') || '').toUpperCase();
+const role = (sessionStorage.getItem('role') || '').toUpperCase();
 if (role !== 'ADMINISTRADOR') { 
     window.location.href = 'login.html'; 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
