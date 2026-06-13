@@ -1,5 +1,4 @@
 /**
- * Clase base genérica para los mapeadores entre entidades y DTOs.
  *
  * Autores:
  * - Hugo Herrero González: 80%
@@ -19,8 +18,8 @@ import es.grupo8.backend.dao.CampaignRepository;
 import es.grupo8.backend.dao.IncidentRepository;
 import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dto.AdminDTO;
-import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.entity.Campaign;
+import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.mapper.AdminMapper;
 
 @Service
