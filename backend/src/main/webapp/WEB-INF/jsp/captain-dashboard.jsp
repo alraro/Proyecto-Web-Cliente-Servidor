@@ -16,7 +16,6 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     java.util.List<es.grupo8.backend.dto.CampaignDTO> campaigns =
             (java.util.List<es.grupo8.backend.dto.CampaignDTO>) request.getAttribute("campaigns");
 %>

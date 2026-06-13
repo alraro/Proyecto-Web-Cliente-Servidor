@@ -2,8 +2,7 @@
  * Mapeador entre la entidad Campaign y CampaignDTO.
  *
  * Autores:
- * - Fernando Luis Pinilla Molina: 90%
- * - IA Generativa: 10%
+ * - Fernando Luis Pinilla Molina: 100%
  */
 package es.grupo8.backend.mapper;
 

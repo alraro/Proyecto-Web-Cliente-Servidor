@@ -1,4 +1,4 @@
-package es.grupo8.backend.exception;
+package es.grupo8.backend.exceptions;
 
 public class ShiftConflictException extends RuntimeException {
 

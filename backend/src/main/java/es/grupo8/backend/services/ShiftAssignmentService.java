@@ -32,7 +32,7 @@ import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
 import es.grupo8.backend.entity.VolunteerShiftId;
-import es.grupo8.backend.exception.ShiftConflictException;
+import es.grupo8.backend.exceptions.ShiftConflictException;
 import es.grupo8.backend.mapper.AvailableCaptainMapper;
 import es.grupo8.backend.mapper.AvailableVolunteerMapper;
 import es.grupo8.backend.mapper.CaptainAssignmentMapper;

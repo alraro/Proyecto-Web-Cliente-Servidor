@@ -26,7 +26,7 @@ import es.grupo8.backend.entity.VolunteerShiftId;
 @Repository
 public interface VolunteerShiftRepository extends JpaRepository<VolunteerShift, VolunteerShiftId> {
 
-    /** Volunteer shifts of a campaign, optionally narrowed to a single store (storeId null = all stores). */
+    // Shifts of a campaign, filtered by store if storeId is given (null = all stores)
     @Query("SELECT vs FROM VolunteerShift vs " +
            "WHERE vs.id.idCampaign = :campaignId " +
            "AND (:storeId IS NULL OR vs.id.idStore = :storeId)")

@@ -35,10 +35,6 @@ import es.grupo8.backend.mapper.CampaignAssignmentsMapper;
 import es.grupo8.backend.mapper.CampaignMapper;
 import es.grupo8.backend.mapper.UserMapper;
 
-/**
- * Verifies the JPQL-based refactor: the service must delegate the look-ups to the
- * repository query methods and only apply the mapper, never filtering in memory.
- */
 @ExtendWith(MockitoExtension.class)
 class CampaignAssignmentServiceTest {
 
@@ -52,7 +48,6 @@ class CampaignAssignmentServiceTest {
 
     @InjectMocks CampaignAssignmentService service;
 
-    /** getCampaignAssignments queries coordinators/captains via JPQL and maps them. */
     @Test
     void getCampaignAssignments_usesJpqlAndMaps() {
         Campaign campaign = new Campaign();
@@ -79,14 +74,12 @@ class CampaignAssignmentServiceTest {
         verify(captainRepository).findUsersByCampaignId(1);
     }
 
-    /** getCampaignAssignments throws when the campaign does not exist. */
     @Test
     void getCampaignAssignments_campaignNotFound_throws() {
         when(campaignRepository.findById(7)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> service.getCampaignAssignments(99, 7));
     }
 
-    /** getAvailableUsers(COORDINATOR) delegates to the JPQL available-coordinators query. */
     @Test
     void getAvailableUsers_coordinator_usesJpql() {
         List<UserEntity> entities = List.of(new UserEntity());
@@ -102,7 +95,6 @@ class CampaignAssignmentServiceTest {
         verify(userRepository, never()).findAllCoordinators();
     }
 
-    /** getAvailableUsers(CAPTAIN) delegates to the JPQL available-captains query. */
     @Test
     void getAvailableUsers_captain_usesJpql() {
         List<UserEntity> entities = List.of(new UserEntity());
@@ -118,14 +110,12 @@ class CampaignAssignmentServiceTest {
         verify(userRepository, never()).findAllCaptains();
     }
 
-    /** getAvailableUsers rejects an invalid role. */
     @Test
     void getAvailableUsers_invalidRole_throws() {
         when(campaignRepository.existsById(1)).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> service.getAvailableUsers(99, 1, "FOO"));
     }
 
-    /** getAvailableUsers throws when the campaign does not exist. */
     @Test
     void getAvailableUsers_campaignNotFound_throws() {
         when(campaignRepository.existsById(5)).thenReturn(false);

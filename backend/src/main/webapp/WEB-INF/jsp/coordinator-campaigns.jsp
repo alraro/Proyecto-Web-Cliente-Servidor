@@ -15,7 +15,6 @@
         response.sendRedirect("/login");
         return;
     }
-    @SuppressWarnings("unchecked")
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
 %>
 <!DOCTYPE html>

@@ -34,7 +34,7 @@ public interface CoordinatorRepository extends JpaRepository<Coordinator, Coordi
     @Query("SELECT c.idCampaign FROM Coordinator c WHERE c.idUser.idUser = :userId")
     List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
 
-    /** Returns the user accounts assigned as coordinators for a campaign. */
+    // Users assigned as coordinators for a campaign
     @Query("SELECT c.idUser FROM Coordinator c WHERE c.id.idCampaign = :campaignId")
     List<UserEntity> findUsersByCampaignId(@Param("campaignId") Integer campaignId);
 
