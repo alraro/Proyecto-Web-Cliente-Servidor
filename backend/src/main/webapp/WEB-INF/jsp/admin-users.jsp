@@ -140,11 +140,21 @@
                                     <form method="POST" action="/admin-users/asignar-rol" style="display:flex; gap:0.25rem; align-items:center;">
                                         <input type="hidden" name="userId" value="<%= u.idUser() %>">
                                         <select name="role" required style="font-size:0.8rem; padding:0.2rem;">
+                                            <% if (!u.roles().contains("ADMINISTRADOR")) { %>
                                             <option value="ADMINISTRADOR">Administrador</option>
+                                            <% } %>
+                                            <% if (!u.roles().contains("COORDINADOR")) { %>
                                             <option value="COORDINADOR">Coordinador</option>
+                                            <% } %>
+                                            <% if (!u.roles().contains("CAPITAN")) { %>
                                             <option value="CAPITAN">Capitan</option>
+                                            <% } %>
+                                            <% if (!u.roles().contains("COLABORADOR")) { %>
                                             <option value="COLABORADOR">Colaborador</option>
+                                            <% } %>
+                                            <% if (!u.roles().contains("RESPONSABLE_TIENDA")) { %>
                                             <option value="RESPONSABLE_TIENDA">Resp. Tienda</option>
+                                            <% } %>
                                         </select>
                                         <button type="submit" class="btn btn-primary btn-sm" style="font-size:0.75rem;">Rol</button>
                                     </form>
