@@ -123,4 +123,15 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
                OR (:role = 'RESPONSABLE_TIENDA' AND EXISTS (SELECT 1 FROM stores s WHERE s.id_responsible = ua.id_user)))
             """, nativeQuery = true)
     long countUsers(@Param("search") String search, @Param("role") String role);
+
+    @Query(value = """
+            SELECT ua.* FROM user_accounts ua
+            WHERE NOT EXISTS (SELECT 1 FROM administrators a WHERE a.id_user = ua.id_user)
+              AND NOT EXISTS (SELECT 1 FROM coordinators c WHERE c.id_user = ua.id_user)
+              AND NOT EXISTS (SELECT 1 FROM captains c WHERE c.id_user = ua.id_user)
+              AND NOT EXISTS (SELECT 1 FROM partner_entity_managers p WHERE p.id_user = ua.id_user)
+              AND NOT EXISTS (SELECT 1 FROM stores s WHERE s.id_responsible = ua.id_user)
+            ORDER BY ua.id_user ASC
+            """, nativeQuery = true)
+    List<UserEntity> findPendingUsers();
 }

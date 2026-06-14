@@ -34,10 +34,7 @@ public class UserService {
     private AuthService authService;
 
     public List<UserResponseDto> getPendingUsersOrdered() {
-        return userRepository.findAllByOrderByIdUserAsc().stream()
-                .filter(user -> "PENDIENTE".equals(userMapper.resolveRole(user.getIdUser())))
-                .map(userMapper::toDTO)
-                .toList();
+        return userMapper.toDTOList(userRepository.findPendingUsers());
     }
 
     public PaginatedResponse<UserResponseDto> getAllUsers(
