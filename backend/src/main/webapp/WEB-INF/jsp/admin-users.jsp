@@ -34,14 +34,13 @@
     String flashSuccess = (String) request.getAttribute("success");
     String flashError = (String) request.getAttribute("error");
 
-    String baseFilterUrl = "/admin-users?size=" + currentSize;
+    String baseFilterUrl = "/admin-users?sort=" + sortField + "," + sortOrder;
     if (currentSearch != null && !currentSearch.isEmpty()) {
         baseFilterUrl += "&search=" + java.net.URLEncoder.encode(currentSearch, "UTF-8");
     }
     if (currentRole != null && !currentRole.isEmpty()) {
         baseFilterUrl += "&role=" + java.net.URLEncoder.encode(currentRole, "UTF-8");
     }
-    baseFilterUrl += "&sort=" + sortField + "," + sortOrder;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,6 +92,7 @@
         </div>
 
         <form method="GET" action="/admin-users" class="filters-bar">
+            <input type="hidden" name="size" value="<%= currentSize %>">
             <input type="text" name="search" placeholder="Buscar por nombre o email..."
                    value="<%= currentSearch != null ? currentSearch : "" %>" class="filter-search">
             <select name="role">
@@ -166,7 +166,7 @@
 
         <div class="pagination">
             <% if (currentPage > 0) { %>
-            <a href="<%= baseFilterUrl %>&page=<%= currentPage - 1 %>" class="btn btn-secondary">&larr; Anterior</a>
+            <a href="<%= baseFilterUrl %>&size=<%= currentSize %>&page=<%= currentPage - 1 %>" class="btn btn-secondary">&larr; Anterior</a>
             <% } else { %>
             <button class="btn btn-secondary" disabled>&larr; Anterior</button>
             <% } %>
@@ -174,13 +174,13 @@
                 Pagina <%= currentPage + 1 %> de <%= totalPages %>
             </span>
             <select class="pagination-select" id="page-size-select"
-                    onchange="window.location.href='<%= baseFilterUrl %>&page=0&size=' + this.value">
+                    onchange="window.location.href='<%= baseFilterUrl %>&size=' + this.value + '&page=0'">
                 <option value="20" <%= currentSize == 20 ? "selected" : "" %>>20 por pagina</option>
                 <option value="50" <%= currentSize == 50 ? "selected" : "" %>>50 por pagina</option>
                 <option value="100" <%= currentSize == 100 ? "selected" : "" %>>100 por pagina</option>
             </select>
             <% if (currentPage + 1 < totalPages) { %>
-            <a href="<%= baseFilterUrl %>&page=<%= currentPage + 1 %>" class="btn btn-secondary">Siguiente &rarr;</a>
+            <a href="<%= baseFilterUrl %>&size=<%= currentSize %>&page=<%= currentPage + 1 %>" class="btn btn-secondary">Siguiente &rarr;</a>
             <% } else { %>
             <button class="btn btn-secondary" disabled>Siguiente &rarr;</button>
             <% } %>
