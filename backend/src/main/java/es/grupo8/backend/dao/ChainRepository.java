@@ -1,3 +1,9 @@
+/**
+ * Repositorio JPA para cadenas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;
