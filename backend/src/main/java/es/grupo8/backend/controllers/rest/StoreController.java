@@ -42,15 +42,17 @@ public class StoreController extends BaseRestController {
     @GetMapping
     public ResponseEntity<PaginatedResponse<StoreResponseDto>> getStores(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer chainId,
             @RequestParam(required = false) Integer localityId,
             @RequestParam(required = false) Integer zoneId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id,asc") String sort) {
 
         checkAdminOrCoordinator(authHeader);
 
-        PaginatedResponse<StoreResponseDto> result = storeService.findAll(chainId, localityId, zoneId, page, size);
+        PaginatedResponse<StoreResponseDto> result = storeService.findAll(search, chainId, localityId, zoneId, page, size, sort);
         return ResponseEntity.ok(result);
     }
 

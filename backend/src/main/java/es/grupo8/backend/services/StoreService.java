@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,42 +31,30 @@ public class StoreService {
     private final PostalCodeRepository postalCodeRepository;
     private final StoreMapper storeMapper;
 
-    public PaginatedResponse<StoreResponseDto> findAll(Integer chainId, Integer localityId, Integer zoneId, int page, int size) {
-        List<es.grupo8.backend.entity.Store> stores = storeRepository.findAllByOrderByIdAsc();
-
-        if (chainId != null)
-            stores = stores.stream()
-                    .filter(s -> s.getIdChain() != null && chainId.equals(s.getIdChain().getIdChain()))
-                    .collect(Collectors.toList());
-        if (localityId != null)
-            stores = stores.stream()
-                    .filter(s -> s.getPostalCode() != null
-                            && s.getPostalCode().getIdLocality() != null
-                            && localityId.equals(s.getPostalCode().getIdLocality().getId()))
-                    .collect(Collectors.toList());
-        if (zoneId != null)
-            stores = stores.stream()
-                    .filter(s -> s.getPostalCode() != null
-                            && s.getPostalCode().getIdLocality() != null
-                            && s.getPostalCode().getIdLocality().getIdZone() != null
-                            && zoneId.equals(s.getPostalCode().getIdLocality().getIdZone().getId()))
-                    .collect(Collectors.toList());
-
-        List<StoreResponseDto> all = storeMapper.toDTOList(stores);
-
+    public PaginatedResponse<StoreResponseDto> findAll(String search, Integer chainId, Integer localityId, Integer zoneId, int page, int size, String sort) {
         page = Math.max(0, page);
         size = Math.max(1, Math.min(size, 100));
-        long totalElements = all.size();
-        int  totalPages = (int) Math.ceil((double) totalElements / size);
-        int  from = page * size;
-        int  to = Math.min(from + size, (int) totalElements);
-        List<StoreResponseDto> content = from >= all.size() ? List.of() : all.subList(from, to);
+        int offset = page * size;
+
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
+
+        List<es.grupo8.backend.entity.Store> stores = switch (sortInfo.field()) {
+            case "name" -> sortInfo.order().equals("asc")
+                    ? storeRepository.findAllByNameAsc(search, chainId, localityId, zoneId, size, offset)
+                    : storeRepository.findAllByNameDesc(search, chainId, localityId, zoneId, size, offset);
+            default -> sortInfo.order().equals("asc")
+                    ? storeRepository.findAllByIdAsc(search, chainId, localityId, zoneId, size, offset)
+                    : storeRepository.findAllByIdDesc(search, chainId, localityId, zoneId, size, offset);
+        };
+
+        long total = storeRepository.countWithFilters(search, chainId, localityId, zoneId);
+        int totalPages = (int) Math.ceil((double) total / size);
 
         return new PaginatedResponse<>(
-                content,
+                storeMapper.toDTOList(stores),
                 page,
                 size,
-                totalElements,
+                total,
                 totalPages,
                 page < totalPages - 1,
                 page > 0

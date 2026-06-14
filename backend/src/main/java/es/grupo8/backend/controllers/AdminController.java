@@ -257,9 +257,11 @@ public class AdminController {
             HttpSession session,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer chainId,
             @RequestParam(required = false) Integer localityId,
             @RequestParam(required = false) Integer zoneId,
+            @RequestParam(defaultValue = "id,asc") String sort,
             @RequestParam(required = false) Integer crear,
             @RequestParam(required = false) Integer editar,
             Model model) {
@@ -270,7 +272,7 @@ public class AdminController {
         }
 
         PaginatedResponse<StoreResponseDto> response =
-                storeService.findAll(chainId, localityId, zoneId, page, size);
+                storeService.findAll(search, chainId, localityId, zoneId, page, size, sort);
 
         model.addAttribute("stores", response.content());
         model.addAttribute("currentPage", response.page());
@@ -279,6 +281,8 @@ public class AdminController {
         model.addAttribute("selectedChainId", chainId);
         model.addAttribute("selectedLocalityId", localityId);
         model.addAttribute("selectedZoneId", zoneId);
+        model.addAttribute("currentSearch", search != null ? search : "");
+        model.addAttribute("currentSort", sort);
 
         model.addAttribute("chains", chainService.findAll());
 
