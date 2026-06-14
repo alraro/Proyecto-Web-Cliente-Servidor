@@ -2,3 +2,11 @@
 
 .icon-teal { background: var(--color-teal-bg); color: var(--color-teal); }
 .icon-green { background: var(--color-green-icon-bg); color: var(--color-green-icon); }
+
+.welcome-bar {
+    background: linear-gradient(135deg, #19a132, #22f01f) !important;
+}
+
+.welcome-bar .role-pill {
+    background: rgba(99, 237, 45, 0.696) !important;
+}

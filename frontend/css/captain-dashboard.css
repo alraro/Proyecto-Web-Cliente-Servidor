@@ -1,1 +1,8 @@
 /* Captain dashboard — page-specific styles (none needed) */
+.welcome-bar {
+    background: linear-gradient(135deg, #55136e, #9714c7) !important;
+}
+
+.welcome-bar .role-pill {
+    background: rgba(131, 31, 181, 0.696) !important;
+}  

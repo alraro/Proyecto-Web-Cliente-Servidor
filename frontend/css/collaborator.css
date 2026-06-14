@@ -1,3 +1,7 @@
 .welcome-bar {
-    background: linear-gradient(135deg, var(--blue-900), var(--blue-700)) !important;
+    background: linear-gradient(135deg, #ca7506, #f07d1f) !important;
 }
+
+.welcome-bar .role-pill {
+    background: rgba(235, 195, 18, 0.696) !important;
+}   
