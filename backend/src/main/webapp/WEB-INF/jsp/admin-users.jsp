@@ -136,7 +136,7 @@
                                 <% } %>
                             </td>
                             <td>
-                                <div class="td-actions" style="gap:0.25rem; flex-wrap:wrap;">
+                                <div class="td-actions" style="gap:0.25rem; flex-wrap:nowrap;">
                                     <button type="button" class="btn btn-primary btn-sm"
                                             onclick="abrirModal(<%= u.idUser() %>, '<%= u.roles().get(0) %>')">Editar</button>
                                     <form method="POST" action="/admin-users/eliminar/<%= u.idUser() %>"
