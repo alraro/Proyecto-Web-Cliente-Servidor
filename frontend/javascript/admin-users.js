@@ -232,7 +232,7 @@ async function saveUserRole() {
     try {
         var response = await fetch(API_BASE + '/api/users/' + currentUserId + '/role', {
             method: 'POST',
-            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            headers: authHeaders(),
             body: JSON.stringify({ role: role })
         });
 

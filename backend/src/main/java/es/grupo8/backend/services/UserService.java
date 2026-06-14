@@ -14,7 +14,6 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -172,9 +171,10 @@ public class UserService {
     }
 
     private void assignPartnerEntityManager(UserEntity user) {
-        PartnerEntity partnerEntity = partnerEntityRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No hay entidades colaboradoras disponibles para asignar este rol."));
+        PartnerEntity partnerEntity = partnerEntityRepository.findFirstPartnerEntity();
+        if (partnerEntity == null) {
+            throw new IllegalArgumentException("No hay entidades colaboradoras disponibles para asignar este rol.");
+        }
 
         if (!partnerEntityManagerRepository.existsById(user.getIdUser())) {
             PartnerEntityManager manager = new PartnerEntityManager();
@@ -185,18 +185,21 @@ public class UserService {
     }
 
     private void assignResponsibleStore(UserEntity user) {
-        Store store = storeRepository.findAllByOrderByIdAsc().stream()
-                .filter(candidate -> candidate.getIdResponsible() == null)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No hay tiendas sin responsable disponibles."));
+        Store store = storeRepository.findFirstWithoutResponsible();
+        if (store == null) {
+            throw new IllegalArgumentException("No hay tiendas sin responsable disponibles.");
+        }
 
         store.setIdResponsible(user);
         storeRepository.save(store);
     }
 
     private Campaign getFirstCampaign() {
-        Optional<Campaign> campaign = campaignRepository.findAll().stream().findFirst();
-        return campaign.orElseThrow(() -> new IllegalArgumentException("No hay campañas disponibles para asignar este rol."));
+        Campaign campaign = campaignRepository.findFirstCampaign();
+        if (campaign == null) {
+            throw new IllegalArgumentException("No hay campañas disponibles para asignar este rol.");
+        }
+        return campaign;
     }
 
     public boolean isAdmin(Integer userId) {

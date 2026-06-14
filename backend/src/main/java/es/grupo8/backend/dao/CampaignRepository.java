@@ -14,6 +14,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import es.grupo8.backend.entity.Campaign;
 
@@ -42,4 +43,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Integer> {
 	long countByStartDateAfter(LocalDate date);
 
 	long countByStartDateLessThanEqualAndEndDateGreaterThanEqual(LocalDate d1, LocalDate d2);
+
+	@Query(value = "SELECT * FROM campaigns ORDER BY id_campaign ASC LIMIT 1", nativeQuery = true)
+	Campaign findFirstCampaign();
 }

@@ -9,6 +9,7 @@ package es.grupo8.backend.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -63,4 +64,7 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
            "COUNT(s) AS total " +
            "FROM Store s GROUP BY s.postalCode.idLocality.idZone.name")
     List<Map<String, Object>> findZoneCoverageCampaign(@Param("campaignId") Integer campaignId);
+
+    @Query(value = "SELECT * FROM stores WHERE id_responsible IS NULL ORDER BY id_store ASC LIMIT 1", nativeQuery = true)
+    Store findFirstWithoutResponsible();
 }
