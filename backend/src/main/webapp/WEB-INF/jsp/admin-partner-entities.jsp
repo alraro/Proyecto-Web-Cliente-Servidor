@@ -2,7 +2,8 @@
     Pagina de administracion de entidades colaboradoras (SSR).
 
     Autores:
-    - Grupo 8
+    - Alfonso Ramos Rojas: 90%
+    - IA Generativa: 10%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="es.grupo8.backend.dto.PartnerEntityResponseDto, java.util.List" %>
