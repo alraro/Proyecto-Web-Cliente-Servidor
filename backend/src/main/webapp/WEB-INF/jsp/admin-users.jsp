@@ -21,11 +21,15 @@
     Integer currentSize = (Integer) request.getAttribute("currentSize");
     String currentSearch = (String) request.getAttribute("currentSearch");
     String currentRole = (String) request.getAttribute("currentRole");
+    String sortField = (String) request.getAttribute("sortField");
+    String sortOrder = (String) request.getAttribute("sortOrder");
 
     if (users == null) users = List.of();
     if (currentPage == null) currentPage = 0;
     if (totalPages == null) totalPages = 1;
     if (currentSize == null) currentSize = 20;
+    if (sortField == null) sortField = "id";
+    if (sortOrder == null) sortOrder = "asc";
 
     String flashSuccess = (String) request.getAttribute("success");
     String flashError = (String) request.getAttribute("error");
@@ -37,6 +41,7 @@
     if (currentRole != null && !currentRole.isEmpty()) {
         baseFilterUrl += "&role=" + java.net.URLEncoder.encode(currentRole, "UTF-8");
     }
+    baseFilterUrl += "&sort=" + sortField + "," + sortOrder;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -97,6 +102,12 @@
                 <option value="CAPITAN" <%= "CAPITAN".equals(currentRole) ? "selected" : "" %>>Capitan</option>
                 <option value="COLABORADOR" <%= "COLABORADOR".equals(currentRole) ? "selected" : "" %>>Colaborador</option>
                 <option value="RESPONSABLE_TIENDA" <%= "RESPONSABLE_TIENDA".equals(currentRole) ? "selected" : "" %>>Responsable de Tienda</option>
+            </select>
+            <select name="sort">
+                <option value="id,asc" <%= "id".equals(sortField) && "asc".equals(sortOrder) ? "selected" : "" %>>ID ascendente</option>
+                <option value="id,desc" <%= "id".equals(sortField) && "desc".equals(sortOrder) ? "selected" : "" %>>ID descendente</option>
+                <option value="name,asc" <%= "name".equals(sortField) && "asc".equals(sortOrder) ? "selected" : "" %>>Nombre A-Z</option>
+                <option value="name,desc" <%= "name".equals(sortField) && "desc".equals(sortOrder) ? "selected" : "" %>>Nombre Z-A</option>
             </select>
             <button type="submit" class="btn">Filtrar</button>
             <a href="/admin-users" class="btn-clear">Limpiar</a>
