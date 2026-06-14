@@ -1,8 +1,16 @@
+/**
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - IA Generativa: 10%
+ */
+
 package es.grupo8.backend.services;
 
-import es.grupo8.backend.dto.PaginatedResponse;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import es.grupo8.backend.dto.PaginatedResponse;
 
 public final class UtilsService {
 

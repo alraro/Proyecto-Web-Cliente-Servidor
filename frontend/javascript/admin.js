@@ -1,14 +1,14 @@
 const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!sessionStorage.getItem('token') || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
 
 
-    const token = localStorage.getItem('token');
-    const nombre = localStorage.getItem('nombre') || 'Administrador';
+    const token = sessionStorage.getItem('token');
+    const nombre = sessionStorage.getItem('nombre') || 'Administrador';
     const welcomeNameEl = document.querySelector('#welcome-name');
 
     if (welcomeNameEl) welcomeNameEl.textContent = nombre;

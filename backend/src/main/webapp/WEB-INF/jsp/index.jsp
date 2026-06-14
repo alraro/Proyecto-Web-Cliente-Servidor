@@ -5,15 +5,11 @@
 -   - IA Generativa: 10%
 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-    Object pageTitleAttribute = request.getAttribute("pageTitle");
-    String pageTitle = pageTitleAttribute == null ? "Bancosol | Inicio" : pageTitleAttribute.toString();
-%>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
+    <title><%= request.getAttribute("pageTitle") %></title>
     <link rel="icon" type="image/png" href="/assets/Bancosol.png">
     <link rel="stylesheet" href="/css/index.css">
 </head>

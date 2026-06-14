@@ -30,8 +30,6 @@ import es.grupo8.backend.dto.AdminDTO;
 import es.grupo8.backend.dto.ChainRequestDto;
 import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.dto.PaginatedResponse;
-import es.grupo8.backend.dto.PartnerEntityRequestDto;
-import es.grupo8.backend.dto.PartnerEntityResponseDto;
 import es.grupo8.backend.dto.StoreRequestDto;
 import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.dto.UserResponseDto;
@@ -42,12 +40,10 @@ import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignService;
 import es.grupo8.backend.services.ChainService;
-import es.grupo8.backend.services.PartnerEntityService;
 import es.grupo8.backend.services.StoreService;
 import es.grupo8.backend.services.UserService;
 import es.grupo8.backend.services.UtilsService;
 import jakarta.servlet.http.HttpSession;
-
 @Controller
 public class AdminController {
 
@@ -158,22 +154,12 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        if (!password.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden.");
-            return "redirect:/admin-createusers";
-        }
-
-        if (password.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "La contraseña debe tener al menos 6 caracteres.");
-            return "redirect:/admin-createusers";
-        }
-
         if (telefono != null && telefono.isBlank()) telefono = null;
         if (domicilio != null && domicilio.isBlank()) domicilio = null;
         if (cp != null && cp.isBlank()) cp = null;
 
         try {
-            authService.register(nombre, email, password, telefono, domicilio, cp);
+            authService.register(nombre, email, password, confirmPassword, telefono, domicilio, cp);
             redirectAttributes.addFlashAttribute("success", "Usuario " + nombre + " creado, esperando validación de rol");
             return "redirect:/admin-createusers";
         } catch (Exception e) {
@@ -512,13 +498,21 @@ public class AdminController {
     }
 
     @GetMapping("/admin-incidents")
-    public String adminIncidents(HttpSession session, Model model) {
+    public String adminIncidents(@RequestParam(value = "sort", required = false) String dir, 
+                                 HttpSession session, 
+                                 Model model) {
         String role = (String) session.getAttribute("role");
         if(!"ADMINISTRADOR".equals(role)){
             return "redirect:/login";
         }
 
-        List<IncidentDTO> incidents = adminService.getAllIncidents();
+        List<IncidentDTO> incidents = adminService.getAllIncidents(dir);
+
+        if("asc".equals(dir)){
+            model.addAttribute("nextDir", "desc");
+        } else {
+            model.addAttribute("nextDir", "asc");
+        }
 
         model.addAttribute("incidents", incidents);
         model.addAttribute("pageTitle", "Bancosol | Todas las incidencias");
@@ -526,4 +520,25 @@ public class AdminController {
         return "admin-incidents";
     }
 
+    @PostMapping("/admin-incidents/delete/{id}")
+    public String deleteIncident(@PathVariable Integer id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+    
+    String role = (String) session.getAttribute("role");
+    if (!"ADMINISTRADOR".equals(role)){
+        return "redirect:/login";
+    }
+
+    try {
+        adminService.deleteIncident(id);
+        redirectAttributes.addFlashAttribute("success", "Incidencia eliminada");
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("error", "Error al eliminar");
+    }
+
+          return "redirect:/admin-incidents";                       
+    }
+
+    
 }

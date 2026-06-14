@@ -10,7 +10,7 @@ async function exportarExcel(resource) {
     try {
         let url = `${API_BASE}/api/export/${resource}`;
         
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 

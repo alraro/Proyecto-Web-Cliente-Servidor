@@ -31,7 +31,6 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-	// Devuelve un AuthResponseDTO y un Map<String, String>
 	public AuthResponseDTO login(@RequestBody AuthResponseDTO request) {
 
 		// Sacamos email y contraseña
@@ -58,12 +57,13 @@ public class AuthController {
 		String nombre = request.getNombre();
 		String email = request.getEmail();
 		String password = request.getPassword();
+		String confirmPassword = request.getConfirmPassword();
 		String telefono = request.getPhone();
 		String domicilio = request.getAddress();
 		String cp = request.getPostalCode();
 
         try {
-            AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+            AuthResponseDTO dto = authService.register(nombre, email, password, confirmPassword, telefono, domicilio, cp);
 
 			return dto;
 
@@ -99,7 +99,7 @@ public class AuthController {
 	// Endpoint para actualizar el perfil del usuario
 	@PutMapping("/profile")
 	public ProfileDTO updateOwnProfile(@RequestHeader(value = "Authorization", required = false) String auth, 
-											  @RequestBody ProfileDTO request) {
+									   @RequestBody ProfileDTO request) {
 
         Integer userId = authService.extractUserIdFromToken(auth);
         if (userId == null) {
@@ -136,7 +136,7 @@ public class AuthController {
 
 	@PostMapping("/admin/users")
 	public AuthResponseDTO createUser(@RequestHeader(value = "Authorization", required = false) String auth,
-										@RequestBody AuthResponseDTO request){
+									  @RequestBody AuthResponseDTO request){
 
 		Integer adminId = authService.extractUserIdFromToken(auth);
 		if(adminId == null) {
@@ -148,6 +148,7 @@ public class AuthController {
 				request.getNombre(),
 				request.getEmail(),
 				request.getPassword(),
+				request.getConfirmPassword(),
 				request.getPhone(),
 				request.getAddress(),
 				request.getPostalCode()

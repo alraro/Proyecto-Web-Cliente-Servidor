@@ -1,3 +1,9 @@
+/**
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.services;
 
 import java.util.List;
@@ -12,6 +18,7 @@ import es.grupo8.backend.dao.StoreRepository;
 import es.grupo8.backend.dto.AdminDTO;
 import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.entity.Campaign;
+import es.grupo8.backend.entity.Incident;
 import es.grupo8.backend.mapper.AdminMapper;
 import es.grupo8.backend.mapper.IncidentMapper;
 
@@ -67,8 +74,30 @@ public class AdminService {
         ).collect(Collectors.toList());
     }
 
-    public List<IncidentDTO> getAllIncidents() {
-        return incidentMapper.toDTOList(incidentRepository.findAll());
+    public List<IncidentDTO> getAllIncidents(String dir) {
+        List<Incident> incidents;
+
+        if ("asc".equals(dir)){
+            incidents = incidentRepository.findAllOrderByIdAsc();
+        } else {
+            incidents = incidentRepository.findAllOrderByIdDesc();
+        }
+        
+        
+        return incidents.stream().map(incidentMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public void deleteIncident (Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id de la incidencia no existe");
+        }
+
+
+        if(incidentRepository.existsById(id)){
+            incidentRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("No se encuentra esta incidencia");
+        }
     }
 
 }

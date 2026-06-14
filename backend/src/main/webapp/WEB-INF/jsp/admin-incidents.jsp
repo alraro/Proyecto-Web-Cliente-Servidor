@@ -10,12 +10,10 @@
     String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
 
-    if (!"ADMINISTRADOR".equals(role) || token == null) {
-        response.sendRedirect("/login");
-        return;
-    }
-
     List<IncidentDTO> incidents = (List<IncidentDTO>) request.getAttribute("incidents");
+
+    String nextDir = (String) request.getAttribute("nextDir");
+    if(nextDir == null) nextDir = "asc";
 
 %>
 <!DOCTYPE html>
@@ -50,6 +48,10 @@
             <a href="/admin" class="back-link-inline">← Volver al panel</a>
             <h1>Historial de Incidencias</h1>
             <p>Visualiza todas las incidencias reportadas por capitanes</p>
+
+            <div style="margin-top: 15px;">
+                <a href="/admin-incidents?sort=<%=nextDir%>" class="btn-edit" style="text-decoration: none; display: inline-block; padding: 8px 12px;">Ordenar</a>
+            </div>
         </div>
 
         <section class="card">
@@ -62,6 +64,7 @@
                             <th>Tienda</th>
                             <th>Reportado por</th>
                             <th>Descripción</th>
+                            <th></th>
                         </tr>
                     </thead>
 
@@ -75,6 +78,7 @@
                         <%
                         } else {
                             for (IncidentDTO i : incidents) {
+                                Object id = i.getId();
                         %>
                         <tr>
                             <td><%= i.getCreatedAt() != null ? i.getCreatedAt() : "-" %></td>
@@ -82,6 +86,21 @@
                             <td><%= i.getStoreName() != null ? i.getStoreName() : "-" %></td>
                             <td><%= i.getCaptainName() != null ? i.getCaptainName() : "-" %></td>
                             <td><%= i.getDescription() != null ? i.getDescription() : "-" %></td>
+                            <td>
+                                <%
+                                if (id != null) {
+                                %>
+                                <form action="/admin-incidents/delete/<%=id%>" method="post">
+                                    <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                                </form>
+                            <%
+                            } else {
+                                %>
+                                -
+                                <%
+                            }
+                                %>
+                            </td>
                         </tr>
                         <%
                         }}%>
