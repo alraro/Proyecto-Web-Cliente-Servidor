@@ -2,8 +2,7 @@
   Vista de asignación de voluntarios a turnos (coordinador).
 
   Autores:
-  - Fernando Luis Pinilla Molina: 70%
-  - Hugo Herrero González: 5%
+  - Fernando Luis Pinilla Molina: 75%
   - IA Generativa: 25%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

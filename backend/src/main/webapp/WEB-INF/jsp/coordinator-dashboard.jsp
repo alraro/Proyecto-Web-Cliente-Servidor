@@ -2,9 +2,8 @@
   Panel principal del coordinador.
 
   Autores:
-  - Fernando Luis Pinilla Molina: 70%
+  - Fernando Luis Pinilla Molina: 75%
   - Alejandro Calvo Aguilar: 5%
-  - Hugo Herrero González: 5%
   - IA Generativa: 20%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

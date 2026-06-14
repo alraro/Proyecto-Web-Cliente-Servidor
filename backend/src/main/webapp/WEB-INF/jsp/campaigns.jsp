@@ -2,8 +2,7 @@
   Vista de solo lectura del listado de campañas (admin).
 
   Autores:
-  - Fernando Luis Pinilla Molina: 70%
-  - Hugo Herrero González: 5%
+  - Fernando Luis Pinilla Molina: 75%
   - IA Generativa: 25%
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
