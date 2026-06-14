@@ -1,3 +1,9 @@
+/**
+ * DTO de petición para crear/editar cadenas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.dto;
 
 import lombok.Data;

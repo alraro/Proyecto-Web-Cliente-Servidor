@@ -1,3 +1,9 @@
+/**
+ * DTO de respuesta para tiendas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.dto;
 
 public record StoreResponseDto(
