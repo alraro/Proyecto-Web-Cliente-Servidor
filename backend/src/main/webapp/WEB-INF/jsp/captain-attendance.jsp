@@ -3,8 +3,7 @@
 
   Autores:
   - Alejandro Calvo Aguilar: 40%
-  - Fernando Luis Pinilla Molina: 35%
-  - Hugo Herrero González: 5%
+  - Fernando Luis Pinilla Molina: 40%
   - IA Generativa: 20%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
