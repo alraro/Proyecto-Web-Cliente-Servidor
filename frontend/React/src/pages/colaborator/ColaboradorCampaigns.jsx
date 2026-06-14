@@ -76,6 +76,7 @@ function ColaboradorCampaigns() {
     }
 
     const formattedCampaigns = campaigns.map(c => ({
+        id: c.id,
         name: c.name,
         start: formatDate(c.startDate),
         end: formatDate(c.endDate),
