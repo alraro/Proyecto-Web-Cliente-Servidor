@@ -1,50 +1,25 @@
 /**
- * Servicio de negocio para operaciones de usuarios.
- *
  * Autores:
- * - Alfonso Ramos: 60%
- * - Alejandra Ortiz: 40%
+ * - Alejandra Ortiz Robles: 55%
+ * - Alfonso Ramos Rojas: 35%
+ * - IA Generativa: 10%
  */
 package es.grupo8.backend.services;
 
-import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.dao.UserSpecifications;
-import es.grupo8.backend.dao.AdminRepository;
-import es.grupo8.backend.dao.CampaignRepository;
-import es.grupo8.backend.dao.CaptainRepository;
-import es.grupo8.backend.dao.CoordinatorRepository;
-import es.grupo8.backend.dao.PartnerEntityManagerRepository;
-import es.grupo8.backend.dao.PartnerEntityRepository;
-import es.grupo8.backend.dao.StoreRepository;
+import es.grupo8.backend.dao.*;
 import es.grupo8.backend.dto.PaginatedResponse;
-import es.grupo8.backend.dto.UserRequestDto;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
 import es.grupo8.backend.dto.UserRoleResponseDto;
-import es.grupo8.backend.entity.AdminEntity;
-import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.Captain;
-import es.grupo8.backend.entity.CaptainId;
-import es.grupo8.backend.entity.Coordinator;
-import es.grupo8.backend.entity.CoordinatorId;
-import es.grupo8.backend.entity.PartnerEntity;
-import es.grupo8.backend.entity.PartnerEntityManager;
-import es.grupo8.backend.entity.Store;
-import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.entity.*;
 import es.grupo8.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -57,21 +32,13 @@ public class UserService {
     @Autowired private PartnerEntityRepository partnerEntityRepository;
     @Autowired private PartnerEntityManagerRepository partnerEntityManagerRepository;
     @Autowired private StoreRepository storeRepository;
-    @Autowired private PasswordService passwordService;
     @Autowired private UserMapper userMapper;
 
     @Autowired
     private AuthService authService;
 
-    public List<UserResponseDto> getAllUsersOrdered() {
-        return userMapper.toDTOList(userRepository.findAllByOrderByIdUserAsc());
-    }
-
     public List<UserResponseDto> getPendingUsersOrdered() {
-        return userRepository.findAllByOrderByIdUserAsc().stream()
-                .filter(user -> "PENDIENTE".equals(userMapper.resolveRole(user.getIdUser())))
-                .map(userMapper::toDTO)
-                .toList();
+        return userMapper.toDTOList(userRepository.findPendingUsers());
     }
 
     public PaginatedResponse<UserResponseDto> getAllUsers(
@@ -79,94 +46,30 @@ public class UserService {
 
         page = Math.max(0, page);
         size = Math.max(1, Math.min(size, 100));
+        int offset = page * size;
 
-        Specification<UserEntity> spec = Specification
-                .where(UserSpecifications.hasSearchTerm(search))
-                .and(UserSpecifications.hasRole(role));
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
+        String sortField = sortInfo.field();
+        String sortDir = sortInfo.order();
 
-        Sort sortObj = Sort.unsorted();
-        if (sort != null && !sort.trim().isEmpty()) {
-            String[] parts = sort.split(",");
-            if (parts.length == 2) {
-                Sort.Direction dir = "desc".equalsIgnoreCase(parts[1].trim())
-                        ? Sort.Direction.DESC : Sort.Direction.ASC;
-                sortObj = Sort.by(dir, "name".equalsIgnoreCase(parts[0].trim()) ? "name" : "idUser");
-            }
-        }
+        List<UserEntity> users = switch (sortField) {
+            case "name" -> sortDir.equals("asc")
+                    ? userRepository.findAllByNameAsc(search, role, size, offset)
+                    : userRepository.findAllByNameDesc(search, role, size, offset);
+            default -> sortDir.equals("asc")
+                    ? userRepository.findAllByIdAsc(search, role, size, offset)
+                    : userRepository.findAllByIdDesc(search, role, size, offset);
+        };
 
-        Pageable pageable = PageRequest.of(page, size, sortObj);
-        Page<UserEntity> userPage = userRepository.findAll(spec, pageable);
+        long total = userRepository.countUsers(search, role);
+        int totalPages = (int) Math.ceil((double) total / size);
 
-        List<UserResponseDto> content = userPage.getContent().stream()
-                .map(userMapper::toDTO)
-                .toList();
+        List<UserResponseDto> content = userMapper.toDTOList(users);
 
         return new PaginatedResponse<>(content, page, size,
-                userPage.getTotalElements(), userPage.getTotalPages(),
-                userPage.hasNext(), userPage.hasPrevious());
-    }
-
-    public UserResponseDto getUserById(Integer userId) {
-        return userMapper.toDTO(userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId)));
-    }
-
-    public UserResponseDto createUser(UserRequestDto request) {
-        validateCreate(request);
-
-        if (userRepository.existsByEmail(request.getEmail().toLowerCase()))
-            throw new IllegalArgumentException("Ya existe un usuario con ese email.");
-
-        UserEntity user = new UserEntity();
-        user.setName(request.getName().trim());
-        user.setEmail(request.getEmail().trim().toLowerCase());
-        user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
-        user.setAddress(request.getAddress() != null ? request.getAddress().trim() : null);
-        user.setPostalCode(request.getPostalCode() != null ? request.getPostalCode().trim() : null);
-        user.setPassword(passwordService.hash(request.getPassword()));
-
-        UserEntity saved = userRepository.save(user);
-        return userMapper.toDTO(userRepository.findById(saved.getIdUser())
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado tras la creación")));
-    }
-
-    public UserResponseDto updateUser(Integer userId, UserRequestDto request) {
-        if (request == null) throw new IllegalArgumentException("La petición no es válida.");
-
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId));
-
-        if (request.getName() != null) {
-            String name = request.getName().trim();
-            if (name.isEmpty()) throw new IllegalArgumentException("El nombre es obligatorio.");
-            if (name.length() > 255) throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
-            user.setName(name);
-        }
-        if (request.getEmail() != null) {
-            String email = request.getEmail().trim().toLowerCase();
-            if (email.isEmpty()) throw new IllegalArgumentException("El email es obligatorio.");
-            if (email.length() > 255) throw new IllegalArgumentException("El email no puede superar 255 caracteres.");
-            if (!email.equals(user.getEmail()) && userRepository.existsByEmail(email))
-                throw new IllegalArgumentException("Ya existe un usuario con ese email.");
-            user.setEmail(email);
-        }
-        if (request.getPhone() != null) {
-            String phone = request.getPhone().trim();
-            if (phone.length() > 20) throw new IllegalArgumentException("El teléfono no puede superar 20 caracteres.");
-            user.setPhone(phone.isEmpty() ? null : phone);
-        }
-        if (request.getAddress() != null) {
-            String address = request.getAddress().trim();
-            user.setAddress(address.isEmpty() ? null : address);
-        }
-        if (request.getPostalCode() != null) {
-            String cp = request.getPostalCode().trim();
-            user.setPostalCode(cp.isEmpty() ? null : cp);
-        }
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty())
-            user.setPassword(passwordService.hash(request.getPassword().trim()));
-
-        return userMapper.toDTO(userRepository.save(user));
+                total, totalPages,
+                page < totalPages - 1,
+                page > 0);
     }
 
     public UserRoleResponseDto assignRole(Integer userId, UserRoleRequestDto request) {
@@ -273,9 +176,10 @@ public class UserService {
     }
 
     private void assignPartnerEntityManager(UserEntity user) {
-        PartnerEntity partnerEntity = partnerEntityRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No hay entidades colaboradoras disponibles para asignar este rol."));
+        PartnerEntity partnerEntity = partnerEntityRepository.findFirstPartnerEntity();
+        if (partnerEntity == null) {
+            throw new IllegalArgumentException("No hay entidades colaboradoras disponibles para asignar este rol.");
+        }
 
         if (!partnerEntityManagerRepository.existsById(user.getIdUser())) {
             PartnerEntityManager manager = new PartnerEntityManager();
@@ -286,40 +190,21 @@ public class UserService {
     }
 
     private void assignResponsibleStore(UserEntity user) {
-        Store store = storeRepository.findAllByOrderByIdAsc().stream()
-                .filter(candidate -> candidate.getIdResponsible() == null)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No hay tiendas sin responsable disponibles."));
+        Store store = storeRepository.findFirstWithoutResponsible();
+        if (store == null) {
+            throw new IllegalArgumentException("No hay tiendas sin responsable disponibles.");
+        }
 
         store.setIdResponsible(user);
         storeRepository.save(store);
     }
 
     private Campaign getFirstCampaign() {
-        Optional<Campaign> campaign = campaignRepository.findAll().stream().findFirst();
-        return campaign.orElseThrow(() -> new IllegalArgumentException("No hay campañas disponibles para asignar este rol."));
-    }
-
-    private void validateCreate(UserRequestDto req) {
-        if (req == null) throw new IllegalArgumentException("La petición no es válida.");
-
-        String name = req.getName() != null ? req.getName().trim() : "";
-        if (name.isEmpty()) throw new IllegalArgumentException("El nombre es obligatorio.");
-        if (name.length() > 255) throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
-
-        String email = req.getEmail() != null ? req.getEmail().trim().toLowerCase() : "";
-        if (email.isEmpty()) throw new IllegalArgumentException("El email es obligatorio.");
-        if (email.length() > 255) throw new IllegalArgumentException("El email no puede superar 255 caracteres.");
-
-        if (req.getPassword() == null || req.getPassword().trim().isEmpty())
-            throw new IllegalArgumentException("La contraseña es obligatoria.");
-
-        if (req.getRole() == null || req.getRole().trim().isEmpty())
-            throw new IllegalArgumentException("El rol es obligatorio.");
-
-        String role = req.getRole().trim().toUpperCase(Locale.ROOT);
-        if (!List.of("ADMIN", "COORDINATOR", "CAPTAIN", "PARTNER_ENTITY_MANAGER").contains(role))
-            throw new IllegalArgumentException("Rol no válido. Los roles válidos son: ADMIN, COORDINATOR, CAPTAIN, PARTNER_ENTITY_MANAGER.");
+        Campaign campaign = campaignRepository.findFirstCampaign();
+        if (campaign == null) {
+            throw new IllegalArgumentException("No hay campañas disponibles para asignar este rol.");
+        }
+        return campaign;
     }
 
     public boolean isAdmin(Integer userId) {

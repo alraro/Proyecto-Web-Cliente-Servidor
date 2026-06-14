@@ -1,3 +1,9 @@
+/**
+ * Autores:
+ * - Alejandra Ortiz Robles: 60%
+ * - Alfonso Ramos Rojas: 30%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dao.StoreRepository;
@@ -41,10 +47,5 @@ public class UserMapper extends MapperDTO<UserResponseDto, UserEntity> {
         if (storeRepository.existsByIdResponsible_IdUser(userId)) roles.add("RESPONSABLE_TIENDA");
         if (roles.isEmpty()) roles.add("PENDIENTE");
         return roles;
-    }
-
-    public String resolveRole(Integer userId) {
-        List<String> roles = resolveRoles(userId);
-        return roles.get(0);
     }
 }

@@ -9,6 +9,7 @@ package es.grupo8.backend.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,29 +21,95 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
 
     List<Store> findAllByOrderByIdAsc();
 
-    List<Store> findByIdChain_IdChain(Integer chainId);
+    @Query(value = "SELECT s.* FROM stores s "
+         + "LEFT JOIN chains c ON s.id_chain = c.id_chain "
+         + "LEFT JOIN postal_codes pc ON s.postal_code = pc.postal_code "
+         + "LEFT JOIN localities l ON pc.id_locality = l.id_locality "
+         + "WHERE (:search IS NULL OR :search = '' "
+         + "   OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))) "
+         + "AND (:chainId IS NULL OR s.id_chain = :chainId) "
+         + "AND (:localityId IS NULL OR l.id_locality = :localityId) "
+         + "AND (:zoneId IS NULL OR l.id_zone = :zoneId) "
+         + "ORDER BY s.id_store ASC LIMIT :size OFFSET :offset", nativeQuery = true)
+    List<Store> findAllByIdAsc(@Param("search") String search,
+                               @Param("chainId") Integer chainId,
+                               @Param("localityId") Integer localityId,
+                               @Param("zoneId") Integer zoneId,
+                               @Param("size") int size,
+                               @Param("offset") int offset);
 
-    @Query("SELECT s FROM Store s WHERE s.postalCode.idLocality.id = :localityId")
-    List<Store> findByLocalityId(@Param("localityId") Integer localityId);
+    @Query(value = "SELECT s.* FROM stores s "
+         + "LEFT JOIN chains c ON s.id_chain = c.id_chain "
+         + "LEFT JOIN postal_codes pc ON s.postal_code = pc.postal_code "
+         + "LEFT JOIN localities l ON pc.id_locality = l.id_locality "
+         + "WHERE (:search IS NULL OR :search = '' "
+         + "   OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))) "
+         + "AND (:chainId IS NULL OR s.id_chain = :chainId) "
+         + "AND (:localityId IS NULL OR l.id_locality = :localityId) "
+         + "AND (:zoneId IS NULL OR l.id_zone = :zoneId) "
+         + "ORDER BY s.id_store DESC LIMIT :size OFFSET :offset", nativeQuery = true)
+    List<Store> findAllByIdDesc(@Param("search") String search,
+                                @Param("chainId") Integer chainId,
+                                @Param("localityId") Integer localityId,
+                                @Param("zoneId") Integer zoneId,
+                                @Param("size") int size,
+                                @Param("offset") int offset);
 
-    @Query("SELECT s FROM Store s WHERE s.postalCode.idLocality.idZone.id = :zoneId")
-    List<Store> findByZoneId(@Param("zoneId") Integer zoneId);
+    @Query(value = "SELECT s.* FROM stores s "
+         + "LEFT JOIN chains c ON s.id_chain = c.id_chain "
+         + "LEFT JOIN postal_codes pc ON s.postal_code = pc.postal_code "
+         + "LEFT JOIN localities l ON pc.id_locality = l.id_locality "
+         + "WHERE (:search IS NULL OR :search = '' "
+         + "   OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))) "
+         + "AND (:chainId IS NULL OR s.id_chain = :chainId) "
+         + "AND (:localityId IS NULL OR l.id_locality = :localityId) "
+         + "AND (:zoneId IS NULL OR l.id_zone = :zoneId) "
+         + "ORDER BY s.name ASC LIMIT :size OFFSET :offset", nativeQuery = true)
+    List<Store> findAllByNameAsc(@Param("search") String search,
+                                 @Param("chainId") Integer chainId,
+                                 @Param("localityId") Integer localityId,
+                                 @Param("zoneId") Integer zoneId,
+                                 @Param("size") int size,
+                                 @Param("offset") int offset);
 
-    @Query("SELECT s FROM Store s WHERE s.idChain.idChain = :chainId AND s.postalCode.idLocality.id = :localityId")
-    List<Store> findByChainAndLocality(@Param("chainId") Integer chainId,
-                                       @Param("localityId") Integer localityId);
+    @Query(value = "SELECT s.* FROM stores s "
+         + "LEFT JOIN chains c ON s.id_chain = c.id_chain "
+         + "LEFT JOIN postal_codes pc ON s.postal_code = pc.postal_code "
+         + "LEFT JOIN localities l ON pc.id_locality = l.id_locality "
+         + "WHERE (:search IS NULL OR :search = '' "
+         + "   OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))) "
+         + "AND (:chainId IS NULL OR s.id_chain = :chainId) "
+         + "AND (:localityId IS NULL OR l.id_locality = :localityId) "
+         + "AND (:zoneId IS NULL OR l.id_zone = :zoneId) "
+         + "ORDER BY s.name DESC LIMIT :size OFFSET :offset", nativeQuery = true)
+    List<Store> findAllByNameDesc(@Param("search") String search,
+                                  @Param("chainId") Integer chainId,
+                                  @Param("localityId") Integer localityId,
+                                  @Param("zoneId") Integer zoneId,
+                                  @Param("size") int size,
+                                  @Param("offset") int offset);
 
-    @Query("SELECT s FROM Store s WHERE s.idChain.idChain = :chainId AND s.postalCode.idLocality.idZone.id = :zoneId")
-    List<Store> findByChainAndZone(@Param("chainId") Integer chainId,
-                                   @Param("zoneId") Integer zoneId);
+    @Query(value = "SELECT COUNT(*) FROM stores s "
+         + "LEFT JOIN chains c ON s.id_chain = c.id_chain "
+         + "LEFT JOIN postal_codes pc ON s.postal_code = pc.postal_code "
+         + "LEFT JOIN localities l ON pc.id_locality = l.id_locality "
+         + "WHERE (:search IS NULL OR :search = '' "
+         + "   OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))) "
+         + "AND (:chainId IS NULL OR s.id_chain = :chainId) "
+         + "AND (:localityId IS NULL OR l.id_locality = :localityId) "
+         + "AND (:zoneId IS NULL OR l.id_zone = :zoneId)", nativeQuery = true)
+    long countWithFilters(@Param("search") String search,
+                          @Param("chainId") Integer chainId,
+                          @Param("localityId") Integer localityId,
+                          @Param("zoneId") Integer zoneId);
 
-    /* Check if a user is the assigned manager of a specific store */
+    /* Comprueba si un usuario es el gerente asignado de una tienda específica */
     boolean existsByIdAndIdResponsible_IdUser(Integer storeId, Integer userId);
 
-    /* Find the store assigned to a responsible user (used at login) */
+    /* Busca la tienda asignada a un usuario responsable (utilizada al iniciar sesión) */
     java.util.Optional<Store> findByIdResponsible_IdUser(Integer userId);
 
-    /* Check if a user is responsible for any store */
+    /* Comprobar si un usuario es responsable de alguna tienda */
     boolean existsByIdResponsible_IdUser(Integer userId);
 
 
@@ -63,4 +130,7 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
            "COUNT(s) AS total " +
            "FROM Store s GROUP BY s.postalCode.idLocality.idZone.name")
     List<Map<String, Object>> findZoneCoverageCampaign(@Param("campaignId") Integer campaignId);
+
+    @Query(value = "SELECT * FROM stores WHERE id_responsible IS NULL ORDER BY id_store ASC LIMIT 1", nativeQuery = true)
+    Store findFirstWithoutResponsible();
 }

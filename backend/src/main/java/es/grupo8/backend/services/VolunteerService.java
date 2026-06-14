@@ -1,3 +1,8 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.PartnerEntityRepository;
@@ -74,7 +79,7 @@ public class VolunteerService {
 
         Volunteer volunteer = new Volunteer();
         volunteer.setName(UtilsService.trimToNull(request.name()));
-        volunteer.setPhone(normalizePhone(request.phone()));
+        volunteer.setPhone(UtilsService.normalizePhone(request.phone()));
         volunteer.setEmail(UtilsService.trimToNull(request.email()));
         volunteer.setAddress(UtilsService.trimToNull(request.address()));
         volunteer.setIdPartnerEntity(partnerEntity);
@@ -96,7 +101,7 @@ public class VolunteerService {
         }
 
         volunteer.setName(UtilsService.trimToNull(request.name()));
-        volunteer.setPhone(normalizePhone(request.phone()));
+        volunteer.setPhone(UtilsService.normalizePhone(request.phone()));
         volunteer.setEmail(UtilsService.trimToNull(request.email()));
         volunteer.setAddress(UtilsService.trimToNull(request.address()));
 
@@ -144,13 +149,5 @@ public class VolunteerService {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    private String normalizePhone(String phone) {
-        String trimmed = UtilsService.trimToNull(phone);
-        if (trimmed == null) {
-            return null;
-        }
-        return trimmed.replaceAll("\\s+", " ");
     }
 }

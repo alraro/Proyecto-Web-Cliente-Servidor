@@ -1,3 +1,8 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import es.grupo8.backend.entity.PartnerEntity;
@@ -37,4 +42,7 @@ public interface PartnerEntityRepository extends JpaRepository<PartnerEntity, In
          + "WHERE (:search IS NULL OR :search = '' "
          + "   OR LOWER(pe.name) LIKE LOWER(CONCAT('%', :search, '%')))", nativeQuery = true)
     long countWithSearch(@Param("search") String search);
+
+    @Query(value = "SELECT * FROM partner_entities ORDER BY id_partner_entity ASC LIMIT 1", nativeQuery = true)
+    PartnerEntity findFirstPartnerEntity();
 }
