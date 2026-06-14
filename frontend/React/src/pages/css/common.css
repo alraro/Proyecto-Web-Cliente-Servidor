@@ -895,7 +895,7 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     background: linear-gradient(135deg, #19a132, #22f01f);
 }
 
-.welcome-bar.COLABORADOR .role-pill {
+.welcome-bar.COORDINADOR .role-pill {
     background: rgba(99, 237, 45, 0.696);
 }
 
