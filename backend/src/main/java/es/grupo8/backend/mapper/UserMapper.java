@@ -1,3 +1,9 @@
+/**
+ * Autores:
+ * - Alejandra Ortiz Robles: 60%
+ * - Alfonso Ramos Rojas: 30%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dao.StoreRepository;
