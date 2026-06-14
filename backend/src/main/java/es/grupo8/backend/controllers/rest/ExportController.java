@@ -23,7 +23,7 @@ import es.grupo8.backend.services.ExportService;
 
 @RestController
 @RequestMapping("/api/export")
-public class ExportController {
+public class ExportController extends BaseRestController {
 
     @Autowired
     private ExportService exportService;

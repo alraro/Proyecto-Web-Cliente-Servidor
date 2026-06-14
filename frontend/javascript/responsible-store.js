@@ -1,9 +1,9 @@
 function getUser() { 
-    return localStorage.getItem('nombre') || 'Responsable'; 
+    return sessionStorage.getItem('nombre') || 'Responsable'; 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken() || localStorage.getItem('role') !== 'RESPONSABLE_TIENDA') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'RESPONSABLE_TIENDA') {
         window.location.href = 'login.html';
         return;
     }

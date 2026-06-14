@@ -29,7 +29,7 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
 
         List<CampaignStore> findByIdCampaign_Id(Integer campaignId);
 
-        /** Returns the stores assigned to a campaign directly (avoids in-memory mapping). */
+        // Stores assigned to a campaign
         @Query("SELECT cs.idStore FROM CampaignStore cs WHERE cs.id.idCampaign = :campaignId")
         List<Store> findStoresByCampaignId(@Param("campaignId") Integer campaignId);
 

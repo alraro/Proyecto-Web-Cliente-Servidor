@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class VolunteerService {
@@ -54,11 +55,11 @@ public class VolunteerService {
 
     public VoluntarioResponseDto getVolunteerById(Integer id, Integer partnerEntityId) {
         Volunteer volunteer = volunteerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Volunteer not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found with ID: " + id));
 
         if (volunteer.getIdPartnerEntity() == null ||
             !volunteer.getIdPartnerEntity().getId().equals(partnerEntityId)) {
-            throw new RuntimeException("Volunteer not found for this entity");
+            throw new NoSuchElementException("Volunteer not found for this entity");
         }
 
         return volunteerMapper.toDTO(volunteer);
@@ -69,7 +70,7 @@ public class VolunteerService {
         validateRequest(request);
 
         PartnerEntity partnerEntity = partnerEntityRepository.findById(partnerEntityId)
-                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + partnerEntityId));
+                .orElseThrow(() -> new NoSuchElementException("Partner entity not found with ID: " + partnerEntityId));
 
         Volunteer volunteer = new Volunteer();
         volunteer.setName(UtilsService.trimToNull(request.name()));
@@ -87,11 +88,11 @@ public class VolunteerService {
         validateRequest(request);
 
         Volunteer volunteer = volunteerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Volunteer not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found with ID: " + id));
 
         if (volunteer.getIdPartnerEntity() == null ||
             !volunteer.getIdPartnerEntity().getId().equals(partnerEntityId)) {
-            throw new RuntimeException("Volunteer not found for this entity");
+            throw new NoSuchElementException("Volunteer not found for this entity");
         }
 
         volunteer.setName(UtilsService.trimToNull(request.name()));
@@ -106,11 +107,11 @@ public class VolunteerService {
     @Transactional
     public void deleteVolunteer(Integer id, Integer partnerEntityId) {
         Volunteer volunteer = volunteerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Volunteer not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found with ID: " + id));
 
         if (volunteer.getIdPartnerEntity() == null ||
             !volunteer.getIdPartnerEntity().getId().equals(partnerEntityId)) {
-            throw new RuntimeException("Volunteer not found for this entity");
+            throw new NoSuchElementException("Volunteer not found for this entity");
         }
 
         volunteerRepository.delete(volunteer);

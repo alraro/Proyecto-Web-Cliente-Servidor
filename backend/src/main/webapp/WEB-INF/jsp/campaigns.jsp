@@ -9,17 +9,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%@ page import="java.util.List, java.util.Collections, java.time.format.DateTimeFormatter, es.grupo8.backend.dto.CampaignDTO" %>
 <%
-    String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
     String nombre = (String) session.getAttribute("nombre");
 
-    if (token == null || role == null || !"ADMINISTRADOR".equals(role)) {
+    if (!"ADMINISTRADOR".equals(role)) {
         response.sendRedirect("/login");
         return;
     }
 
-    // Campaigns come from the controller's model (SSR); we never fetch them with JS here.
-    @SuppressWarnings("unchecked")
+    // Las campañas llegan por el model del controlador (SSR)
     List<CampaignDTO> campaigns = (List<CampaignDTO>) request.getAttribute("campaigns");
     if (campaigns == null) campaigns = Collections.emptyList();
 
@@ -129,7 +127,7 @@
 </main>
 
 <script>
-    // Data is already rendered from the model. JS only filters/sorts the existing rows (no fetch, no reload).
+    // El JS solo filtra y ordena las filas ya pintadas, sin fetch
     const tbody = document.getElementById('campaigns-tbody');
     const emptyRow = document.getElementById('empty-row');
     const rows = Array.from(tbody.querySelectorAll('tr[data-status]'));
@@ -167,7 +165,7 @@
         sorted.forEach(row => tbody.insertBefore(row, emptyRow));
     });
 
-    // Initial state: show the empty message if the model returned no campaigns.
+    // si no hay campañas, que salga el mensaje de tabla vacia
     applyFilter();
 </script>
 </body>

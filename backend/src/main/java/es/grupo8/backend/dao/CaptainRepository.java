@@ -29,7 +29,7 @@ public interface CaptainRepository extends JpaRepository<Captain, CaptainId> {
 	@Query("SELECT c.idCampaign FROM Captain c WHERE c.idUser.idUser = :userId")
 	List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
 
-	/** Returns the user accounts assigned as captains for a campaign. */
+	// Users assigned as captains for a campaign
 	@Query("SELECT c.idUser FROM Captain c WHERE c.id.idCampaign = :campaignId")
 	List<UserEntity> findUsersByCampaignId(@Param("campaignId") Integer campaignId);
 

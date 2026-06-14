@@ -17,10 +17,6 @@ import org.springframework.ui.Model;
 
 import es.grupo8.backend.services.CoordinatorDashboardService;
 
-/**
- * Unit tests for {@link CoordinatorController}: session-role auth redirect and model
- * population for the campaigns page. Plain method calls — no Spring context.
- */
 @ExtendWith(MockitoExtension.class)
 class CoordinatorControllerTest {
 
@@ -28,7 +24,6 @@ class CoordinatorControllerTest {
 
     @InjectMocks CoordinatorController controller;
 
-    /** A session whose role is not COORDINADOR is bounced to the login page. */
     @Test
     void coordinatorCampaigns_notCoordinator_redirectsToLogin() {
         MockHttpSession session = new MockHttpSession();
@@ -39,7 +34,6 @@ class CoordinatorControllerTest {
         assertEquals("redirect:/login", view);
     }
 
-    /** A valid coordinator session gets the view and the campaigns in the model. */
     @Test
     void coordinatorCampaigns_validSession_returnsViewWithModel() {
         MockHttpSession session = new MockHttpSession();

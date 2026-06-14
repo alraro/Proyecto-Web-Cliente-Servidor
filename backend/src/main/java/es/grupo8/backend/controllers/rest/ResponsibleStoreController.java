@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/stores")
 @AllArgsConstructor
-public class ResponsibleStoreController {
+public class ResponsibleStoreController extends BaseRestController {
 
     private final ResponsibleStoreService responsibleStoreService;
     private final AuthService authService;
@@ -46,11 +46,5 @@ public class ResponsibleStoreController {
         Integer userId = authService.extractUserIdFromToken(authHeader);
         Map<String, Object> detail = responsibleStoreService.getStoreDetail(id, userId);
         return ResponseEntity.ok(detail);
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handleAuthException(AuthException e) {
-        return ResponseEntity.status(e.getStatus())
-                .body(Map.of("message", e.getMessage()));
     }
 }

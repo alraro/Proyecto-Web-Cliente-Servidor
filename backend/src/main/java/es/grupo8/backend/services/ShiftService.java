@@ -14,6 +14,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +143,7 @@ public class ShiftService {
      */
     public List<StoreSimpleDto> getStoresForCampaign(Integer campaignId) {
         campaignRepository.findById(campaignId)
-                .orElseThrow(() -> new RuntimeException("Campaña no encontrada"));
+                .orElseThrow(() -> new NoSuchElementException("Campaña no encontrada"));
 
         return campaignStoreRepository.findByIdCampaign_Id(campaignId).stream()
                 .filter(cs -> cs.getIdStore() != null)

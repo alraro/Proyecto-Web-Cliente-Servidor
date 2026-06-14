@@ -27,10 +27,6 @@ import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.CampaignService;
 import es.grupo8.backend.services.UserService;
 
-/**
- * Unit tests for {@link CampaignRestController}: admin-only enforcement and response codes.
- * Uses direct method invocation — no Spring context or HTTP layer required.
- */
 @ExtendWith(MockitoExtension.class)
 class CampaignRestControllerTest {
 
@@ -40,7 +36,6 @@ class CampaignRestControllerTest {
 
     @InjectMocks CampaignRestController controller;
 
-    /** getCampaigns with valid service data must return 200. */
     @Test
     void getCampaigns_returnsOk() {
         when(campaignService.getCampaigns(any(), any(Pageable.class))).thenReturn(Page.empty());
@@ -51,7 +46,6 @@ class CampaignRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
-    /** createCampaign with a non-admin token must return 403. */
     @Test
     void createCampaign_notAdmin_returnsForbidden() {
         when(userService.isAdminFromToken("Bearer bad-token")).thenReturn(false);
@@ -61,7 +55,6 @@ class CampaignRestControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
-    /** createCampaign with no Authorization header must return 403. */
     @Test
     void createCampaign_noToken_returnsForbidden() {
         when(userService.isAdminFromToken(null)).thenReturn(false);
@@ -71,7 +64,6 @@ class CampaignRestControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
-    /** createCampaign with valid admin token and full request must return 201 with success message. */
     @Test
     void createCampaign_admin_returnsCreated() {
         CampaignRequestDto req = new CampaignRequestDto();
@@ -97,7 +89,6 @@ class CampaignRestControllerTest {
         assertEquals("Campaign created successfully", body.get("message"));
     }
 
-    /** handleNotFound must return 404 with the exception message in the body. */
     @Test
     void handleNotFound_returns404() {
         ResponseEntity<Map<String, String>> response =
@@ -108,7 +99,6 @@ class CampaignRestControllerTest {
                 Objects.requireNonNull(response.getBody()).get("message"));
     }
 
-    /** deleteCampaign with a non-admin token must return 403 without calling the service. */
     @Test
     void deleteCampaign_notAdmin_returnsForbidden() {
         when(userService.isAdminFromToken(any())).thenReturn(false);

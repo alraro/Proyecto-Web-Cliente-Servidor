@@ -1,3 +1,10 @@
+/*
+* Autores:
+* - Alejandra Ortiz Robles: 60%
+* - Hugo Herrero González: 30%
+* - IA Generativa: 10%
+* 
+*/
 package es.grupo8.backend.dao;
 
 import java.util.List;

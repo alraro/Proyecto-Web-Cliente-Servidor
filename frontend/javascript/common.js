@@ -1,19 +1,19 @@
 ﻿const API_BASE = 'http://localhost:8080';
 
 function getToken() {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
 }
 
 function getUserName() {
-    return localStorage.getItem('nombre') || 'Usuario';
+    return sessionStorage.getItem('nombre') || 'Usuario';
 }
 
 function getUserRole() {
-    return localStorage.getItem('role');
+    return sessionStorage.getItem('role');
 }
 
 function getStoreId() {
-    return localStorage.getItem('storeId');
+    return sessionStorage.getItem('storeId');
 }
 
 function authHeaders(token = getToken()) {
@@ -24,7 +24,7 @@ function authHeaders(token = getToken()) {
 }
 
 function logout() {
-    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = 'login.html';
 }
 
@@ -32,8 +32,8 @@ function handleUrlTokenParams() {
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
     const nameFromQuery = params.get('nombre');
-    if (tokenFromQuery) localStorage.setItem('token', tokenFromQuery);
-    if (nameFromQuery) localStorage.setItem('nombre', nameFromQuery);
+    if (tokenFromQuery) sessionStorage.setItem('token', tokenFromQuery);
+    if (nameFromQuery) sessionStorage.setItem('nombre', nameFromQuery);
 }
 
 function requireAuth(expectedRole) {

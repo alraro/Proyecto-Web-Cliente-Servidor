@@ -1,6 +1,7 @@
 package es.grupo8.backend.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import es.grupo8.backend.entity.UserEntity;
 import es.grupo8.backend.entity.Volunteer;
 import es.grupo8.backend.entity.VolunteerShift;
 import es.grupo8.backend.entity.VolunteerShiftId;
-import es.grupo8.backend.exception.ShiftConflictException;
+import es.grupo8.backend.exceptions.ShiftConflictException;
 import es.grupo8.backend.mapper.AvailableCaptainMapper;
 import es.grupo8.backend.mapper.AvailableVolunteerMapper;
 import es.grupo8.backend.mapper.CaptainAssignmentMapper;
@@ -79,7 +80,7 @@ public class ShiftAssignmentService {
         Integer volunteerId = request.getVolunteerId();
 
         Volunteer volunteer = volunteerRepository.findById(volunteerId)
-                .orElseThrow(() -> new RuntimeException("Voluntario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Voluntario no encontrado"));
 
         VolunteerShiftId vsId = buildVolunteerShiftId(volunteerId, shift);
         if (volunteerShiftRepository.existsById(vsId)) {
@@ -139,7 +140,7 @@ public class ShiftAssignmentService {
 
         VolunteerShiftId vsId = buildVolunteerShiftId(volunteerId, shift);
         if (!volunteerShiftRepository.existsById(vsId)) {
-            throw new RuntimeException("El voluntario no está asignado a este turno");
+            throw new IllegalStateException("El voluntario no está asignado a este turno");
         }
 
         volunteerShiftRepository.deleteById(vsId);
@@ -168,7 +169,7 @@ public class ShiftAssignmentService {
         Integer userId = request.getUserId();
 
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
 
         ShiftCaptainId scId = new ShiftCaptainId();
         scId.setIdShift(shiftId);
@@ -213,7 +214,7 @@ public class ShiftAssignmentService {
         scId.setIdShift(shiftId);
         scId.setIdUser(userId);
         if (!shiftCaptainRepository.existsById(scId)) {
-            throw new RuntimeException("El capitán no está asignado a este turno");
+            throw new IllegalStateException("El capitán no está asignado a este turno");
         }
 
         shiftCaptainRepository.deleteById(scId);
@@ -231,7 +232,7 @@ public class ShiftAssignmentService {
 
         VolunteerShiftId vsId = buildVolunteerShiftId(request.getVolunteerId(), shift);
         VolunteerShift vs = volunteerShiftRepository.findById(vsId)
-                .orElseThrow(() -> new RuntimeException("El voluntario no está asignado a este turno"));
+                .orElseThrow(() -> new NoSuchElementException("El voluntario no está asignado a este turno"));
 
         vs.setAttendance(request.getAttendance());
         volunteerShiftRepository.save(vs);
@@ -278,7 +279,7 @@ public class ShiftAssignmentService {
 
     private Shift findShift(Integer shiftId) {
         return shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new RuntimeException("Turno no encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Turno no encontrado"));
     }
 
     private VolunteerShiftId buildVolunteerShiftId(Integer volunteerId, Shift shift) {

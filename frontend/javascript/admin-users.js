@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    if (localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }

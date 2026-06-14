@@ -5,7 +5,7 @@ let selectedStores = new Map();
 let allFilteredStores = [];
 let cachedTypes = [];
 
-function getToken() { return localStorage.getItem('token'); }
+function getToken() { return sessionStorage.getItem('token'); }
 
 
 function authHeaders() {
@@ -398,7 +398,7 @@ async function loadCampaignTypes() {
 // ── Boot ────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
 
 
     document.querySelector('#btn-new').addEventListener('click', openCreateModal);

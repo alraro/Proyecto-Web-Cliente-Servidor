@@ -1171,7 +1171,7 @@ Las siguientes tecnologías y conceptos no forman parte del temario y el agente 
 - Frameworks o bibliotecas externas (React, Vue, Angular, jQuery, etc.)
 - TypeScript
 - Node.js ni su ecosistema (npm, require, etc.)
-- `localStorage` / `sessionStorage`
+- `sessionStorage` / `sessionStorage`
 - `IndexedDB`
 - Service Workers
 - WebSockets

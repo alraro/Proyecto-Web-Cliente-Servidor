@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 @Service
@@ -48,19 +49,13 @@ public class PartnerEntityManagerService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        String sortField = "id";
-        String sortDir = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0].trim().toLowerCase();
-            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
 
-        List<PartnerEntityManager> managers = switch (sortField) {
-            case "name" -> sortDir.equals("asc")
+        List<PartnerEntityManager> managers = switch (sortInfo.field()) {
+            case "name" -> sortInfo.order().equals("asc")
                     ? partnerEntityManagerRepository.findAllByNameAsc(search, size, offset)
                     : partnerEntityManagerRepository.findAllByNameDesc(search, size, offset);
-            default -> sortDir.equals("asc")
+            default -> sortInfo.order().equals("asc")
                     ? partnerEntityManagerRepository.findAllByIdAsc(search, size, offset)
                     : partnerEntityManagerRepository.findAllByIdDesc(search, size, offset);
         };
@@ -81,7 +76,7 @@ public class PartnerEntityManagerService {
 
     public PartnerEntityManagerResponseDto getPartnerEntityManagerByUserId(Integer userId) {
         PartnerEntityManager manager = partnerEntityManagerRepository.findByIdWithRelations(userId)
-                .orElseThrow(() -> new RuntimeException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId));
         return partnerEntityManagerMapper.toDTO(manager);
     }
 
@@ -98,7 +93,7 @@ public class PartnerEntityManagerService {
         }
 
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId));
 
         PartnerEntityManager manager = new PartnerEntityManager();
         manager.setId(user.getIdUser());
@@ -118,12 +113,12 @@ public class PartnerEntityManagerService {
         }
 
         PartnerEntityManager manager = partnerEntityManagerRepository.findByIdWithRelations(userId)
-                .orElseThrow(() -> new RuntimeException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId));
 
         UserEntity user = manager.getUserAccounts();
         if (user == null) {
             user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
+                    .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId));
             manager.setUserAccounts(user);
         }
 
@@ -190,7 +185,7 @@ public class PartnerEntityManagerService {
 
     public void removePartnerEntityManagerRole(Integer userId) {
         if (!partnerEntityManagerRepository.existsById(userId)) {
-            throw new RuntimeException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId);
+            throw new NoSuchElementException("No existe un responsable de entidad colaboradora con ID de usuario: " + userId);
         }
         partnerEntityManagerRepository.deleteById(userId);
     }

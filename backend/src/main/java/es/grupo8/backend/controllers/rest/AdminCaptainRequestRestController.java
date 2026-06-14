@@ -10,12 +10,10 @@ package es.grupo8.backend.controllers.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,45 +22,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.grupo8.backend.dto.IncidentDTO;
 import es.grupo8.backend.entity.CaptainRequest;
 import es.grupo8.backend.services.AdminCaptainRequestService;
+import es.grupo8.backend.services.AdminService;
 import es.grupo8.backend.services.AuthService;
 import es.grupo8.backend.services.UserService;
 import lombok.AllArgsConstructor;
 
-// Admin API to list, approve and reject captain sign-up requests.
-// The controller only checks the token and shapes the response; the real work lives in the service.
 @RestController
 @RequestMapping("/api/admin")
 @AllArgsConstructor
-public class AdminCaptainRequestRestController {
+public class AdminCaptainRequestRestController extends BaseRestController {
 
     private final AuthService authService;
     private final UserService userService;
     private final AdminCaptainRequestService adminCaptainRequestService;
+    private final AdminService adminService;
 
-    // ── Endpoints ─────────────────────────────────────────────────────────────
-
-    // Lists requests, pending by default. Returns one flat map per request.
     @GetMapping("/captain-requests")
     public ResponseEntity<?> getCaptainRequests(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(value = "status", defaultValue = "PENDIENTE") String status) {
 
-        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden("administrators");
         List<Map<String, Object>> result = adminCaptainRequestService.getRequests(status).stream()
                 .map(this::requestToMap)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
 
-    // Approving creates the user, grants the captain role and closes the request — all inside the service.
     @PostMapping("/captain-requests/{id}/approve")
     public ResponseEntity<?> approveCaptainRequest(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden("administrators");
         Integer newUserId = adminCaptainRequestService.approveRequest(
                 authService.extractUserIdFromToken(authHeader), id);
         return ResponseEntity.ok(Map.of(
@@ -70,38 +65,16 @@ public class AdminCaptainRequestRestController {
                 "userId",  newUserId));
     }
 
-    // Rejecting just flips the request's status.
     @PostMapping("/captain-requests/{id}/reject")
     public ResponseEntity<?> rejectCaptainRequest(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Integer id) {
 
-        if (!userService.isAdminFromToken(authHeader)) return forbidden();
+        if (!userService.isAdminFromToken(authHeader)) return forbidden("administrators");
         adminCaptainRequestService.rejectRequest(authService.extractUserIdFromToken(authHeader), id);
         return ResponseEntity.ok(Map.of("message", "Solicitud rechazada."));
     }
 
-    // ── Error handling ──────────────────────────────────────────────────────────
-
-    /** @param e request not found */
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
-    }
-
-    /** @param e request already processed */
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException e) {
-        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private ResponseEntity<?> forbidden() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access restricted to administrators"));
-    }
-
-    // Flattens the entity into a simple map for the JSON response (with campaign and coordinator info).
     private Map<String, Object> requestToMap(CaptainRequest r) {
         Map<String, Object> m = new HashMap<>();
         m.put("id",              r.getId());
@@ -115,4 +88,31 @@ public class AdminCaptainRequestRestController {
         m.put("coordinatorName", r.getIdCoordinator() != null ? r.getIdCoordinator().getName()  : null);
         return m;
     }
+
+
+    @GetMapping("/incidents")
+    public ResponseEntity<?> getIncidents(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!userService.isAdminFromToken(authHeader)) {
+            return forbidden("administrators");
+        }
+        List<IncidentDTO> incidents = adminService.getAllIncidents("desc");
+
+        return ResponseEntity.ok(incidents);
+    }
+
+    @DeleteMapping("/incidents/{id}")
+    public ResponseEntity<?> deleteIncident(@RequestHeader(value = "Authorization", required = false) String authHeader, 
+                                            @PathVariable Integer id) {
+        if (!userService.isAdminFromToken(authHeader)) {
+            return forbidden("administrators");
+        }
+        try {
+            adminService.deleteIncident(id);
+            return ResponseEntity.ok("Incidencia eliminada");
+        } catch(Exception e){
+            return ResponseEntity.badRequest().body("Error al eliminar");
+        }
+    }
+
+
 }

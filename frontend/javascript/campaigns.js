@@ -18,7 +18,7 @@ function formatDate(iso) {
 }
 
 async function loadCampaigns() {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const tbody = document.querySelector('#campaigns-tbody');
     try {
         let url = API_BASE + '/api/campaigns?page=' + currentPage + '&size=' + PAGE_SIZE
@@ -115,7 +115,7 @@ function updateChips() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!sessionStorage.getItem('token') || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
