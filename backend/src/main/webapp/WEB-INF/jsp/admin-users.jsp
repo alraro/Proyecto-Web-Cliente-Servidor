@@ -122,10 +122,9 @@
                         </td>
                     </tr>
                     <% } else { %>
-                        <% int displayId = currentPage * currentSize + 1; %>
                         <% for (UserResponseDto u : users) { %>
                         <tr>
-                            <td><%= displayId++ %></td>
+                            <td><%= u.idUser() %></td>
                             <td><strong><%= u.name() %></strong></td>
                             <td><%= u.email() != null ? u.email() : "&mdash;" %></td>
                             <td><%= u.phone() != null ? u.phone() : "&mdash;" %></td>

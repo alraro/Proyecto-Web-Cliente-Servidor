@@ -33,11 +33,11 @@ function createRoleBadge(role) {
 }
 
 // Renderizar una fila de usuario con DOM
-function renderUserRow(user, displayId) {
+function renderUserRow(user) {
     const tr = document.createElement('tr');
 
     const tdId = document.createElement('td');
-    tdId.textContent = displayId;
+    tdId.textContent = user.idUser;
     tr.appendChild(tdId);
 
     const tdName = document.createElement('td');
@@ -118,8 +118,8 @@ async function loadUsers() {
 
         usersCache = data;
 
-        data.forEach(function (user, index) {
-            usersTbody.appendChild(renderUserRow(user, index + 1));
+        data.forEach(function (user) {
+            usersTbody.appendChild(renderUserRow(user));
         });
     } catch (error) {
         usersTbody.innerHTML = '';
