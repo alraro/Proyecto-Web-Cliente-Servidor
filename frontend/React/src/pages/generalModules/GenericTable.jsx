@@ -97,9 +97,11 @@ function GenericTable({
 						)}
 					</div>
 				</div>
-				<div className="filters-bar">
-					<input type="text" placeholder="Buscar..." className="search-field" onChange={(e) => onChangeSearch && onChangeSearch(e.target.value)}/>
-				</div>
+				{onChangeSearch && (
+					<div className="filters-bar">
+						<input type="text" placeholder="Buscar..." className="search-field" onChange={(e) => onChangeSearch(e.target.value)}/>
+					</div>
+				)}
 				<div className="table-wrap">
 					<table>
 						{renderTableHeaders(headers, editRowFunction, deleteRowFunction)}
