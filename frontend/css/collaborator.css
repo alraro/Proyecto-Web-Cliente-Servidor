@@ -1,7 +1,7 @@
-/* Captain dashboard — page-specific styles (none needed) */
+
 /* Welcome bar */
 .welcome-bar {
-    background: linear-gradient(135deg, #55136e, #9714c7);
+    background: linear-gradient(135deg, #ca7506, #f07d1f);
     border-radius: 20px;
     padding: 1.75rem 2rem;
     color: var(--white);
@@ -28,7 +28,7 @@
 .welcome-bar .role-pill {
     padding: 0.4rem 1rem;
     border-radius: 999px;
-    background: rgba(131, 31, 181, 0.696);
+    background: rgba(235, 195, 18, 0.696);
     font-size: 0.85rem;
     font-weight: 700;
     white-space: nowrap;

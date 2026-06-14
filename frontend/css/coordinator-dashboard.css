@@ -2,3 +2,38 @@
 
 .icon-teal { background: var(--color-teal-bg); color: var(--color-teal); }
 .icon-green { background: var(--color-green-icon-bg); color: var(--color-green-icon); }
+
+/* Welcome bar */
+.welcome-bar {
+    background: linear-gradient(135deg, #19a132, #22f01f);
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.welcome-bar h2 {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+}
+
+.welcome-bar p {
+    margin: 0;
+    opacity: 0.8;
+    font-size: 0.92rem;
+}
+
+.welcome-bar .role-pill {
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    background: rgba(99, 237, 45, 0.696);
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
