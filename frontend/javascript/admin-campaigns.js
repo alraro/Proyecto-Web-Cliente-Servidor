@@ -248,7 +248,7 @@ function renderTable(campaigns) {
         tr.appendChild(td1);
 
         const td2 = document.createElement('td');
-        td2.textContent = escapeHtml((c.type && c.type.name) ? c.type.name : '-');
+        td2.textContent = escapeHtml(c.typeName ? c.typeName : '-');
         tr.appendChild(td2);
 
         const td3 = document.createElement('td');
@@ -305,7 +305,7 @@ async function openEditModal(id) {
         currentCampaignId = id;
         document.querySelector('#modal-title').textContent = 'Editar campaña';
         document.querySelector('#campaign-name').value  = c.name  || '';
-        document.querySelector('#campaign-type').value  = (c.type && c.type.id !== null) ? String(c.type.id) : '';
+        document.querySelector('#campaign-type').value  = (c.typeId != null) ? String(c.typeId) : '';
         document.querySelector('#campaign-start').value = c.startDate || '';
         document.querySelector('#campaign-end').value   = c.endDate   || '';
         selectedStores = new Map();
