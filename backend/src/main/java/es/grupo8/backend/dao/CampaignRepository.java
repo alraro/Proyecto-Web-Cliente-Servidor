@@ -27,9 +27,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Integer> {
 	List<Campaign> findByOrderByStartDateDesc();
 
 	List<Campaign> findByIdTypeId(Integer id);
-
-	boolean existsByIdTypeId(Integer id);
-
+	
 	Page<Campaign> findAll(Pageable pageable);
 
 	Page<Campaign> findByEndDateBefore(LocalDate date, Pageable pageable);

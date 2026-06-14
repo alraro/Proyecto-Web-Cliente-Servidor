@@ -70,7 +70,7 @@ function renderTable(campaigns) {
         tr.appendChild(tdName);
 
         const tdType = document.createElement('td');
-        tdType.textContent = (c.type && c.type.name) ? c.type.name : '—';
+        tdType.textContent = c.typeName ? c.typeName : '—';
         tr.appendChild(tdType);
 
         const tdStart = document.createElement('td');

@@ -23,9 +23,6 @@ import es.grupo8.backend.entity.UserEntity;
 
 public interface CaptainRepository extends JpaRepository<Captain, CaptainId> {
 
-	@Query("SELECT COUNT(c) > 0 FROM Captain c WHERE c.idUser.idUser = :userId")
-	boolean isUserCaptain(@Param("userId") Integer userId);
-
 	@Query("SELECT c.idCampaign FROM Captain c WHERE c.idUser.idUser = :userId")
 	List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
 
