@@ -95,7 +95,6 @@ a {
     max-width: 1220px;
     margin: 0 auto;
     padding: 2rem 1.5rem 1rem;
-    display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 450px);
     gap: 1.2rem;
     align-items: stretch;

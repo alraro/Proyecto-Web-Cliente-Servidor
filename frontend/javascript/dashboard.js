@@ -58,20 +58,34 @@ async function loadCampaigns() {
     try {
         const campaigns = await apiFetch('/api/dashboard/campaigns');
         const sel = document.querySelector('#campaignSelect');
+
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
 
-            const start = formatDate(c.startDate);
-            const end   = formatDate(c.endDate);
+            const startStr = formatDate(c.startDate);
+            const endStr   = formatDate(c.endDate);
 
-            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${start} → ${end})`;
+            // Problemas con la comparación de fechas
+            const now = new Date();
+            const isActive = now >= new Date(c.startDate) && now <= new Date(c.endDate);
+
+            // Lo guardamos en un atributo data-active para usarlo luego en KPIs
+            opt.dataset.active = isActive ? 'true' : 'false';
+            opt.textContent = `${c.name} ${isActive ? '🔄' : '✅'} (${startStr} → ${endStr})`;
             sel.appendChild(opt);
         });
 
         // KPI global de campañas activas
-        const actives = campaigns.filter(c => c.active);
-        document.querySelector('#kpiStatus') && (document.querySelector('#kpiChains').textContent = campaigns.length);
+        const actives = campaigns.filter(c => {
+            const now = new Date();
+            return now >= new Date(c.startDate) && now <= new Date(c.endDate);
+        });
+
+        if(document.querySelector('#kpiChains')) {
+            document.querySelector('#kpiChains').textContent = actives.length;
+        }
+
     } catch(e) {
         showError(e.message);
     }
@@ -125,6 +139,18 @@ function updateKPIs(chainData, zoneData) {
     document.querySelector('#kpiStores').textContent = totalStores;
     document.querySelector('#kpiChains').textContent = chainsActive;
     document.querySelector('#kpiZones').textContent  = zonesActive;
+
+    const selectedCampaign = document.querySelector('#campaignSelect');
+    if (selectedCampaign && selectedCampaign.selectedIndex > 0) {
+        const selectedOption = selectedCampaign.options[selectedCampaign.selectedIndex];
+        // Obtenemos el estado de la campaña seleccionada
+        const isActive = selectedOption.dataset.active === 'true';
+
+        document.querySelector('#kpiStatus').textContent = isActive ? 'Activa' : 'Finalizada';
+    } else {
+        document.querySelector('#kpiStatus').textContent = '-';
+    }
+
 }
 
 // Configuramos y dibujamos el gráfico usando Chart.js
