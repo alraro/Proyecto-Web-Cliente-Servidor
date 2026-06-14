@@ -27,10 +27,6 @@ import es.grupo8.backend.entity.UserEntity;
 @Repository
 public interface CoordinatorRepository extends JpaRepository<Coordinator, CoordinatorId> {
 
-    // Tu método (HEAD) - Lo mantenemos para que tu Controlador siga funcionando
-    @Query("SELECT COUNT(c) > 0 FROM Coordinator c WHERE c.idUser.idUser = :userId")
-    boolean isUserCoordinator(@Param("userId") Integer userId);
-
     @Query("SELECT c.idCampaign FROM Coordinator c WHERE c.idUser.idUser = :userId")
     List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
 

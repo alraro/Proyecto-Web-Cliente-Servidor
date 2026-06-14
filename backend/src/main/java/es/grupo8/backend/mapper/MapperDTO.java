@@ -23,13 +23,4 @@ public abstract class MapperDTO<DTOClass, EntityClass> {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
-
-    public Set<DTOClass> toDtoSet(Set<EntityClass> entities) {
-        if (entities == null) {
-            return Set.of();
-        }
-        return entities.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toSet());
-    }
 }
