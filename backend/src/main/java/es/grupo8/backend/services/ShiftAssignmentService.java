@@ -1,3 +1,11 @@
+/**
+ * Servicio para la gestión de asignaciones de turnos.
+ *
+ * Autores:
+ * - Alejandro Calvo Aguilar: 70%
+ * - IA Generativa: 30%
+ */
+
 package es.grupo8.backend.services;
 
 import java.util.List;
