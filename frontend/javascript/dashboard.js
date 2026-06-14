@@ -66,15 +66,26 @@ async function loadCampaigns() {
             const startStr = formatDate(c.startDate);
             const endStr   = formatDate(c.endDate);
 
-            const isActive = new Date() <= new Date(c.endDate);
+            // Problemas con la comparación de fechas
+            const now = new Date();
+            const isActive = now >= new Date(c.startDate) && now <= new Date(c.endDate);
 
+            // Lo guardamos en un atributo data-active para usarlo luego en KPIs
+            opt.dataset.active = isActive ? 'true' : 'false';
             opt.textContent = `${c.name} ${isActive ? '🔄' : '✅'} (${startStr} → ${endStr})`;
             sel.appendChild(opt);
         });
 
         // KPI global de campañas activas
-        const actives = campaigns.filter(c => c.status);
-        document.querySelector('#kpiStatus') && (document.querySelector('#kpiChains').textContent = campaigns.length);
+        const actives = campaigns.filter(c => {
+            const now = new Date();
+            return now >= new Date(c.startDate) && now <= new Date(c.endDate);
+        });
+
+        if(document.querySelector('#kpiChains')) {
+            document.querySelector('#kpiChains').textContent = actives.length;
+        }
+
     } catch(e) {
         showError(e.message);
     }
@@ -132,12 +143,10 @@ function updateKPIs(chainData, zoneData) {
     const selectedCampaign = document.querySelector('#campaignSelect');
     if (selectedCampaign && selectedCampaign.selectedIndex > 0) {
         const selectedOption = selectedCampaign.options[selectedCampaign.selectedIndex];
+        // Obtenemos el estado de la campaña seleccionada
+        const isActive = selectedOption.dataset.active === 'true';
 
-        if (selectedOption.textContent.includes('🔄')) {
-            document.querySelector('#kpiStatus').textContent = 'Activa';
-        } else {
-            document.querySelector('#kpiStatus').textContent = 'Finalizada';
-        }
+        document.querySelector('#kpiStatus').textContent = isActive ? 'Activa' : 'Finalizada';
     } else {
         document.querySelector('#kpiStatus').textContent = '-';
     }
