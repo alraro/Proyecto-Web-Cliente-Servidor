@@ -57,4 +57,11 @@ gestionCards.push({
     link: "/admin/incidents"
 })
 
+gestionCards.push({
+    icon: "📢",
+    title: "Campañas",
+    description: "Crear y gestionar campanas de recogida de alimentos, asignar fechas y zonas.",
+    link: "/admin/campaigns"
+});
+
 export default gestionCards;
