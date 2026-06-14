@@ -58,19 +58,22 @@ async function loadCampaigns() {
     try {
         const campaigns = await apiFetch('/api/dashboard/campaigns');
         const sel = document.querySelector('#campaignSelect');
+
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
 
-            const start = formatDate(c.startDate);
-            const end   = formatDate(c.endDate);
+            const startStr = formatDate(c.startDate);
+            const endStr   = formatDate(c.endDate);
 
-            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${start} → ${end})`;
+            const isActive = new Date() <= new Date(c.endDate);
+
+            opt.textContent = `${c.name} ${isActive ? '🔄' : '✅'} (${startStr} → ${endStr})`;
             sel.appendChild(opt);
         });
 
         // KPI global de campañas activas
-        const actives = campaigns.filter(c => c.active);
+        const actives = campaigns.filter(c => c.status);
         document.querySelector('#kpiStatus') && (document.querySelector('#kpiChains').textContent = campaigns.length);
     } catch(e) {
         showError(e.message);
@@ -125,6 +128,20 @@ function updateKPIs(chainData, zoneData) {
     document.querySelector('#kpiStores').textContent = totalStores;
     document.querySelector('#kpiChains').textContent = chainsActive;
     document.querySelector('#kpiZones').textContent  = zonesActive;
+
+    const selectElem = document.querySelector('#campaignSelect');
+    if (selectElem && selectElem.selectedIndex > 0) {
+        const selectedOption = selectElem.options[selectElem.selectedIndex];
+
+        if(selectedOption.dataset.activa === 'true') {
+            document.querySelector('#kpiStatus').textContent = 'Activa';
+        } else {
+            document.querySelector('#kpiStatus').textContent = 'Finalizada';
+        }
+    } else {
+        document.querySelector('#kpiStatus').textContent = '-';
+    }
+
 }
 
 // Configuramos y dibujamos el gráfico usando Chart.js
