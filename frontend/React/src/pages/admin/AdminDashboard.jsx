@@ -26,6 +26,11 @@ function formatDate(date) {
     });
 }
 
+function isCampaignActive(c) {
+    const now = new Date();
+    return now >= new Date(c.startDate) && now <= new Date(c.endDate);
+}
+
 function Dashboard() {
     const { usuario } = useAuth();
     const username = usuario?.nombre ?? 'Admin';    
@@ -114,6 +119,9 @@ function Dashboard() {
     const totalStores = metrics.chainData ? metrics.chainData.reduce((s, c) => s + c.storesInCampaign, 0) : '-';
     const chainsActive = metrics.chainData ? metrics.chainData.filter(c => c.storesInCampaign > 0).length : '-';
     const zonesActive = metrics.zoneData ? metrics.zoneData.filter(z => z.storesInCampaign > 0).length : '-';
+    const activeCampaignsCount = campaigns.filter(isCampaignActive).length;
+    const selectedCampaign = campaigns.find(c => String(c.id) === String(selectedCampaignId));
+    const selectedIsActive = selectedCampaign ? isCampaignActive(selectedCampaign) : null;
 
     const generarChart = (data, isHorizontal = false) => {
         if (!data) return null;
@@ -187,7 +195,7 @@ function Dashboard() {
 
                             {campaigns.map((c) => (
                                 <option key={c.id} value={c.id}>
-                                {c.name} {c.active ? '🔄' : '✅'} ({formatDate(c.startDate)} → {formatDate(c.endDate)})
+                                    {isCampaignActive(c) ? '🔄' : '✅'} {c.name} ({formatDate(c.startDate)} → {formatDate(c.endDate)})
                                 </option>
                             ) )}
                         </select>
@@ -214,8 +222,8 @@ function Dashboard() {
                                     <span className="kpi-value">{totalStores}</span>
                                 </div>
                                 <div className="kpi-card">
-                                    <span className="kpi-label">Cadenas activas</span>
-                                    <span className="kpi-value">{campaigns.length}</span>
+                                    <span className="kpi-label">Estado</span>
+                                    <span className="kpi-value">{selectedIsActive === null ? '-' : selectedIsActive ? 'Activa' : 'Finalizada'}</span>
                                 </div>
                                 <div className="kpi-card">
                                     <span className="kpi-label">Cadenas cubiertas</span>
