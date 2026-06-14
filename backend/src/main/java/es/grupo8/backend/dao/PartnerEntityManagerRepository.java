@@ -1,3 +1,8 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;

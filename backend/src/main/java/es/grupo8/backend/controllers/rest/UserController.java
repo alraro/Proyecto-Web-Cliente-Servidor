@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
 import es.grupo8.backend.dto.UserRoleResponseDto;
@@ -39,12 +41,16 @@ public class UserController extends BaseRestController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUsers(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<PaginatedResponse<UserResponseDto>> getAllUsers(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String role) {
 
         authService.checkAdmin(authHeader);
-        List<UserResponseDto> users = userService.getAllUsersOrdered();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.getAllUsers(page, size, sort, search, role));
     }
 
     @GetMapping("/pending")

@@ -1,3 +1,8 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.PartnerEntityManagerRepository;

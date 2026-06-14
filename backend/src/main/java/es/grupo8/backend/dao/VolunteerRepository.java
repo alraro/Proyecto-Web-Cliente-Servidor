@@ -20,7 +20,5 @@ public interface VolunteerRepository extends JpaRepository<Volunteer, Integer> {
 
     List<Volunteer> findByIdPartnerEntity_Id(Integer partnerEntityId);
 
-    List<Volunteer> findByIdPartnerEntityIsNull();
-
     List<Volunteer> findAllByOrderByNameAsc();
 }

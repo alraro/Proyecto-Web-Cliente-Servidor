@@ -31,6 +31,25 @@
                     <button class="btn btn-edit btn-sm" id="btn-refresh">↻ Actualizar</button>
                 </div>
             </div>
+            <div class="filters-bar">
+                <input type="text" id="filter-search" placeholder="Buscar por nombre o email..." class="filter-search">
+                <select id="filter-role">
+                    <option value="">Todos los roles</option>
+                    <option value="ADMINISTRADOR">Administrador</option>
+                    <option value="COORDINADOR">Coordinador</option>
+                    <option value="CAPITAN">Capitan</option>
+                    <option value="COLABORADOR">Colaborador</option>
+                    <option value="RESPONSABLE_TIENDA">Resp. Tienda</option>
+                </select>
+                <select id="filter-sort">
+                    <option value="id,asc">ID ascendente</option>
+                    <option value="id,desc">ID descendente</option>
+                    <option value="name,asc">Nombre A-Z</option>
+                    <option value="name,desc">Nombre Z-A</option>
+                </select>
+                <button id="btn-filter" class="btn">Filtrar</button>
+                <button class="btn-clear" id="btn-clear-filters">Limpiar</button>
+            </div>
             <div class="table-wrap">
                 <table>
                     <thead>
