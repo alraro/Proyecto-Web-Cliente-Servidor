@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'btn btn-sm btn-danger';
-            btn.setAttribute('data-userid', captain.userId);
+            btn.setAttribute('data-userid', captain.idUser);
             btn.setAttribute('data-role', 'CAPTAIN');
             btn.textContent = 'Eliminar';
             tdAction.appendChild(btn);
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectEl.appendChild(defaultOption);
         (users || []).forEach(user => {
             const option = document.createElement('option');
-            option.value = String(user.userId);
+            option.value = String(user.idUser);
             option.textContent = user.name + ' (' + user.email + ')';
             selectEl.appendChild(option);
         });
