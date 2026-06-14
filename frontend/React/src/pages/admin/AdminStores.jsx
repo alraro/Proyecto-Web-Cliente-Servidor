@@ -131,7 +131,6 @@ export default function AdminStores() {
     const [zonesData, setZonesData] = useState([]);
     const [localitiesData, setLocalitiesData] = useState([]);
     const [filters, setFilters] = useState({ chainId: "", zoneId: "", localityId: "" });
-    const [filterString, setFilterString] = useState("");
     const [selectedStore, setSelectedStore] = useState(null);
     const [isEditingModalOpen, setIsEditingModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -195,7 +194,6 @@ export default function AdminStores() {
 
     function handleClearFilters() {
         setFilters({ chainId: "", zoneId: "", localityId: "" });
-        setFilterString("");
     }
 
     function handleUpdateFilters(nextFilters) {
@@ -274,8 +272,6 @@ export default function AdminStores() {
                     data={visibleStores}
                     editRowFunction={handleEditStore}
                     itemName="Tienda"
-                    onChangeSearch={setFilterString}
-                    filterCondition={(store) => store.name.toLowerCase().includes(filterString.toLowerCase())}
                     isLoading={isLoading}
                 />
 
