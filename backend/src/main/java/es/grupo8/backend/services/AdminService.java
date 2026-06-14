@@ -78,9 +78,9 @@ public class AdminService {
         List<Incident> incidents;
 
         if ("asc".equals(dir)){
-            incidents = incidentRepository.findAllOrderByIdAsc();
+            incidents = incidentRepository.findAllOrderByCampaignNameAsc();
         } else {
-            incidents = incidentRepository.findAllOrderByIdDesc();
+            incidents = incidentRepository.findAllOrderByCampaignNameDesc();
         }
         
         
