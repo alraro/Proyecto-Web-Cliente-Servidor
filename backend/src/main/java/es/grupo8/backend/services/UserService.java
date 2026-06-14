@@ -1,43 +1,14 @@
-/**
- * Servicio de negocio para operaciones de usuarios.
- *
- * Autores:
- * - Alfonso Ramos: 60%
- * - Alejandra Ortiz: 40%
- */
 package es.grupo8.backend.services;
 
-import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.dao.UserSpecifications;
-import es.grupo8.backend.dao.AdminRepository;
-import es.grupo8.backend.dao.CampaignRepository;
-import es.grupo8.backend.dao.CaptainRepository;
-import es.grupo8.backend.dao.CoordinatorRepository;
-import es.grupo8.backend.dao.PartnerEntityManagerRepository;
-import es.grupo8.backend.dao.PartnerEntityRepository;
-import es.grupo8.backend.dao.StoreRepository;
+import es.grupo8.backend.dao.*;
 import es.grupo8.backend.dto.PaginatedResponse;
 import es.grupo8.backend.dto.UserRequestDto;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
 import es.grupo8.backend.dto.UserRoleResponseDto;
-import es.grupo8.backend.entity.AdminEntity;
-import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.Captain;
-import es.grupo8.backend.entity.CaptainId;
-import es.grupo8.backend.entity.Coordinator;
-import es.grupo8.backend.entity.CoordinatorId;
-import es.grupo8.backend.entity.PartnerEntity;
-import es.grupo8.backend.entity.PartnerEntityManager;
-import es.grupo8.backend.entity.Store;
-import es.grupo8.backend.entity.UserEntity;
+import es.grupo8.backend.entity.*;
 import es.grupo8.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -79,31 +50,36 @@ public class UserService {
 
         page = Math.max(0, page);
         size = Math.max(1, Math.min(size, 100));
+        int offset = page * size;
 
-        Specification<UserEntity> spec = Specification
-                .where(UserSpecifications.hasSearchTerm(search))
-                .and(UserSpecifications.hasRole(role));
-
-        Sort sortObj = Sort.unsorted();
-        if (sort != null && !sort.trim().isEmpty()) {
+        String sortField = "id";
+        String sortDir = "asc";
+        if (sort != null && sort.contains(",")) {
             String[] parts = sort.split(",");
-            if (parts.length == 2) {
-                Sort.Direction dir = "desc".equalsIgnoreCase(parts[1].trim())
-                        ? Sort.Direction.DESC : Sort.Direction.ASC;
-                sortObj = Sort.by(dir, "name".equalsIgnoreCase(parts[0].trim()) ? "name" : "idUser");
-            }
+            sortField = parts[0].trim().toLowerCase();
+            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
         }
 
-        Pageable pageable = PageRequest.of(page, size, sortObj);
-        Page<UserEntity> userPage = userRepository.findAll(spec, pageable);
+        List<UserEntity> users = switch (sortField) {
+            case "name" -> sortDir.equals("asc")
+                    ? userRepository.findAllByNameAsc(search, role, size, offset)
+                    : userRepository.findAllByNameDesc(search, role, size, offset);
+            default -> sortDir.equals("asc")
+                    ? userRepository.findAllByIdAsc(search, role, size, offset)
+                    : userRepository.findAllByIdDesc(search, role, size, offset);
+        };
 
-        List<UserResponseDto> content = userPage.getContent().stream()
+        long total = userRepository.countUsers(search, role);
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        List<UserResponseDto> content = users.stream()
                 .map(userMapper::toDTO)
                 .toList();
 
         return new PaginatedResponse<>(content, page, size,
-                userPage.getTotalElements(), userPage.getTotalPages(),
-                userPage.hasNext(), userPage.hasPrevious());
+                total, totalPages,
+                page < totalPages - 1,
+                page > 0);
     }
 
     public UserResponseDto getUserById(Integer userId) {
