@@ -10,6 +10,7 @@
  */
 package es.grupo8.backend.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import es.grupo8.backend.dto.StoreRequestDto;
 import es.grupo8.backend.dto.StoreResponseDto;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
+import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.GeographicZone;
 import es.grupo8.backend.entity.Locality;
 import es.grupo8.backend.services.AdminService;
@@ -44,6 +46,7 @@ import es.grupo8.backend.services.StoreService;
 import es.grupo8.backend.services.UserService;
 import es.grupo8.backend.services.UtilsService;
 import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class AdminController {
 
@@ -122,7 +125,22 @@ public class AdminController {
             model.addAttribute("kpiStores", totalStores);
             model.addAttribute("kpiChains", chainsActive);
             model.addAttribute("kpiZones", zonesActive);
-            model.addAttribute("kpiStatus", "Activa (ID: " + campaignId + ")");
+
+            String status = "-";
+            for (Campaign c : adminService.getAllCampaigns()) {
+                if (c.getId().equals(campaignId)) {
+                    if(c.getStartDate() != null && c.getEndDate() != null) {
+                        LocalDate today = LocalDate.now();
+                        if(!today.isBefore(c.getStartDate()) && !today.isAfter(c.getEndDate())) {
+                            status = "Activa";
+                        } else {
+                            status = "Finalizada";
+                        }
+                    }
+                    break;
+                }
+            }
+            model.addAttribute("kpiStatus", status);
         }
 
         return "admin-dashboard";

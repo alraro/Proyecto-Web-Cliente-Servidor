@@ -129,11 +129,11 @@ function updateKPIs(chainData, zoneData) {
     document.querySelector('#kpiChains').textContent = chainsActive;
     document.querySelector('#kpiZones').textContent  = zonesActive;
 
-    const selectElem = document.querySelector('#campaignSelect');
-    if (selectElem && selectElem.selectedIndex > 0) {
-        const selectedOption = selectElem.options[selectElem.selectedIndex];
+    const selectedCampaign = document.querySelector('#campaignSelect');
+    if (selectedCampaign && selectedCampaign.selectedIndex > 0) {
+        const selectedOption = selectedCampaign.options[selectedCampaign.selectedIndex];
 
-        if(selectedOption.dataset.activa === 'true') {
+        if (selectedOption.textContent.includes('🔄')) {
             document.querySelector('#kpiStatus').textContent = 'Activa';
         } else {
             document.querySelector('#kpiStatus').textContent = 'Finalizada';

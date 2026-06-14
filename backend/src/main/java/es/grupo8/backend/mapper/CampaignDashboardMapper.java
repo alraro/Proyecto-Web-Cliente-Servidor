@@ -7,7 +7,9 @@
 package es.grupo8.backend.mapper;
 
 import java.time.LocalDate;
+
 import org.springframework.stereotype.Component;
+
 import es.grupo8.backend.dto.CampaignDTO;
 
 // Mapper para transformar los resultados del dashboard a DTO, solo lo usamos para el dashboard de campañas general

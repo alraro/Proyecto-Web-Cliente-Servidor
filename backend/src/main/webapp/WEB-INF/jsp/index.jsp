@@ -36,11 +36,6 @@
                 entidades sociales para que nadie se quede atrás.
             </p>
 
-            <div class="hero-actions">
-                <a class="primary-action" href="/login">Ir a inicio de sesión</a>
-                <a class="secondary-action" href="#que-es">Conocer más</a>
-            </div>
-
             <div class="hero-stats" aria-label="Indicadores principales">
                 <article>
                     <strong>+31.000</strong>
@@ -55,52 +50,6 @@
                     <span>Entidades colaboradoras</span>
                 </article>
             </div>
-        </div>
-
-        <aside class="hero-panel" aria-label="Resumen de acceso">
-            <div class="panel-card panel-card-dark">
-                <p>Misión principal</p>
-                <h2>Recuperar y repartir</h2>
-                <span>Con dignidad y transparencia</span>
-            </div>
-
-            <div class="panel-card">
-                <p>Cómo ayudamos</p>
-                <ul>
-                    <li><span>Recogida en supermercados y empresas</span></li>
-                    <li><span>Clasificación y control de calidad</span></li>
-                    <li><span>Distribución a entidades sociales</span></li>
-                </ul>
-            </div>
-
-            <div class="quick-access">
-                <a href="/login" class="quick-link">Iniciar sesión</a>
-                <a href="/register" class="quick-link">No tengo cuenta</a>
-            </div>
-
-            <p class="panel-message" id="panel-message">Selecciona una opción para continuar.</p>
-        </aside>
-    </section>
-
-    <section class="section-block" id="que-es">
-        <div class="section-heading">
-            <span class="eyebrow">Qué es Bancosol</span>
-            <h2>Una organización que conecta alimentos con personas</h2>
-        </div>
-
-        <div class="service-grid">
-            <article>
-                <h3>Recuperación de alimentos</h3>
-                <p>Recogemos productos aptos para consumo que no se comercializan y evitamos su desperdicio.</p>
-            </article>
-            <article>
-                <h3>Red de voluntariado</h3>
-                <p>Personas voluntarias colaboran en clasificación, logística y acompañamiento de campañas.</p>
-            </article>
-            <article>
-                <h3>Impacto social</h3>
-                <p>Entregamos de forma coordinada a entidades sociales para ayudar a hogares en situación vulnerable.</p>
-            </article>
         </div>
     </section>
 
