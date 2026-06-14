@@ -45,7 +45,13 @@
     String flashSuccess = (String) request.getAttribute("success");
     String flashError = (String) request.getAttribute("error");
 
-    String baseFilterUrl = "/admin-stores?size=" + currentSize;
+    String currentSearch = (String) request.getAttribute("currentSearch");
+    String currentSort = (String) request.getAttribute("currentSort");
+    if (currentSearch == null) currentSearch = "";
+    if (currentSort == null) currentSort = "id,asc";
+
+    String baseFilterUrl = "/admin-stores?size=" + currentSize + "&sort=" + java.net.URLEncoder.encode(currentSort, "UTF-8");
+    if (!currentSearch.isEmpty()) baseFilterUrl += "&search=" + java.net.URLEncoder.encode(currentSearch, "UTF-8");
     if (selectedChainId != null) baseFilterUrl += "&chainId=" + selectedChainId;
     if (selectedLocalityId != null) baseFilterUrl += "&localityId=" + selectedLocalityId;
     if (selectedZoneId != null) baseFilterUrl += "&zoneId=" + selectedZoneId;
@@ -147,6 +153,8 @@
         </div>
 
         <form method="GET" action="/admin-stores" class="filters-bar">
+            <input type="text" name="search" placeholder="Buscar por nombre..."
+                   value="<%= currentSearch %>" class="filter-search">
             <select id="filter-zone" name="zoneId">
                 <option value="">Todas las zonas</option>
                 <% for (GeographicZone z : zones) { %>

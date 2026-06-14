@@ -69,10 +69,10 @@ public class CampaignController extends MvcSessionController {
         if (crear != null || editar != null) {
             model.addAttribute("showForm", true);
 
-            List<StoreResponseDto> unfiltered = storeService.findAll(null, null, null, 0, 100).content();
+            List<StoreResponseDto> unfiltered = storeService.findAll(null, null, null, null, 0, 100, "id,asc").content();
             boolean filtering = chainId != null || zoneId != null || localityId != null;
             model.addAttribute("allStores", filtering
-                    ? storeService.findAll(chainId, localityId, zoneId, 0, 100).content()
+                    ? storeService.findAll(null, chainId, localityId, zoneId, 0, 100, "id,asc").content()
                     : unfiltered);
             model.addAttribute("chains", chainService.findAll());
             model.addAttribute("zoneOptions", options(unfiltered, true));
