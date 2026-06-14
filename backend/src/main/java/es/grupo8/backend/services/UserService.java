@@ -44,13 +44,9 @@ public class UserService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        String sortField = "id";
-        String sortDir = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0].trim().toLowerCase();
-            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
+        String sortField = sortInfo.field();
+        String sortDir = sortInfo.order();
 
         List<UserEntity> users = switch (sortField) {
             case "name" -> sortDir.equals("asc")
