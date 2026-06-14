@@ -1,12 +1,11 @@
 const form = document.querySelector('#register-form');
 const nameInput = document.querySelector('#name');
 const emailInput = document.querySelector('#email');
-const telefonoInput = document.querySelector('#telefono');
-const localidadInput = document.querySelector('#localidad');
+const phoneInput = document.querySelector('#telefono');
 const passwordInput = document.querySelector('#password');
 const confirmPasswordInput = document.querySelector('#confirm-password');
-const domicilioInput = document.querySelector('#domicilio');
-const cpInput = document.querySelector('#cp');
+const addressInput = document.querySelector('#domicilio');
+const postalCodeInput = document.querySelector('#cp');
 const togglePasswordButton = document.querySelector('#toggle-password');
 const toggleConfirmPasswordButton = document.querySelector('#toggle-confirm-password');
 const message = document.querySelector('#form-message');
@@ -30,12 +29,11 @@ form.addEventListener('submit', async (event) => {
 
     const nombre = nameInput.value.trim();
     const email = emailInput.value.trim();
-    const telefono = telefonoInput.value.trim();
-    const localidad = localidadInput.value.trim();
+    const phone = phoneInput.value.trim();
     const password = passwordInput.value.trim();
     const confirmPassword = confirmPasswordInput.value.trim();
-    const domicilio = domicilioInput.value.trim();
-    const cp = cpInput.value.trim();
+    const address = addressInput.value.trim();
+    const postalCode = postalCodeInput.value.trim();
 
     message.classList.remove('is-error', 'is-success');
 
@@ -72,10 +70,12 @@ form.addEventListener('submit', async (event) => {
             headers: { 
                 'Content-Type': 'application/json' 
             },
-            body: JSON.stringify({ nombre, email, password, telefono, domicilio, cp })
+            body: JSON.stringify({ nombre, email, password, confirmPassword, phone, address, postalCode })
         });
 
         const data = await res.json();
+
+        console.log('Response data:', data);
 
         if (res.status === 201) {
             message.textContent = 'Tu solicitud ha sido registrada. Un administrador revisará tu cuenta y te asignará un rol. Recibirás acceso una vez aprobado.';

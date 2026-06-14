@@ -9,7 +9,6 @@ const ruta = "http://localhost:8080";
 
 function Register() {
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
     const navigate = useNavigate();
 
     const handleFormSubmit = async (e) => {
@@ -17,27 +16,24 @@ function Register() {
 
         const nombre = e.target.nombre.value.trim();
         const email = e.target.email.value.trim();
-        const telefono = e.target.telefono.value.trim();
+        const phone = e.target.telefono.value.trim();
         const password = e.target.password.value;
         const confirmPassword = e.target.confirmPassword.value;
-        const domicilio = e.target.domicilio.value.trim();
-        const cp = e.target.cp.value.trim();
+        const address = e.target.domicilio.value.trim();
+        const postalCode = e.target.cp.value.trim();
 
         if(!nombre || !email || !password || !confirmPassword) {
             setMessage("Completa los campos obligatorios");
-            setMessageType("error");
             return;
         }
 
         if(password.length < 6) {
             setMessage("La contraseña debe tener al menos 6 caracteres");
-            setMessageType("error");
             return;
         }
 
         if(password !== confirmPassword) {
             setMessage("Las contraseñas no coinciden");
-            setMessageType("error");
             return;
         }
 
@@ -47,25 +43,22 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nombre, email, telefono, password, domicilio, cp }),
+                body: JSON.stringify({ nombre, email, phone, password, confirmPassword, address, postalCode }),
             });
 
             const data = await res.json();
 
             if(res.ok) {
                 setMessage("Solicitud registrada, espera aprobación del administrador");
-                setMessageType("success");
                 e.target.reset();
                 setTimeout(() => navigate('/login'), 1500);
                 return;
             }
 
             setMessage(data.message || "Error al registrar. Intenta nuevamente.");
-            setMessageType("error");
         } catch (e) {
             console.error(e);
             setMessage("Error de conexión. Intenta nuevamente.");
-            setMessageType("error");
         }
     };
 
@@ -177,12 +170,7 @@ function Register() {
                             <p className="help-text full-width">Los datos se almacenan en la tabla Usuario de PostgreSQL y la contraseña se usa para autenticación inicial del proyecto.</p>
                         </div>
 
-                        {/* Renderizado condicional del mensaje */}
-                        {message && (
-                            <p className={`form-message ${messageType === 'error' ? 'is-error' : 'is-success'}`} style={{ color: messageType === 'error' ? '#d32f2f' : '#2e7d32', margin: '10px 0' }}>
-                                {message}
-                            </p>
-                        )}
+                        {message}
 
                         <button type="submit" className="login-button">Crear cuenta</button>
                         

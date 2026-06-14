@@ -1,6 +1,6 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-    const rolUsuario = localStorage.getItem('role') || 'Usuario';
-    const nombreUsuario = localStorage.getItem('nombre') || 'Invitado';
+    const rolUsuario = sessionStorage.getItem('role') || 'Usuario';
+    const nombreUsuario = sessionStorage.getItem('nombre') || 'Invitado';
 
     const checkHeader = setInterval(() => {
         const userNameEl = document.querySelector('#user-name');
@@ -16,7 +16,7 @@
         if(e.target.id === 'btn-edit'){
             window.location.href = 'edit.html';
         } else if(e.target.id === 'btn-logout'){
-            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = 'login.html';
         }
     });

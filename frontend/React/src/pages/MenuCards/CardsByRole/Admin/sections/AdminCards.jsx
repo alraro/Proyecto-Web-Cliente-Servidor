@@ -50,4 +50,11 @@ gestionCards.push({
     link: "/admin/create-user"
 });
 
+gestionCards.push({
+    icon: "🚨",
+    title: "Incidencias",
+    description: "Visualizar y gestionar las incidencias",
+    link: "/admin/incidents"
+})
+
 export default gestionCards;

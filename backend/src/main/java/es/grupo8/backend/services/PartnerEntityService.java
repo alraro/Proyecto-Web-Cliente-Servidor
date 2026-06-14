@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class PartnerEntityService {
@@ -30,19 +31,13 @@ public class PartnerEntityService {
         size = Math.max(1, Math.min(size, 100));
         int offset = page * size;
 
-        String sortField = "id";
-        String sortDir = "asc";
-        if (sort != null && sort.contains(",")) {
-            String[] parts = sort.split(",");
-            sortField = parts[0].trim().toLowerCase();
-            sortDir = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
-        }
+        UtilsService.SortInfo sortInfo = UtilsService.parseSort(sort);
 
-        List<PartnerEntity> entities = switch (sortField) {
-            case "name" -> sortDir.equals("asc")
+        List<PartnerEntity> entities = switch (sortInfo.field()) {
+            case "name" -> sortInfo.order().equals("asc")
                     ? partnerEntityRepository.findAllByNameAsc(search, size, offset)
                     : partnerEntityRepository.findAllByNameDesc(search, size, offset);
-            default -> sortDir.equals("asc")
+            default -> sortInfo.order().equals("asc")
                     ? partnerEntityRepository.findAllByIdAsc(search, size, offset)
                     : partnerEntityRepository.findAllByIdDesc(search, size, offset);
         };
@@ -63,7 +58,7 @@ public class PartnerEntityService {
 
     public PartnerEntityResponseDto getPartnerEntityById(Integer id) {
         PartnerEntity entity = partnerEntityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Partner entity not found with ID: " + id));
         return partnerEntityMapper.toDTO(entity);
     }
 
@@ -83,7 +78,7 @@ public class PartnerEntityService {
         validateRequest(request);
 
         PartnerEntity entity = partnerEntityRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner entity not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Partner entity not found with ID: " + id));
 
         entity.setName(request.getName().trim());
         entity.setAddress(UtilsService.trimToNull(request.getAddress()));
@@ -95,7 +90,7 @@ public class PartnerEntityService {
 
     public void deletePartnerEntity(Integer id) {
         if (!partnerEntityRepository.existsById(id)) {
-            throw new RuntimeException("Partner entity not found with ID: " + id);
+            throw new NoSuchElementException("Partner entity not found with ID: " + id);
         }
         partnerEntityRepository.deleteById(id);
     }
@@ -125,4 +120,5 @@ public class PartnerEntityService {
             }
         }
     }
+
 }

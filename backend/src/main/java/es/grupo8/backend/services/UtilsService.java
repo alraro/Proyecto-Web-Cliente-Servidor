@@ -1,14 +1,35 @@
+/**
+ *
+ * Autores:
+ * - Hugo Herrero González: 90%
+ * - IA Generativa: 10%
+ */
+
 package es.grupo8.backend.services;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
-
+import java.util.List;
 import java.util.regex.Pattern;
+
+import es.grupo8.backend.dto.PaginatedResponse;
 
 public final class UtilsService {
 
     public static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9()\\-\\s]{7,20}$");
 
     private UtilsService() {
+    }
+
+    public record SortInfo(String field, String order) {}
+
+    public static SortInfo parseSort(String sort) {
+        String field = "id";
+        String order = "asc";
+        if (sort != null && sort.contains(",")) {
+            String[] parts = sort.split(",");
+            field = parts[0].trim().toLowerCase();
+            order = parts.length > 1 && "desc".equals(parts[1].trim().toLowerCase()) ? "desc" : "asc";
+        }
+        return new SortInfo(field, order);
     }
 
     public static String trimToNull(String value) {
@@ -40,22 +61,24 @@ public final class UtilsService {
         return trimmed.replaceAll("\\s+", " ");
     }
 
-    public static String hashPassword(String rawPassword) {
-        if (rawPassword == null) return null;
-        return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
+    public static int clampPageSize(int size) {
+        return clampPageSize(size, 100);
     }
 
-    public static boolean matchesPassword(String rawPassword, String storedPassword) {
-        if (rawPassword == null || storedPassword == null) return false;
-
-        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
-            return BCrypt.checkpw(rawPassword, storedPassword);
-        }
-        return rawPassword.equals(storedPassword);
+    public static int clampPageSize(int size, int max) {
+        return Math.max(1, Math.min(size, max));
     }
 
-    public static boolean needsMigration(String storedPassword) {
-        if (storedPassword == null) return false;
-        return !(storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"));
+    public static <T> PaginatedResponse<T> buildPaginatedResponse(List<T> content, int page, int size, long totalElements) {
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        return new PaginatedResponse<>(
+                content,
+                page,
+                size,
+                totalElements,
+                totalPages,
+                page < totalPages - 1,
+                page > 0
+        );
     }
 }

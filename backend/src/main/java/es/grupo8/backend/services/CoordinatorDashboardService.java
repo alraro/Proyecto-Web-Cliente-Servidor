@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +67,7 @@ public class CoordinatorDashboardService {
     private final UserMapper userMapper;
     private final PartnerEntityMapper partnerEntityMapper;
     private final CampaignEntityMapper campaignEntityMapper;
+    private final PasswordService passwordService;
 
     @Transactional(readOnly = true)
     public List<CampaignDTO> getMyCampaigns(Integer userId) {
@@ -225,7 +225,7 @@ public class CoordinatorDashboardService {
         CaptainRequest req = new CaptainRequest();
         req.setName(name);
         req.setEmail(normalizedEmail);
-        req.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt(10)));
+        req.setPasswordHash(passwordService.hash(password));
         req.setIdCampaign(campaign);
         req.setIdCoordinator(coordinator);
         req.setStatus("PENDIENTE");

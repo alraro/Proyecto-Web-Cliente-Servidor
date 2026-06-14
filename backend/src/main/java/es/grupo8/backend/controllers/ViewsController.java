@@ -2,10 +2,9 @@
  * Controlador MVC de las vistas generales (login, registro, perfil, etc.).
  *
  * Autores:
- * - Hugo Herrero González: 65%
- * - Fernando Luis Pinilla Molina: 5%
- * - Alejandro Calvo Aguilar: 5%
- * - IA Generativa: 25%
+ * - Hugo Herrero González: 85%
+ * - Alejandra Ortiz Robles: 10%
+ * - IA Generativa: 5%
  */
 package es.grupo8.backend.controllers;
 
@@ -119,12 +118,13 @@ public class ViewsController {
                                  @RequestParam(value = "email", required = false) String email,
                                  @RequestParam(value = "telefono", required = false) String telefono,
                                  @RequestParam(value = "password", required = false) String password,
+								 @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
                                  @RequestParam(value = "domicilio", required = false) String domicilio,
                                  @RequestParam(value = "cp", required = false) String cp,
                                  Model model) {
 
 		try {
-			AuthResponseDTO dto = authService.register(nombre, email, password, telefono, domicilio, cp);
+			AuthResponseDTO dto = authService.register(nombre, email, password, confirmPassword, telefono, domicilio, cp);
 
 			if (dto == null) {
 				model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
@@ -134,12 +134,7 @@ public class ViewsController {
 
 			return "redirect:/login";
 
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
-			model.addAttribute("registerError", e.getMessage());
-			return "register";
-
-		} catch (IllegalStateException e) {
+		} catch (IllegalArgumentException | IllegalStateException e) {
 			model.addAttribute("pageTitle", "Bancosol | Crear cuenta");
 			model.addAttribute("registerError", e.getMessage());
 			return "register";

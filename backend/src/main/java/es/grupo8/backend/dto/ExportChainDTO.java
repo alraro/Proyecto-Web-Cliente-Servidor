@@ -2,9 +2,8 @@
  * DTO para exportar datos de cadenas.
  *
  * Autores:
- * - Hugo Herrero González: 90%
+ * - Hugo Herrero González: 95%
  * - Fernando Luis Pinilla Molina: 5%
- * - IA Generativa: 5%
  */
 package es.grupo8.backend.dto;
 import lombok.Data;

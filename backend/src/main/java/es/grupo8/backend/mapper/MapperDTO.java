@@ -2,14 +2,13 @@
  * Clase base genérica para los mapeadores entre entidades y DTOs.
  *
  * Autores:
- * - Hugo Herrero González: 50%
+ * - Hugo Herrero González: 60%
  * - Fernando Luis Pinilla Molina: 25%
  * - Alejandra Ortiz: 15%
- * - IA Generativa: 10%
  */
 package es.grupo8.backend.mapper;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class MapperDTO<DTOClass, EntityClass> {

@@ -4,18 +4,16 @@
 -	- Hugo Herrero González: 100%
 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, java.util.Map" %>
+<%@ page import="java.util.List, es.grupo8.backend.dto.IncidentDTO" %>
 <%
     String nombre = (String) session.getAttribute("nombre");
     String token = (String) session.getAttribute("token");
     String role = (String) session.getAttribute("role");
 
-    if (!"ADMINISTRADOR".equals(role) || token == null) {
-        response.sendRedirect("/login");
-        return;
-    }
+    List<IncidentDTO> incidents = (List<IncidentDTO>) request.getAttribute("incidents");
 
-    List<Map<String, Object>> incidents = (List<Map<String, Object>>) request.getAttribute("incidents");
+    String nextDir = (String) request.getAttribute("nextDir");
+    if(nextDir == null) nextDir = "asc";
 
 %>
 <!DOCTYPE html>
@@ -50,6 +48,10 @@
             <a href="/admin" class="back-link-inline">← Volver al panel</a>
             <h1>Historial de Incidencias</h1>
             <p>Visualiza todas las incidencias reportadas por capitanes</p>
+
+            <div style="margin-top: 15px;">
+                <a href="/admin-incidents?sort=<%=nextDir%>" class="btn-edit" style="text-decoration: none; display: inline-block; padding: 8px 12px;">Ordenar</a>
+            </div>
         </div>
 
         <section class="card">
@@ -62,6 +64,7 @@
                             <th>Tienda</th>
                             <th>Reportado por</th>
                             <th>Descripción</th>
+                            <th></th>
                         </tr>
                     </thead>
 
@@ -74,14 +77,30 @@
                         </tr>
                         <%
                         } else {
-                            for (Map<String, Object> i : incidents) {
+                            for (IncidentDTO i : incidents) {
+                                Object id = i.getId();
                         %>
                         <tr>
-                            <td><%= i.get("createdAt") != null ? i.get("createdAt") : "-" %></td>
-                            <td><%= i.get("campaignName") != null ? i.get("campaignName") : "-" %></td>
-                            <td><%= i.get("storeName") != null ? i.get("storeName") : "-" %></td>
-                            <td><%= i.get("captainName") != null ? i.get("captainName") : "-" %></td>
-                            <td><%= i.get("description") != null ? i.get("description") : "-" %></td>
+                            <td><%= i.getCreatedAt() != null ? i.getCreatedAt() : "-" %></td>
+                            <td><%= i.getCampaignName() != null ? i.getCampaignName() : "-" %></td>
+                            <td><%= i.getStoreName() != null ? i.getStoreName() : "-" %></td>
+                            <td><%= i.getCaptainName() != null ? i.getCaptainName() : "-" %></td>
+                            <td><%= i.getDescription() != null ? i.getDescription() : "-" %></td>
+                            <td>
+                                <%
+                                if (id != null) {
+                                %>
+                                <form action="/admin-incidents/delete/<%=id%>" method="post">
+                                    <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                                </form>
+                            <%
+                            } else {
+                                %>
+                                -
+                                <%
+                            }
+                                %>
+                            </td>
                         </tr>
                         <%
                         }}%>

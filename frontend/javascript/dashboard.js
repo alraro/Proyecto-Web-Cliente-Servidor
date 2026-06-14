@@ -1,5 +1,5 @@
 const API_BASE = 'http://localhost:8080';
-const getToken  = () => localStorage.getItem('token');
+const getToken  = () => sessionStorage.getItem('token');
 
 function formatDate(dateString){
     if (!dateString) return '-';
@@ -40,7 +40,7 @@ let currentCampaignId = null;
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
