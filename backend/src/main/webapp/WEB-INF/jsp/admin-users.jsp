@@ -137,27 +137,8 @@
                             </td>
                             <td>
                                 <div class="td-actions" style="gap:0.25rem; flex-wrap:wrap;">
-                                    <form method="POST" action="/admin-users/asignar-rol" style="display:flex; gap:0.25rem; align-items:center;">
-                                        <input type="hidden" name="userId" value="<%= u.idUser() %>">
-                                        <select name="role" required style="font-size:0.8rem; padding:0.2rem;">
-                                            <% if (!u.roles().contains("ADMINISTRADOR")) { %>
-                                            <option value="ADMINISTRADOR">Administrador</option>
-                                            <% } %>
-                                            <% if (!u.roles().contains("COORDINADOR")) { %>
-                                            <option value="COORDINADOR">Coordinador</option>
-                                            <% } %>
-                                            <% if (!u.roles().contains("CAPITAN")) { %>
-                                            <option value="CAPITAN">Capitan</option>
-                                            <% } %>
-                                            <% if (!u.roles().contains("COLABORADOR")) { %>
-                                            <option value="COLABORADOR">Colaborador</option>
-                                            <% } %>
-                                            <% if (!u.roles().contains("RESPONSABLE_TIENDA")) { %>
-                                            <option value="RESPONSABLE_TIENDA">Resp. Tienda</option>
-                                            <% } %>
-                                        </select>
-                                        <button type="submit" class="btn btn-primary btn-sm" style="font-size:0.75rem;">Rol</button>
-                                    </form>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                            onclick="abrirModal(<%= u.idUser() %>, '<%= u.roles().get(0) %>')">Editar</button>
                                     <form method="POST" action="/admin-users/eliminar/<%= u.idUser() %>"
                                           style="display:inline"
                                           onsubmit="return confirm('&iquest;Eliminar al usuario &quot;<%= u.name() %>&quot;? Esta acci&oacute;n no se puede deshacer.')">
@@ -196,7 +177,54 @@
     </div>
 </main>
 
+<div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">Cambiar rol de usuario</h3>
+        <form method="POST" action="/admin-users/asignar-rol">
+            <input type="hidden" name="userId" id="modal-userId">
+            <div class="form-group">
+                <label for="modal-role">Nuevo rol <span class="required-asterisk">*</span></label>
+                <select name="role" id="modal-role" required>
+                    <option value="ADMINISTRADOR">Administrador</option>
+                    <option value="COORDINADOR">Coordinador</option>
+                    <option value="CAPITAN">Capitan</option>
+                    <option value="COLABORADOR">Colaborador</option>
+                    <option value="RESPONSABLE_TIENDA">Resp. Tienda</option>
+                </select>
+            </div>
+            <p class="form-message" id="modal-error"></p>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
 <script>
+    var currentRole = null;
+
+    function abrirModal(userId, role) {
+        currentRole = role;
+        document.getElementById("modal-userId").value = userId;
+        var select = document.getElementById("modal-role");
+        Array.from(select.options).forEach(function(opt) {
+            opt.hidden = opt.value === currentRole;
+        });
+        document.getElementById("modal-backdrop").classList.add("open");
+        document.getElementById("modal-error").textContent = "";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modal-backdrop").classList.remove("open");
+    }
+
+    document.getElementById("modal-backdrop").addEventListener("click", function(e) {
+        if (e.target === this) cerrarModal();
+    });
+
     (function () {
         var msg = document.getElementById("flash-message");
         if (msg) {
