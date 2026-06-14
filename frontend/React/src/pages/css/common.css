@@ -891,6 +891,22 @@ tr:hover td { background: rgba(45, 101, 160, 0.03); }
     background: rgba(235, 195, 18, 0.696);
 }
 
+.welcome-bar.COORDINADOR {
+    background: linear-gradient(135deg, #19a132, #22f01f);
+}
+
+.welcome-bar.COLABORADOR .role-pill {
+    background: rgba(99, 237, 45, 0.696);
+}
+
+.welcome-bar.CAPITAN {
+    background: linear-gradient(135deg, #55136e, #9714c7);
+}
+
+.welcome-bar.CAPITAN .role-pill {
+    background: rgba(131, 31, 181, 0.696);
+}   
+
 .section-title {
     font-family: var(--font-heading);
     font-size: 0.78rem;
