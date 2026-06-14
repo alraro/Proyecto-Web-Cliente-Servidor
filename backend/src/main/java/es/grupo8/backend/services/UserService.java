@@ -26,7 +26,6 @@ public class UserService {
     @Autowired private PartnerEntityRepository partnerEntityRepository;
     @Autowired private PartnerEntityManagerRepository partnerEntityManagerRepository;
     @Autowired private StoreRepository storeRepository;
-    @Autowired private PasswordService passwordService;
     @Autowired private UserMapper userMapper;
 
     @Autowired

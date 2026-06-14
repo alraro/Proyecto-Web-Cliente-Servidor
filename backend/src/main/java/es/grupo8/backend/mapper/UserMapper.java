@@ -42,9 +42,4 @@ public class UserMapper extends MapperDTO<UserResponseDto, UserEntity> {
         if (roles.isEmpty()) roles.add("PENDIENTE");
         return roles;
     }
-
-    public String resolveRole(Integer userId) {
-        List<String> roles = resolveRoles(userId);
-        return roles.get(0);
-    }
 }
