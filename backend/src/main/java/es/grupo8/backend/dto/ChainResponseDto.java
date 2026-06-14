@@ -1,3 +1,9 @@
+/**
+ * DTO de respuesta para cadenas.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.dto;
 
 public record ChainResponseDto(

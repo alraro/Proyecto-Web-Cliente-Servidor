@@ -1,3 +1,8 @@
+/**
+ * Autores:
+ * - Alejandro Calvo Aguilar: 95%
+ * - IA Generativa: 5%
+ */
 package es.grupo8.backend.mapper;
 
 import org.springframework.stereotype.Component;

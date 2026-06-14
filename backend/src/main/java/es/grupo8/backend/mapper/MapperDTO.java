@@ -8,7 +8,6 @@
  */
 package es.grupo8.backend.mapper;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class MapperDTO<DTOClass, EntityClass> {

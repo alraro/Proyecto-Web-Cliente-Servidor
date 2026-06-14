@@ -1,3 +1,9 @@
+/**
+ * Mapper de entidad Store a StoreResponseDto.
+ *
+ * Autores:
+ * - Alejandra Ortiz: 100%
+ */
 package es.grupo8.backend.mapper;
 
 import es.grupo8.backend.dto.StoreResponseDto;
