@@ -2,8 +2,7 @@
   Vista de campañas asignadas (coordinador).
 
   Autores:
-  - Fernando Luis Pinilla Molina: 80%
-  - Hugo Herrero González: 5%
+  - Fernando Luis Pinilla Molina: 85%
   - IA Generativa: 15%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

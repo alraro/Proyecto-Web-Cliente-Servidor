@@ -2,8 +2,7 @@
   Vista de tiendas de la campaña (coordinador).
 
   Autores:
-  - Fernando Luis Pinilla Molina: 75%
-  - Hugo Herrero González: 5%
+  - Fernando Luis Pinilla Molina: 80%
   - IA Generativa: 20%
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
