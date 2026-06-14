@@ -2,7 +2,6 @@ package es.grupo8.backend.services;
 
 import es.grupo8.backend.dao.*;
 import es.grupo8.backend.dto.PaginatedResponse;
-import es.grupo8.backend.dto.UserRequestDto;
 import es.grupo8.backend.dto.UserResponseDto;
 import es.grupo8.backend.dto.UserRoleRequestDto;
 import es.grupo8.backend.dto.UserRoleResponseDto;
@@ -33,10 +32,6 @@ public class UserService {
 
     @Autowired
     private AuthService authService;
-
-    public List<UserResponseDto> getAllUsersOrdered() {
-        return userMapper.toDTOList(userRepository.findAllByOrderByIdUserAsc());
-    }
 
     public List<UserResponseDto> getPendingUsersOrdered() {
         return userRepository.findAllByOrderByIdUserAsc().stream()
@@ -72,77 +67,12 @@ public class UserService {
         long total = userRepository.countUsers(search, role);
         int totalPages = (int) Math.ceil((double) total / size);
 
-        List<UserResponseDto> content = users.stream()
-                .map(userMapper::toDTO)
-                .toList();
+        List<UserResponseDto> content = userMapper.toDTOList(users);
 
         return new PaginatedResponse<>(content, page, size,
                 total, totalPages,
                 page < totalPages - 1,
                 page > 0);
-    }
-
-    public UserResponseDto getUserById(Integer userId) {
-        return userMapper.toDTO(userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId)));
-    }
-
-    public UserResponseDto createUser(UserRequestDto request) {
-        validateCreate(request);
-
-        if (userRepository.existsByEmail(request.getEmail().toLowerCase()))
-            throw new IllegalArgumentException("Ya existe un usuario con ese email.");
-
-        UserEntity user = new UserEntity();
-        user.setName(request.getName().trim());
-        user.setEmail(request.getEmail().trim().toLowerCase());
-        user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
-        user.setAddress(request.getAddress() != null ? request.getAddress().trim() : null);
-        user.setPostalCode(request.getPostalCode() != null ? request.getPostalCode().trim() : null);
-        user.setPassword(passwordService.hash(request.getPassword()));
-
-        UserEntity saved = userRepository.save(user);
-        return userMapper.toDTO(userRepository.findById(saved.getIdUser())
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado tras la creación")));
-    }
-
-    public UserResponseDto updateUser(Integer userId, UserRequestDto request) {
-        if (request == null) throw new IllegalArgumentException("La petición no es válida.");
-
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: " + userId));
-
-        if (request.getName() != null) {
-            String name = request.getName().trim();
-            if (name.isEmpty()) throw new IllegalArgumentException("El nombre es obligatorio.");
-            if (name.length() > 255) throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
-            user.setName(name);
-        }
-        if (request.getEmail() != null) {
-            String email = request.getEmail().trim().toLowerCase();
-            if (email.isEmpty()) throw new IllegalArgumentException("El email es obligatorio.");
-            if (email.length() > 255) throw new IllegalArgumentException("El email no puede superar 255 caracteres.");
-            if (!email.equals(user.getEmail()) && userRepository.existsByEmail(email))
-                throw new IllegalArgumentException("Ya existe un usuario con ese email.");
-            user.setEmail(email);
-        }
-        if (request.getPhone() != null) {
-            String phone = request.getPhone().trim();
-            if (phone.length() > 20) throw new IllegalArgumentException("El teléfono no puede superar 20 caracteres.");
-            user.setPhone(phone.isEmpty() ? null : phone);
-        }
-        if (request.getAddress() != null) {
-            String address = request.getAddress().trim();
-            user.setAddress(address.isEmpty() ? null : address);
-        }
-        if (request.getPostalCode() != null) {
-            String cp = request.getPostalCode().trim();
-            user.setPostalCode(cp.isEmpty() ? null : cp);
-        }
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty())
-            user.setPassword(passwordService.hash(request.getPassword().trim()));
-
-        return userMapper.toDTO(userRepository.save(user));
     }
 
     public UserRoleResponseDto assignRole(Integer userId, UserRoleRequestDto request) {
@@ -274,28 +204,6 @@ public class UserService {
     private Campaign getFirstCampaign() {
         Optional<Campaign> campaign = campaignRepository.findAll().stream().findFirst();
         return campaign.orElseThrow(() -> new IllegalArgumentException("No hay campañas disponibles para asignar este rol."));
-    }
-
-    private void validateCreate(UserRequestDto req) {
-        if (req == null) throw new IllegalArgumentException("La petición no es válida.");
-
-        String name = req.getName() != null ? req.getName().trim() : "";
-        if (name.isEmpty()) throw new IllegalArgumentException("El nombre es obligatorio.");
-        if (name.length() > 255) throw new IllegalArgumentException("El nombre no puede superar 255 caracteres.");
-
-        String email = req.getEmail() != null ? req.getEmail().trim().toLowerCase() : "";
-        if (email.isEmpty()) throw new IllegalArgumentException("El email es obligatorio.");
-        if (email.length() > 255) throw new IllegalArgumentException("El email no puede superar 255 caracteres.");
-
-        if (req.getPassword() == null || req.getPassword().trim().isEmpty())
-            throw new IllegalArgumentException("La contraseña es obligatoria.");
-
-        if (req.getRole() == null || req.getRole().trim().isEmpty())
-            throw new IllegalArgumentException("El rol es obligatorio.");
-
-        String role = req.getRole().trim().toUpperCase(Locale.ROOT);
-        if (!List.of("ADMIN", "COORDINATOR", "CAPTAIN", "PARTNER_ENTITY_MANAGER").contains(role))
-            throw new IllegalArgumentException("Rol no válido. Los roles válidos son: ADMIN, COORDINATOR, CAPTAIN, PARTNER_ENTITY_MANAGER.");
     }
 
     public boolean isAdmin(Integer userId) {
