@@ -23,11 +23,11 @@ function CrearUsuario() {
 
         const nombre = e.target.nombre.value.trim();
         const email = e.target.email.value.trim();
-        const telefono = e.target.telefono.value.trim();
+        const phone = e.target.phone.value.trim();
         const password = e.target.password.value;
         const confirmPassword = e.target.confirmPassword.value;
-        const domicilio = e.target.domicilio.value.trim();
-        const cp = e.target.cp.value.trim();
+        const address = e.target.address.value.trim();
+        const postalCode = e.target.postalCode.value.trim();
 
         if(!nombre || !email || !password || !confirmPassword) {
             setMessage('Completa los campos obligatorios');
@@ -48,7 +48,7 @@ function CrearUsuario() {
             const res = await fetch(`${ruta}/api/auth/admin/users`, {
                 method: 'POST',
                 headers: authHeaders({ 'Content-Type': 'application/json' }),
-                body: JSON.stringify({nombre, email, telefono, password, domicilio, cp}),
+                body: JSON.stringify({nombre, email, phone, password, confirmPassword, address, postalCode}),
             });
 
             const data = await res.json();
@@ -129,14 +129,14 @@ function CrearUsuario() {
                             <div className="field-group">
                                 <label>Telefono</label>
                                 <div className="input-shell">
-                                    <input type="text" name="telefono" id="telefono" />
+                                    <input type="text" name="phone" id="phone" />
                                 </div>
                             </div>
 
                             <div className="field-group">
                                 <label>Código postal</label>
                                 <div className="input-shell">
-                                    <input id="cp" name="cp" type="text" placeholder="29001"/>
+                                    <input id="postalCode" name="postalCode" type="text" placeholder="29001"/>
                                 </div>
                             </div>
                         </div>
@@ -145,7 +145,7 @@ function CrearUsuario() {
                             <div className="field-group full-width">
                                 <label>Domicilio</label>
                                 <div className="input-shell">
-                                    <input id="domicilio" name="domicilio" type="text" placeholder="Calle, número, piso..."/>
+                                    <input id="address" name="address" type="text" placeholder="Calle, número, piso..."/>
                                 </div>
                             </div>
                         </div>
