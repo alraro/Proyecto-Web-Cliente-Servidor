@@ -55,7 +55,7 @@ function showMessage(text, isError) {
     el.hidden = false;
     el.textContent = text;
     el.className = isError ? 'error' : 'success';
-    clearTimeout(showMessage._t);
+    clearTimeout(showMessage._t);                   // _t para establecer timeout asociado
     showMessage._t = setTimeout(() => { el.hidden = true; }, 4000);
 }
 
@@ -84,7 +84,7 @@ function hideModal() {
     clearModalError();
 }
 
-// ── Store selector ─────────────────────────────────────────────────────────
+// Store selector 
 
 async function loadStoreFilters() {
     const opts = { headers: { Authorization: 'Bearer ' + getToken() } };
@@ -215,7 +215,7 @@ function renderSelectedList() {
     document.querySelector('#selected-count').textContent = String(items.length);
 }
 
-// ── Campaign table ──────────────────────────────────────────────────────────
+// Campaign table 
 
 async function loadCampaigns() {
     const data = await fetchJson(API_BASE + '/api/campaigns?size=200&sort=startDate,desc', {
@@ -282,7 +282,7 @@ function renderTable(campaigns) {
     });
 }
 
-// ── Modal open/save ─────────────────────────────────────────────────────────
+// Modal open/save
 
 async function openCreateModal() {
     currentCampaignId = null;
@@ -395,7 +395,7 @@ async function loadCampaignTypes() {
     });
 }
 
-// ── Boot ────────────────────────────────────────────────────────────────────
+// Boot 
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') { window.location.href = 'login.html'; return; }
