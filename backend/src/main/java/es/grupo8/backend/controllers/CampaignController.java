@@ -1,432 +1,363 @@
+/**
+ * Controlador MVC de las vistas de gestión de campañas (admin).
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 80%
+ * - IA Generativa: 20%
+ */
 package es.grupo8.backend.controllers;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import es.grupo8.backend.dao.CampaignRepository;
-import es.grupo8.backend.dao.CampaignStoreRepository;
-import es.grupo8.backend.dao.CampaignTypeRepository;
-import es.grupo8.backend.dao.CaptainRepository;
-import es.grupo8.backend.dao.CoordinatorRepository;
-import es.grupo8.backend.entity.Campaign;
-import es.grupo8.backend.entity.CampaignType;
-import es.grupo8.backend.security.AdminGuard;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import es.grupo8.backend.dto.CampaignDTO;
+import es.grupo8.backend.dto.CampaignRequestDto;
+import es.grupo8.backend.dto.StoreResponseDto;
+import es.grupo8.backend.services.CampaignAssignmentService;
+import es.grupo8.backend.services.CampaignService;
+import es.grupo8.backend.services.CampaignStoreService;
+import es.grupo8.backend.services.ChainService;
+import es.grupo8.backend.services.StoreService;
+import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 
-@RestController
-@RequestMapping("/api")
-@Tag(name = "Campaigns", description = "Campaign management — Admin only for write operations")
-public class CampaignController {
+@Controller
+@AllArgsConstructor
+public class CampaignController extends MvcSessionController {
 
-	private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
+    private final CampaignService campaignService;
+    private final CampaignAssignmentService campaignAssignmentService;
+    private final CampaignStoreService campaignStoreService;
+    private final StoreService storeService;
+    private final ChainService chainService;
 
-	@Autowired
-	private AdminGuard adminGuard;
+    // crear=1 abre el formulario vacio y editar=id lo abre relleno; los filtros acotan la lista de tiendas
+    @GetMapping("/admin-campaigns")
+    public String adminCampaigns(HttpSession session,
+                                 @RequestParam(required = false) Integer crear,
+                                 @RequestParam(required = false) Integer editar,
+                                 @RequestParam(required = false) Integer chainId,
+                                 @RequestParam(required = false) Integer zoneId,
+                                 @RequestParam(required = false) Integer localityId,
+                                 Model model) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        Page<CampaignDTO> campaigns = campaignService.getCampaigns(
+                null, PageRequest.of(0, 200, Sort.by(Sort.Direction.DESC, "startDate")));
+        model.addAttribute("campaigns", campaigns.getContent());
+        model.addAttribute("campaignTypes", campaignService.getCampaignTypes());
 
-	@Autowired
-	private CampaignRepository campaignRepository;
+        if (crear != null || editar != null) {
+            model.addAttribute("showForm", true);
 
-	@Autowired
-	private CampaignTypeRepository campaignTypeRepository;
+            List<StoreResponseDto> unfiltered = storeService.findAll(null, null, null, null, 0, 100, "id,asc").content();
+            boolean filtering = chainId != null || zoneId != null || localityId != null;
+            model.addAttribute("allStores", filtering
+                    ? storeService.findAll(null, chainId, localityId, zoneId, 0, 100, "id,asc").content()
+                    : unfiltered);
+            model.addAttribute("chains", chainService.findAll());
+            model.addAttribute("zoneOptions", options(unfiltered, true));
+            model.addAttribute("localityOptions", options(unfiltered, false));
+            model.addAttribute("selectedChainId", chainId);
+            model.addAttribute("selectedZoneId", zoneId);
+            model.addAttribute("selectedLocalityId", localityId);
 
-	@Autowired
-	private CoordinatorRepository coordinatorRepository;
+            if (crear != null) {
+                model.addAttribute("isCreating", true);
+                model.addAttribute("assignedStoreIds", Set.of());
+            } else {
+                campaignService.getCampaignById(editar).ifPresent(dto -> {
+                    model.addAttribute("editEntity", dto);
+                    model.addAttribute("assignedStoreIds", assignedStoreIds(session, editar));
+                });
+            }
+        }
+        return "admin-campaigns";
+    }
 
-	@Autowired
-	private CaptainRepository captainRepository;
+    @PostMapping("/admin-campaigns/guardar")
+    public String saveCampaign(HttpSession session,
+                               @RequestParam(required = false) Integer id,
+                               @RequestParam String name,
+                               @RequestParam Integer typeId,
+                               @RequestParam String startDate,
+                               @RequestParam String endDate,
+                               @RequestParam(required = false) List<Integer> storeIds,
+                               RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            CampaignRequestDto dto = new CampaignRequestDto();
+            dto.setName(name);
+            dto.setTypeId(typeId);
+            dto.setStartDate(LocalDate.parse(startDate));
+            dto.setEndDate(LocalDate.parse(endDate));
 
-	@Autowired
-	private CampaignStoreRepository campaignStoreRepository;
+            Integer campaignId;
+            if (id == null) {
+                campaignId = campaignService.createCampaign(currentUserId(session), dto).getId();
+                attr.addFlashAttribute("success", "Campaña creada correctamente.");
+            } else {
+                campaignId = campaignService.updateCampaign(currentUserId(session), id, dto).getId();
+                attr.addFlashAttribute("success", "Campaña actualizada correctamente.");
+            }
+            campaignStoreService.replaceCampaignStores(currentUserId(session), campaignId,
+                    storeIds != null ? storeIds : List.of());
+        } catch (DateTimeParseException e) {
+            attr.addFlashAttribute("error", "Formato de fecha inválido.");
+        } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-campaigns";
+    }
 
-	@GetMapping("/campaign-types")
-	@Operation(summary = "List all campaign types")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaign types listed successfully")
-	})
-	public ResponseEntity<?> getCampaignTypes() {
-		List<Map<String, Object>> response = campaignTypeRepository.findAll().stream()
-				.map(type -> Map.<String, Object>of(
-						"id", type.getId(),
-						"name", type.getName()))
-				.collect(Collectors.toList());
+    @PostMapping("/admin-campaigns/eliminar/{id}")
+    public String deleteCampaign(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            campaignService.deleteCampaign(currentUserId(session), id);
+            attr.addFlashAttribute("success", "Campaña eliminada correctamente.");
+        } catch (NoSuchElementException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-campaigns";
+    }
 
-		return ResponseEntity.ok(response);
-	}
+    @GetMapping("/admin-campaign-assignments")
+    public String adminCampaignAssignments(HttpSession session,
+                                           @RequestParam(required = false) Integer campaignId,
+                                           Model model) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            try {
+                model.addAttribute("selectedCampaignId", campaignId);
+                var assignments = campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId);
+                model.addAttribute("assignedCoordinators", assignments.getCoordinators());
+                model.addAttribute("assignedCaptains", assignments.getCaptains());
+                model.addAttribute("availableCoordinators",
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
+                model.addAttribute("availableCaptains",
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
+            }
+        }
+        return "admin-campaign-assignments";
+    }
 
-	@GetMapping("/campaigns")
-	@Operation(summary = "List campaigns with optional status filter and pagination")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaigns listed successfully"),
-			@ApiResponse(responseCode = "400", description = "Invalid status value")
-	})
-	public ResponseEntity<?> getCampaigns(
-			@RequestParam(required = false) String status,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size,
-			@RequestParam(defaultValue = "startDate,desc") String sort) {
+    @PostMapping("/admin-campaign-assignments/asignar")
+    public String assignFromCombined(HttpSession session,
+                                     @RequestParam Integer campaignId,
+                                     @RequestParam Integer userId,
+                                     @RequestParam String rol,
+                                     RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            if ("COORDINATOR".equals(rol)) {
+                campaignAssignmentService.assignCoordinator(currentUserId(session), campaignId, userId);
+                attr.addFlashAttribute("success", "Coordinador asignado correctamente.");
+            } else {
+                campaignAssignmentService.assignCaptain(currentUserId(session), campaignId, userId);
+                attr.addFlashAttribute("success", "Capitán asignado correctamente.");
+            }
+        } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-campaign-assignments?campaignId=" + campaignId;
+    }
 
-		if (status != null && !status.equalsIgnoreCase("ACTIVE")
-				&& !status.equalsIgnoreCase("PAST")
-				&& !status.equalsIgnoreCase("FUTURE")) {
-			return ResponseEntity.badRequest()
-					.body(Map.of("message", "Invalid status. Use ACTIVE, PAST or FUTURE"));
-		}
+    @PostMapping("/admin-campaign-assignments/eliminar")
+    public String unassignFromCombined(HttpSession session,
+                                       @RequestParam Integer campaignId,
+                                       @RequestParam Integer userId,
+                                       @RequestParam String rol,
+                                       RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            if ("COORDINATOR".equals(rol)) {
+                campaignAssignmentService.unassignCoordinator(currentUserId(session), campaignId, userId);
+                attr.addFlashAttribute("success", "Coordinador desasignado correctamente.");
+            } else {
+                campaignAssignmentService.unassignCaptain(currentUserId(session), campaignId, userId);
+                attr.addFlashAttribute("success", "Capitán desasignado correctamente.");
+            }
+        } catch (NoSuchElementException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-campaign-assignments?campaignId=" + campaignId;
+    }
 
-		if (size > 50) {
-			size = 50;
-		}
-		if (size < 1) {
-			size = 10;
-		}
+    @GetMapping("/admin-captains")
+    public String adminCaptains(HttpSession session,
+                                @RequestParam(required = false) Integer campaignId,
+                                Model model) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            try {
+                model.addAttribute("selectedCampaignId", campaignId);
+                model.addAttribute("assignedCaptains",
+                        campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCaptains());
+                model.addAttribute("availableCaptains",
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "CAPTAIN"));
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
+            }
+        }
+        return "admin-captains";
+    }
 
-		Sort sortObject = Sort.by(Sort.Direction.DESC, "startDate");
-		String[] sortParts = sort == null ? new String[0] : sort.split(",");
-		if (sortParts.length == 2) {
-			String field = sortParts[0] == null ? "" : sortParts[0].trim();
-			String direction = sortParts[1] == null ? "" : sortParts[1].trim();
-			boolean allowedField = Arrays.asList("startDate", "endDate", "name").contains(field);
-			if (allowedField) {
-				if ("asc".equalsIgnoreCase(direction)) {
-					sortObject = Sort.by(Sort.Direction.ASC, field);
-				} else if ("desc".equalsIgnoreCase(direction)) {
-					sortObject = Sort.by(Sort.Direction.DESC, field);
-				}
-			}
-		}
+    @PostMapping("/admin-captains/asignar")
+    public String assignCaptain(HttpSession session,
+                                @RequestParam Integer campaignId,
+                                @RequestParam Integer userId,
+                                RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            campaignAssignmentService.assignCaptain(currentUserId(session), campaignId, userId);
+            attr.addFlashAttribute("success", "Capitán asignado correctamente.");
+        } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-captains?campaignId=" + campaignId;
+    }
 
-		Pageable pageable = PageRequest.of(page, size, sortObject);
+    @PostMapping("/admin-captains/eliminar")
+    public String unassignCaptain(HttpSession session,
+                                  @RequestParam Integer campaignId,
+                                  @RequestParam Integer userId,
+                                  RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            campaignAssignmentService.unassignCaptain(currentUserId(session), campaignId, userId);
+            attr.addFlashAttribute("success", "Capitán desasignado correctamente.");
+        } catch (NoSuchElementException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-captains?campaignId=" + campaignId;
+    }
 
-		LocalDate today = LocalDate.now();
-		long totalActive = campaignRepository
-				.countByStartDateLessThanEqualAndEndDateGreaterThanEqual(today, today);
-		long totalPast = campaignRepository.countByEndDateBefore(today);
-		long totalFuture = campaignRepository.countByStartDateAfter(today);
+    @GetMapping("/admin-coordinators")
+    public String adminCoordinators(HttpSession session,
+                                    @RequestParam(required = false) Integer campaignId,
+                                    Model model) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        model.addAttribute("campaigns", campaignAssignmentService.getCampaigns(currentUserId(session)));
+        if (campaignId != null) {
+            try {
+                model.addAttribute("selectedCampaignId", campaignId);
+                model.addAttribute("assignedCoordinators",
+                        campaignAssignmentService.getCampaignAssignments(currentUserId(session), campaignId).getCoordinators());
+                model.addAttribute("availableCoordinators",
+                        campaignAssignmentService.getAvailableUsers(currentUserId(session), campaignId, "COORDINATOR"));
+            } catch (NoSuchElementException e) {
+                model.addAttribute("error", "Campaña no encontrada.");
+            }
+        }
+        return "admin-coordinators";
+    }
 
-		Page<Campaign> campaignPage;
-		if (status == null) {
-			campaignPage = campaignRepository.findAll(pageable);
-		} else {
-			campaignPage = switch (status.toUpperCase()) {
-				case "PAST" -> campaignRepository.findByEndDateBefore(today, pageable);
-				case "FUTURE" -> campaignRepository.findByStartDateAfter(today, pageable);
-				default -> campaignRepository
-						.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(today, today, pageable);
-			};
-		}
+    @PostMapping("/admin-coordinators/asignar")
+    public String assignCoordinator(HttpSession session,
+                                    @RequestParam Integer campaignId,
+                                    @RequestParam Integer userId,
+                                    RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            campaignAssignmentService.assignCoordinator(currentUserId(session), campaignId, userId);
+            attr.addFlashAttribute("success", "Coordinador asignado correctamente.");
+        } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-coordinators?campaignId=" + campaignId;
+    }
 
-		List<Map<String, Object>> content = campaignPage.getContent().stream()
-				.map(this::toCampaignMap)
-				.collect(Collectors.toList());
+    @PostMapping("/admin-coordinators/eliminar")
+    public String unassignCoordinator(HttpSession session,
+                                      @RequestParam Integer campaignId,
+                                      @RequestParam Integer userId,
+                                      RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+        try {
+            campaignAssignmentService.unassignCoordinator(currentUserId(session), campaignId, userId);
+            attr.addFlashAttribute("success", "Coordinador desasignado correctamente.");
+        } catch (NoSuchElementException e) {
+            attr.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin-coordinators?campaignId=" + campaignId;
+    }
 
-		Map<String, Object> pagination = new LinkedHashMap<>();
-		pagination.put("page", campaignPage.getNumber());
-		pagination.put("size", campaignPage.getSize());
-		pagination.put("totalElements", campaignPage.getTotalElements());
-		pagination.put("totalPages", campaignPage.getTotalPages());
-		pagination.put("isFirst", campaignPage.isFirst());
-		pagination.put("isLast", campaignPage.isLast());
+    // Opciones de zona/localidad para los filtros, sacadas de las propias tiendas
+    private Map<Integer, String> options(List<StoreResponseDto> stores, boolean zones) {
+        Map<String, Integer> byName = new TreeMap<>();
+        for (StoreResponseDto s : stores) {
+            Integer id = zones ? s.zoneId() : s.localityId();
+            String name = zones ? s.zone() : s.locality();
+            if (id != null && name != null) {
+                byName.put(name, id);
+            }
+        }
+        Map<Integer, String> result = new LinkedHashMap<>();
+        byName.forEach((name, id) -> result.put(id, name));
+        return result;
+    }
 
-		Map<String, Object> summary = new LinkedHashMap<>();
-		summary.put("totalActive", totalActive);
-		summary.put("totalPast", totalPast);
-		summary.put("totalFuture", totalFuture);
-
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("content", content);
-		response.put("pagination", pagination);
-		response.put("summary", summary);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/campaigns/{id}")
-	@Operation(summary = "Get a single campaign by id")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaign found"),
-			@ApiResponse(responseCode = "404", description = "Campaign not found")
-	})
-	public ResponseEntity<?> getCampaignById(@PathVariable Integer id) {
-		Campaign campaign = campaignRepository.findById(id).orElse(null);
-		if (campaign == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Campaign not found"));
-		}
-
-		return ResponseEntity.ok(toCampaignMap(campaign));
-	}
-
-	@PostMapping("/campaigns")
-	@Operation(summary = "Create a new campaign — Admin only")
-	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "Campaign created successfully"),
-			@ApiResponse(responseCode = "400", description = "Validation error"),
-			@ApiResponse(responseCode = "403", description = "Access restricted to administrators"),
-			@ApiResponse(responseCode = "404", description = "Campaign type not found"),
-			@ApiResponse(responseCode = "409", description = "Campaign name conflict")
-	})
-	public ResponseEntity<?> createCampaign(
-			@RequestHeader(value = "Authorization", required = false) String authHeader,
-			@RequestBody(required = false) Map<String, Object> request) {
-
-		if (!adminGuard.isAdmin(authHeader)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "Access restricted to administrators"));
-		}
-
-		String name = trimToNull(valueAsString(request == null ? null : request.get("name")));
-		Integer typeId = valueAsInteger(request == null ? null : request.get("typeId"));
-		LocalDate startDate = valueAsLocalDate(request == null ? null : request.get("startDate"));
-		LocalDate endDate = valueAsLocalDate(request == null ? null : request.get("endDate"));
-
-		if (name == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Campaign name is required"));
-		}
-		if (typeId == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Campaign type is required"));
-		}
-		if (startDate == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Start date is required"));
-		}
-		if (endDate == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "End date is required"));
-		}
-		if (!endDate.isAfter(startDate)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "End date must be after start date"));
-		}
-
-		CampaignType campaignType = campaignTypeRepository.findById(typeId).orElse(null);
-		if (campaignType == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Campaign type not found"));
-		}
-
-		if (campaignRepository.existsByName(name)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(Map.of("message", "A campaign with this name already exists"));
-		}
-
-		Campaign campaign = new Campaign();
-		campaign.setName(name);
-		campaign.setIdType(campaignType);
-		campaign.setStartDate(startDate);
-		campaign.setEndDate(endDate);
-
-		Campaign saved = campaignRepository.save(campaign);
-		logAudit("CREATE_CAMPAIGN", authHeader, saved.getId(), saved.getName());
-
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("message", "Campaign created successfully");
-		response.put("campaign", toCampaignMap(saved));
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
-	}
-
-	@PutMapping("/campaigns/{id}")
-	@Operation(summary = "Update an existing campaign — Admin only")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaign updated successfully"),
-			@ApiResponse(responseCode = "400", description = "Validation error"),
-			@ApiResponse(responseCode = "403", description = "Access restricted to administrators"),
-			@ApiResponse(responseCode = "404", description = "Campaign or campaign type not found"),
-			@ApiResponse(responseCode = "409", description = "Campaign name conflict")
-	})
-	public ResponseEntity<?> updateCampaign(
-			@RequestHeader(value = "Authorization", required = false) String authHeader,
-			@PathVariable Integer id,
-			@RequestBody(required = false) Map<String, Object> request) {
-
-		if (!adminGuard.isAdmin(authHeader)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "Access restricted to administrators"));
-		}
-
-		String name = trimToNull(valueAsString(request == null ? null : request.get("name")));
-		Integer typeId = valueAsInteger(request == null ? null : request.get("typeId"));
-		LocalDate startDate = valueAsLocalDate(request == null ? null : request.get("startDate"));
-		LocalDate endDate = valueAsLocalDate(request == null ? null : request.get("endDate"));
-
-		if (name == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Campaign name is required"));
-		}
-		if (typeId == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Campaign type is required"));
-		}
-		if (startDate == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "Start date is required"));
-		}
-		if (endDate == null) {
-			return ResponseEntity.badRequest().body(Map.of("message", "End date is required"));
-		}
-		if (!endDate.isAfter(startDate)) {
-			return ResponseEntity.badRequest().body(Map.of("message", "End date must be after start date"));
-		}
-
-		Campaign campaign = campaignRepository.findById(id).orElse(null);
-		if (campaign == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Campaign not found"));
-		}
-
-		CampaignType campaignType = campaignTypeRepository.findById(typeId).orElse(null);
-		if (campaignType == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Campaign type not found"));
-		}
-
-		if (campaignRepository.existsByNameAndIdNot(name, id)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(Map.of("message", "A campaign with this name already exists"));
-		}
-
-		campaign.setName(name);
-		campaign.setIdType(campaignType);
-		campaign.setStartDate(startDate);
-		campaign.setEndDate(endDate);
-
-		Campaign updated = campaignRepository.save(campaign);
-		logAudit("UPDATE_CAMPAIGN", authHeader, updated.getId(), updated.getName());
-
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("message", "Campaign updated successfully");
-		response.put("campaign", toCampaignMap(updated));
-		return ResponseEntity.ok(response);
-	}
-
-	@DeleteMapping("/campaigns/{id}")
-	@Transactional
-	@Operation(summary = "Delete a campaign and its assignments — Admin only")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Campaign deleted successfully"),
-			@ApiResponse(responseCode = "403", description = "Access restricted to administrators"),
-			@ApiResponse(responseCode = "404", description = "Campaign not found")
-	})
-	public ResponseEntity<?> deleteCampaign(
-			@RequestHeader(value = "Authorization", required = false) String authHeader,
-			@PathVariable Integer id) {
-
-		if (!adminGuard.isAdmin(authHeader)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "Access restricted to administrators"));
-		}
-
-		Campaign campaign = campaignRepository.findById(id).orElse(null);
-		if (campaign == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Campaign not found"));
-		}
-
-		coordinatorRepository.deleteAllByIdIdCampaign(id);
-		captainRepository.deleteAllByIdIdCampaign(id);
-		// RF-12: remove store assignments before deleting the campaign
-		campaignStoreRepository.deleteByCampaignId(id);
-		campaignRepository.deleteById(id);
-
-		logAudit("DELETE_CAMPAIGN", authHeader, id, campaign.getName());
-		return ResponseEntity.ok(Map.of("message", "Campaign deleted successfully"));
-	}
-
-	private void logAudit(String action, String authHeader, Integer id, String name) {
-		auditLog.info("ACTION={} adminUserId={} timestamp={} campaignId={} campaignName={}",
-				action, adminGuard.extractUserId(authHeader), Instant.now(), id, name);
-	}
-
-	private Map<String, Object> toCampaignMap(Campaign campaign) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("id", campaign.getId());
-		response.put("name", campaign.getName());
-		response.put("type", campaignTypeToMap(campaign.getIdType()));
-		response.put("startDate", campaign.getStartDate() == null ? null : campaign.getStartDate().toString());
-		response.put("endDate", campaign.getEndDate() == null ? null : campaign.getEndDate().toString());
-		response.put("status", computeStatus(campaign.getStartDate(), campaign.getEndDate()));
-		return response;
-	}
-
-	private static String computeStatus(LocalDate startDate, LocalDate endDate) {
-		LocalDate today = LocalDate.now();
-		if (endDate != null && endDate.isBefore(today)) {
-			return "PAST";
-		}
-		if (startDate != null && startDate.isAfter(today)) {
-			return "FUTURE";
-		}
-		return "ACTIVE";
-	}
-
-	private Map<String, Object> campaignTypeToMap(CampaignType type) {
-		if (type == null) {
-			return null;
-		}
-		return Map.of(
-				"id", type.getId(),
-				"name", type.getName());
-	}
-
-	private static String trimToNull(String value) {
-		if (value == null) {
-			return null;
-		}
-		String trimmed = value.trim();
-		return trimmed.isEmpty() ? null : trimmed;
-	}
-
-	private static String valueAsString(Object value) {
-		return value == null ? null : String.valueOf(value);
-	}
-
-	private static Integer valueAsInteger(Object value) {
-		if (value == null) {
-			return null;
-		}
-		if (value instanceof Integer i) {
-			return i;
-		}
-		if (value instanceof Number n) {
-			return n.intValue();
-		}
-		try {
-			return Integer.valueOf(String.valueOf(value));
-		} catch (NumberFormatException ex) {
-			return null;
-		}
-	}
-
-	private static LocalDate valueAsLocalDate(Object value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return LocalDate.parse(String.valueOf(value));
-		} catch (DateTimeParseException ex) {
-			return null;
-		}
-	}
+    // Ids de las tiendas ya asignadas, para marcar los checkbox al editar
+    private Set<Integer> assignedStoreIds(HttpSession session, Integer campaignId) {
+        Set<Integer> ids = new HashSet<>();
+        try {
+            Map<String, Object> data = campaignStoreService.getCampaignStores(currentUserId(session), campaignId);
+            Object stores = data.get("stores");
+            if (stores instanceof List<?> list) {
+                for (Object o : list) {
+                    if (o instanceof StoreResponseDto dto) {
+                        ids.add(dto.id());
+                    }
+                }
+            }
+        } catch (NoSuchElementException ignored) {
+        }
+        return ids;
+    }
 }

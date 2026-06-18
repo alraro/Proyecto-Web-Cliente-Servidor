@@ -1,19 +1,19 @@
 ﻿const API_BASE = 'http://localhost:8080';
 
 function getToken() {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
 }
 
 function getUserName() {
-    return localStorage.getItem('nombre') || 'Usuario';
+    return sessionStorage.getItem('nombre') || 'Usuario';
 }
 
 function getUserRole() {
-    return localStorage.getItem('role');
+    return sessionStorage.getItem('role');
 }
 
 function getStoreId() {
-    return localStorage.getItem('storeId');
+    return sessionStorage.getItem('storeId');
 }
 
 function authHeaders(token = getToken()) {
@@ -24,16 +24,8 @@ function authHeaders(token = getToken()) {
 }
 
 function logout() {
-    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = 'login.html';
-}
-
-function handleUrlTokenParams() {
-    const params = new URLSearchParams(window.location.search);
-    const tokenFromQuery = params.get('token');
-    const nameFromQuery = params.get('nombre');
-    if (tokenFromQuery) localStorage.setItem('token', tokenFromQuery);
-    if (nameFromQuery) localStorage.setItem('nombre', nameFromQuery);
 }
 
 function requireAuth(expectedRole) {
@@ -46,49 +38,12 @@ function requireAuth(expectedRole) {
     return true;
 }
 
-function setWelcomeName(elementId, defaultName) {
-    const el = document.querySelector(`#${elementId}`);
-    if (el) el.textContent = getUserName() || defaultName;
-}
-
-function setUserNameDisplay() {
-    const userNameEl = document.querySelector('#user-name');
-    if (userNameEl) {
-        userNameEl.textContent = `${getUserName()} (${getUserRole() || 'Usuario'})`;
-    }
-}
-
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function escapeAttr(value) {
-    return String(value ?? '').replace(/'/g, "\\'");
-}
-
-function showMessage(text, isError) {
-    const el = document.querySelector('#global-message');
-    if (!el) return;
-    el.hidden = false;
-    el.textContent = text;
-    el.className = isError ? 'error' : 'success';
-    clearTimeout(showMessage._t);
-    showMessage._t = setTimeout(function() { el.hidden = true; }, 4000);
-}
-
-function showToast(msg, type = 'success', containerId = 'toast-container') {
-    const container = document.querySelector(`#${containerId}`);
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+function handleUrlTokenParams() {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromQuery = params.get('token');
+    const nameFromQuery = params.get('nombre');
+    if (tokenFromQuery) sessionStorage.setItem('token', tokenFromQuery);
+    if (nameFromQuery) sessionStorage.setItem('nombre', nameFromQuery);
 }
 
 async function apiFetch(url, options = {}) {
@@ -108,31 +63,16 @@ async function apiFetch(url, options = {}) {
     return res.json();
 }
 
-function setupCommonButtonHandlers() {
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'btn-edit') {
-            window.location.href = 'edit.html';
-        } else if (e.target.id === 'btn-logout') {
-            logout();
-        }
-    });
+function showToast(msg, type = 'success', containerId = 'toast-container') {
+    const container = document.querySelector(`#${containerId}`);
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
 }
 
-function attachTokenToLinks() {
-    const token = getToken();
-    const nombre = getUserName();
-    if (token) {
-        document.querySelectorAll('a[href]').forEach((link) => {
-            try {
-                const targetUrl = new URL(link.href);
-                if (targetUrl.origin === window.location.origin) {
-                    targetUrl.searchParams.set('token', token);
-                    if (nombre) {
-                        targetUrl.searchParams.set('nombre', nombre);
-                    }
-                    link.href = targetUrl.toString();
-                }
-            } catch (_) {}
-        });
-    }
+function escapeAttr(value) {
+    return String(value ?? '').replace(/'/g, "\\'");
 }

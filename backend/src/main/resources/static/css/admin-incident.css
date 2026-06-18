@@ -1,0 +1,107 @@
+/* admin-incidents.css — Estilos específicos para el historial de incidencias */
+
+/* =========================================
+   Cabecera (Page Header)
+   ========================================= */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 0.8rem;
+    color: var(--orange-500, #eb7b31); /* Usa tu variable, con un fallback por si acaso */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: opacity 0.2s ease;
+}
+
+.back-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.page-header-row h1 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.75rem;
+    color: #333;
+}
+
+.page-header-row p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* =========================================
+   Tabla de Incidencias
+   ========================================= */
+.campaigns-table-wrap {
+    width: 100%;
+    overflow-x: auto; /* Scroll horizontal si la pantalla es pequeña */
+}
+
+#incident-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+#incident-table thead {
+    background: rgba(0, 0, 0, 0.03); /* Fondo sutil grisáceo */
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+#incident-table th {
+    padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+#incident-table td {
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    vertical-align: top; /* Alinea arriba por si la descripción es muy larga */
+}
+
+/* Efecto hover en las filas de la tabla */
+#incident-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+#incident-table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* =========================================
+   Ajustes de Columnas (Wrap)
+   ========================================= */
+/* La columna de descripción (última) debe poder saltar de línea */
+#incident-table td:last-child {
+    min-width: 300px;
+    white-space: normal;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* Las demás columnas (fecha, tienda, etc.) se mantienen en una sola línea */
+#incident-table td:not(:last-child) {
+    white-space: nowrap;
+}
+
+/* =========================================
+   Estado Vacío
+   ========================================= */
+.table-empty {
+    text-align: center !important;
+    padding: 3rem 1rem !important;
+    color: #888 !important;
+    font-style: italic;
+    background-color: transparent !important;
+}

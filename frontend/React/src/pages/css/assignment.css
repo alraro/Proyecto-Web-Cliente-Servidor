@@ -1,0 +1,24 @@
+/* assignment.css — page-specific overrides. Base modal/card/badge/button styles in common.css */
+
+/* Assignment modal: taller with scroll */
+.assignment-modal .modal {
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Override btn-sm for assignment tables */
+.btn.btn-sm {
+    padding: 4px 12px;
+    font-size: .82rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}

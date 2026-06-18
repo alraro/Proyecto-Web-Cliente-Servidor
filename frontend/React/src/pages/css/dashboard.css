@@ -1,0 +1,12 @@
+/* dashboard.css — page-specific overrides for AdminDashboard */
+
+/* Coordinator-themed body override for dashboard */
+body.dashboard-page {
+    background: var(--coord-bg);
+}
+
+/* Responsive */
+@media screen and (width <= 600px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .kpi-row { flex-direction: column; }
+}

@@ -1,3 +1,10 @@
+/**
+ * Repositorio JPA de incidencias.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 90%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;
@@ -17,4 +24,11 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     @Query("SELECT i FROM Incident i WHERE i.idUser.idUser = :userId ORDER BY i.createdAt DESC")
     List<Incident> findByUserId(@Param("userId") Integer userId);
+
+
+    @Query("SELECT i FROM Incident i ORDER BY i.idCampaign.name ASC")
+    List<Incident> findAllOrderByCampaignNameAsc();
+
+    @Query("SELECT i FROM Incident i ORDER BY i.idCampaign.name DESC")
+    List<Incident> findAllOrderByCampaignNameDesc();
 }

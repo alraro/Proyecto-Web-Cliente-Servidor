@@ -1,6 +1,5 @@
-const TOKEN_KEY = 'token';
 const API_BASE = 'http://localhost:8080';
-const getToken  = () => localStorage.getItem(TOKEN_KEY);
+const getToken  = () => sessionStorage.getItem('token');
 
 function formatDate(dateString){
     if (!dateString) return '-';
@@ -16,14 +15,21 @@ function formatDate(dateString){
 }
 
 function authHeaders() {
-    return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
+    return { 
+        'Authorization': `Bearer ${getToken()}`, 
+        'Content-Type': 'application/json' 
+    };
 }
 
 async function apiFetch(url) {
-    const res = await fetch(`${API_BASE}${url}`, { headers: authHeaders() });
-    if (res.status === 401) { window.location.href = 'login.html'; throw new Error('Unauthorized'); }
-    if (res.status === 403) { throw new Error('Acceso denegado'); }
-    if (!res.ok) { throw new Error(`Error ${res.status}`); }
+    const res = await fetch(`${API_BASE}${url}`, { 
+        headers: authHeaders() 
+    });
+    
+    if (!res.ok) { 
+        throw new Error(`Error ${res.status}`); 
+    }
+
     return res.json();
 }
 
@@ -34,7 +40,7 @@ let currentCampaignId = null;
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
@@ -52,20 +58,34 @@ async function loadCampaigns() {
     try {
         const campaigns = await apiFetch('/api/dashboard/campaigns');
         const sel = document.querySelector('#campaignSelect');
+
         campaigns.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.id;
 
-            const start = formatDate(c.startDate);
-            const end   = formatDate(c.endDate);
+            const startStr = formatDate(c.startDate);
+            const endStr   = formatDate(c.endDate);
 
-            opt.textContent = `${c.name} ${c.active ? '🔄' : '✅'} (${start} → ${end})`;
+            // Problemas con la comparación de fechas
+            const now = new Date();
+            const isActive = now >= new Date(c.startDate) && now <= new Date(c.endDate);
+
+            // Lo guardamos en un atributo data-active para usarlo luego en KPIs
+            opt.dataset.active = isActive ? 'true' : 'false';
+            opt.textContent = `${c.name} ${isActive ? '🔄' : '✅'} (${startStr} → ${endStr})`;
             sel.appendChild(opt);
         });
 
         // KPI global de campañas activas
-        const actives = campaigns.filter(c => c.active);
-        document.querySelector('#kpiStatus') && (document.querySelector('#kpiChains').textContent = campaigns.length);
+        const actives = campaigns.filter(c => {
+            const now = new Date();
+            return now >= new Date(c.startDate) && now <= new Date(c.endDate);
+        });
+
+        if(document.querySelector('#kpiChains')) {
+            document.querySelector('#kpiChains').textContent = actives.length;
+        }
+
     } catch(e) {
         showError(e.message);
     }
@@ -84,7 +104,6 @@ function onCampaignChange(e) {
 // Cargamos datos para mostrar KPIs y gráficos
 async function loadMetrics(campaignId) {
     if (!campaignId) return;
-    showLoading(true); // Mostramos spinner de carga
     hideError();
 
     try {
@@ -109,8 +128,6 @@ async function loadMetrics(campaignId) {
 
     } catch(e) {
         showError(e.message);
-    } finally {
-        showLoading(false);
     }
 }
 
@@ -122,6 +139,18 @@ function updateKPIs(chainData, zoneData) {
     document.querySelector('#kpiStores').textContent = totalStores;
     document.querySelector('#kpiChains').textContent = chainsActive;
     document.querySelector('#kpiZones').textContent  = zonesActive;
+
+    const selectedCampaign = document.querySelector('#campaignSelect');
+    if (selectedCampaign && selectedCampaign.selectedIndex > 0) {
+        const selectedOption = selectedCampaign.options[selectedCampaign.selectedIndex];
+        // Obtenemos el estado de la campaña seleccionada
+        const isActive = selectedOption.dataset.active === 'true';
+
+        document.querySelector('#kpiStatus').textContent = isActive ? 'Activa' : 'Finalizada';
+    } else {
+        document.querySelector('#kpiStatus').textContent = '-';
+    }
+
 }
 
 // Configuramos y dibujamos el gráfico usando Chart.js
@@ -191,12 +220,6 @@ function resetTimer() {
     if (ms > 0 && currentCampaignId) {
         refreshTimer = setInterval(() => loadMetrics(currentCampaignId), ms);
     }
-}
-
-
-function showLoading(on) {
-    const el = document.querySelector('#loadingSpinner');
-    if (on) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
 }
 
 // Mostramos vista inicial

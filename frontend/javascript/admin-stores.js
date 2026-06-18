@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
@@ -259,7 +259,7 @@ document.querySelector('#modal-backdrop').addEventListener('click', e => {
 
 async function openEdit(id) {
     try {
-        const res = await fetch(BACKEND + '/api/stores/' + id, { headers: authHeaders() });
+        const res = await fetch(API_BASE + '/api/stores/' + id, { headers: authHeaders() });
         if (!res.ok) { showToast('Error al cargar la tienda.', 'error'); return; }
         const s = await res.json();
         editingId = s.id;
@@ -284,15 +284,16 @@ document.querySelector('#btn-modal-save').addEventListener('click', async () => 
     if (cp && !/^\d{5}$/.test(cp)) { errorEl.textContent = 'El código postal debe tener exactamente 5 dígitos.'; return; }
 
     const body = JSON.stringify({ name: nombre, address: domicilio || null, postalCode: cp || null, chainId: chainId ? parseInt(chainId) : null });
-    const url = editingId ? `${BACKEND}/api/stores/${editingId}` : `${BACKEND}/api/stores`;
+    const url = editingId ? `${API_BASE}/api/stores/${editingId}` : `${API_BASE}/api/stores`;
     const method = editingId ? 'PUT' : 'POST';
+    const isEditing = editingId !== null;
 
     try {
         const res = await fetch(url, { method, headers: authHeaders(), body });
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) { errorEl.textContent = data.message || 'Error al guardar.'; return; }
         closeModal();
-        showToast(editingId ? 'Tienda actualizada.' : 'Tienda creada.');
+        showToast(isEditing ? 'Tienda actualizada.' : 'Tienda creada.');
         loadStores(currentPage);
     } catch { errorEl.textContent = 'Error de conexión con el servidor.'; }
 });
@@ -300,8 +301,8 @@ document.querySelector('#btn-modal-save').addEventListener('click', async () => 
 async function deleteStore(id, nombre) {
     if (!confirm(`¿Eliminar la tienda "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
     try {
-        const res = await fetch(`${BACKEND}/api/stores/${id}`, { method: 'DELETE', headers: authHeaders() });
-        if (!res.ok) { const d = await res.json(); showToast(d.message || 'Error al eliminar.', 'error'); return; }
+        const res = await fetch(`${API_BASE}/api/stores/${id}`, { method: 'DELETE', headers: authHeaders() });
+        if (!res.ok) { const d = await res.json().catch(() => ({})); showToast(d.message || 'Error al eliminar.', 'error'); return; }
         showToast('Tienda eliminada.');
         loadStores(currentPage);
     } catch { showToast('Error de conexión.', 'error'); }

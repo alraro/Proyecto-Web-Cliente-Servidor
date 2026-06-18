@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    if (!getToken() || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!getToken() || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
@@ -62,7 +62,7 @@ async function loadPending() {
             const tr = document.createElement('tr');
 
             const td1 = document.createElement('td');
-            td1.textContent = u.id;
+            td1.textContent = u.idUser;
             tr.appendChild(td1);
 
             const td2 = document.createElement('td');
@@ -81,7 +81,7 @@ async function loadPending() {
 
             const td5 = document.createElement('td');
             const select = document.createElement('select');
-            select.id = 'role-' + u.id;
+            select.id = 'role-' + u.idUser;
             select.style.cssText = 'padding:.35rem .6rem;border-radius:8px;border:1.5px solid #d1d5db;font-family:inherit;font-size:.85rem;';
 
             const optDefault = document.createElement('option');
@@ -113,14 +113,14 @@ async function loadPending() {
             const btnApprove = document.createElement('button');
             btnApprove.className = 'btn btn-primary btn-sm';
             btnApprove.setAttribute('data-action', 'approve');
-            btnApprove.setAttribute('data-user-id', u.id);
+            btnApprove.setAttribute('data-user-id', u.idUser);
             btnApprove.textContent = '✓ Aprobar';
             div.appendChild(btnApprove);
 
             const btnReject = document.createElement('button');
             btnReject.className = 'btn btn-danger btn-sm';
             btnReject.setAttribute('data-action', 'reject');
-            btnReject.setAttribute('data-user-id', u.id);
+            btnReject.setAttribute('data-user-id', u.idUser);
             btnReject.setAttribute('data-user-name', escHtml(u.name));
             btnReject.textContent = '✗ Rechazar';
             div.appendChild(btnReject);

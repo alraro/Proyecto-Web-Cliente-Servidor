@@ -1,0 +1,67 @@
+/*
+ * Estilos de la vista del responsable de tienda.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 15%
+ */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    background: var(--surface-light);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+}
+
+.info-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.info-item span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.badge-attendance {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-yes {
+    background: var(--color-success-light);
+    color: var(--color-success-text);
+}
+
+.badge-no {
+    background: var(--color-error-light);
+    color: var(--color-error-text);
+}
+
+.badge-pending {
+    background: var(--color-warning-light);
+    color: var(--color-warning-text);
+}
+
+.error-panel {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-error);
+    font-weight: 600;
+}

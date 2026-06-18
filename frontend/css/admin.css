@@ -5,6 +5,41 @@
     overflow: hidden;
 }
 
+/* Welcome bar */
+.welcome-bar {
+    background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.welcome-bar h2 {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+}
+
+.welcome-bar p {
+    margin: 0;
+    opacity: 0.8;
+    font-size: 0.92rem;
+}
+
+.welcome-bar .role-pill {
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 .card-header {
     padding: 1.25rem 1.5rem;
     gap: 1rem;

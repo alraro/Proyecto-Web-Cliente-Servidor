@@ -1,3 +1,13 @@
+/**
+ * Repositorio JPA de la relación campaña-tienda.
+ *
+ * Autores:
+ * - Hugo Herrero González: 55%
+ * - Fernando Luis Pinilla Molina: 15%
+ * - Alfonso Ramos Rojas: 10%
+ * - Alejandra Ortiz: 5%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.dao;
  
 import java.util.List;
@@ -10,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.grupo8.backend.entity.CampaignStore;
 import es.grupo8.backend.entity.CampaignStoreId;
+import es.grupo8.backend.entity.Store;
  
 public interface CampaignStoreRepository extends JpaRepository<CampaignStore, CampaignStoreId> {
  
@@ -17,6 +28,10 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
     List<CampaignStore> findByIdStore_Id(Integer storeId);
 
         List<CampaignStore> findByIdCampaign_Id(Integer campaignId);
+
+        // Stores assigned to a campaign
+        @Query("SELECT cs.idStore FROM CampaignStore cs WHERE cs.id.idCampaign = :campaignId")
+        List<Store> findStoresByCampaignId(@Param("campaignId") Integer campaignId);
 
         boolean existsByIdCampaign_IdAndIdStore_Id(Integer campaignId, Integer storeId);
 
@@ -30,10 +45,10 @@ public interface CampaignStoreRepository extends JpaRepository<CampaignStore, Ca
         void deleteByCampaignId(@Param("campaignId") Integer campaignId);
 
     // Cobertura por Cadena para una campaña concreta
-    @Query("select s.idChain.name, COUNT(DISTINCT s.id), COUNT(DISTINCT cs.idStore.id) " +
+    @Query("select s.idChain.name, count(distinct s.id), count(distinct cs.idStore.id) " +
             "from Store s " +
             "left join CampaignStore cs ON cs.idStore.id = s.id AND cs.idCampaign.id = :campaignId " +
-            "where s.idChain IS NOT NULL " +
+            "where s.idChain is not null " +
             "group by s.idChain.id, s.idChain.name " +
             "order by s.idChain.name")
     List<Object[]> coverageByChain(@Param("campaignId") Integer campaignId);

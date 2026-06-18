@@ -1,3 +1,13 @@
+/**
+ * Repositorio JPA de la asignación de coordinadores a campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 45%
+ * - Alejandro Calvo Aguilar: 15%
+ * - Alfonso Ramos Rojas: 15%
+ * - Hugo Herrero González: 10%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;
@@ -12,16 +22,17 @@ import org.springframework.transaction.annotation.Transactional;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Coordinator;
 import es.grupo8.backend.entity.CoordinatorId;
+import es.grupo8.backend.entity.UserEntity;
 
 @Repository
 public interface CoordinatorRepository extends JpaRepository<Coordinator, CoordinatorId> {
 
-    // Tu método (HEAD) - Lo mantenemos para que tu Controlador siga funcionando
-    @Query("SELECT COUNT(c) > 0 FROM Coordinator c WHERE c.idUser.idUser = :userId")
-    boolean isUserCoordinator(@Param("userId") Integer userId);
-
     @Query("SELECT c.idCampaign FROM Coordinator c WHERE c.idUser.idUser = :userId")
     List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
+
+    // Users assigned as coordinators for a campaign
+    @Query("SELECT c.idUser FROM Coordinator c WHERE c.id.idCampaign = :campaignId")
+    List<UserEntity> findUsersByCampaignId(@Param("campaignId") Integer campaignId);
 
     // Los métodos de tu compañero (dev) - Los mantenemos para no romper su parte
     boolean existsByIdUser_IdUser(Integer userId);

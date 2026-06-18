@@ -20,7 +20,7 @@ const roleReturnLink = document.querySelector('#role-return-link');
 const message = document.querySelector('#form-message');
 
 function getRoleRoute() {
-	const role = (localStorage.getItem('role') || '').toUpperCase();
+	const role = (sessionStorage.getItem('role') || '').toUpperCase();
 	return ROLE_ROUTES[role] || 'login.html';
 }
 
@@ -39,16 +39,16 @@ function setRoleLink() {
 }
 
 function fillForm(profile) {
-	nameInput.value = profile.nombre || localStorage.getItem('nombre') || '';
-	emailInput.value = profile.email || localStorage.getItem('email') || '';
+	nameInput.value = profile.nombre || sessionStorage.getItem('nombre') || '';
+	emailInput.value = profile.email || sessionStorage.getItem('email') || '';
 	telefonoInput.value = profile.telefono || '';
 	domicilioInput.value = profile.domicilio || '';
 	cpInput.value = profile.cp || '';
-	localidadInput.value = localStorage.getItem('localidadPerfil') || '';
+	localidadInput.value = sessionStorage.getItem('localidadPerfil') || '';
 }
 
 async function loadProfile() {
-	const token = localStorage.getItem('token');
+	const token = sessionStorage.getItem('token');
 
 	if (!token) {
 		window.location.href = 'login.html';
@@ -67,7 +67,7 @@ async function loadProfile() {
 
 		if (!response.ok) {
 			if (response.status === 401) {
-				localStorage.clear();
+				sessionStorage.clear();
 				window.location.href = 'login.html';
 				return;
 			}
@@ -123,7 +123,7 @@ async function handleSubmit(event) {
 		return;
 	}
 
-	const token = localStorage.getItem('token');
+	const token = sessionStorage.getItem('token');
 	if (!token) {
 		window.location.href = 'login.html';
 		return;
@@ -151,7 +151,7 @@ async function handleSubmit(event) {
 
 		if (!response.ok) {
 			if (response.status === 401) {
-				localStorage.clear();
+				sessionStorage.clear();
 				window.location.href = 'login.html';
 				return;
 			}
@@ -160,9 +160,9 @@ async function handleSubmit(event) {
 			return;
 		}
 
-		localStorage.setItem('nombre', data.nombre || nameInput.value.trim());
-		localStorage.setItem('email', data.email || payload.email);
-		localStorage.setItem('localidadPerfil', payload.localidad);
+		sessionStorage.setItem('nombre', data.nombre || nameInput.value.trim());
+		sessionStorage.setItem('email', data.email || payload.email);
+		sessionStorage.setItem('localidadPerfil', payload.localidad);
 
 		showMessage('Guardando cambios');
 		setTimeout(() => {

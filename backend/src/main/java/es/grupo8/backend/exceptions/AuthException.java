@@ -1,0 +1,21 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 100%
+ */
+package es.grupo8.backend.exceptions;
+
+import org.springframework.http.HttpStatus;
+
+public class AuthException extends RuntimeException {
+
+    private final HttpStatus status;
+
+    public AuthException(HttpStatus status, String message) {
+        super(message);
+        this.status = status;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
+}

@@ -1,4 +1,7 @@
-﻿let selectedCampaign = null;
+﻿﻿/* Extract token from URL params (used when navigating from the SSR coordinator portal). */
+handleUrlTokenParams();
+
+let selectedCampaign = null;
 
 
 document.addEventListener('DOMContentLoaded', () => {

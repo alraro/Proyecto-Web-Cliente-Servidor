@@ -1,7 +1,7 @@
 ﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'ADMINISTRADOR') {
+    if (!sessionStorage.getItem('token') || sessionStorage.getItem('role') !== 'ADMINISTRADOR') {
         window.location.href = 'login.html';
         return;
     }
@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
     const nameFromQuery  = params.get('nombre');
-    if (tokenFromQuery) localStorage.setItem('token', tokenFromQuery);
-    if (nameFromQuery)  localStorage.setItem('nombre', nameFromQuery);
+    if (tokenFromQuery) sessionStorage.setItem('token', tokenFromQuery);
+    if (nameFromQuery)  sessionStorage.setItem('nombre', nameFromQuery);
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     const campaignSelect  = document.querySelector('#campaign-select');
     const btnLoad         = document.querySelector('#btn-load');
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'btn btn-sm btn-danger';
-            btn.setAttribute('data-userid', captain.userId);
+            btn.setAttribute('data-userid', captain.idUser);
             btn.setAttribute('data-role', 'CAPTAIN');
             btn.textContent = 'Eliminar';
             tdAction.appendChild(btn);
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectEl.appendChild(defaultOption);
         (users || []).forEach(user => {
             const option = document.createElement('option');
-            option.value = String(user.userId);
+            option.value = String(user.idUser);
             option.textContent = user.name + ' (' + user.email + ')';
             selectEl.appendChild(option);
         });

@@ -90,6 +90,4 @@ public class UserEntity {
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
-
-    
 }

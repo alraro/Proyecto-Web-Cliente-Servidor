@@ -1,104 +1,87 @@
-import { useState } from 'react';
-import GestionVoluntarios from './pages/responsable/GestionVoluntarios';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Admin from './pages/admin/Admin';
+import Dashboard from './pages/admin/AdminDashboard';
+import AdminChains from './pages/admin/AdminChains';
+import AdminStores from './pages/admin/AdminStores';
+import AdminCampaigns from './pages/admin/AdminCampaings';
+import Campaigns from './pages/admin/Campaigns';
+import AdminCreateUser from './pages/admin/AdminCreateUser';
+import AdminIncidents from './pages/admin/AdminIncidents';
+import AdminVolunteers from './pages/admin/AdminVolunteers';
+import Coordinator from './pages/coordinator/Coordinator';
+import CreateShift from './pages/coordinator/CreateShift';
+import ShiftsCalendar from './pages/coordinator/ShiftsCalendar';
+import Captain from './pages/captain/Captain';
+import Colaborator from './pages/colaborator/Colaborator';
+import ColaboradorEntity from './pages/colaborator/ColaboradorEntity';
+import ColaboradorVolunteers from './pages/colaborator/ColaboradorVolunteers';
+import ColaboradorCampaigns from './pages/colaborator/ColaboradorCampaigns';
+import Responsible from './pages/responsible/ResponsibleStore';
+import ErrorPage from './pages/ErrorPage';
+import Edit from './pages/Edit.jsx';
+
 import './App.css';
+import { RutaProtegida } from './pages/auth/RutaProtegida';
+import { ProveedorAuten } from './pages/auth/ProveedorAuten';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'volunteers':
-        return <GestionVoluntarios />;
-      default:
-        return <HomePage onNavigate={setCurrentPage} />;
-    }
-  };
-
-  return renderPage();
-}
-
-function HomePage({ onNavigate }) {
   return (
-    <div className="home-page">
-      <header className="topbar">
-        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
-          <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" className="logo" />
-        </a>
-        <nav className="main-nav">
-          <a href="#" className="active">Inicio</a>
-        </nav>
-      </header>
+    <ProveedorAuten>
+      <BrowserRouter>
+        <Routes>
 
-      <main>
-        <section className="hero">
-          <div className="hero-copy">
-            <span className="eyebrow">Banco de alimentos de Málaga</span>
-            <h1>Bancosol transforma excedentes en ayuda real para miles de familias.</h1>
-            <p>
-              Somos una red solidaria que recupera alimentos, coordina voluntariado y distribuye recursos a
-              entidades sociales para que nadie se quede atrás.
-            </p>
-            <div className="hero-actions">
-              <a className="primary-action" href="#" onClick={(e) => { e.preventDefault(); onNavigate('volunteers'); }}>
-                Gestión de Voluntarios
-              </a>
-            </div>
-          </div>
+          {/* Account management routes */}
+          <Route index element={<Index />} /> 
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/edit" element={<Edit />} />
+          
+          {/* Admin routes */}
+          <Route element={<RutaProtegida roles={['ADMINISTRADOR']} />}>
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/campaigns" element={<AdminCampaigns />} />
+            <Route path="/admin/view-campaigns" element={<Campaigns />} />
+            <Route path="/admin/chains" element={<AdminChains />} />
+            <Route path="/admin/stores" element={<AdminStores />} />
+            <Route path="/admin/volunteers" element={<AdminVolunteers />} />
+            <Route path="/admin/create-user" element={<AdminCreateUser />} />
+            <Route path="/admin/incidents" element={<AdminIncidents />} />
+          </Route>
 
-          <aside className="hero-panel">
-            <div className="panel-card panel-card-dark">
-              <p>Misión principal</p>
-              <h2>Recuperar y repartir</h2>
-              <span>Con dignidad y transparencia</span>
-            </div>
-            <div className="panel-card">
-              <p>Zona de responsables</p>
-              <ul>
-                <li><span>Gestionar voluntarios de mi entidad</span></li>
-                <li><span>Ver campañas asignadas</span></li>
-                <li><span>Administrar turnos</span></li>
-              </ul>
-            </div>
-          </aside>
-        </section>
+          {/* Coordinator routes */}
+          <Route element={<RutaProtegida roles={['COORDINADOR']} />}>
+            <Route path="/coordinator" element={<Coordinator />} />
+            <Route path="/coordinator/create-shift" element={<CreateShift />} />
+            <Route path="/coordinator/shifts-calendar" element={<ShiftsCalendar />} />
+          </Route>
 
-        <section className="section-block">
-          <div className="section-heading">
-            <span className="eyebrow">Acceso rápido</span>
-            <h2>¿Qué necesitas hacer?</h2>
-          </div>
-          <div className="service-grid">
-            <article>
-              <h3>Mis Voluntarios</h3>
-              <p>Gestiona los voluntarios vinculados a tu entidad colaboradora.</p>
-              <button className="action-btn" onClick={() => onNavigate('volunteers')}>
-                Acceder
-              </button>
-            </article>
-            <article>
-              <h3>Mis Campañas</h3>
-              <p>Consulta las campañas activas de tu entidad.</p>
-              <button className="action-btn" disabled>
-                Próximamente
-              </button>
-            </article>
-            <article>
-              <h3>Mis Turnos</h3>
-              <p>Administra los turnos de voluntariado.</p>
-              <button className="action-btn" disabled>
-                Próximamente
-              </button>
-            </article>
-          </div>
-        </section>
-      </main>
+          {/* Captain routes */}
+          <Route element={<RutaProtegida roles={['CAPITAN']} />}>
+            <Route path="/captain" element={<Captain />} />
+          </Route>
 
-      <footer className="site-footer">
-        <img src="/assets/LOGO_BANCOSOL.png" alt="Logo Bancosol" className="logo" />
-        <p>Bancosol · Banco de alimentos</p>
-      </footer>
-    </div>
+          {/* Colaborator routes */}
+          <Route element={<RutaProtegida roles={['COLABORADOR']} />}>
+            <Route path="/colaborator" element={<Colaborator />} />
+            <Route path="/colaborator/entity" element={<ColaboradorEntity />} />
+            <Route path="/colaborator/volunteers" element={<ColaboradorVolunteers />} />
+            <Route path="/colaborator/campaigns" element={<ColaboradorCampaigns />} />
+          </Route>
+
+          {/* Responsible routes */}
+          <Route element={<RutaProtegida roles={['RESPONSABLE_TIENDA']} />}>
+            <Route path="/responsible" element={<Responsible />} />
+          </Route>
+
+          {/* Error page route (fallback) */}
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </BrowserRouter>
+    </ProveedorAuten>
   );
 }
-
-export default App;
+export default App

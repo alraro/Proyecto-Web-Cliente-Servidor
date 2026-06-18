@@ -1,172 +1,67 @@
+/**
+ * Controlador MVC de la vista de solicitudes de capitanes del administrador.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 85%
+ * - IA Generativa: 15%
+ */
 package es.grupo8.backend.controllers;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import es.grupo8.backend.dao.CaptainRepository;
-import es.grupo8.backend.dao.CaptainRequestRepository;
-import es.grupo8.backend.dao.UserRepository;
-import es.grupo8.backend.entity.Captain;
-import es.grupo8.backend.entity.CaptainId;
-import es.grupo8.backend.entity.CaptainRequest;
-import es.grupo8.backend.entity.UserEntity;
-import es.grupo8.backend.security.AdminGuard;
+import es.grupo8.backend.services.AdminCaptainRequestService;
+import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 
-@RestController
-@RequestMapping("/api/admin")
-public class AdminCaptainRequestController {
+@Controller
+@AllArgsConstructor
+public class AdminCaptainRequestController extends MvcSessionController {
 
-    private static final Logger auditLog = LoggerFactory.getLogger("AUDIT");
+    private final AdminCaptainRequestService adminCaptainRequestService;
 
-    @Autowired private AdminGuard               adminGuard;
-    @Autowired private CaptainRequestRepository captainRequestRepository;
-    @Autowired private UserRepository           userRepository;
-    @Autowired private CaptainRepository        captainRepository;
-
-    // ── GET /api/admin/captain-requests?status=PENDIENTE ─────────────────────
-
-    @GetMapping("/captain-requests")
-    public ResponseEntity<?> getCaptainRequests(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestParam(value = "status", defaultValue = "PENDIENTE") String status) {
-
-        if (!adminGuard.isAdmin(authHeader)) {
-            return forbidden();
+    @GetMapping("/admin-captain-requests")
+    public String adminCaptainRequests(HttpSession session, Model model) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
         }
-
-        List<CaptainRequest> requests = captainRequestRepository.findByStatus(status.toUpperCase());
-
-        List<Map<String, Object>> result = requests.stream()
-                .map(this::requestToMap)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(result);
+        model.addAttribute("pendingRequests", adminCaptainRequestService.getPendingRequests());
+        return "admin-captain-requests";
     }
 
-    // ── POST /api/admin/captain-requests/{id}/approve ─────────────────────────
-
-    @PostMapping("/captain-requests/{id}/approve")
-    public ResponseEntity<?> approveCaptainRequest(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @PathVariable Integer id) {
-
-        if (!adminGuard.isAdmin(authHeader)) {
-            return forbidden();
+    @PostMapping("/admin-captain-requests/{id}/aprobar")
+    public String approveRequest(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
         }
-
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
-
-        CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
-        if (req == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Solicitud no encontrada"));
+        Integer adminUserId = currentUserId(session);
+        try {
+            adminCaptainRequestService.approveRequest(adminUserId, id);
+            attr.addFlashAttribute("success", "Solicitud aprobada. El capitán ha sido creado.");
+        } catch (NoSuchElementException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
         }
-
-        if (!"PENDIENTE".equals(req.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Esta solicitud ya fue procesada"));
-        }
-
-        // Crear el usuario con los datos de la solicitud
-        UserEntity newUser = new UserEntity();
-        newUser.setName(req.getName());
-        newUser.setEmail(req.getEmail());
-        newUser.setPassword(req.getPasswordHash());
-        UserEntity savedUser = userRepository.save(newUser);
-
-        // Asignar rol CAPITÁN en la campaña
-        CaptainId captainId = new CaptainId();
-        captainId.setIdUser(savedUser.getIdUser());
-        captainId.setIdCampaign(req.getIdCampaign().getId());
-
-        Captain captain = new Captain();
-        captain.setId(captainId);
-        captain.setIdUser(savedUser);
-        captain.setIdCampaign(req.getIdCampaign());
-        captainRepository.save(captain);
-
-        // Marcar solicitud como aprobada
-        req.setStatus("APROBADA");
-        req.setResolvedAt(Instant.now());
-        captainRequestRepository.save(req);
-
-        auditLog.info("ACTION=APPROVE_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={} newUserId={}",
-                adminUserId, Instant.now(), id, savedUser.getIdUser());
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Capitán aprobado y creado correctamente.",
-                "userId",  savedUser.getIdUser()
-        ));
+        return "redirect:/admin-captain-requests";
     }
 
-    // ── POST /api/admin/captain-requests/{id}/reject ──────────────────────────
-
-    @PostMapping("/captain-requests/{id}/reject")
-    public ResponseEntity<?> rejectCaptainRequest(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @PathVariable Integer id) {
-
-        if (!adminGuard.isAdmin(authHeader)) {
-            return forbidden();
+    @PostMapping("/admin-captain-requests/{id}/rechazar")
+    public String rejectRequest(HttpSession session, @PathVariable Integer id, RedirectAttributes attr) {
+        if (!hasRole(session, "ADMINISTRADOR")) {
+            return "redirect:/login";
         }
-
-        Integer adminUserId = adminGuard.extractUserId(authHeader);
-
-        CaptainRequest req = captainRequestRepository.findById(id).orElse(null);
-        if (req == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Solicitud no encontrada"));
+        Integer adminUserId = currentUserId(session);
+        try {
+            adminCaptainRequestService.rejectRequest(adminUserId, id);
+            attr.addFlashAttribute("success", "Solicitud rechazada.");
+        } catch (NoSuchElementException | IllegalStateException e) {
+            attr.addFlashAttribute("error", e.getMessage());
         }
-
-        if (!"PENDIENTE".equals(req.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", "Esta solicitud ya fue procesada"));
-        }
-
-        req.setStatus("RECHAZADA");
-        req.setResolvedAt(Instant.now());
-        captainRequestRepository.save(req);
-
-        auditLog.info("ACTION=REJECT_CAPTAIN_REQUEST adminUserId={} timestamp={} requestId={}",
-                adminUserId, Instant.now(), id);
-
-        return ResponseEntity.ok(Map.of("message", "Solicitud rechazada."));
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private ResponseEntity<Map<String, String>> forbidden() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Acceso denegado"));
-    }
-
-    private Map<String, Object> requestToMap(CaptainRequest r) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id",              r.getId());
-        m.put("name",            r.getName());
-        m.put("email",           r.getEmail());
-        m.put("status",          r.getStatus());
-        m.put("createdAt",       r.getCreatedAt() != null ? r.getCreatedAt().toString() : null);
-        m.put("resolvedAt",      r.getResolvedAt() != null ? r.getResolvedAt().toString() : null);
-        m.put("campaignId",      r.getIdCampaign()    != null ? r.getIdCampaign().getId()    : null);
-        m.put("campaignName",    r.getIdCampaign()    != null ? r.getIdCampaign().getName()  : null);
-        m.put("coordinatorName", r.getIdCoordinator() != null ? r.getIdCoordinator().getName() : null);
-        return m;
+        return "redirect:/admin-captain-requests";
     }
 }

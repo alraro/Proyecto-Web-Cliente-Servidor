@@ -1,3 +1,7 @@
+/**
+ * Autores:
+ * - Alfonso Ramos Rojas: 100%
+ */
 package es.grupo8.backend.dto;
 
 public record PartnerEntityResponseDto(

@@ -98,7 +98,7 @@ CREATE TABLE administrators (
 
 CREATE TABLE partner_entity_managers (
     id_user              INT PRIMARY KEY REFERENCES user_accounts(id_user) ON DELETE CASCADE,
-    id_partner_entity INT REFERENCES partner_entities(id_partner_entity) ON DELETE CASCADE
+    id_partner_entity INT NOT NULL REFERENCES partner_entities(id_partner_entity) ON DELETE CASCADE
 );
 
 CREATE TABLE coordinators (

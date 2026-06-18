@@ -1,0 +1,88 @@
+/*
+ * Estilos generales del panel de administrador.
+ *
+ * Autores:
+ * - Hugo Herrero González: 80%
+ * - Fernando Luis Pinilla Molina: 5%
+ * - IA Generativa: 15%
+ */
+/* Admin panel overrides — loaded after common.css and layout.css */
+
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-edit {
+    background: rgba(235, 123, 49, 0.12);
+    color: var(--orange-500);
+}
+.btn-edit:hover { background: rgba(235, 123, 49, 0.22); }
+
+.btn-edit:hover { background: var(--color-error-light); color: var(--color-error-text); border-color: var(--color-error-border); }
+
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.form-group { margin-bottom: 1.1rem; }
+
+.form-group label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.toast-container {
+    gap: 0.5rem;
+    z-index: 300;
+}
+
+.toast {
+    padding: 0.8rem 1.2rem;
+    color: var(--white);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.toast-success { background: var(--color-success); }
+.toast-error { background: var(--color-error); }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.form-message {
+    color: var(--color-error);
+}
+
+#modal-error {
+    margin-top: 0.6rem;
+    color: var(--color-error-text);
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+#campaign-modal .modal-card {
+    max-width: 960px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+}
+
+@media screen and (width <= 640px) {
+    .store-dual-panel {
+        grid-template-columns: 1fr;
+    }
+}

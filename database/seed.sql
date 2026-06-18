@@ -1066,21 +1066,51 @@ INSERT INTO user_accounts (id_user, name, email, phone, password) VALUES
   (14, 'Admin Test', 'admin@bancosol.info', '600000001', 'changeme'),
   (15, 'Captain Test', 'capitan@bancosol.info', '600000002', 'changeme'),
   (16, 'Collaborator Test', 'colaborador@bancosol.info', '600000003', 'changeme'),
-  (21, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
+  (17, 'Responsible Store', 'responsable@bancosol.info', '600000005', 'changeme');
 
-INSERT INTO volunteers (id_volunteer, name, phone, email)
-VALUES (1, 'Voluntario Test', '600000010', 'voluntario@bancosol.info');
+INSERT INTO volunteers (id_volunteer, name, phone, email, address, id_partner_entity)
+VALUES
+  (1, 'Voluntario Test', '600000010', 'voluntario@bancosol.info', 'Calle Test, 1 - Málaga', 1),
+  (2, 'Laura Sánchez', '600000011', 'laura.sanchez@bancosol.info', 'Calle Larios, 12 - Málaga', 1),
+  (3, 'Miguel Torres', '600000012', 'miguel.torres@bancosol.info', 'Avenida de Andalucía, 45 - Málaga', 1),
+  (4, 'Carmen Ruiz', '600000013', 'carmen.ruiz@bancosol.info', 'Plaza de la Merced, 8 - Málaga', 1),
+  (5, 'Javier Moreno', '600000014', 'javier.moreno@bancosol.info', 'Calle Nueva, 21 - Marbella', 1),
+  (6, 'Sofía Navarro', '600000015', 'sofia.navarro@bancosol.info', 'Calle Calvario, 5 - Ronda', 1),
+  (7, 'David Herrera', '600000016', 'david.herrera@bancosol.info', 'Camino de la Corta, 14 - Málaga', 1),
+  (8, 'Elena Martín', '600000017', 'elena.martin@bancosol.info', 'Calle Córdoba, 29 - Antequera', 1),
+  (9, 'Pablo Iglesias', '600000018', 'pablo.iglesias@bancosol.info', 'Calle Tulipán, 48 - Málaga', 1),
+  (10, 'Marta Gil', '600000019', 'marta.gil@bancosol.info', 'Camino de la Corta s/n - Málaga', 2),
+  (11, 'Raúl Castro', '600000020', 'raul.castro@bancosol.info', 'Plaza de las Indias, 7 - Vélez-Málaga', 2),
+  (12, 'Lucía Vega', '600000021', 'lucia.vega@bancosol.info', 'Calle Salesianos, 6 - Málaga', 2),
+  (13, 'Andrés Molina', '600000022', 'andres.molina@bancosol.info', 'Avenida Estrella de Mar, 18 - Benalmádena', 2),
+  (14, 'Nuria Romero', '600000023', 'nuria.romero@bancosol.info', 'Plaza Hospital Civil, 1 - Málaga', 2),
+  (15, 'Carlos León', '600000024', 'carlos.leon@bancosol.info', 'Calle Jinetes, 5 - Málaga', 2),
+  (16, 'Alba Navarro', '600000025', 'alba.navarro@bancosol.info', 'Río Viñuela, 1 - Mijas Costa', 2),
+  (17, 'Diego Serrano', '600000026', 'diego.serrano@bancosol.info', 'Camino Viejo de Vélez, 5 - Rincón de la Victoria', 2),
+  (18, 'Sara Molina', '600000027', 'sara.molina@bancosol.info', 'Jaboneros, 7 - Málaga', 2),
+  (19, 'Iván Romero', '600000028', 'ivan.romero@bancosol.info', 'Calle Abul Beka, 15 - Málaga', 2),
+  (20, 'Paula Ortiz', '600000029', 'paula.ortiz@bancosol.info', 'Calle Eucalipto - Málaga', 3),
+  (21, 'Hugo Ramos', '600000030', 'hugo.ramos@bancosol.info', 'Plaza de España, 5 - Alameda', 3),
+  (22, 'Inés Prieto', '600000031', 'ines.prieto@bancosol.info', 'Calle Antonio Ruiz Rivas, 2 - Algarrobo', 3),
+  (23, 'Daniel Rubio', '600000032', 'daniel.rubio@bancosol.info', 'Calle Fuente, 2 - Algatocín', 3),
+  (24, 'Clara Domínguez', '600000033', 'clara.dominguez@bancosol.info', 'Plaza de la Constitución - Almogía', 3),
+  (25, 'Adrián Vázquez', '600000034', 'adrian.vazquez@bancosol.info', 'Calle Llanete de Abajo, 2 - Casabermeja', 3),
+  (26, 'Julia Campos', '600000035', 'julia.campos@bancosol.info', 'Plaza del Prado, 1 - Villanueva del Trabuco', 3),
+  (27, 'Marcos Prieto', '600000036', 'marcos.prieto@bancosol.info', 'Plaza del Prado, 1 - Villanueva de Algaidas', 3),
+  (28, 'Aitana Gil', '600000037', 'aitana.gil@bancosol.info', 'Avenida Pablo Ruiz Picasso, 20 - Álora', 3),
+  (29, 'Nicolás Reyes', '600000038', 'nicolas.reyes@bancosol.info', 'Calle del Calvario, s/n - Marbella', 3),
+  (30, 'Irene Blanco', '600000039', 'irene.blanco@bancosol.info', 'Mariana Pineda, 1 - Estepona', 3);
 
 INSERT INTO volunteer_shifts (id_volunteer, id_campaign, id_store, shift_day, start_time, end_time, attendance, notes)
 VALUES (1, 1, 48, '2026-05-10', '09:00', '13:00', false, 'Turno de prueba');
 
-UPDATE stores SET id_responsible = 21 WHERE id_store = 1;  
+UPDATE stores SET id_responsible = 17 WHERE id_store = 1;  
 
 INSERT INTO administrators (id_user) VALUES (14);
 
 INSERT INTO captains (id_user, id_campaign) VALUES (15, 1);
 
-INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, NULL);
+INSERT INTO partner_entity_managers (id_user, id_partner_entity) VALUES (16, 1);
 
 -- ============================================================
 -- SEQUENCE RESYNC (PostgreSQL)

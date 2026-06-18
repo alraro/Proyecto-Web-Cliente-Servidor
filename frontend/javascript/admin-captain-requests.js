@@ -1,7 +1,7 @@
 ﻿const API_BASE = 'http://localhost:8080';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
     const statusSelect  = document.querySelector('#status-select');
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await fetch(url, options);
         const data = await res.json().catch(() => ({}));
         if (res.status === 401 || res.status === 403) {
-            localStorage.clear(); window.location.href = 'login.html';
+            sessionStorage.clear(); window.location.href = 'login.html';
             throw new Error('Sesión expirada');
         }
         if (!res.ok) throw new Error(data.message || 'Error ' + res.status);

@@ -1,3 +1,11 @@
+/**
+ * Repositorio JPA de la asignación de capitanes a campañas.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 65%
+ * - Alfonso Ramos Rojas: 25%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;
@@ -11,14 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import es.grupo8.backend.entity.Campaign;
 import es.grupo8.backend.entity.Captain;
 import es.grupo8.backend.entity.CaptainId;
+import es.grupo8.backend.entity.UserEntity;
 
 public interface CaptainRepository extends JpaRepository<Captain, CaptainId> {
 
-	@Query("SELECT COUNT(c) > 0 FROM Captain c WHERE c.idUser.idUser = :userId")
-	boolean isUserCaptain(@Param("userId") Integer userId);
-
 	@Query("SELECT c.idCampaign FROM Captain c WHERE c.idUser.idUser = :userId")
 	List<Campaign> findCampaignsByUserId(@Param("userId") Integer userId);
+
+	// Users assigned as captains for a campaign
+	@Query("SELECT c.idUser FROM Captain c WHERE c.id.idCampaign = :campaignId")
+	List<UserEntity> findUsersByCampaignId(@Param("campaignId") Integer campaignId);
 
 	List<Captain> findByIdIdCampaign(Integer idCampaign);
 

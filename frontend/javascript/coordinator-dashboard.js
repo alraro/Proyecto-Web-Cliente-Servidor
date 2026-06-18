@@ -1,11 +1,14 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
+﻿/* Bootstrap auth from URL params (when navigating from the SSR portal). */
+handleUrlTokenParams();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const token = sessionStorage.getItem('token');
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
-    const nombre = localStorage.getItem('nombre') || 'Coordinador';
+    const nombre = sessionStorage.getItem('nombre') || 'Coordinador';
     const welcomeNameEl = document.querySelector('#welcome-name');
 
     if (welcomeNameEl) welcomeNameEl.textContent = nombre;

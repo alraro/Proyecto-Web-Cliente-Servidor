@@ -1,3 +1,11 @@
+/**
+ * Repositorio JPA de voluntarios.
+ *
+ * Autores:
+ * - Fernando Luis Pinilla Molina: 50%
+ * - Alfonso Ramos Rojas: 40%
+ * - IA Generativa: 10%
+ */
 package es.grupo8.backend.dao;
 
 import java.util.List;
@@ -11,8 +19,6 @@ import es.grupo8.backend.entity.Volunteer;
 public interface VolunteerRepository extends JpaRepository<Volunteer, Integer> {
 
     List<Volunteer> findByIdPartnerEntity_Id(Integer partnerEntityId);
-
-    List<Volunteer> findByIdPartnerEntityIsNull();
 
     List<Volunteer> findAllByOrderByNameAsc();
 }
